@@ -1,4 +1,5 @@
 #include "CameraScene.hpp"
+#include "Scene.hpp"
 
 namespace KikooRenderer {
 namespace CoreEngine {
@@ -20,8 +21,7 @@ glm::dmat4 CameraScene::GetProjectionMatrix() {
 }
 
 glm::dmat4 CameraScene::GetViewMatrix() {
-    glm::dmat4 res = glm::dmat4(1.0);
-    return res;
+    return glm::inverse(this->transform.GetModelMatrix());  
 }
 
 glm::dmat4 CameraScene::GetModelTransform() {
@@ -30,6 +30,20 @@ glm::dmat4 CameraScene::GetModelTransform() {
 
 void CameraScene::UpdateProjectionMatrix() {
     this->projectionMatrix = glm::perspective(this->fov, this->aspect, this->nearClip, this->farClip);     
+}
+
+void CameraScene::OnKeyPressEvent(QKeyEvent *e){
+    if(e->key() == Qt::Key_Z) {
+        this->transform.position.y+=0.1;
+    } else if(e->key() == Qt::Key_S) {
+        this->transform.position.y-=0.1;
+    } else if(e->key() == Qt::Key_Q) {
+        this->transform.position.x-=0.1;
+    } else if(e->key() == Qt::Key_D) {
+        this->transform.position.x+=0.1;
+    }   
+     
+    scene->triggerRefresh = true;
 }
 
 }

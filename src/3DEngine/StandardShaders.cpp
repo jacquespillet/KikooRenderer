@@ -25,7 +25,7 @@ out float fragmentDepth;
 void main()
 {
 	//compute outputs
-	fragmentColor = vec4(0.0, 1.0, 0.0, 1.0);
+	fragmentColor = color;
 	vec4 finalPosition = modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
 	gl_Position = vec4(finalPosition.x, finalPosition.y, finalPosition.z, 1.0f);
 }

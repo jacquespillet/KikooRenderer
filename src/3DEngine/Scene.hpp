@@ -10,6 +10,8 @@
 namespace KikooRenderer {
 namespace CoreEngine {
 class Object3D;
+class CameraScene;
+
 class Scene {
     public: 
         Scene();
@@ -43,6 +45,8 @@ class Scene {
 
 		int windowHeight;
 		int windowWidth;
+
+		bool triggerRefresh = true;
 
 };
 

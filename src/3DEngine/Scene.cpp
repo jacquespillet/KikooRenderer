@@ -25,32 +25,35 @@ namespace CoreEngine {
         std::vector<glm::dvec4> colors;
         std::vector<int> triangles;
 
-        //Front 1
+        //Front
         vertex.push_back(glm::dvec3(-0.5, -0.5, -0.5)); //bottom left
         vertex.push_back(glm::dvec3(-0.5, 0.5, -0.5)); // top left
         vertex.push_back(glm::dvec3(0.5, 0.5, -0.5)); //Top right
         vertex.push_back(glm::dvec3(0.5, -0.5, -0.5)); //Bottom right
+
+
+        //Front
         normals.push_back(glm::dvec3(0, 0, 1));
         normals.push_back(glm::dvec3(0, 0, 1));
         normals.push_back(glm::dvec3(0, 0, 1));
         normals.push_back(glm::dvec3(0, 0, 1));
+        
+        //Front
         uv.push_back(glm::dvec2(0, 0));
         uv.push_back(glm::dvec2(0, 0));
         uv.push_back(glm::dvec2(0, 0));
         uv.push_back(glm::dvec2(0, 0));
+        
+        //Front
         colors.push_back(glm::dvec4(255.0, 0, 0, 255));
         colors.push_back(glm::dvec4(0.0, 255, 0, 255));
         colors.push_back(glm::dvec4(0.0, 0, 255, 255));
         colors.push_back(glm::dvec4(255.0, 0, 0, 255));
-        // colors.push_back(glm::dvec4(1.0, 0, 0, 1));
-        // colors.push_back(glm::dvec4(1.0, 0, 0, 1));
-        // colors.push_back(glm::dvec4(1.0, 0, 0, 1));
-        // colors.push_back(glm::dvec4(1.0, 0, 0, 1));
 
+        //Front
         triangles.push_back(0);
         triangles.push_back(2);
         triangles.push_back(1);
-
         triangles.push_back(3);
         triangles.push_back(2);
         triangles.push_back(0);
@@ -78,7 +81,7 @@ namespace CoreEngine {
     void Scene::Render() {
         GETGL
         ogl->glClearColor(100, 0, 0, 0);
-        // ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //Render each object
         for(int i=0; i<objects3D.size(); i++) {
@@ -108,8 +111,9 @@ namespace CoreEngine {
 
 
     void Scene::OnKeyPressEvent(QKeyEvent *e){
-    	OnKeyPressEvent(e);
-        std::cout << "key" << std::endl;
+    	//Foreach object : 
+        //  OnKeyPress
+        this->camera.OnKeyPressEvent(e);
     }
 
     void Scene::SetWindowSize(int w, int h) {

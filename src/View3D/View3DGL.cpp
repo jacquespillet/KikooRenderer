@@ -58,12 +58,12 @@ namespace KikooRenderer {
 
         connect(timer, &QTimer::timeout, [this]() {
             makeCurrent();
-            // scene->Update();
+            scene->OnUpdate();
 
-            // if(scene->triggerRefresh) {
-            //     Refresh();
-            //     scene->triggerRefresh=false;
-            // }
+            if(scene->triggerRefresh) {
+                Refresh();
+                scene->triggerRefresh=false;
+            }
 
             doneCurrent();
         });
@@ -105,7 +105,7 @@ namespace KikooRenderer {
 
     //Event Listeners
     void View3DGL::keyPressEvent(QKeyEvent *e) {
-
+        scene->OnKeyPressEvent(e);
     }
 
     void View3DGL::keyReleaseEvent(QKeyEvent *e) {

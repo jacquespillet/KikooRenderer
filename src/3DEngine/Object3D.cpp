@@ -29,7 +29,6 @@ void Object3D::Enable() {
 }
 
 Component* Object3D::GetComponent(std::string name) {
-	std::cout << components.size() << std::endl;
 	for(int i=0; i<components.size(); i++) { 
 		if(components[i]->name == name) {
 			return components[i];
@@ -47,6 +46,7 @@ void Object3D::Render() {
 	glm::mat4 vMatrix = scene->camera.GetViewMatrix();
 	glm::mat4 pMatrix = scene->camera.GetProjectionMatrix();
 	glm::mat4 mvpMatrix = pMatrix * vMatrix * mMatrix;
+
 
 	//
 	//Set GL states
