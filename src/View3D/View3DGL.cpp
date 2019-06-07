@@ -84,8 +84,8 @@ namespace KikooRenderer {
         windowWidth = w;
         windowHeight = h;
 
-        // scene->SetWindowSize(w, h);
-
+        scene->SetWindowSize(w, h);
+        
         Refresh();
     }
 

@@ -9,7 +9,8 @@ namespace CoreEngine {
 class Scene;
 class CameraScene{
     public: 
-        CameraScene(Scene* scene, double eyeDistance, double fov, double near, double far);
+        CameraScene(Scene* scene, double eyeDistance, double fov, double near, double far, double aspect);
+        
         CameraScene(){
             std::cout <<"build camera" << std::endl;            
         }
@@ -18,13 +19,16 @@ class CameraScene{
         double fov;
         double nearClip;
         double farClip;
+        double aspect;
         glm::mat4 projectionMatrix;
-        // TransformComponent transform;
+        TransformComponent transform;
 
 
         glm::dmat4 GetProjectionMatrix();
         glm::dmat4 GetViewMatrix();
         glm::dmat4 GetModelTransform();
+        
+        void UpdateProjectionMatrix();
 };
 
 }

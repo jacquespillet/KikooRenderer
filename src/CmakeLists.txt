@@ -13,7 +13,9 @@ set(MainWindowSrc
 	3DEngine/Shader.cpp
 	3DEngine/StandardShaders.cpp
 	3DEngine/CameraScene.cpp
-	
+	3DEngine/Util.cpp
+
+	Geometry/Util.cpp	
 )
 
 add_executable(MainWindow ${MainWindowSrc})

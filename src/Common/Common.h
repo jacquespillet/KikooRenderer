@@ -63,6 +63,7 @@
 #include <glm/mat4x4.hpp> // glm::mat4
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include <glm/ext.hpp>
+#include <glm/gtx/string_cast.hpp>
 
  //std lib
 #include <stdint.h>

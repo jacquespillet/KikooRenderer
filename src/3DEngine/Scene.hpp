@@ -14,8 +14,10 @@ class Scene {
     public: 
         Scene();
         void Start();
-        void Enable();
 		void Render();
+        void Enable();
+        // void Disable();
+        // void Destroy();
         bool started;
 
 		std::vector<Object3D*> objects3D; 
@@ -30,12 +32,18 @@ class Scene {
 		void virtual OnDisable(){};
 		void virtual OnDestroy(){};
 		
-		virtual void OnKeyPressEvent(QKeyEvent *e){}
+		virtual void OnKeyPressEvent(QKeyEvent *e);
 		virtual void OnKeyReleaseEvent(QKeyEvent *e){}
 		virtual void OnMousePressEvent(QMouseEvent *e){}
 		virtual void OnMouseReleaseEvent(QMouseEvent *e){}
 		virtual void OnMouseMoveEvent(QMouseEvent *e){}
-		virtual void OnWheelEvent(QWheelEvent *event){}        
+		virtual void OnWheelEvent(QWheelEvent *event){}       
+
+		void SetWindowSize(int w, int h);
+
+		int windowHeight;
+		int windowWidth;
+
 };
 
 
