@@ -14,6 +14,8 @@ CameraScene::CameraScene(Scene* _scene, double _eyeDistance, double _fov, double
 
     UpdateProjectionMatrix();
 
+    this->transform.position.z = -5;
+
 }
 
 glm::dmat4 CameraScene::GetProjectionMatrix() {
@@ -29,19 +31,27 @@ glm::dmat4 CameraScene::GetModelTransform() {
 }
 
 void CameraScene::UpdateProjectionMatrix() {
-    this->projectionMatrix = glm::perspective(this->fov, this->aspect, this->nearClip, this->farClip);     
+    this->projectionMatrix = glm::perspectiveLH(this->fov, this->aspect, this->nearClip, this->farClip);     
 }
 
 void CameraScene::OnKeyPressEvent(QKeyEvent *e){
     if(e->key() == Qt::Key_Z) {
-        this->transform.position.y+=0.1;
+        this->transform.position.z+=0.1;
     } else if(e->key() == Qt::Key_S) {
-        this->transform.position.y-=0.1;
+        this->transform.position.z-=0.1;
     } else if(e->key() == Qt::Key_Q) {
         this->transform.position.x-=0.1;
     } else if(e->key() == Qt::Key_D) {
         this->transform.position.x+=0.1;
-    }   
+    }   else if(e->key() == Qt::Key_Up) {
+        this->transform.position.y+=0.1;
+    }   else if(e->key() == Qt::Key_Down) {
+        this->transform.position.y-=0.1;
+    }   else if(e->key() == Qt::Key_Right) {
+        this->transform.rotation.y+=1.0;
+    }   else if(e->key() == Qt::Key_Left) {
+        this->transform.rotation.y-=1.0;
+    }      
      
     scene->triggerRefresh = true;
 }

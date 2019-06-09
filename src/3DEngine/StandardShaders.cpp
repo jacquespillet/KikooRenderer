@@ -27,7 +27,7 @@ void main()
 	//compute outputs
 	fragmentColor = color;
 	vec4 finalPosition = modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
-	gl_Position = vec4(finalPosition.x, finalPosition.y, finalPosition.z, 1.0f);
+	gl_Position = vec4(finalPosition.x, finalPosition.y, finalPosition.z, finalPosition.w);
 }
 )";
 
