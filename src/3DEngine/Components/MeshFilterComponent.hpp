@@ -15,7 +15,7 @@ class MeshFilterComponent : public Component {
 			unsigned char r, g, b, a; 
 		};    
 
-        MeshFilterComponent();
+        MeshFilterComponent(Object3D* object);
         void OnStart();
         void OnEnable();
         void OnUpdate();

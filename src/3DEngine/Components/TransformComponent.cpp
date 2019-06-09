@@ -3,7 +3,7 @@
 namespace KikooRenderer {
 namespace CoreEngine {
 
-TransformComponent::TransformComponent() : Component("Transform") {
+TransformComponent::TransformComponent(Object3D* object) : Component("Transform", object) {
     position = glm::dvec3(0, 0, 0);
     rotation = glm::dvec3(0, 0, 0);
     scale = glm::dvec3(1, 1, 1);   

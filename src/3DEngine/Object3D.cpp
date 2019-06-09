@@ -1,4 +1,5 @@
 #include "Object3D.hpp"
+#include "Components/MaterialComponent.hpp"
 
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLFunctions_3_2_Core>
@@ -34,19 +35,18 @@ Component* Object3D::GetComponent(std::string name) {
 			return components[i];
 		}
 	}
+	return nullptr;
 }
 
 void Object3D::Render() {
 	GETGL
-	//GET MODEL MATRIX FROM TRANSFORM COMPONENT
+	
 	TransformComponent* transform = (TransformComponent*)(this->GetComponent("Transform")); 
 	glm::mat4 mMatrix = transform->GetModelMatrix();
 	
-	// glm::mat4 mMatrix = glm::mat4(1.0);
 	glm::mat4 vMatrix = scene->camera.GetViewMatrix();
 	glm::mat4 pMatrix = scene->camera.GetProjectionMatrix();
 	glm::mat4 mvpMatrix = pMatrix * vMatrix * mMatrix;
-
 
 	//
 	//Set GL states
@@ -62,20 +62,21 @@ void Object3D::Render() {
 	//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-	//
-	//update shader state and bind
-	//
 	
 	//IF NO MATERIAL COMPONENT : STANDARD SHADER
 	//bind shader
-	ogl->glUseProgram(scene->standardShaders.unlitMeshShader.programShaderObject);
-	
-	//update mvp transform uniform in shader
-	int modelViewProjectionMatrixLocation = ogl->glGetUniformLocation(scene->standardShaders.unlitMeshShader.programShaderObject, "modelViewProjectionMatrix"); 
-	ogl->glUniformMatrix4fv(modelViewProjectionMatrixLocation, 1, false, glm::value_ptr(mvpMatrix));
-	
-	//materialColor
+	// ogl->glUseProgram(scene->standardShaders.unlitMeshShader.programShaderObject);
+	// int modelViewProjectionMatrixLocation = ogl->glGetUniformLocation(scene->standardShaders.unlitMeshShader.programShaderObject, "modelViewProjectionMatrix"); 
+	// ogl->glUniformMatrix4fv(modelViewProjectionMatrixLocation, 1, false, glm::value_ptr(mvpMatrix));
 	// ogl->glUniform4f(ogl->glGetUniformLocation(scene->standardShaders.lineShader.programShaderObject, "materialColor"), 1, 1, 1, 1);
+	
+	MaterialComponent* material = (MaterialComponent*)(this->GetComponent("Material"));
+	if(material == nullptr) {
+		material = new MaterialComponent(this);
+		material->SetShader(&scene->standardShaders.unlitMeshShader);
+		this->AddComponent(material);
+	}
+	material->SetupShaderUniforms(mMatrix, vMatrix, pMatrix, this->scene);
 
 	//
 	//Draw

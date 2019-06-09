@@ -7,7 +7,7 @@ namespace CoreEngine {
 class Component;
 class TransformComponent : public Component {
     public: 
-        TransformComponent();
+        TransformComponent(Object3D* object);
         void OnStart();
         void OnEnable();
         void OnUpdate();

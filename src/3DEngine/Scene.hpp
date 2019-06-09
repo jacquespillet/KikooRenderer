@@ -1,11 +1,11 @@
 #pragma once
 
 #include "Common/Common.h"
-#include "Component.hpp"
+#include "Components/Component.hpp"
 #include "Object3D.hpp"
 #include "StandardShaders.hpp"
 #include "CameraScene.hpp"
-#include "MeshFilterComponent.hpp"
+#include "Components/MeshFilterComponent.hpp"
 
 namespace KikooRenderer {
 namespace CoreEngine {

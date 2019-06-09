@@ -10,7 +10,7 @@ class Component  {
         std::string name;
         Object3D* object3D;
 
-        Component(std::string name);
+        Component(std::string name, Object3D* object);
         virtual void OnStart()=0;
         virtual void OnEnable()=0;
         virtual void OnUpdate()=0;

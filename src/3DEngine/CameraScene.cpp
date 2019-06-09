@@ -4,7 +4,7 @@
 namespace KikooRenderer {
 namespace CoreEngine {
 
-CameraScene::CameraScene(Scene* _scene, double _eyeDistance, double _fov, double _near, double _far, double _aspect){
+CameraScene::CameraScene(Scene* _scene, double _eyeDistance, double _fov, double _near, double _far, double _aspect) :  transform(TransformComponent(nullptr))  {
     this->scene = _scene;
     this->eyeDistance = _eyeDistance;
     this->fov = _fov;

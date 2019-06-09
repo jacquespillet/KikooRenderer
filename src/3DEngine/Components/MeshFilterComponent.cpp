@@ -8,7 +8,7 @@
 namespace KikooRenderer {
 namespace CoreEngine {
 
-MeshFilterComponent::MeshFilterComponent() : Component("MeshFilter") {
+MeshFilterComponent::MeshFilterComponent(Object3D* object) : Component("MeshFilter", object) {
     inited= false;
 }
 void MeshFilterComponent::OnStart(){}

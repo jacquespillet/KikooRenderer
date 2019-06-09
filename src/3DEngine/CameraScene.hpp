@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Common/Common.h"
-#include "TransformComponent.hpp"
+#include "Components/TransformComponent.hpp"
 
 namespace KikooRenderer {
 namespace CoreEngine {
@@ -10,7 +10,7 @@ class CameraScene{
     public: 
         CameraScene(Scene* scene, double eyeDistance, double fov, double near, double far, double aspect);
         
-        CameraScene(){
+        CameraScene() :  transform(TransformComponent(nullptr)) {
         }
         Scene* scene;
         double eyeDistance;
