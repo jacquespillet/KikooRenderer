@@ -24,6 +24,7 @@ class Object3D {
         void OnStart();
         void Enable();
         void Render();
+        void Update();
 };
 }
 

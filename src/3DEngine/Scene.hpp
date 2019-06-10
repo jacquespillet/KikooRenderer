@@ -28,7 +28,7 @@ class Scene {
 
 
 		void virtual OnStart(){};
-		void virtual OnUpdate(){};
+		void virtual OnUpdate();
 		void virtual OnRender(){};
 		void virtual OnEnable(){};
 		void virtual OnDisable(){};

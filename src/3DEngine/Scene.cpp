@@ -43,13 +43,11 @@ namespace CoreEngine {
         }
     }
 
-    //Update : 
-    //Foreach object 
-    //  If not started :
-    //      Start it
-    //      Enable it
-    //Foreach object
-    //  Update 
+    void Scene::OnUpdate() {
+        for(int i=0; i<objects3D.size(); i++) {
+            objects3D[i]->Update();            
+        }
+    }
 
     //AddObject
 

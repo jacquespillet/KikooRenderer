@@ -31,7 +31,12 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 
 	int modelViewProjectionMatrixLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "modelViewProjectionMatrix"); 
 	ogl->glUniformMatrix4fv(modelViewProjectionMatrixLocation, 1, false, glm::value_ptr(mvpMatrix));
+    
 
+    //Shader->GetUniformVariables()->setVariables();
+    
+	int albedoLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "albedo"); 
+	ogl->glUniform4fv(albedoLocation, 1, glm::value_ptr(albedo));
 }
 }
 }

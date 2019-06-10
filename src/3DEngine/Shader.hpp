@@ -27,6 +27,9 @@ class Shader
 		int programShaderObject;
 		int vertexShaderObject;
 		int fragmentShaderObject;
+
+		//ShaderUniformsObject
+		//	ShaderUniformObjects->setAllUniforms();
 		
 		Shader();
 		void Compile();

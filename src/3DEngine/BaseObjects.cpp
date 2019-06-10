@@ -145,40 +145,40 @@ Object3D* GetCube(Scene* scene) {
     //
 
     //Front
-    colors.push_back(glm::dvec4(255.0, 0, 0, 255));
-    colors.push_back(glm::dvec4(0.0, 255, 0, 255));
-    colors.push_back(glm::dvec4(0.0, 0, 255, 255));
-    colors.push_back(glm::dvec4(255.0, 0, 0, 255));
+    colors.push_back(glm::dvec4(255, 0, 0, 255));
+    colors.push_back(glm::dvec4(0, 255, 0, 255));
+    colors.push_back(glm::dvec4(0, 0, 255, 255));
+    colors.push_back(glm::dvec4(255, 0, 0, 255));
     
     //Back
-    colors.push_back(glm::dvec4(255.0, 0, 0, 255));
-    colors.push_back(glm::dvec4(0.0, 255, 0, 255));
-    colors.push_back(glm::dvec4(0.0, 0, 255, 255));
-    colors.push_back(glm::dvec4(255.0, 0, 0, 255));
+    colors.push_back(glm::dvec4(255, 0, 0, 255));
+    colors.push_back(glm::dvec4(0, 255, 0, 255));
+    colors.push_back(glm::dvec4(0, 0, 255, 255));
+    colors.push_back(glm::dvec4(255, 0, 0, 255));
     
     //Right
-    colors.push_back(glm::dvec4(255.0, 0, 0, 255));
-    colors.push_back(glm::dvec4(0.0, 255, 0, 255));
-    colors.push_back(glm::dvec4(0.0, 0, 255, 255));
-    colors.push_back(glm::dvec4(255.0, 0, 0, 255));
+    colors.push_back(glm::dvec4(255, 0, 0, 255));
+    colors.push_back(glm::dvec4(0, 255, 0, 255));
+    colors.push_back(glm::dvec4(0, 0, 255, 255));
+    colors.push_back(glm::dvec4(255, 0, 0, 255));
     
     //Left
-    colors.push_back(glm::dvec4(255.0, 0, 0, 255));
-    colors.push_back(glm::dvec4(0.0, 255, 0, 255));
-    colors.push_back(glm::dvec4(0.0, 0, 255, 255));
-    colors.push_back(glm::dvec4(255.0, 0, 0, 255));
+    colors.push_back(glm::dvec4(255, 0, 0, 255));
+    colors.push_back(glm::dvec4(0, 255, 0, 255));
+    colors.push_back(glm::dvec4(0, 0, 255, 255));
+    colors.push_back(glm::dvec4(255, 0, 0, 255));
     
     //Top
-    colors.push_back(glm::dvec4(255.0, 0, 0, 255));
-    colors.push_back(glm::dvec4(0.0, 255, 0, 255));
-    colors.push_back(glm::dvec4(0.0, 0, 255, 255));
-    colors.push_back(glm::dvec4(255.0, 0, 0, 255));
+    colors.push_back(glm::dvec4(255, 0, 0, 255));
+    colors.push_back(glm::dvec4(0, 255, 0, 255));
+    colors.push_back(glm::dvec4(0, 0, 255, 255));
+    colors.push_back(glm::dvec4(255, 0, 0, 255));
     
     //Bottom
-    colors.push_back(glm::dvec4(255.0, 0, 0, 255));
-    colors.push_back(glm::dvec4(0.0, 255, 0, 255));
-    colors.push_back(glm::dvec4(0.0, 0, 255, 255));
-    colors.push_back(glm::dvec4(255.0, 0, 0, 255));
+    colors.push_back(glm::dvec4(255, 0, 0, 255));
+    colors.push_back(glm::dvec4(0, 255, 0, 255));
+    colors.push_back(glm::dvec4(0, 0, 255, 255));
+    colors.push_back(glm::dvec4(255, 0, 0, 255));
 
 
     //
@@ -243,6 +243,7 @@ Object3D* GetCube(Scene* scene) {
     
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
+    material->albedo = glm::vec4(0.0, 1.0, 0.0, 1.0);
     material->SetShader(&scene->standardShaders.unlitMeshShader);
 
     newObject->AddComponent(material);

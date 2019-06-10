@@ -18,7 +18,8 @@ class MaterialComponent : public Component {
         void SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 viewMatrix, glm::dmat4 projectionMatrix, Scene* scene);
 
         Shader* shader;
-    private: 
+
+        glm::vec4 albedo;
 };
 }
 }

@@ -58,7 +58,7 @@ namespace KikooRenderer {
 
         connect(timer, &QTimer::timeout, [this]() {
             makeCurrent();
-            scene->OnUpdate();
+            scene->OnUpdate();  
 
             if(scene->triggerRefresh) {
                 Refresh();

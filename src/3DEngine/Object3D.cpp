@@ -29,6 +29,12 @@ void Object3D::Enable() {
     }
 }
 
+void Object3D::Update() {
+    for(int i=0; i<components.size(); i++) {
+        components[i]->OnUpdate();
+    }
+}
+
 Component* Object3D::GetComponent(std::string name) {
 	for(int i=0; i<components.size(); i++) { 
 		if(components[i]->name == name) {
@@ -63,13 +69,7 @@ void Object3D::Render() {
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
 	
-	//IF NO MATERIAL COMPONENT : STANDARD SHADER
 	//bind shader
-	// ogl->glUseProgram(scene->standardShaders.unlitMeshShader.programShaderObject);
-	// int modelViewProjectionMatrixLocation = ogl->glGetUniformLocation(scene->standardShaders.unlitMeshShader.programShaderObject, "modelViewProjectionMatrix"); 
-	// ogl->glUniformMatrix4fv(modelViewProjectionMatrixLocation, 1, false, glm::value_ptr(mvpMatrix));
-	// ogl->glUniform4f(ogl->glGetUniformLocation(scene->standardShaders.lineShader.programShaderObject, "materialColor"), 1, 1, 1, 1);
-	
 	MaterialComponent* material = (MaterialComponent*)(this->GetComponent("Material"));
 	if(material == nullptr) {
 		material = new MaterialComponent(this);

@@ -17,7 +17,7 @@ layout(location = 2) in vec2 uv;
 layout(location = 3) in vec4 color;
 //transforms
 uniform mat4 modelViewProjectionMatrix;
-uniform vec4 materialColor; 
+uniform vec4 albedo; 
 //outputs
 out vec4 fragmentColor;  
 out float fragmentDepth;
@@ -25,7 +25,7 @@ out float fragmentDepth;
 void main()
 {
 	//compute outputs
-	fragmentColor = color;
+	fragmentColor = albedo;
 	vec4 finalPosition = modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
 	gl_Position = vec4(finalPosition.x, finalPosition.y, finalPosition.z, finalPosition.w);
 }
