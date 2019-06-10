@@ -10,6 +10,7 @@ namespace CoreEngine {
 
 MeshFilterComponent::MeshFilterComponent(Object3D* object) : Component("MeshFilter", object) {
     inited= false;
+	drawingMode = GL_TRIANGLES;
 }
 void MeshFilterComponent::OnStart(){}
 void MeshFilterComponent::OnEnable(){
@@ -30,7 +31,7 @@ void MeshFilterComponent::OnRender(){
 	//
 	
 	//draw elements
-	ogl->glDrawElements(GL_TRIANGLES, triangles.size(), GL_UNSIGNED_INT, (void*)0);
+	ogl->glDrawElements(drawingMode, triangles.size(), GL_UNSIGNED_INT, (void*)0);
 	
 	//
 	//unbind VAO

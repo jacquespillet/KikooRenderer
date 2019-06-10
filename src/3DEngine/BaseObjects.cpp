@@ -348,15 +348,15 @@ Object3D* GetCircle(Scene* scene) {
     std::vector<int> triangles;
 
 
-    uint32_t numPoints = 16;
+    uint32_t numSlices = 16;
 
     vertex.push_back(glm::dvec3(0, 0, 0));
     normals.push_back(glm::dvec3(0, 0, -1));
     uv.push_back(glm::dvec2(0, 0));
     colors.push_back(glm::dvec4(255, 255, 255, 255));
 
-    for(uint32_t i=0; i<=numPoints; i++) {
-        float inx = ((float)i / (float)numPoints) * TWO_PI;
+    for(uint32_t i=0; i<=numSlices; i++) {
+        float inx = ((float)i / (float)numSlices) * TWO_PI;
         float x = std::cos(inx);
         float y = std::sin(inx);
 
@@ -370,7 +370,7 @@ Object3D* GetCircle(Scene* scene) {
         triangles.push_back(0);
     }
     
-    triangles.push_back(numPoints);
+    triangles.push_back(numSlices);
     triangles.push_back(1);
     triangles.push_back(0);
     //Setup mesh
@@ -392,6 +392,60 @@ Object3D* GetCircle(Scene* scene) {
     return newObject;
 }
 
+Object3D* GetSphere(Scene* scene) {
+    //Start each Object3D in scene
+    Object3D* newObject = new Object3D("Quad", scene);
+    std::vector<glm::dvec3> vertex;
+    std::vector<glm::dvec3> normals;
+    std::vector<glm::dvec2> uv;
+    std::vector<glm::dvec4> colors;
+    std::vector<int> triangles;
+
+
+    uint32_t numSlices = 32;
+    float radius = 1.0;
+
+    for(int x=0, inx = 0; x<numSlices; x++) {
+        for(int y=0; y<numSlices * 2; y++, inx++) {
+            float yAngle = ((float)y / (float)numSlices * 2) * TWO_PI;
+            float xAngle = ((float)x / (float)numSlices) * PI;
+            
+            float posx = radius * std::sin(xAngle) * std::cos(yAngle);
+            float posy = radius * std::sin(xAngle) * std::sin(yAngle);
+            float posz = radius * std::cos(xAngle);
+
+            vertex.push_back(glm::dvec3(posx, posy, posz));
+            normals.push_back(glm::dvec3(posx, posy, posz));
+            uv.push_back(glm::dvec2(0, 0));
+            colors.push_back(glm::dvec4(255, 255, 255, 255));
+            
+            triangles.push_back(inx);
+            triangles.push_back(inx + numSlices * 2);
+            triangles.push_back(inx + (numSlices * 2 + 1));
+        }        
+    }
+
+    //Setup mesh
+    MeshFilterComponent* mesh = new MeshFilterComponent(newObject);
+    mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles);
+    mesh->drawingMode = GL_TRIANGLE_FAN;
+
+    //Setup transform
+    TransformComponent* transform = new TransformComponent(newObject);
+    
+    //Setup material
+    MaterialComponent* material = new MaterialComponent(newObject);
+    material->albedo = glm::vec4(0.0, 1.0, 0.0, 1.0);
+    material->SetShader(&scene->standardShaders.unlitMeshShader);
+
+    newObject->AddComponent(material);
+    newObject->AddComponent(mesh);
+    newObject->AddComponent(transform);
+
+    return newObject;    
+
+
+}
 
 }
 }

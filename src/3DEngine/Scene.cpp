@@ -10,7 +10,7 @@
 namespace KikooRenderer {
 
 namespace CoreEngine {
-    Scene::Scene() : camera(CameraScene(this, 1.0, 70 * Util::DEGTORAD, 0.1, 1000.0, 1.0)){
+    Scene::Scene() : camera(CameraScene(this, 1.0, 70 * DEGTORAD, 0.1, 1000.0, 1.0)){
         this->started = false;
     }
 
@@ -22,7 +22,7 @@ namespace CoreEngine {
         //ADD OBJECTS HERE 
         
         // Object3D* newObject = GetQuad(this);
-        Object3D* newObject = GetCircle(this);
+        Object3D* newObject = GetSphere(this);
         objects3D.push_back(newObject);
 
         //Start each object

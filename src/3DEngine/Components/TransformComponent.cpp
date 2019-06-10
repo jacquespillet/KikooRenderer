@@ -14,8 +14,6 @@ void TransformComponent::OnUpdate(){}
 void TransformComponent::OnRender(){} 
 
 glm::dmat4 TransformComponent::GetModelMatrix() {
-    const float DEGTORAD = 0.01745329251f; 
-	
 	glm::dmat4 translateM = glm::translate(glm::dmat4(1.0f), this->position);
 	
 	glm::dmat4 scaleM = glm::scale(glm::dmat4(1.0f), scale);

@@ -29,6 +29,8 @@ class MeshFilterComponent : public Component {
         std::vector<int> triangles);
         void RebuildBuffers();
 
+        GLenum drawingMode;
+
     private: 
         void InitBuffers();
 

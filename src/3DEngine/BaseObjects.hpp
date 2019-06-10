@@ -11,5 +11,7 @@ namespace CoreEngine {
     Object3D* GetQuad(Scene* scene);
 
     Object3D* GetCircle(Scene* scene);
+
+    Object3D* GetSphere(Scene* scene);
 }
 }
