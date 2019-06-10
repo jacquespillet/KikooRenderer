@@ -18,10 +18,17 @@ namespace CoreEngine {
         this->started = true;
         OnStart();
 
-        Object3D* newObject = GetCube(this);
+
+        //ADD OBJECTS HERE 
+        
+        // Object3D* newObject = GetQuad(this);
+        Object3D* newObject = GetCircle(this);
         objects3D.push_back(newObject);
 
         //Start each object
+        for(int i=0; i<objects3D.size(); i++) {
+            objects3D[i]->Start();
+        }        
     }
 
     void Scene::Enable() {

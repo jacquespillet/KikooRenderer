@@ -83,3 +83,5 @@
 #include <iomanip>
 #include <numeric>
 #include <random>
+
+#define TWO_PI 6.28318530717958647692529

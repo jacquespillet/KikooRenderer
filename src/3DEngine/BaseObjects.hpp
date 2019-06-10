@@ -7,5 +7,9 @@ namespace KikooRenderer {
 
 namespace CoreEngine {
     Object3D* GetCube(Scene* scene);
+    
+    Object3D* GetQuad(Scene* scene);
+
+    Object3D* GetCircle(Scene* scene);
 }
 }

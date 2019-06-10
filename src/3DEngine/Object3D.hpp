@@ -21,7 +21,7 @@ class Object3D {
         void AddComponent(Component* component);
         Component*  GetComponent(std::string name);
 
-        void OnStart();
+        void Start();
         void Enable();
         void Render();
         void Update();

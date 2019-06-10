@@ -51,6 +51,7 @@ namespace KikooRenderer {
 
 
     void View3DGL::initializeGL() {
+
         if(!scene->started) {
             scene->Start();
         }
@@ -59,6 +60,27 @@ namespace KikooRenderer {
         connect(timer, &QTimer::timeout, [this]() {
             makeCurrent();
             scene->OnUpdate();  
+
+            GETGL 
+
+            //
+            //Set GL states
+            //
+            // ogl->glEnable(GL_CULL_FACE);  
+            
+            ogl->glEnable(GL_BLEND);
+            ogl->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+            //disable writting to depth buffer
+            ogl->glEnable(GL_DEPTH_TEST);
+            //glDepthMask(GL_FALSE);
+            
+            //enable blending
+            //glBlendFunc(GL_ZERO, GL_SRC_COLOR);
+            //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+            //glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+
 
             if(scene->triggerRefresh) {
                 Refresh();

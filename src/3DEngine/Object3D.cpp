@@ -19,7 +19,7 @@ Object3D::Object3D(std::string _name, Scene* _scene) {
 void Object3D::AddComponent(Component* component) {
     this->components.push_back(component);
 }
-void Object3D::OnStart() {
+void Object3D::Start() {
 
 }
 
@@ -53,20 +53,6 @@ void Object3D::Render() {
 	glm::mat4 vMatrix = scene->camera.GetViewMatrix();
 	glm::mat4 pMatrix = scene->camera.GetProjectionMatrix();
 	glm::mat4 mvpMatrix = pMatrix * vMatrix * mMatrix;
-
-	//
-	//Set GL states
-	//
-	//disable writting to depth buffer
-	ogl->glEnable(GL_DEPTH_TEST);
-	//glDepthMask(GL_FALSE);
-	
-	//enable blending
-	ogl->glEnable(GL_BLEND);
-	ogl->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//glBlendFunc(GL_ZERO, GL_SRC_COLOR);
-	//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
 	
 	//bind shader

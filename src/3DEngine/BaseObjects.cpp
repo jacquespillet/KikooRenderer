@@ -253,6 +253,145 @@ Object3D* GetCube(Scene* scene) {
     return newObject;
 }
 
+Object3D* GetQuad(Scene* scene) {
+     //Start each Object3D in scene
+    Object3D* newObject = new Object3D("Quad", scene);
+    std::vector<glm::dvec3> vertex;
+    std::vector<glm::dvec3> normals;
+    std::vector<glm::dvec2> uv;
+    std::vector<glm::dvec4> colors;
+    std::vector<int> triangles;
+
+
+    //
+    ///Vertices
+    //
+
+    //Front
+    vertex.push_back(glm::dvec3(-1.0, -1.0, 0)); //bottom left
+    vertex.push_back(glm::dvec3(-1.0, 1.0, 0)); // top left
+    vertex.push_back(glm::dvec3(1.0, 1.0, 0)); //Top right
+    vertex.push_back(glm::dvec3(1.0, -1.0, 0)); //Bottom right
+
+    //
+    ///Normals
+    //
+
+    //Front
+    normals.push_back(glm::dvec3(0, 0, -1));
+    normals.push_back(glm::dvec3(0, 0, -1));
+    normals.push_back(glm::dvec3(0, 0, -1));
+    normals.push_back(glm::dvec3(0, 0, -1));
+
+
+    //
+    ////UV
+    //
+
+    //Front
+    uv.push_back(glm::dvec2(0, 0));
+    uv.push_back(glm::dvec2(0, 0));
+    uv.push_back(glm::dvec2(0, 0));
+    uv.push_back(glm::dvec2(0, 0));
+
+
+    //
+    ////Colors
+    //
+
+    //Front
+    colors.push_back(glm::dvec4(255, 255, 255, 255));
+    colors.push_back(glm::dvec4(255, 255, 255, 255));
+    colors.push_back(glm::dvec4(255, 255, 255, 255));
+    colors.push_back(glm::dvec4(255, 255, 255, 255));
+
+    //
+    ////Triangles
+    //
+
+    //Front
+    int index = 0;
+    triangles.push_back(index + 0);
+    triangles.push_back(index + 2);
+    triangles.push_back(index + 1);
+    triangles.push_back(index + 3);
+    triangles.push_back(index + 2);
+    triangles.push_back(index + 0);
+
+
+    //Setup mesh
+    MeshFilterComponent* mesh = new MeshFilterComponent(newObject);
+    mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles);
+
+    //Setup transform
+    TransformComponent* transform = new TransformComponent(newObject);
+    
+    //Setup material
+    MaterialComponent* material = new MaterialComponent(newObject);
+    material->albedo = glm::vec4(0.0, 1.0, 0.0, 1.0);
+    material->SetShader(&scene->standardShaders.unlitMeshShader);
+
+    newObject->AddComponent(material);
+    newObject->AddComponent(mesh);
+    newObject->AddComponent(transform);
+
+    return newObject;
+}
+
+Object3D* GetCircle(Scene* scene) {
+     //Start each Object3D in scene
+    Object3D* newObject = new Object3D("Quad", scene);
+    std::vector<glm::dvec3> vertex;
+    std::vector<glm::dvec3> normals;
+    std::vector<glm::dvec2> uv;
+    std::vector<glm::dvec4> colors;
+    std::vector<int> triangles;
+
+
+    uint32_t numPoints = 16;
+
+    vertex.push_back(glm::dvec3(0, 0, 0));
+    normals.push_back(glm::dvec3(0, 0, -1));
+    uv.push_back(glm::dvec2(0, 0));
+    colors.push_back(glm::dvec4(255, 255, 255, 255));
+
+    for(uint32_t i=0; i<=numPoints; i++) {
+        float inx = ((float)i / (float)numPoints) * TWO_PI;
+        float x = std::cos(inx);
+        float y = std::sin(inx);
+
+        vertex.push_back(glm::dvec3(x, y, 0));
+        normals.push_back(glm::dvec3(0, 0, -1));
+        uv.push_back(glm::dvec2(0, 0));
+        colors.push_back(glm::dvec4(255, 255, 255, 255));
+        
+        triangles.push_back(i);
+        triangles.push_back(i-1);
+        triangles.push_back(0);
+    }
+    
+    triangles.push_back(numPoints);
+    triangles.push_back(1);
+    triangles.push_back(0);
+    //Setup mesh
+    MeshFilterComponent* mesh = new MeshFilterComponent(newObject);
+    mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles);
+
+    //Setup transform
+    TransformComponent* transform = new TransformComponent(newObject);
+    
+    //Setup material
+    MaterialComponent* material = new MaterialComponent(newObject);
+    material->albedo = glm::vec4(0.0, 1.0, 0.0, 1.0);
+    material->SetShader(&scene->standardShaders.unlitMeshShader);
+
+    newObject->AddComponent(material);
+    newObject->AddComponent(mesh);
+    newObject->AddComponent(transform);
+
+    return newObject;
+}
+
 
 }
 }
