@@ -247,8 +247,8 @@ Object3D* GetCube(Scene* scene) {
     material->SetShader(&scene->standardShaders.unlitMeshShader);
 
     newObject->AddComponent(material);
-    newObject->AddComponent(mesh);
     newObject->AddComponent(transform);
+    newObject->AddComponent(mesh);
 
     return newObject;
 }
@@ -446,6 +446,54 @@ Object3D* GetSphere(Scene* scene) {
 
 
 }
+
+Object3D* GetGrid(Scene* scene) {
+   //Start each Object3D in scene
+    Object3D* newObject = new Object3D("Cube", scene);
+    std::vector<glm::dvec3> vertex;
+    std::vector<glm::dvec3> normals;
+    std::vector<glm::dvec2> uv;
+    std::vector<glm::dvec4> colors;
+    std::vector<int> triangles;
+
+    for(int i=0; i<10; i++) {
+        vertex.push_back(glm::dvec3( -i, -10,  0)); //bottom left
+        vertex.push_back(glm::dvec3(  i,  10,  0)); // top left
+
+        normals.push_back(glm::dvec3(0, 0, 1));
+        normals.push_back(glm::dvec3(0, 0, 1));
+
+        uv.push_back(glm::dvec2(0, 0));
+        uv.push_back(glm::dvec2(0, 0));
+
+        colors.push_back(glm::dvec4(255, 0, 0, 255));
+        colors.push_back(glm::dvec4(0, 255, 0, 255));
+
+        triangles.push_back(i-1);
+        triangles.push_back(i);
+    }
+
+
+    //Setup mesh
+    MeshFilterComponent* mesh = new MeshFilterComponent(newObject);
+    mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles);
+    mesh->drawingMode = GL_LINES;
+
+    //Setup transform
+    TransformComponent* transform = new TransformComponent(newObject );
+    
+    //Setup material
+    MaterialComponent* material = new MaterialComponent(newObject);
+    material->albedo = glm::vec4(0.0, 1.0, 0.0, 1.0);
+    material->SetShader(&scene->standardShaders.unlitMeshShader);
+
+    newObject->AddComponent(material);
+    newObject->AddComponent(transform);
+    newObject->AddComponent(mesh);
+
+    return newObject;
+}
+
 
 }
 }

@@ -12,6 +12,7 @@ void TransformComponent::OnStart(){}
 void TransformComponent::OnEnable(){}
 void TransformComponent::OnUpdate(){}
 void TransformComponent::OnRender(){} 
+void TransformComponent::OnDestroy(){} 
 
 glm::dmat4 TransformComponent::GetModelMatrix() {
 	glm::dmat4 translateM = glm::translate(glm::dmat4(1.0f), this->position);

@@ -80,8 +80,6 @@ namespace KikooRenderer {
             //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
             //glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
-
-
             if(scene->triggerRefresh) {
                 Refresh();
                 scene->triggerRefresh=false;
@@ -95,7 +93,7 @@ namespace KikooRenderer {
         connect(context(), &QOpenGLContext::aboutToBeDestroyed, [this]() {
             makeCurrent();
             timer->stop();
-            // scene->Disable();
+            scene->OnDestroy();
             doneCurrent();
         });
 
@@ -128,6 +126,7 @@ namespace KikooRenderer {
     //Event Listeners
     void View3DGL::keyPressEvent(QKeyEvent *e) {
         scene->OnKeyPressEvent(e);
+        Refresh();
     }
 
     void View3DGL::keyReleaseEvent(QKeyEvent *e) {
@@ -147,6 +146,5 @@ namespace KikooRenderer {
     }
 
     void View3DGL::wheelEvent(QKeyEvent *e) {
-
     }   
 }

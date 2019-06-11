@@ -22,8 +22,11 @@ namespace CoreEngine {
         //ADD OBJECTS HERE 
         
         // Object3D* newObject = GetQuad(this);
-        Object3D* newObject = GetSphere(this);
-        objects3D.push_back(newObject);
+        // Object3D* sphere = GetSphere(this);
+        // objects3D.push_back(sphere);
+
+        Object3D* plane = GetGrid(this);
+        objects3D.push_back(plane);
 
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
@@ -41,12 +44,12 @@ namespace CoreEngine {
 
     void Scene::Render() {
         GETGL
-        ogl->glClearColor(100, 0, 0, 0);
+        ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
         ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        //Render each object
+        // Render each object
         for(int i=0; i<objects3D.size(); i++) {
-            objects3D[i]->Render();
+            objects3D[i]->Render(); 
         }
     }
 
@@ -66,13 +69,13 @@ namespace CoreEngine {
 
     //Disable
 
-    //Destroy
+    void Scene::OnDestroy() { 
+        std::cout << "Destroying scene" << std::endl;
+    }
 
 
     void Scene::OnKeyPressEvent(QKeyEvent *e){
-    	//Foreach object : 
-        //  OnKeyPress
-        this->camera.OnKeyPressEvent(e);
+        this->camera.OnKeyPressEvent(e);        
     }
 
     void Scene::SetWindowSize(int w, int h) {

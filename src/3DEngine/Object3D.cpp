@@ -35,6 +35,12 @@ void Object3D::Update() {
     }
 }
 
+void Object3D::Destroy() {
+    for(int i=0; i<components.size(); i++) {
+        components[i]->OnDestroy();
+    }
+}
+
 Component* Object3D::GetComponent(std::string name) {
 	for(int i=0; i<components.size(); i++) { 
 		if(components[i]->name == name) {
@@ -46,7 +52,7 @@ Component* Object3D::GetComponent(std::string name) {
 
 void Object3D::Render() {
 	GETGL
-	
+
 	TransformComponent* transform = (TransformComponent*)(this->GetComponent("Transform")); 
 	glm::mat4 mMatrix = transform->GetModelMatrix();
 	

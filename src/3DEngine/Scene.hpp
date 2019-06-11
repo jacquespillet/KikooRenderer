@@ -26,13 +26,14 @@ class Scene {
 		StandardShaders standardShaders;
 		CameraScene camera;
 
+		bool test = false;
 
 		void virtual OnStart(){};
 		void virtual OnUpdate();
 		void virtual OnRender(){};
 		void virtual OnEnable(){};
 		void virtual OnDisable(){};
-		void virtual OnDestroy(){};
+		void virtual OnDestroy();
 		
 		virtual void OnKeyPressEvent(QKeyEvent *e);
 		virtual void OnKeyReleaseEvent(QKeyEvent *e){}

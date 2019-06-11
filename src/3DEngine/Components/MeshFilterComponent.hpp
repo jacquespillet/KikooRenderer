@@ -20,6 +20,7 @@ class MeshFilterComponent : public Component {
         void OnEnable();
         void OnUpdate();
         void OnRender();
+        void OnDestroy();
         
 
         void LoadFromBuffers(std::vector<glm::dvec3> vertex,
@@ -28,6 +29,7 @@ class MeshFilterComponent : public Component {
         std::vector<glm::dvec4> colors,
         std::vector<int> triangles);
         void RebuildBuffers();
+        void DestroyBuffers();
 
         GLenum drawingMode;
 

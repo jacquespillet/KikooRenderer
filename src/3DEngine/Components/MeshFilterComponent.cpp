@@ -20,6 +20,7 @@ void MeshFilterComponent::OnEnable(){
 void MeshFilterComponent::OnUpdate(){}
 void MeshFilterComponent::OnRender(){
 	GETGL
+
 	//
 	//bind VAO
 	//
@@ -39,6 +40,10 @@ void MeshFilterComponent::OnRender(){
 	
 	ogl->glBindVertexArray(0);
 } 
+
+void MeshFilterComponent::OnDestroy() {
+	DestroyBuffers();
+}
 
 
 void MeshFilterComponent::LoadFromBuffers(std::vector<glm::dvec3> _vertex,
@@ -92,6 +97,17 @@ void MeshFilterComponent::InitBuffers() {
 	ogl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	
 	inited = true; 
+}
+
+void MeshFilterComponent::DestroyBuffers() { 
+	GETGL
+	if(inited)
+	{
+		ogl->glDeleteBuffers(1, &vertexBuffer);
+		ogl->glDeleteBuffers(1, &elementBuffer);
+		ogl->glDeleteVertexArrays(1, &vertexArrayObject);
+		inited = false; 
+	}
 }
 
 void MeshFilterComponent::RebuildBuffers() {

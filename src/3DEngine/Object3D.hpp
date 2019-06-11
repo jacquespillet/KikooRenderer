@@ -25,6 +25,7 @@ class Object3D {
         void Enable();
         void Render();
         void Update();
+        void Destroy();
 };
 }
 

@@ -51,9 +51,7 @@ void CameraScene::OnKeyPressEvent(QKeyEvent *e){
         this->transform.rotation.y+=1.0;
     }   else if(e->key() == Qt::Key_Left) {
         this->transform.rotation.y-=1.0;
-    }      
-     
-    scene->triggerRefresh = true;
+    }          
 }
 
 }
