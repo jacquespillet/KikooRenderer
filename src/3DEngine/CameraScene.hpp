@@ -29,6 +29,19 @@ class CameraScene{
         void UpdateProjectionMatrix();
 
         void OnKeyPressEvent(QKeyEvent *e);
+		void OnMousePressEvent(QMouseEvent *e);
+		void OnMouseReleaseEvent(QMouseEvent *e);
+		void OnMouseMoveEvent(QMouseEvent *e);
+		void OnWheelEvent(QWheelEvent *event); 
+
+    private: 
+        bool isRightClicked = false;
+        bool isLeftClicked = false;
+        bool isMiddleClicked = false;
+        int previousX;
+        int previousY;
+
+        float speedFactor = 0.1;
 };
 
 }

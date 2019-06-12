@@ -35,23 +35,104 @@ void CameraScene::UpdateProjectionMatrix() {
 }
 
 void CameraScene::OnKeyPressEvent(QKeyEvent *e){
-    if(e->key() == Qt::Key_Z) {
-        this->transform.position.z+=0.1;
-    } else if(e->key() == Qt::Key_S) {
-        this->transform.position.z-=0.1;
-    } else if(e->key() == Qt::Key_Q) {
-        this->transform.position.x-=0.1;
-    } else if(e->key() == Qt::Key_D) {
-        this->transform.position.x+=0.1;
-    }   else if(e->key() == Qt::Key_Up) {
-        this->transform.position.y+=0.1;
-    }   else if(e->key() == Qt::Key_Down) {
-        this->transform.position.y-=0.1;
-    }   else if(e->key() == Qt::Key_Right) {
-        this->transform.rotation.y+=1.0;
-    }   else if(e->key() == Qt::Key_Left) {
-        this->transform.rotation.y-=1.0;
-    }          
+    if(isRightClicked) {
+        glm::dmat4 transform = this->transform.GetModelMatrix();
+
+        if(e->key() == Qt::Key_Z) {
+            this->transform.position.x += glm::column(transform, 2).x * speedFactor;
+            this->transform.position.y += glm::column(transform, 2).y * speedFactor;
+            this->transform.position.z += glm::column(transform, 2).z * speedFactor;
+        }  
+        if(e->key() == Qt::Key_S) {
+            this->transform.position.x -= glm::column(transform, 2).x * speedFactor;
+            this->transform.position.y -= glm::column(transform, 2).y * speedFactor;
+            this->transform.position.z -= glm::column(transform, 2).z * speedFactor;
+        } 
+        if(e->key() == Qt::Key_Q) {
+            this->transform.position.x -= glm::column(transform, 0).x * speedFactor;
+            this->transform.position.y -= glm::column(transform, 0).y * speedFactor;
+            this->transform.position.z -= glm::column(transform, 0).z * speedFactor;
+        } 
+        if(e->key() == Qt::Key_D) {
+            this->transform.position.x += glm::column(transform, 0).x * speedFactor;
+            this->transform.position.y += glm::column(transform, 0).y * speedFactor;
+            this->transform.position.z += glm::column(transform, 0).z * speedFactor;
+        } 
+    }  
+}
+
+void CameraScene::OnMousePressEvent(QMouseEvent *e) {
+    if(e->button() == Qt::LeftButton) {
+        isLeftClicked = true;
+    }
+    
+    if(e->button() == Qt::RightButton) {
+        isRightClicked = true;
+    }
+
+    if(e->button() == Qt::MidButton) {
+        isMiddleClicked = true;
+    }
+
+    previousX = e->x();
+    previousY = e->y();
+}
+void CameraScene::OnMouseReleaseEvent(QMouseEvent *e) {
+    if(isLeftClicked) isLeftClicked = false;
+    if(isRightClicked) isRightClicked = false;
+    if(isMiddleClicked) isMiddleClicked = false;
+}
+void CameraScene::OnMouseMoveEvent(QMouseEvent *e) {
+    if(isLeftClicked) {
+    }
+    if(isRightClicked) {
+        int newX = e->x();
+        int newY = e->y();
+
+        int xOffset = newX - previousX;
+        int yOffset = newY - previousY;
+
+        this->transform.rotation.y += (float)xOffset * 0.1;
+        this->transform.rotation.x += (float)yOffset * 0.1;
+
+        previousX = newX;
+        previousY = newY;
+    }
+
+    if(isMiddleClicked) {
+        int newX = e->x();
+        int newY = e->y();
+
+        int xOffset = newX - previousX;
+        int yOffset = newY - previousY;
+
+        glm::dmat4 transform = this->transform.GetModelMatrix();
+
+        this->transform.position.x -= glm::column(transform, 0).x * xOffset * speedFactor * 0.1;
+        this->transform.position.y -= glm::column(transform, 0).y * xOffset * speedFactor * 0.1;
+        this->transform.position.z -= glm::column(transform, 0).z * xOffset * speedFactor * 0.1;
+        
+        this->transform.position.x += glm::column(transform, 1).x * yOffset * speedFactor * 0.1;
+        this->transform.position.y += glm::column(transform, 1).y * yOffset * speedFactor * 0.1;
+        this->transform.position.z += glm::column(transform, 1).z * yOffset * speedFactor * 0.1;
+
+        previousX = newX;
+        previousY = newY;        
+    }
+}
+void CameraScene::OnWheelEvent(QWheelEvent *event) {
+    QPoint point = event->angleDelta();
+
+    glm::dmat4 transform = this->transform.GetModelMatrix();
+    if(point.y() > 0) {
+        this->transform.position.x += glm::column(transform, 2).x * speedFactor;
+        this->transform.position.y += glm::column(transform, 2).y * speedFactor;
+        this->transform.position.z += glm::column(transform, 2).z * speedFactor;
+    } else if(point.y() < 0) {
+        this->transform.position.x -= glm::column(transform, 2).x * speedFactor;
+        this->transform.position.y -= glm::column(transform, 2).y * speedFactor;
+        this->transform.position.z -= glm::column(transform, 2).z * speedFactor;
+    }
 }
 
 }

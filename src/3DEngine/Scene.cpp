@@ -18,18 +18,23 @@ namespace CoreEngine {
         this->started = true;
         OnStart();
 
-
-        //ADD OBJECTS HERE 
-        
-        // Object3D* newObject = GetQuad(this);
-        // Object3D* sphere = GetSphere(this);
-        // objects3D.push_back(sphere);
-
         Object3D* plane = GetGrid(this);
         objects3D.push_back(plane);
 
         Object3D* axes = GetAxes(this);
         objects3D.push_back(axes);
+
+        //ADD OBJECTS HERE 
+        
+        // Object3D* newObject = GetQuad(this);
+        // Object3D* sphere = GetCube(this);
+        // objects3D.push_back(sphere);
+
+        Object3D* sphere = GetCone(this);
+        TransformComponent* transform = (TransformComponent*) sphere->GetComponent("Transform");
+        transform->rotation.y = 90;
+        objects3D.push_back(sphere);
+        
 
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
@@ -79,6 +84,19 @@ namespace CoreEngine {
 
     void Scene::OnKeyPressEvent(QKeyEvent *e){
         this->camera.OnKeyPressEvent(e);        
+    }
+
+    void Scene::OnMousePressEvent(QMouseEvent *e) {
+        this->camera.OnMousePressEvent(e);  
+    }
+    void Scene::OnMouseReleaseEvent(QMouseEvent *e) {
+        this->camera.OnMouseReleaseEvent(e);  
+    }
+    void Scene::OnMouseMoveEvent(QMouseEvent *e) {
+        this->camera.OnMouseMoveEvent(e);  
+    }
+    void Scene::OnWheelEvent(QWheelEvent *event) {
+        this->camera.OnWheelEvent(event);  
     }
 
     void Scene::SetWindowSize(int w, int h) {

@@ -37,10 +37,10 @@ class Scene {
 		
 		virtual void OnKeyPressEvent(QKeyEvent *e);
 		virtual void OnKeyReleaseEvent(QKeyEvent *e){}
-		virtual void OnMousePressEvent(QMouseEvent *e){}
-		virtual void OnMouseReleaseEvent(QMouseEvent *e){}
-		virtual void OnMouseMoveEvent(QMouseEvent *e){}
-		virtual void OnWheelEvent(QWheelEvent *event){}       
+		virtual void OnMousePressEvent(QMouseEvent *e);
+		virtual void OnMouseReleaseEvent(QMouseEvent *e);
+		virtual void OnMouseMoveEvent(QMouseEvent *e);
+		virtual void OnWheelEvent(QWheelEvent *event);       
 
 		void SetWindowSize(int w, int h);
 

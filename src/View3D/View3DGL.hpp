@@ -39,10 +39,10 @@ class View3DGL: public QOpenGLWidget {
         //Event Listeners
         virtual void keyPressEvent(QKeyEvent *e);
         virtual void keyReleaseEvent(QKeyEvent *e);
-        virtual void mousePressEvent(QKeyEvent *e);
-        virtual void mouseReleaseEvent(QKeyEvent *e);
-        virtual void mouseMoveEvent(QKeyEvent *e);
-        virtual void wheelEvent(QKeyEvent *e);
+        virtual void mousePressEvent(QMouseEvent *e);
+        virtual void mouseReleaseEvent(QMouseEvent *e);
+        virtual void mouseMoveEvent(QMouseEvent *e);
+        virtual void wheelEvent(QWheelEvent *e);
 
     //public slots: ??  
         void Refresh();

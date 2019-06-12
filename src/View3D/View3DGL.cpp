@@ -133,18 +133,23 @@ namespace KikooRenderer {
 
     }
 
-    void View3DGL::mousePressEvent(QKeyEvent *e) {
-
+    void View3DGL::mousePressEvent(QMouseEvent *e) {
+        scene->OnMousePressEvent(e);
+        Refresh();
     }
 
-    void View3DGL::mouseReleaseEvent(QKeyEvent *e) {
-
+    void View3DGL::mouseReleaseEvent(QMouseEvent *e) {
+        scene->OnMouseReleaseEvent(e);
+        Refresh();
     }
 
-    void View3DGL::mouseMoveEvent(QKeyEvent *e) {
-
+    void View3DGL::mouseMoveEvent(QMouseEvent *e) {
+        scene->OnMouseMoveEvent(e);
+        Refresh();
     }
 
-    void View3DGL::wheelEvent(QKeyEvent *e) {
+    void View3DGL::wheelEvent(QWheelEvent *e) {
+        scene->OnWheelEvent(e);
+        Refresh();
     }   
 }
