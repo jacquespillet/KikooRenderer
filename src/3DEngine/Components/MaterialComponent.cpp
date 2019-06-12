@@ -11,6 +11,7 @@ namespace CoreEngine {
 
 MaterialComponent::MaterialComponent(Object3D* object) : Component("Material", object) {
     inited= false;
+    influence = 1.0;
 }
 void MaterialComponent::OnStart(){}
 void MaterialComponent::OnEnable(){}
@@ -33,6 +34,8 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 	int modelViewProjectionMatrixLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "modelViewProjectionMatrix"); 
 	ogl->glUniformMatrix4fv(modelViewProjectionMatrixLocation, 1, false, glm::value_ptr(mvpMatrix));
     
+	int influenceLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "materialInfluence"); 
+	ogl->glUniform1f(influenceLocation, influence);
 
     //Shader->GetUniformVariables()->setVariables();
     

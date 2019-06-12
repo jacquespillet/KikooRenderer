@@ -340,7 +340,7 @@ Object3D* GetQuad(Scene* scene) {
 
 Object3D* GetCircle(Scene* scene) {
      //Start each Object3D in scene
-    Object3D* newObject = new Object3D("Quad", scene);
+    Object3D* newObject = new Object3D("Circle", scene);
     std::vector<glm::dvec3> vertex;
     std::vector<glm::dvec3> normals;
     std::vector<glm::dvec2> uv;
@@ -394,7 +394,7 @@ Object3D* GetCircle(Scene* scene) {
 
 Object3D* GetSphere(Scene* scene) {
     //Start each Object3D in scene
-    Object3D* newObject = new Object3D("Quad", scene);
+    Object3D* newObject = new Object3D("Sphere", scene);
     std::vector<glm::dvec3> vertex;
     std::vector<glm::dvec3> normals;
     std::vector<glm::dvec2> uv;
@@ -449,30 +449,50 @@ Object3D* GetSphere(Scene* scene) {
 
 Object3D* GetGrid(Scene* scene) {
    //Start each Object3D in scene
-    Object3D* newObject = new Object3D("Cube", scene);
+    Object3D* newObject = new Object3D("Grid", scene);
     std::vector<glm::dvec3> vertex;
     std::vector<glm::dvec3> normals;
     std::vector<glm::dvec2> uv;
     std::vector<glm::dvec4> colors;
     std::vector<int> triangles;
 
-    for(int i=0; i<10; i++) {
-        vertex.push_back(glm::dvec3( -i, -10,  0)); //bottom left
-        vertex.push_back(glm::dvec3(  i,  10,  0)); // top left
+    for(int i=0, z=-5; z<=5; i++, z++) {
+        if(z != 0) {
+            vertex.push_back(glm::dvec3( -5, 0,  z)); 
+            vertex.push_back(glm::dvec3(  5, 0,  z)); 
 
-        normals.push_back(glm::dvec3(0, 0, 1));
-        normals.push_back(glm::dvec3(0, 0, 1));
+            normals.push_back(glm::dvec3(0, 0, 1));
+            normals.push_back(glm::dvec3(0, 0, 1));
 
-        uv.push_back(glm::dvec2(0, 0));
-        uv.push_back(glm::dvec2(0, 0));
+            uv.push_back(glm::dvec2(0, 0));
+            uv.push_back(glm::dvec2(0, 0));
 
-        colors.push_back(glm::dvec4(255, 0, 0, 255));
-        colors.push_back(glm::dvec4(0, 255, 0, 255));
+            colors.push_back(glm::dvec4(255, 255, 255, 255));
+            colors.push_back(glm::dvec4(255, 255, 255, 255));
 
-        triangles.push_back(i-1);
-        triangles.push_back(i);
+            triangles.push_back(vertex.size()-1);
+            triangles.push_back(vertex.size()-2);        
+        }
     }
 
+   for(int i=0, x=-5; x<=5; i++, x++) {
+       if(x != 0) {
+            vertex.push_back(glm::dvec3( x, 0,  -5)); //bottom left
+            vertex.push_back(glm::dvec3(  x, 0,  5)); // top left
+
+            normals.push_back(glm::dvec3(0, 0, 1));
+            normals.push_back(glm::dvec3(0, 0, 1));
+
+            uv.push_back(glm::dvec2(0, 0));
+            uv.push_back(glm::dvec2(0, 0));
+
+            colors.push_back(glm::dvec4(255, 0, 255, 255));
+            colors.push_back(glm::dvec4(255, 0, 255, 255));
+
+            triangles.push_back(vertex.size()-1);
+            triangles.push_back(vertex.size()-2);
+       }
+    }
 
     //Setup mesh
     MeshFilterComponent* mesh = new MeshFilterComponent(newObject);
@@ -484,7 +504,7 @@ Object3D* GetGrid(Scene* scene) {
     
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
-    material->albedo = glm::vec4(0.0, 1.0, 0.0, 1.0);
+    material->albedo = glm::vec4(0.6, 0.6, 0.6, 0.6);
     material->SetShader(&scene->standardShaders.unlitMeshShader);
 
     newObject->AddComponent(material);
@@ -494,6 +514,86 @@ Object3D* GetGrid(Scene* scene) {
     return newObject;
 }
 
+
+Object3D* GetAxes(Scene* scene) {
+    Object3D* newObject = new Object3D("Grid", scene);
+    std::vector<glm::dvec3> vertex;
+    std::vector<glm::dvec3> normals;
+    std::vector<glm::dvec2> uv;
+    std::vector<glm::dvec4> colors;
+    std::vector<int> triangles;
+
+
+    //X axis
+    vertex.push_back(glm::dvec3( -100, 0,  0)); 
+    vertex.push_back(glm::dvec3(  100, 0,  0)); 
+
+    normals.push_back(glm::dvec3(0, 0, 1));
+    normals.push_back(glm::dvec3(0, 0, 1));
+
+    uv.push_back(glm::dvec2(0, 0));
+    uv.push_back(glm::dvec2(0, 0));
+
+    colors.push_back(glm::dvec4(255, 0, 0, 255));
+    colors.push_back(glm::dvec4(255, 0, 0, 255));
+
+    triangles.push_back(vertex.size()-1);
+    triangles.push_back(vertex.size()-2);     
+
+    //Y axis
+    vertex.push_back(glm::dvec3( 0, -100,  0)); 
+    vertex.push_back(glm::dvec3( 0,  100,  0)); 
+
+    normals.push_back(glm::dvec3(0, 0, 1));
+    normals.push_back(glm::dvec3(0, 0, 1));
+
+    uv.push_back(glm::dvec2(0, 0));
+    uv.push_back(glm::dvec2(0, 0));
+
+    colors.push_back(glm::dvec4(0, 255, 0, 255));
+    colors.push_back(glm::dvec4(0, 255, 0, 255));
+
+    triangles.push_back(vertex.size()-1);
+    triangles.push_back(vertex.size()-2);
+    
+    //Z axis
+    vertex.push_back(glm::dvec3( 0,  0, -100)); 
+    vertex.push_back(glm::dvec3( 0,  0,  100)); 
+
+    normals.push_back(glm::dvec3(0, 0, 1));
+    normals.push_back(glm::dvec3(0, 0, 1));
+
+    uv.push_back(glm::dvec2(0, 0));
+    uv.push_back(glm::dvec2(0, 0));
+
+    colors.push_back(glm::dvec4(0, 0, 255, 255));
+    colors.push_back(glm::dvec4(0, 0, 255, 255));
+
+    triangles.push_back(vertex.size()-1);
+    triangles.push_back(vertex.size()-2);
+
+    
+    //Setup mesh
+    MeshFilterComponent* mesh = new MeshFilterComponent(newObject);
+    mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles);
+    mesh->drawingMode = GL_LINES;
+    mesh->primitiveSize = 10;
+
+    //Setup transform
+    TransformComponent* transform = new TransformComponent(newObject );
+    
+    //Setup material
+    MaterialComponent* material = new MaterialComponent(newObject);
+    material->albedo = glm::vec4(0.6, 0.6, 0.6, 0.6);
+    material->influence = 0;
+    material->SetShader(&scene->standardShaders.unlitMeshShader);
+
+    newObject->AddComponent(material);
+    newObject->AddComponent(transform);
+    newObject->AddComponent(mesh);
+
+    return newObject;
+}
 
 }
 }

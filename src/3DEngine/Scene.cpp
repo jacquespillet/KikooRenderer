@@ -28,6 +28,9 @@ namespace CoreEngine {
         Object3D* plane = GetGrid(this);
         objects3D.push_back(plane);
 
+        Object3D* axes = GetAxes(this);
+        objects3D.push_back(axes);
+
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
             objects3D[i]->Start();

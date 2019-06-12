@@ -20,6 +20,9 @@ class MaterialComponent : public Component {
 
         Shader* shader;
 
+
+        float influence;
+
         glm::vec4 albedo;
 };
 }

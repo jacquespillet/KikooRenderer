@@ -32,6 +32,7 @@ class MeshFilterComponent : public Component {
         void DestroyBuffers();
 
         GLenum drawingMode;
+        int primitiveSize;
 
     private: 
         void InitBuffers();

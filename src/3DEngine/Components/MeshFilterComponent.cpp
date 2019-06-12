@@ -11,6 +11,7 @@ namespace CoreEngine {
 MeshFilterComponent::MeshFilterComponent(Object3D* object) : Component("MeshFilter", object) {
     inited= false;
 	drawingMode = GL_TRIANGLES;
+	primitiveSize = 1;
 }
 void MeshFilterComponent::OnStart(){}
 void MeshFilterComponent::OnEnable(){
@@ -31,6 +32,10 @@ void MeshFilterComponent::OnRender(){
 	//Draw
 	//
 	
+	if(drawingMode == GL_LINES) {
+		// ogl->glLineWidth(10.0);
+	}
+
 	//draw elements
 	ogl->glDrawElements(drawingMode, triangles.size(), GL_UNSIGNED_INT, (void*)0);
 	
