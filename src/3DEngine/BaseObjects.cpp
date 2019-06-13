@@ -7,7 +7,7 @@ namespace KikooRenderer {
 namespace CoreEngine {
 
 
-Object3D* GetCube(Scene* scene) {
+Object3D* GetCube(Scene* scene, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
      //Start each Object3D in scene
     Object3D* newObject = new Object3D("Cube", scene);
     std::vector<glm::dvec3> vertex;
@@ -240,10 +240,13 @@ Object3D* GetCube(Scene* scene) {
 
     //Setup transform
     TransformComponent* transform = new TransformComponent(newObject );
+    transform->position = _position;
+    transform->rotation = _rotation;
+    transform->scale = _scale;
     
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
-    material->albedo = glm::vec4(0.6, 0.6, 0.6, 1.0);
+    material->albedo = _color;
     material->SetShader(&scene->standardShaders.unlitMeshShader);
 
     newObject->AddComponent(material);
@@ -253,7 +256,7 @@ Object3D* GetCube(Scene* scene) {
     return newObject;
 }
 
-Object3D* GetQuad(Scene* scene) {
+Object3D* GetQuad(Scene* scene, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
      //Start each Object3D in scene
     Object3D* newObject = new Object3D("Quad", scene);
     std::vector<glm::dvec3> vertex;
@@ -324,11 +327,14 @@ Object3D* GetQuad(Scene* scene) {
     mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles);
 
     //Setup transform
-    TransformComponent* transform = new TransformComponent(newObject);
+    TransformComponent* transform = new TransformComponent(newObject );
+    transform->position = _position;
+    transform->rotation = _rotation;
+    transform->scale = _scale;
     
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
-    material->albedo = glm::vec4(0.0, 1.0, 0.0, 1.0);
+    material->albedo = _color;
     material->SetShader(&scene->standardShaders.unlitMeshShader);
 
     newObject->AddComponent(material);
@@ -338,7 +344,7 @@ Object3D* GetQuad(Scene* scene) {
     return newObject;
 }
 
-Object3D* GetCircle(Scene* scene) {
+Object3D* GetCircle(Scene* scene, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
      //Start each Object3D in scene
     Object3D* newObject = new Object3D("Circle", scene);
     std::vector<glm::dvec3> vertex;
@@ -378,11 +384,15 @@ Object3D* GetCircle(Scene* scene) {
     mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles);
 
     //Setup transform
-    TransformComponent* transform = new TransformComponent(newObject);
+    TransformComponent* transform = new TransformComponent(newObject );
+    transform->position = _position;
+    transform->rotation = _rotation;
+    transform->scale = _scale;
+    
     
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
-    material->albedo = glm::vec4(0.0, 1.0, 0.0, 1.0);
+    material->albedo = _color;
     material->SetShader(&scene->standardShaders.unlitMeshShader);
 
     newObject->AddComponent(material);
@@ -392,7 +402,7 @@ Object3D* GetCircle(Scene* scene) {
     return newObject;
 }
 
-Object3D* GetSphere(Scene* scene) {
+Object3D* GetSphere(Scene* scene, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
     //Start each Object3D in scene
     Object3D* newObject = new Object3D("Sphere", scene);
     std::vector<glm::dvec3> vertex;
@@ -431,11 +441,15 @@ Object3D* GetSphere(Scene* scene) {
     mesh->drawingMode = GL_TRIANGLE_FAN;
 
     //Setup transform
-    TransformComponent* transform = new TransformComponent(newObject);
+    TransformComponent* transform = new TransformComponent(newObject );
+    transform->position = _position;
+    transform->rotation = _rotation;
+    transform->scale = _scale;
+    
     
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
-    material->albedo = glm::vec4(0.0, 1.0, 0.0, 1.0);
+    material->albedo = _color;
     material->SetShader(&scene->standardShaders.unlitMeshShader);
 
     newObject->AddComponent(material);
@@ -502,9 +516,10 @@ Object3D* GetGrid(Scene* scene) {
     //Setup transform
     TransformComponent* transform = new TransformComponent(newObject );
     
+    
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
-    material->albedo = glm::vec4(0.6, 0.6, 0.6, 0.6);
+    material->albedo =  glm::vec4(0.6, 0.6, 0.6, 0.6);
     material->SetShader(&scene->standardShaders.unlitMeshShader);
 
     newObject->AddComponent(material);
@@ -516,7 +531,7 @@ Object3D* GetGrid(Scene* scene) {
 
 
 Object3D* GetAxes(Scene* scene) {
-    Object3D* newObject = new Object3D("Grid", scene);
+    Object3D* newObject = new Object3D("Axes", scene);
     std::vector<glm::dvec3> vertex;
     std::vector<glm::dvec3> normals;
     std::vector<glm::dvec2> uv;
@@ -582,9 +597,10 @@ Object3D* GetAxes(Scene* scene) {
     //Setup transform
     TransformComponent* transform = new TransformComponent(newObject );
     
+    
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
-    material->albedo = glm::vec4(0.6, 0.6, 0.6, 0.6);
+    material->albedo =glm::vec4(0.6, 0.6, 0.6, 0.6);
     material->influence = 0;
     material->SetShader(&scene->standardShaders.unlitMeshShader);
 
@@ -596,9 +612,9 @@ Object3D* GetAxes(Scene* scene) {
 }
 
 
-Object3D* GetCone(Scene* scene) {
+Object3D* GetCone(Scene* scene, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
     //Start each Object3D in scene
-    Object3D* newObject = new Object3D("Cylinder", scene);
+    Object3D* newObject = new Object3D("Cone", scene);
     std::vector<glm::dvec3> vertex;
     std::vector<glm::dvec3> normals;
     std::vector<glm::dvec2> uv;
@@ -642,23 +658,75 @@ Object3D* GetCone(Scene* scene) {
     }
     
     triangles.push_back(numSlices);
-    triangles.push_back(1);
+    triangles.push_back(2);
     triangles.push_back(0);
+
     //Setup mesh
     MeshFilterComponent* mesh = new MeshFilterComponent(newObject);
     mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles);
 
     //Setup transform
     TransformComponent* transform = new TransformComponent(newObject);
+    transform->position = _position;
+    transform->rotation = _rotation;
+    transform->scale = _scale;
     
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
-    material->albedo = glm::vec4(0.0, 1.0, 0.0, 1.0);
+    material->albedo = _color;
     material->SetShader(&scene->standardShaders.unlitMeshShader);
 
     newObject->AddComponent(material);
     newObject->AddComponent(mesh);
     newObject->AddComponent(transform);
+
+    return newObject;
+}
+
+
+Object3D* GetLine(Scene* scene, glm::dvec3 position1, glm::dvec3 position2, glm::dvec4 color) {
+    Object3D* newObject = new Object3D("Line", scene);
+    std::vector<glm::dvec3> vertex;
+    std::vector<glm::dvec3> normals;
+    std::vector<glm::dvec2> uv;
+    std::vector<glm::dvec4> colors;
+    std::vector<int> triangles;
+
+
+    //X axis
+    vertex.push_back(position1); 
+    vertex.push_back(position2); 
+
+    normals.push_back(glm::dvec3(0, 0, 1));
+    normals.push_back(glm::dvec3(0, 0, 1));
+
+    uv.push_back(glm::dvec2(0, 0));
+    uv.push_back(glm::dvec2(0, 0));
+
+    colors.push_back(color);
+    colors.push_back(color);
+
+    triangles.push_back(0);
+    triangles.push_back(1);     
+    
+    //Setup mesh
+    MeshFilterComponent* mesh = new MeshFilterComponent(newObject);
+    mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles);
+    mesh->drawingMode = GL_LINES;
+    mesh->primitiveSize = 10;
+
+    //Setup transform
+    TransformComponent* transform = new TransformComponent(newObject );
+    
+    
+    //Setup material
+    MaterialComponent* material = new MaterialComponent(newObject);
+    material->albedo =color;
+    material->SetShader(&scene->standardShaders.unlitMeshShader);
+
+    newObject->AddComponent(material);
+    newObject->AddComponent(transform);
+    newObject->AddComponent(mesh);
 
     return newObject;
 }

@@ -30,10 +30,27 @@ namespace CoreEngine {
         // Object3D* sphere = GetCube(this);
         // objects3D.push_back(sphere);
 
-        Object3D* sphere = GetCone(this);
-        TransformComponent* transform = (TransformComponent*) sphere->GetComponent("Transform");
-        transform->rotation.y = 90;
-        objects3D.push_back(sphere);
+        Object3D* cone = GetCone(this, glm::dvec3(0), glm::dvec3(0,  90, 0), glm::dvec3(1), glm::dvec4(1.0, 0.0, 0.0, 1.0));
+        // objects3D.push_back(cone);
+        
+        Object3D* line = GetLine(this, glm::dvec3(-1, 0, 0), glm::dvec3(0), glm::dvec4(1.0, 0.0, 0.0, 1.0));
+        // objects3D.push_back(line);
+
+        Object3D* arrow = new Object3D("Parent", this);
+        arrow->AddObject(cone);
+        arrow->AddObject(line);
+        objects3D.push_back(arrow);
+
+        TransformComponent* transform =  (TransformComponent*)arrow->GetComponent("Transform");
+        transform->position = glm::dvec3(1.0, 1.0, 1.0);
+
+
+        // TransformComponent* transform =(TransformComponent*) arrow->GetComponent("Transform");
+        // transform->position.x += 1.0;
+        // transform->position.y += 1.0;
+
+        //Update the position of the arrow 
+        //Should use the local position & global position
         
 
         //Start each object
@@ -79,6 +96,10 @@ namespace CoreEngine {
 
     void Scene::OnDestroy() { 
         std::cout << "Destroying scene" << std::endl;
+        for(int i=0; i<objects3D.size(); i++) {
+            objects3D[i]->Destroy();
+            delete objects3D[i];
+        }
     }
 
 
