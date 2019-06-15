@@ -34,10 +34,10 @@ class MeshFilterComponent : public Component {
         GLenum drawingMode;
         int primitiveSize;
 
+        std::vector<Vertex> vertices;
     private: 
         void InitBuffers();
 
-        std::vector<Vertex> vertices;
         std::vector<int> triangles;
 
         unsigned int vertexBuffer;

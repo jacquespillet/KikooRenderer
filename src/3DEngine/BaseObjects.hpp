@@ -21,5 +21,9 @@ namespace CoreEngine {
     Object3D* GetCone(Scene* scene, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color);
 
     Object3D* GetLine(Scene* scene, glm::dvec3 position1, glm::dvec3 position2, glm::dvec4 color);
+
+    Object3D* GetTranslateWidget(Scene* scene,glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale);
+
+    Object3D* GetScaleWidget(Scene* scene,glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale);
 }
 }

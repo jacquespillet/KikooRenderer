@@ -1,5 +1,6 @@
 #include "BaseObjects.hpp"
 #include "Components/MaterialComponent.hpp"
+#include "Components/BoundingComponent.hpp"
 
 
 namespace KikooRenderer {
@@ -452,13 +453,14 @@ Object3D* GetSphere(Scene* scene, glm::dvec3 _position, glm::dvec3 _rotation, gl
     material->albedo = _color;
     material->SetShader(&scene->standardShaders.unlitMeshShader);
 
+    BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
+
     newObject->AddComponent(material);
     newObject->AddComponent(mesh);
     newObject->AddComponent(transform);
+    newObject->AddComponent(boundingBox);
 
-    return newObject;    
-
-
+    return newObject;
 }
 
 Object3D* GetGrid(Scene* scene) {
@@ -729,6 +731,64 @@ Object3D* GetLine(Scene* scene, glm::dvec3 position1, glm::dvec3 position2, glm:
     newObject->AddComponent(mesh);
 
     return newObject;
+}
+
+Object3D* GetTranslateWidget(Scene* scene,glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale) {
+    Object3D* widget = new Object3D("Parent", scene);
+
+    Object3D* xcone = GetCone(scene, glm::dvec3(1, 0, 0), glm::dvec3(0,  90, 0), glm::dvec3(1), glm::dvec4(1.0, 0.0, 0.0, 1.0));
+    Object3D* xline = GetLine(scene, glm::dvec3(0, 0, 0), glm::dvec3(1, 0, 0), glm::dvec4(1.0, 0.0, 0.0, 1.0));   
+
+    widget->AddObject(xcone);
+    widget->AddObject(xline);
+
+    Object3D* ycone = GetCone(scene, glm::dvec3(0, 1, 0), glm::dvec3(- 90,  0, 0), glm::dvec3(1), glm::dvec4(0.0, 1.0, 0.0, 1.0));
+    Object3D* yline = GetLine(scene, glm::dvec3(0, 0, 0), glm::dvec3(0, 1, 0), glm::dvec4(0.0, 1.0, 0.0, 1.0));
+
+    widget->AddObject(ycone);
+    widget->AddObject(yline);
+
+    Object3D* zcone = GetCone(scene, glm::dvec3(0, 0, 1), glm::dvec3(0, 0, 0), glm::dvec3(1), glm::dvec4(0.0, 0.0, 1.0, 1.0));
+    Object3D* zline = GetLine(scene, glm::dvec3(0, 0, 0), glm::dvec3(0, 0, 1), glm::dvec4(0.0, 0.0, 1.0, 1.0));
+
+    widget->AddObject(zcone);
+    widget->AddObject(zline);
+
+    TransformComponent* transform =  (TransformComponent*)widget->GetComponent("Transform");
+    transform->position = _position;
+    transform->rotation = _rotation;
+    transform->scale = _scale;
+
+    return widget;
+}
+
+Object3D* GetScaleWidget(Scene* scene,glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale) {
+    Object3D* widget = new Object3D("Parent", scene);
+
+    Object3D* xcube = GetCube(scene, glm::dvec3(1, 0, 0), glm::dvec3(0,  0, 0), glm::dvec3(0.5), glm::dvec4(1.0, 0.0, 0.0, 1.0));
+    Object3D* xline = GetLine(scene, glm::dvec3(0, 0, 0), glm::dvec3(1, 0, 0), glm::dvec4(1.0, 0.0, 0.0, 1.0));   
+
+    widget->AddObject(xcube);
+    widget->AddObject(xline);
+
+    Object3D* ycube = GetCube(scene, glm::dvec3(0, 1, 0), glm::dvec3(0,  0, 0), glm::dvec3(0.5), glm::dvec4(0.0, 1.0, 0.0, 1.0));
+    Object3D* yline = GetLine(scene, glm::dvec3(0, 0, 0), glm::dvec3(0, 1, 0), glm::dvec4(0.0, 1.0, 0.0, 1.0));
+
+    widget->AddObject(ycube);
+    widget->AddObject(yline);
+
+    Object3D* zcube = GetCube(scene, glm::dvec3(0, 0, 1), glm::dvec3(0, 0, 0), glm::dvec3(0.5), glm::dvec4(0.0, 0.0, 1.0, 1.0));
+    Object3D* zline = GetLine(scene, glm::dvec3(0, 0, 0), glm::dvec3(0, 0, 1), glm::dvec4(0.0, 0.0, 1.0, 1.0));
+
+    widget->AddObject(zcube);
+    widget->AddObject(zline);
+
+    TransformComponent* transform =  (TransformComponent*)widget->GetComponent("Transform");
+    transform->position = _position;
+    transform->rotation = _rotation;
+    transform->scale = _scale;
+
+    return widget;
 }
 
 }

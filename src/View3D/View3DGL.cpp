@@ -1,4 +1,5 @@
 #include "View3DGL.hpp"
+#include <ctime>
 
 
 #include <QOpenGLFunctions_3_2_Core>
@@ -58,6 +59,12 @@ namespace KikooRenderer {
         scene->Enable();
 
         connect(timer, &QTimer::timeout, [this]() {
+            std::time_t result = std::time(nullptr);
+            
+            clock_t currentTime = clock();
+            scene->deltaTime =  double( clock () - scene->previousTime ) /  CLOCKS_PER_SEC;
+            scene->previousTime = currentTime; 
+
             makeCurrent();
             scene->OnUpdate();  
 

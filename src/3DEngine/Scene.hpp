@@ -7,6 +7,7 @@
 #include "CameraScene.hpp"
 #include "Components/MeshFilterComponent.hpp"
 
+
 namespace KikooRenderer {
 namespace CoreEngine {
 class Object3D;
@@ -48,6 +49,9 @@ class Scene {
 		int windowWidth;
 
 		bool triggerRefresh = true;
+
+		clock_t previousTime=0;
+		double deltaTime;
 
 };
 

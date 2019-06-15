@@ -12,6 +12,7 @@ namespace KikooRenderer {
 namespace CoreEngine {
     Scene::Scene() : camera(CameraScene(this, 1.0, 70 * DEGTORAD, 0.1, 1000.0, 1.0)){
         this->started = false;
+        
     }
 
     void Scene::Start() {
@@ -23,34 +24,16 @@ namespace CoreEngine {
 
         Object3D* axes = GetAxes(this);
         objects3D.push_back(axes);
+        
+        // Object3D* widget = GetScaleWidget(this, glm::dvec3(0), glm::dvec3(0), glm::dvec3(1));
+        // objects3D.push_back(widget);
 
         //ADD OBJECTS HERE 
-        
-        // Object3D* newObject = GetQuad(this);
-        // Object3D* sphere = GetCube(this);
-        // objects3D.push_back(sphere);
-
-        Object3D* cone = GetCone(this, glm::dvec3(0), glm::dvec3(0,  90, 0), glm::dvec3(1), glm::dvec4(1.0, 0.0, 0.0, 1.0));
-        // objects3D.push_back(cone);
-        
-        Object3D* line = GetLine(this, glm::dvec3(-1, 0, 0), glm::dvec3(0), glm::dvec4(1.0, 0.0, 0.0, 1.0));
-        // objects3D.push_back(line);
-
-        Object3D* arrow = new Object3D("Parent", this);
-        arrow->AddObject(cone);
-        arrow->AddObject(line);
-        objects3D.push_back(arrow);
-
-        TransformComponent* transform =  (TransformComponent*)arrow->GetComponent("Transform");
-        transform->position = glm::dvec3(1.0, 1.0, 1.0);
+        Object3D* sphere = GetSphere(this, glm::dvec3(1), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.8, 0.4, 0.4, 1.0));
+        objects3D.push_back(sphere);
 
 
-        // TransformComponent* transform =(TransformComponent*) arrow->GetComponent("Transform");
-        // transform->position.x += 1.0;
-        // transform->position.y += 1.0;
 
-        //Update the position of the arrow 
-        //Should use the local position & global position
         
 
         //Start each object

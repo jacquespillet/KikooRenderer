@@ -20,14 +20,15 @@ Object3D::Object3D(std::string _name, Scene* _scene) {
 }
 
 void Object3D::AddComponent(Component* component) {
-
-	for(int i=0; i<components.size(); i++) { 
-		if(components[i]->name == component->name) {
-			components[i] = component;
-			return;
-		}
-	}	
-    this->components.push_back(component);
+	if(component != nullptr) {
+		for(int i=0; i<components.size(); i++) { 
+			if(components[i]->name == component->name) {
+				components[i] = component;
+				return;
+			}
+		}	
+		this->components.push_back(component);
+	}
 }
 
 void Object3D::AddObject(Object3D* object) {
