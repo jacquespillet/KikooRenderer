@@ -17,6 +17,9 @@ class Object3D {
 
         bool visible;
         bool enabled;
+        bool started;
+
+        bool hasToRecompute=false;
 
         Object3D(std::string name, Scene* scene);
         void AddComponent(Component* component);
@@ -28,6 +31,7 @@ class Object3D {
         void Render(glm::mat4* modelMatrix=nullptr);
         void Update();
         void Destroy();
+        void Recompute();
 };
 }
 

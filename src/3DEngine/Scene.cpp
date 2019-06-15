@@ -1,6 +1,7 @@
 #include "Scene.hpp"
 #include "Util.hpp"
 #include "BaseObjects.hpp"
+#include "Components/BoundingComponent.hpp"
 
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLFunctions_3_2_Core>
@@ -30,24 +31,27 @@ namespace CoreEngine {
 
         //ADD OBJECTS HERE 
         Object3D* sphere = GetSphere(this, glm::dvec3(1), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.8, 0.4, 0.4, 1.0));
-        objects3D.push_back(sphere);
-
-
-
-        
+        objects3D.push_back(sphere);        
 
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
             objects3D[i]->Start();
-        }        
+        } 
     }
 
     void Scene::Enable() {
         standardShaders.Compile();
-        //Enable each Object3D in scene
         for(int i=0; i<objects3D.size(); i++) {
+            if(!objects3D[i]->started) objects3D[i]->Start(); 
             objects3D[i]->Enable();
         }
+
+        Object3D* sphere = FindObjectByName("Sphere");
+        BoundingBoxComponent* bb = (BoundingBoxComponent*) sphere->GetComponent("BoundingBox");
+        Object3D* bbObj = bb->GetBoxObject();
+        bbObj->Start();
+        bbObj->Enable();
+        objects3D.push_back(bbObj);        
     }
 
     void Scene::Render() {
@@ -63,6 +67,8 @@ namespace CoreEngine {
 
     void Scene::OnUpdate() {
         for(int i=0; i<objects3D.size(); i++) {
+            if(!objects3D[i]->started) objects3D[i]->Start(); 
+            if(!objects3D[i]->enabled) objects3D[i]->Enable(); 
             objects3D[i]->Update();            
         }
     }
@@ -71,7 +77,15 @@ namespace CoreEngine {
 
     //RemoveObject
 
-    //FindObjectByName
+    Object3D* Scene::FindObjectByName(std::string name) {
+        for(int i=0; i<objects3D.size(); i++) {
+            if(objects3D[i]->name == name) {
+                return objects3D[i];
+            }
+        }        
+        return nullptr;
+    }
+
 
     //Enable
 

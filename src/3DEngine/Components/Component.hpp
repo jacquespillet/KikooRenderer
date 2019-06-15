@@ -16,6 +16,7 @@ class Component  {
         virtual void OnUpdate()=0;
         virtual void OnRender()=0;
         virtual void OnDestroy()=0;
+        virtual void Recompute()=0;
 
     protected: 
         bool inited;

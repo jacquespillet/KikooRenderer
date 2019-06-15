@@ -18,6 +18,7 @@ void MaterialComponent::OnEnable(){}
 void MaterialComponent::OnUpdate(){}
 void MaterialComponent::OnRender(){} 
 void MaterialComponent::OnDestroy(){} 
+        void Recompute(){}
 
 void MaterialComponent::SetShader(Shader* shader) {
     this->shader = shader;

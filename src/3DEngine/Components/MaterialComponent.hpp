@@ -14,6 +14,7 @@ class MaterialComponent : public Component {
         void OnUpdate();
         void OnRender();
         void OnDestroy();
+        void Recompute(){}
         
         void SetShader(Shader* shader);
         void SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 viewMatrix, glm::dmat4 projectionMatrix, Scene* scene);

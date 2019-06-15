@@ -257,6 +257,150 @@ Object3D* GetCube(Scene* scene, glm::dvec3 _position, glm::dvec3 _rotation, glm:
     return newObject;
 }
 
+Object3D* GetWireFrameBox(Scene* scene, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
+    //Start each Object3D in scene
+    Object3D* newObject = new Object3D("Cube", scene);
+    std::vector<glm::dvec3> vertex;
+    std::vector<glm::dvec3> normals;
+    std::vector<glm::dvec2> uv;
+    std::vector<glm::dvec4> colors;
+    std::vector<int> triangles;
+
+
+    //
+    ///Vertices
+    //
+
+    //Front
+    vertex.push_back(glm::dvec3(-0.5, -0.5, -0.5)); //bottom left
+    vertex.push_back(glm::dvec3(-0.5, 0.5, -0.5)); // top left
+    vertex.push_back(glm::dvec3(0.5, 0.5, -0.5)); //Top right
+    vertex.push_back(glm::dvec3(0.5, -0.5, -0.5)); //Bottom right
+
+    // Back
+    vertex.push_back(glm::dvec3(-0.5, -0.5, 0.5)); //bottom right
+    vertex.push_back(glm::dvec3(-0.5, 0.5, 0.5)); // top right
+    vertex.push_back(glm::dvec3(0.5, 0.5, 0.5)); //Top left
+    vertex.push_back(glm::dvec3(0.5, -0.5, 0.5)); //Bottom Left
+
+    //
+    ///Normals
+    //
+
+    //Front
+    normals.push_back(glm::dvec3(0, 0, 1));
+    normals.push_back(glm::dvec3(0, 0, 1));
+    normals.push_back(glm::dvec3(0, 0, 1));
+    normals.push_back(glm::dvec3(0, 0, 1));
+    
+    //Back
+    normals.push_back(glm::dvec3(0, 0, -1));
+    normals.push_back(glm::dvec3(0, 0, -1));
+    normals.push_back(glm::dvec3(0, 0, -1));
+    normals.push_back(glm::dvec3(0, 0, -1));
+  
+
+    //
+    ////UV
+    //
+
+    //Front
+    uv.push_back(glm::dvec2(0, 0));
+    uv.push_back(glm::dvec2(0, 0));
+    uv.push_back(glm::dvec2(0, 0));
+    uv.push_back(glm::dvec2(0, 0));
+    
+    //Back
+    uv.push_back(glm::dvec2(0, 0));
+    uv.push_back(glm::dvec2(0, 0));
+    uv.push_back(glm::dvec2(0, 0));
+    uv.push_back(glm::dvec2(0, 0));
+
+
+    //
+    ////Colors
+    //
+
+    //Front
+    colors.push_back(glm::dvec4(255, 0, 0, 255));
+    colors.push_back(glm::dvec4(0, 255, 0, 255));
+    colors.push_back(glm::dvec4(0, 0, 255, 255));
+    colors.push_back(glm::dvec4(255, 0, 0, 255));
+    
+    //Back
+    colors.push_back(glm::dvec4(255, 0, 0, 255));
+    colors.push_back(glm::dvec4(0, 255, 0, 255));
+    colors.push_back(glm::dvec4(0, 0, 255, 255));
+    colors.push_back(glm::dvec4(255, 0, 0, 255));
+
+
+    //
+    ////Triangles
+    //
+
+    //Front
+    int index = 0;
+    triangles.push_back(index + 0);
+    triangles.push_back(index + 1);
+
+    triangles.push_back(index + 1);
+    triangles.push_back(index + 2);
+
+    triangles.push_back(index + 2);
+    triangles.push_back(index + 3);
+
+    triangles.push_back(index + 3);
+    triangles.push_back(index + 0);
+
+
+    index = 4;
+    triangles.push_back(index + 0);
+    triangles.push_back(index + 1);
+
+    triangles.push_back(index + 1);
+    triangles.push_back(index + 2);
+
+    triangles.push_back(index + 2);
+    triangles.push_back(index + 3);
+
+    triangles.push_back(index + 3);
+    triangles.push_back(index + 0);
+
+    triangles.push_back( 0);
+    triangles.push_back( 4);
+
+    triangles.push_back( 1);
+    triangles.push_back( 5);
+
+    triangles.push_back( 2);
+    triangles.push_back( 6);
+
+    triangles.push_back( 3);
+    triangles.push_back( 7);
+
+    //Setup mesh
+    MeshFilterComponent* mesh = new MeshFilterComponent(newObject);
+    mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles);
+    mesh->drawingMode = GL_LINES;
+
+    //Setup transform
+    TransformComponent* transform = new TransformComponent(newObject );
+    transform->position = _position;
+    transform->rotation = _rotation;
+    transform->scale = _scale;
+    
+    //Setup material
+    MaterialComponent* material = new MaterialComponent(newObject);
+    material->albedo = _color;
+    material->SetShader(&scene->standardShaders.unlitMeshShader);
+
+    newObject->AddComponent(material);
+    newObject->AddComponent(transform);
+    newObject->AddComponent(mesh);
+
+    return newObject;
+}
+
 Object3D* GetQuad(Scene* scene, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
      //Start each Object3D in scene
     Object3D* newObject = new Object3D("Quad", scene);

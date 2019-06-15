@@ -39,6 +39,7 @@ void Object3D::Start() {
 	for(int i=0; i<childObjects.size(); i++) {
 		childObjects[i]->Start();
 	}
+	started = true;
 }
 
 void Object3D::Enable() {
@@ -48,15 +49,31 @@ void Object3D::Enable() {
     for(int i=0; i<components.size(); i++) {
         components[i]->OnEnable();
     }
+	enabled = true;
 }
 
 void Object3D::Update() {
+	if(hasToRecompute) {
+		Recompute();
+	}
+	
 	for(int i=0; i<childObjects.size(); i++) {
 		childObjects[i]->Update();
 	}
 
     for(int i=0; i<components.size(); i++) {
         components[i]->OnUpdate();
+    }
+
+}
+
+void Object3D::Recompute() {
+	for(int i=0; i<childObjects.size(); i++) {
+		childObjects[i]->Recompute();
+	}
+
+    for(int i=0; i<components.size(); i++) {
+        components[i]->Recompute();
     }
 }
 
@@ -69,6 +86,8 @@ void Object3D::Destroy() {
 		delete components[i];
     }
 }
+
+
 
 Component* Object3D::GetComponent(std::string name) {
 	for(int i=0; i<components.size(); i++) { 

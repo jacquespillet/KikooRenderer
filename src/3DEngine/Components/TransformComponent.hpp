@@ -13,6 +13,7 @@ class TransformComponent : public Component {
         void OnUpdate();
         void OnRender();
         void OnDestroy();
+        void Recompute(){}
 
         glm::dvec3 position;
         glm::dvec3 rotation;

@@ -7,6 +7,11 @@
 
 namespace KikooRenderer {
 namespace CoreEngine {
+    // //Maybe use it when different types of components ? 
+    // class BoundingComponent : public Component {
+
+    // }
+
     class BoundingBoxComponent : public Component {
         public:
         BoundingBoxComponent(Object3D* object);
@@ -15,21 +20,14 @@ namespace CoreEngine {
         void OnUpdate();
         void OnRender();
         void OnDestroy();
+        void Recompute(){}
 
         glm::dvec3 min;
         glm::dvec3 max;
 
-        //
-        // glm::dvec3 frontTopLeft;
-        // glm::dvec3 frontTopRight;
-        // glm::dvec3 frontBottomRight;
-        // glm::dvec3 frontBottomLeft;
-
-        // glm::dvec3 backTopLeft;
-        // glm::dvec3 backTopRight;
-        // glm::dvec3 backBottomRight;
-        // glm::dvec3 backBottomLeft;
-        // Collides(Ray ray);     
+        Object3D* GetBoxObject();
+        private: 
+        Object3D* boxObject;
     };
     
     // class BoundingSphere : public Component {

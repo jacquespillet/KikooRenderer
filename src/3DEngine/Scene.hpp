@@ -43,6 +43,8 @@ class Scene {
 		virtual void OnMouseMoveEvent(QMouseEvent *e);
 		virtual void OnWheelEvent(QWheelEvent *event);       
 
+		Object3D* FindObjectByName(std::string name);
+
 		void SetWindowSize(int w, int h);
 
 		int windowHeight;

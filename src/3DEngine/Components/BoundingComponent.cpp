@@ -1,5 +1,6 @@
 #include "BoundingComponent.hpp"
 #include "MeshFilterComponent.hpp"
+#include "../BaseObjects.hpp"
 
 
 #include <QtGui/QOpenGLFunctions>
@@ -15,13 +16,10 @@ namespace CoreEngine {
         max = glm::dvec3(-9999, -9999, -9999);
     }
    
-    void BoundingBoxComponent::OnStart() {
-
-    }
+    void BoundingBoxComponent::OnStart() {    }
    
     void BoundingBoxComponent::OnEnable() {
         MeshFilterComponent* mesh = (MeshFilterComponent*) this->object3D->GetComponent("MeshFilter");
-        std::cout << mesh->vertices.size() << std::endl;
         for(int i=0; i<mesh->vertices.size(); i++) {
             if(mesh->vertices[i].position.x < min.x) min.x = mesh->vertices[i].position.x; 
             if(mesh->vertices[i].position.y < min.y) min.y = mesh->vertices[i].position.y; 
@@ -31,10 +29,16 @@ namespace CoreEngine {
             if(mesh->vertices[i].position.y > max.y) max.y = mesh->vertices[i].position.y; 
             if(mesh->vertices[i].position.z > max.z) max.z = mesh->vertices[i].position.z;
         }
+        
+        TransformComponent* objectTransform = (TransformComponent*) object3D->GetComponent("Transform");
+
+        glm::dvec3 position = (max + min) / 2.0;
+        glm::dvec3 scale = max - min;
+        boxObject = GetWireFrameBox(object3D->scene, objectTransform->position, objectTransform->rotation, objectTransform->scale * scale, glm::dvec4(0, 1, 0, 1));
+        inited = true;
     }
     
     void BoundingBoxComponent::OnUpdate() {
-
     }
     
     void BoundingBoxComponent::OnRender() {
@@ -43,6 +47,11 @@ namespace CoreEngine {
     
     void BoundingBoxComponent::OnDestroy() {
 
+    }
+    
+    Object3D* BoundingBoxComponent::GetBoxObject() {
+        std::cout << "getting box" << std::endl;
+        return boxObject;
     }
 }
 }

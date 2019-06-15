@@ -21,6 +21,7 @@ class MeshFilterComponent : public Component {
         void OnUpdate();
         void OnRender();
         void OnDestroy();
+        void Recompute(){}
         
 
         void LoadFromBuffers(std::vector<glm::dvec3> vertex,
