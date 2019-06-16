@@ -51,7 +51,7 @@ namespace CoreEngine {
         Object3D* bbObj = bb->GetBoxObject();
         bbObj->Start();
         bbObj->Enable();
-        objects3D.push_back(bbObj);        
+        sphere->AddObject(bbObj);        
     }
 
     void Scene::Render() {

@@ -21,6 +21,9 @@ set(QT_BUILD_DIR  "C:/Qt/5.11.2/msvc2017_64")
 set(GLM_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/glm)
 include_directories(${GLM_INC_DIR})
 
+#eigen
+set(EIGEN_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/eigen)
+include_directories(${EIGEN_INC_DIR})
 
 include_directories(src)
 

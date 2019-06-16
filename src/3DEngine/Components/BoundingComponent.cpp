@@ -30,11 +30,9 @@ namespace CoreEngine {
             if(mesh->vertices[i].position.z > max.z) max.z = mesh->vertices[i].position.z;
         }
         
-        TransformComponent* objectTransform = (TransformComponent*) object3D->GetComponent("Transform");
-
         glm::dvec3 position = (max + min) / 2.0;
         glm::dvec3 scale = max - min;
-        boxObject = GetWireFrameBox(object3D->scene, objectTransform->position, objectTransform->rotation, objectTransform->scale * scale, glm::dvec4(0, 1, 0, 1));
+        boxObject = GetWireFrameBox(object3D->scene, position, glm::dvec3(0), scale, glm::dvec4(0, 1, 0, 1));
         inited = true;
     }
     
