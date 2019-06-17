@@ -2,6 +2,7 @@
 
 #include "Common/Common.h"
 #include "Components/TransformComponent.hpp"
+#include "Geometry/Ray.hpp"
 
 namespace KikooRenderer {
 namespace CoreEngine {
@@ -33,6 +34,8 @@ class CameraScene{
 		void OnMouseReleaseEvent(QMouseEvent *e);
 		void OnMouseMoveEvent(QMouseEvent *e);
 		void OnWheelEvent(QWheelEvent *event); 
+
+        Geometry::Ray GetRay(int x, int y);
 
     private: 
         bool isRightClicked = false;

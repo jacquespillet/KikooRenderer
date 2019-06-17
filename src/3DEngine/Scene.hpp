@@ -44,6 +44,8 @@ class Scene {
 		virtual void OnWheelEvent(QWheelEvent *event);       
 
 		Object3D* FindObjectByName(std::string name);
+		void AddObject(Object3D* object);
+		void RemoveObject(Object3D* object);
 
 		void SetWindowSize(int w, int h);
 
@@ -54,6 +56,9 @@ class Scene {
 
 		clock_t previousTime=0;
 		double deltaTime;
+
+	private:
+		Object3D* GetIntersectObject(int x, int y);
 
 };
 

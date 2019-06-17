@@ -32,7 +32,7 @@ namespace CoreEngine {
         
         glm::dvec3 position = (max + min) / 2.0;
         glm::dvec3 scale = max - min;
-        boxObject = GetWireFrameBox(object3D->scene, position, glm::dvec3(0), scale, glm::dvec4(0, 1, 0, 1));
+        boxObject = GetWireFrameBox(object3D->scene, "BoundingBox", position, glm::dvec3(0), scale, glm::dvec4(0, 1, 0, 1));
         inited = true;
     }
     
@@ -48,7 +48,6 @@ namespace CoreEngine {
     }
     
     Object3D* BoundingBoxComponent::GetBoxObject() {
-        std::cout << "getting box" << std::endl;
         return boxObject;
     }
 }

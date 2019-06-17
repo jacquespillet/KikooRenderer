@@ -8,9 +8,9 @@ namespace KikooRenderer {
 namespace CoreEngine {
 
 
-Object3D* GetCube(Scene* scene, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
+Object3D* GetCube(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
      //Start each Object3D in scene
-    Object3D* newObject = new Object3D("Cube", scene);
+    Object3D* newObject = new Object3D(name, scene);
     std::vector<glm::dvec3> vertex;
     std::vector<glm::dvec3> normals;
     std::vector<glm::dvec2> uv;
@@ -257,9 +257,9 @@ Object3D* GetCube(Scene* scene, glm::dvec3 _position, glm::dvec3 _rotation, glm:
     return newObject;
 }
 
-Object3D* GetWireFrameBox(Scene* scene, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
+Object3D* GetWireFrameBox(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
     //Start each Object3D in scene
-    Object3D* newObject = new Object3D("Cube", scene);
+    Object3D* newObject = new Object3D(name, scene);
     std::vector<glm::dvec3> vertex;
     std::vector<glm::dvec3> normals;
     std::vector<glm::dvec2> uv;
@@ -401,9 +401,9 @@ Object3D* GetWireFrameBox(Scene* scene, glm::dvec3 _position, glm::dvec3 _rotati
     return newObject;
 }
 
-Object3D* GetQuad(Scene* scene, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
+Object3D* GetQuad(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
      //Start each Object3D in scene
-    Object3D* newObject = new Object3D("Quad", scene);
+    Object3D* newObject = new Object3D(name, scene);
     std::vector<glm::dvec3> vertex;
     std::vector<glm::dvec3> normals;
     std::vector<glm::dvec2> uv;
@@ -489,9 +489,9 @@ Object3D* GetQuad(Scene* scene, glm::dvec3 _position, glm::dvec3 _rotation, glm:
     return newObject;
 }
 
-Object3D* GetCircle(Scene* scene, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
+Object3D* GetCircle(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
      //Start each Object3D in scene
-    Object3D* newObject = new Object3D("Circle", scene);
+    Object3D* newObject = new Object3D(name, scene);
     std::vector<glm::dvec3> vertex;
     std::vector<glm::dvec3> normals;
     std::vector<glm::dvec2> uv;
@@ -547,9 +547,9 @@ Object3D* GetCircle(Scene* scene, glm::dvec3 _position, glm::dvec3 _rotation, gl
     return newObject;
 }
 
-Object3D* GetSphere(Scene* scene, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
+Object3D* GetSphere(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
     //Start each Object3D in scene
-    Object3D* newObject = new Object3D("Sphere", scene);
+    Object3D* newObject = new Object3D(name, scene);
     std::vector<glm::dvec3> vertex;
     std::vector<glm::dvec3> normals;
     std::vector<glm::dvec2> uv;
@@ -607,9 +607,9 @@ Object3D* GetSphere(Scene* scene, glm::dvec3 _position, glm::dvec3 _rotation, gl
     return newObject;
 }
 
-Object3D* GetGrid(Scene* scene) {
+Object3D* GetGrid(Scene* scene, std::string name) {
    //Start each Object3D in scene
-    Object3D* newObject = new Object3D("Grid", scene);
+    Object3D* newObject = new Object3D(name, scene);
     std::vector<glm::dvec3> vertex;
     std::vector<glm::dvec3> normals;
     std::vector<glm::dvec2> uv;
@@ -676,8 +676,8 @@ Object3D* GetGrid(Scene* scene) {
 }
 
 
-Object3D* GetAxes(Scene* scene) {
-    Object3D* newObject = new Object3D("Axes", scene);
+Object3D* GetAxes(Scene* scene, std::string name) {
+    Object3D* newObject = new Object3D(name, scene);
     std::vector<glm::dvec3> vertex;
     std::vector<glm::dvec3> normals;
     std::vector<glm::dvec2> uv;
@@ -758,9 +758,9 @@ Object3D* GetAxes(Scene* scene) {
 }
 
 
-Object3D* GetCone(Scene* scene, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
+Object3D* GetCone(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
     //Start each Object3D in scene
-    Object3D* newObject = new Object3D("Cone", scene);
+    Object3D* newObject = new Object3D(name, scene);
     std::vector<glm::dvec3> vertex;
     std::vector<glm::dvec3> normals;
     std::vector<glm::dvec2> uv;
@@ -830,8 +830,8 @@ Object3D* GetCone(Scene* scene, glm::dvec3 _position, glm::dvec3 _rotation, glm:
 }
 
 
-Object3D* GetLine(Scene* scene, glm::dvec3 position1, glm::dvec3 position2, glm::dvec4 color) {
-    Object3D* newObject = new Object3D("Line", scene);
+Object3D* GetLine(Scene* scene, std::string name, glm::dvec3 position1, glm::dvec3 position2, glm::dvec4 color) {
+    Object3D* newObject = new Object3D(name, scene);
     std::vector<glm::dvec3> vertex;
     std::vector<glm::dvec3> normals;
     std::vector<glm::dvec2> uv;
@@ -877,23 +877,23 @@ Object3D* GetLine(Scene* scene, glm::dvec3 position1, glm::dvec3 position2, glm:
     return newObject;
 }
 
-Object3D* GetTranslateWidget(Scene* scene,glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale) {
-    Object3D* widget = new Object3D("Parent", scene);
+Object3D* GetTranslateWidget(Scene* scene, std::string name,glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale) {
+    Object3D* widget = new Object3D(name, scene);
 
-    Object3D* xcone = GetCone(scene, glm::dvec3(1, 0, 0), glm::dvec3(0,  90, 0), glm::dvec3(1), glm::dvec4(1.0, 0.0, 0.0, 1.0));
-    Object3D* xline = GetLine(scene, glm::dvec3(0, 0, 0), glm::dvec3(1, 0, 0), glm::dvec4(1.0, 0.0, 0.0, 1.0));   
+    Object3D* xcone = GetCone(scene,"coneX", glm::dvec3(1, 0, 0), glm::dvec3(0,  90, 0), glm::dvec3(1), glm::dvec4(1.0, 0.0, 0.0, 1.0));
+    Object3D* xline = GetLine(scene,"lineX", glm::dvec3(0, 0, 0), glm::dvec3(1, 0, 0), glm::dvec4(1.0, 0.0, 0.0, 1.0));   
 
     widget->AddObject(xcone);
     widget->AddObject(xline);
 
-    Object3D* ycone = GetCone(scene, glm::dvec3(0, 1, 0), glm::dvec3(- 90,  0, 0), glm::dvec3(1), glm::dvec4(0.0, 1.0, 0.0, 1.0));
-    Object3D* yline = GetLine(scene, glm::dvec3(0, 0, 0), glm::dvec3(0, 1, 0), glm::dvec4(0.0, 1.0, 0.0, 1.0));
+    Object3D* ycone = GetCone(scene,"coneY", glm::dvec3(0, 1, 0), glm::dvec3(- 90,  0, 0), glm::dvec3(1), glm::dvec4(0.0, 1.0, 0.0, 1.0));
+    Object3D* yline = GetLine(scene,"lineY", glm::dvec3(0, 0, 0), glm::dvec3(0, 1, 0), glm::dvec4(0.0, 1.0, 0.0, 1.0));
 
     widget->AddObject(ycone);
     widget->AddObject(yline);
 
-    Object3D* zcone = GetCone(scene, glm::dvec3(0, 0, 1), glm::dvec3(0, 0, 0), glm::dvec3(1), glm::dvec4(0.0, 0.0, 1.0, 1.0));
-    Object3D* zline = GetLine(scene, glm::dvec3(0, 0, 0), glm::dvec3(0, 0, 1), glm::dvec4(0.0, 0.0, 1.0, 1.0));
+    Object3D* zcone = GetCone(scene,"coneZ", glm::dvec3(0, 0, 1), glm::dvec3(0, 0, 0), glm::dvec3(1), glm::dvec4(0.0, 0.0, 1.0, 1.0));
+    Object3D* zline = GetLine(scene,"lineZ", glm::dvec3(0, 0, 0), glm::dvec3(0, 0, 1), glm::dvec4(0.0, 0.0, 1.0, 1.0));
 
     widget->AddObject(zcone);
     widget->AddObject(zline);
@@ -906,23 +906,23 @@ Object3D* GetTranslateWidget(Scene* scene,glm::dvec3 _position, glm::dvec3 _rota
     return widget;
 }
 
-Object3D* GetScaleWidget(Scene* scene,glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale) {
-    Object3D* widget = new Object3D("Parent", scene);
+Object3D* GetScaleWidget(Scene* scene, std::string name,glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale) {
+    Object3D* widget = new Object3D(name, scene);
 
-    Object3D* xcube = GetCube(scene, glm::dvec3(1, 0, 0), glm::dvec3(0,  0, 0), glm::dvec3(0.5), glm::dvec4(1.0, 0.0, 0.0, 1.0));
-    Object3D* xline = GetLine(scene, glm::dvec3(0, 0, 0), glm::dvec3(1, 0, 0), glm::dvec4(1.0, 0.0, 0.0, 1.0));   
+    Object3D* xcube = GetCube(scene, "cubeX", glm::dvec3(1, 0, 0), glm::dvec3(0,  0, 0), glm::dvec3(0.5), glm::dvec4(1.0, 0.0, 0.0, 1.0));
+    Object3D* xline = GetLine(scene, "lineX", glm::dvec3(0, 0, 0), glm::dvec3(1, 0, 0), glm::dvec4(1.0, 0.0, 0.0, 1.0));   
 
     widget->AddObject(xcube);
     widget->AddObject(xline);
 
-    Object3D* ycube = GetCube(scene, glm::dvec3(0, 1, 0), glm::dvec3(0,  0, 0), glm::dvec3(0.5), glm::dvec4(0.0, 1.0, 0.0, 1.0));
-    Object3D* yline = GetLine(scene, glm::dvec3(0, 0, 0), glm::dvec3(0, 1, 0), glm::dvec4(0.0, 1.0, 0.0, 1.0));
+    Object3D* ycube = GetCube(scene, "cubeY", glm::dvec3(0, 1, 0), glm::dvec3(0,  0, 0), glm::dvec3(0.5), glm::dvec4(0.0, 1.0, 0.0, 1.0));
+    Object3D* yline = GetLine(scene, "lineY", glm::dvec3(0, 0, 0), glm::dvec3(0, 1, 0), glm::dvec4(0.0, 1.0, 0.0, 1.0));
 
     widget->AddObject(ycube);
     widget->AddObject(yline);
 
-    Object3D* zcube = GetCube(scene, glm::dvec3(0, 0, 1), glm::dvec3(0, 0, 0), glm::dvec3(0.5), glm::dvec4(0.0, 0.0, 1.0, 1.0));
-    Object3D* zline = GetLine(scene, glm::dvec3(0, 0, 0), glm::dvec3(0, 0, 1), glm::dvec4(0.0, 0.0, 1.0, 1.0));
+    Object3D* zcube = GetCube(scene, "cubeZ", glm::dvec3(0, 0, 1), glm::dvec3(0, 0, 0), glm::dvec3(0.5), glm::dvec4(0.0, 0.0, 1.0, 1.0));
+    Object3D* zline = GetLine(scene, "lineZ", glm::dvec3(0, 0, 0), glm::dvec3(0, 0, 1), glm::dvec4(0.0, 0.0, 1.0, 1.0));
 
     widget->AddObject(zcube);
     widget->AddObject(zline);

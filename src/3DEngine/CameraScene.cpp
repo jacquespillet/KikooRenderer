@@ -135,5 +135,14 @@ void CameraScene::OnWheelEvent(QWheelEvent *event) {
     }
 }
 
+Geometry::Ray CameraScene::GetRay(int x, int y) {
+    Geometry::Ray ray;
+    ray.origin = glm::dvec3(0, 0, 0);
+    ray.direction   = glm::dvec3(0, 0, 1);
+
+    return ray;
+}
+
+
 }
 }

@@ -21,6 +21,7 @@ set(MainWindowSrc
 	3DEngine/BaseObjects.cpp
 
 	Geometry/Util.cpp	
+	Geometry/Ray.cpp	
 )
 
 add_executable(MainWindow ${MainWindowSrc})
