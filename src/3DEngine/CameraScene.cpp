@@ -137,8 +137,17 @@ void CameraScene::OnWheelEvent(QWheelEvent *event) {
 
 Geometry::Ray CameraScene::GetRay(int x, int y) {
     Geometry::Ray ray;
-    ray.origin = glm::dvec3(0, 0, 0);
-    ray.direction   = glm::dvec3(0, 0, 1);
+    glm::dmat4 localToWorld = this->transform->GetModelMatrix();
+
+    int width = this->scene->windowWidth;
+    int height = this->scene->windowHeight;
+    float ndcX = ((((float)x / (float)width) * 2.0) - 1.0) * this->aspect;
+    float ndcY = 1.0 - (((float)x / (float)width) * 2.0);
+
+    float ndcZ = 1 / std::tan(this->fov/2.0);
+
+    ray.origin = localToWorld *  glm::dvec3(0, 0, 0);
+    ray.direction = localToWorld * glm::dvec3(ndcX, ndcY, ndcZ);
 
     return ray;
 }
