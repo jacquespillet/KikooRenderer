@@ -31,15 +31,18 @@ namespace CoreEngine {
         // objects3D.push_back(widget);
 
         //ADD OBJECTS HERE 
-        Object3D* sphere = GetSphere(this,"Sphere", glm::dvec3(1), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.8, 0.4, 0.4, 1.0));
-        AddObject(sphere);
-
+        // Object3D* sphere = GetSphere(this,"Sphere", glm::dvec3(1), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.8, 0.4, 0.4, 1.0));
+        // AddObject(sphere);
         
         Object3D* sphere1 = GetSphere(this,"Sphere", glm::dvec3(-1), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.4, 0.1, 0.1, 1.0));
         AddObject(sphere1);
         
         Object3D* sphere2 = GetSphere(this,"Sphere", glm::dvec3(1, -1, 0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.4, 0.1, 0.1, 1.0));
         AddObject(sphere2);
+
+        Object3D* cube = GetCube(this,"Cube", glm::dvec3(1, 10, 2), glm::dvec3(78, -45, 17), glm::dvec3(4.5), glm::dvec4(0.4, 0.1, 0.1, 1.0));
+        AddObject(cube);
+
         // objects3D.push_back(sphere); 
 
 
@@ -143,7 +146,10 @@ namespace CoreEngine {
     void Scene::OnMousePressEvent(QMouseEvent *e) {
         this->camera.OnMousePressEvent(e);
 
-        Object3D* intersectedObject = GetIntersectObject(e->x(), e->y());             
+        Object3D* intersectedObject = GetIntersectObject(e->x(), e->y());
+        if(intersectedObject != nullptr) {
+            std::cout << intersectedObject->name << std::endl;
+        }             
     }
 
     void Scene::OnMouseReleaseEvent(QMouseEvent *e) {
@@ -167,13 +173,35 @@ namespace CoreEngine {
         this->camera.UpdateProjectionMatrix();
     }
 
-    Object3D* Scene::GetIntersectObject(int x, int y) {
-        std::cout << x << std::endl;
-        std::cout << y << std::endl;
-        Geometry::Ray ray = this->camera.GetRay(x, y);
-        // glm::dvec4 p1 = glm::dvec4()
 
-        return nullptr;
+    Object3D* Scene::GetIntersectObject(int x, int y) {
+        Geometry::Ray ray = this->camera.GetRay(x, y);
+        double minDistance = 99999999999999.0;
+        int intersectedInx=-1;
+        for(int i=0; i<objects3D.size(); i++) {
+            BoundingBoxComponent* bb = (BoundingBoxComponent*) objects3D[i]->GetComponent("BoundingBox");
+            if(bb != nullptr) {
+                glm::dvec3 min;
+                glm::dvec3 max;
+                bb->GetLocalBounds(&min, &max);
+            
+                TransformComponent* transform = (TransformComponent*) objects3D[i]->GetComponent("Transform");
+                glm::dmat4 transformMat = transform->GetTransRotMatrix();
+                glm::dvec3 minScale = min * transform->scale;
+                glm::dvec3 maxScale = max * transform->scale;
+
+                double distance;
+                bool intersect = Util::RayBoxTest(ray.origin, ray.direction, transformMat, minScale, maxScale, distance);
+
+                if(intersect && distance < minDistance) {
+                    minDistance = distance;
+                    intersectedInx = i;
+                }
+            }
+        }
+
+        if(intersectedInx >= 0) return objects3D[intersectedInx];
+        else return nullptr;
     }
 
 }

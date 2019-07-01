@@ -22,12 +22,16 @@ namespace CoreEngine {
         void OnDestroy();
         void Recompute(){}
 
+        void GetWorldBounds(glm::dvec3* _min, glm::dvec3* _max);
+        void GetLocalBounds(glm::dvec3* _min, glm::dvec3* _max);
+
         glm::dvec3 min;
         glm::dvec3 max;
 
         Object3D* GetBoxObject();
         private: 
         Object3D* boxObject;
+        TransformComponent* transform;
     };
     
     // class BoundingSphere : public Component {

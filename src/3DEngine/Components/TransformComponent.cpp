@@ -27,6 +27,17 @@ glm::dmat4 TransformComponent::GetModelMatrix() {
 		
 	return translateM * rotM * scaleM;
 }
+glm::dmat4 TransformComponent::GetTransRotMatrix() {
+	glm::dmat4 translateM = glm::translate(glm::dmat4(1.0f), this->position);
+	
+	glm::dmat4 rotxPM = glm::rotate(glm::dmat4(1.0f), rotation.x * DEGTORAD, glm::dvec3(1.0f, 0.0f, 0.0f));//rot x axis
+	glm::dmat4 rotyPM = glm::rotate(glm::dmat4(1.0f), rotation.y * DEGTORAD, glm::dvec3(0.0f, 1.0f, 0.0f));//rot y axis
+	glm::dmat4 rotzPM = glm::rotate(glm::dmat4(1.0f), rotation.z * DEGTORAD, glm::dvec3(0.0f, 0.0f, 1.0f));//rot z axis
+
+	glm::dmat4 rotM = rotyPM * rotxPM * rotzPM; 	
+		
+	return translateM * rotM;
+}
 
 }
 }

@@ -250,9 +250,13 @@ Object3D* GetCube(Scene* scene, std::string name, glm::dvec3 _position, glm::dve
     material->albedo = _color;
     material->SetShader(&scene->standardShaders.unlitMeshShader);
 
+    BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
+
+
     newObject->AddComponent(material);
     newObject->AddComponent(transform);
     newObject->AddComponent(mesh);
+    newObject->AddComponent(boundingBox);
 
     return newObject;
 }
@@ -482,9 +486,14 @@ Object3D* GetQuad(Scene* scene, std::string name, glm::dvec3 _position, glm::dve
     material->albedo = _color;
     material->SetShader(&scene->standardShaders.unlitMeshShader);
 
+
+    BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
+
     newObject->AddComponent(material);
     newObject->AddComponent(mesh);
     newObject->AddComponent(transform);
+    newObject->AddComponent(boundingBox);
+
 
     return newObject;
 }
@@ -540,9 +549,13 @@ Object3D* GetCircle(Scene* scene, std::string name, glm::dvec3 _position, glm::d
     material->albedo = _color;
     material->SetShader(&scene->standardShaders.unlitMeshShader);
 
+    BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
+
     newObject->AddComponent(material);
     newObject->AddComponent(mesh);
     newObject->AddComponent(transform);
+    newObject->AddComponent(boundingBox);
+
 
     return newObject;
 }
@@ -822,9 +835,12 @@ Object3D* GetCone(Scene* scene, std::string name, glm::dvec3 _position, glm::dve
     material->albedo = _color;
     material->SetShader(&scene->standardShaders.unlitMeshShader);
 
+    BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
+
     newObject->AddComponent(material);
     newObject->AddComponent(mesh);
     newObject->AddComponent(transform);
+    newObject->AddComponent(boundingBox);
 
     return newObject;
 }

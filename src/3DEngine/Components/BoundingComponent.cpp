@@ -20,6 +20,8 @@ namespace CoreEngine {
    
     void BoundingBoxComponent::OnEnable() {
         MeshFilterComponent* mesh = (MeshFilterComponent*) this->object3D->GetComponent("MeshFilter");
+        transform = (TransformComponent*) this->object3D->GetComponent("Transform");
+
         for(int i=0; i<mesh->vertices.size(); i++) {
             if(mesh->vertices[i].position.x < min.x) min.x = mesh->vertices[i].position.x; 
             if(mesh->vertices[i].position.y < min.y) min.y = mesh->vertices[i].position.y; 
@@ -49,6 +51,16 @@ namespace CoreEngine {
     
     Object3D* BoundingBoxComponent::GetBoxObject() {
         return boxObject;
+    }
+
+    void BoundingBoxComponent::GetWorldBounds(glm::dvec3* _min, glm::dvec3* _max) {
+        (*_min) = this->transform->GetModelMatrix() * glm::dvec4(this->min, 1.0);
+        (*_max) = this->transform->GetModelMatrix() * glm::dvec4(this->max, 1.0);
+    }
+
+    void BoundingBoxComponent::GetLocalBounds(glm::dvec3* _min, glm::dvec3* _max) {
+        (*_min) =  glm::dvec4(this->min, 1.0);
+        (*_max) =  glm::dvec4(this->max, 1.0);
     }
 }
 }

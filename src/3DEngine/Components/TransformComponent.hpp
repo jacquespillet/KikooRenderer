@@ -20,6 +20,7 @@ class TransformComponent : public Component {
         glm::dvec3 scale;
 
         glm::dmat4 GetModelMatrix(); 
+        glm::dmat4 GetTransRotMatrix(); 
 };
 }
 }

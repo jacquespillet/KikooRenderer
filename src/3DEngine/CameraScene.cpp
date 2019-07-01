@@ -15,6 +15,8 @@ CameraScene::CameraScene(Scene* _scene, double _eyeDistance, double _fov, double
     UpdateProjectionMatrix();
 
     this->transform.position.z = -5;
+    this->transform.position.x = 2.5;
+    this->transform.position.y = 2.5;
 
 }
 
@@ -137,17 +139,16 @@ void CameraScene::OnWheelEvent(QWheelEvent *event) {
 
 Geometry::Ray CameraScene::GetRay(int x, int y) {
     Geometry::Ray ray;
-    glm::dmat4 localToWorld = this->transform->GetModelMatrix();
+    glm::dmat4 localToWorld = this->transform.GetModelMatrix();
 
     int width = this->scene->windowWidth;
     int height = this->scene->windowHeight;
     float ndcX = ((((float)x / (float)width) * 2.0) - 1.0) * this->aspect;
-    float ndcY = 1.0 - (((float)x / (float)width) * 2.0);
-
+    float ndcY = 1.0 - (((float)y / (float)height) * 2.0);
     float ndcZ = 1 / std::tan(this->fov/2.0);
 
-    ray.origin = localToWorld *  glm::dvec3(0, 0, 0);
-    ray.direction = localToWorld * glm::dvec3(ndcX, ndcY, ndcZ);
+    ray.origin = localToWorld *  glm::dvec4(0, 0, 0, 1);
+    ray.direction = glm::normalize(localToWorld * glm::dvec4(ndcX, ndcY, ndcZ, 0));
 
     return ray;
 }
