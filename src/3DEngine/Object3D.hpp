@@ -2,6 +2,7 @@
 #include "Common/Common.h"
 // #include "Component.hpp"
 #include "Scene.hpp"
+#include "Geometry/Ray.hpp"
 
 namespace KikooRenderer {
 
@@ -14,12 +15,17 @@ class Object3D {
         std::vector<Component*> components;
         Scene* scene;
         std::vector<Object3D*> childObjects;
+        Object3D* parent = nullptr;
 
-        bool visible;
+
+        bool visible = true;
         bool enabled;
         bool started;
+        bool depthTest = true;
 
         bool hasToRecompute=false;
+
+        bool isSelected = false;
 
         Object3D(std::string name, Scene* scene);
         void AddComponent(Component* component);
@@ -32,6 +38,8 @@ class Object3D {
         void Update();
         void Destroy();
         void Recompute();
+
+        Object3D* Intersects(Geometry::Ray ray, double& distance);
 };
 }
 

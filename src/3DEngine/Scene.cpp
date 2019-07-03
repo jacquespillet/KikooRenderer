@@ -21,30 +21,27 @@ namespace CoreEngine {
         this->started = true;
         OnStart();
 
-        Object3D* plane = GetGrid(this, "Grid");
-        objects3D.push_back(plane);
+
+        Object3D* grid = GetGrid(this, "Grid");
+        objects3D.push_back(grid);
 
         Object3D* axes = GetAxes(this, "Axes");
         objects3D.push_back(axes);
-        
-        // Object3D* widget = GetScaleWidget(this, glm::dvec3(0), glm::dvec3(0), glm::dvec3(1));
-        // objects3D.push_back(widget);
 
-        //ADD OBJECTS HERE 
-        // Object3D* sphere = GetSphere(this,"Sphere", glm::dvec3(1), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.8, 0.4, 0.4, 1.0));
-        // AddObject(sphere);
-        
+
         Object3D* sphere1 = GetSphere(this,"Sphere", glm::dvec3(-1), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.4, 0.1, 0.1, 1.0));
         AddObject(sphere1);
         
-        Object3D* sphere2 = GetSphere(this,"Sphere", glm::dvec3(1, -1, 0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.4, 0.1, 0.1, 1.0));
+        Object3D* sphere2 = GetSphere(this,"Sphere", glm::dvec3(1, -1, 0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.1, 0.4, 0.1, 1.0));
         AddObject(sphere2);
 
-        Object3D* cube = GetCube(this,"Cube", glm::dvec3(1, 10, 2), glm::dvec3(78, -45, 17), glm::dvec3(4.5), glm::dvec4(0.4, 0.1, 0.1, 1.0));
+        Object3D* cube = GetCube(this,"Cube", glm::dvec3(1, 10, 2), glm::dvec3(78, -45, 17), glm::dvec3(4.5), glm::dvec4(0.0, 0.1, 0.4, 1.0));
         AddObject(cube);
-
-        // objects3D.push_back(sphere); 
-
+        
+        transformWidget = GetTranslateWidget(this, "TranslateWidget", glm::dvec3(0), glm::dvec3(0), glm::dvec3(1));
+        transformWidget->visible = false;
+        transformWidget->depthTest = false;
+        AddObject(transformWidget);
 
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
@@ -58,13 +55,6 @@ namespace CoreEngine {
             if(!objects3D[i]->started) objects3D[i]->Start(); 
             objects3D[i]->Enable();
         }
-
-        // Object3D* sphere = FindObjectByName("Sphere");
-        // BoundingBoxComponent* bb = (BoundingBoxComponent*) sphere->GetComponent("BoundingBox");
-        // Object3D* bbObj = bb->GetBoxObject();
-        // bbObj->Start();
-        // bbObj->Enable();
-        // sphere->AddObject(bbObj);        
     }
 
     void Scene::Render() {
@@ -74,7 +64,9 @@ namespace CoreEngine {
 
         // Render each object
         for(int i=0; i<objects3D.size(); i++) {
-            objects3D[i]->Render(); 
+            if(objects3D[i]->visible) {
+                objects3D[i]->Render(); 
+            }
         }
     }
 
@@ -99,7 +91,6 @@ namespace CoreEngine {
     void Scene::AddObject(Object3D* object) {
         bool nameIsOk = false;
         std::string currentName = object->name;
-        
         while(!nameIsOk) {
             for(int i=0; i<objects3D.size(); i++) {
                 std::string otherName=objects3D[i]->name;
@@ -145,11 +136,7 @@ namespace CoreEngine {
 
     void Scene::OnMousePressEvent(QMouseEvent *e) {
         this->camera.OnMousePressEvent(e);
-
-        Object3D* intersectedObject = GetIntersectObject(e->x(), e->y());
-        if(intersectedObject != nullptr) {
-            std::cout << intersectedObject->name << std::endl;
-        }             
+        if(e->button() == Qt::LeftButton) HandleSelection(e->x(), e->y());
     }
 
     void Scene::OnMouseReleaseEvent(QMouseEvent *e) {
@@ -173,35 +160,56 @@ namespace CoreEngine {
         this->camera.UpdateProjectionMatrix();
     }
 
+    void Scene::HandleSelection(int x, int y) {
+        Object3D* intersectedObject = GetIntersectObject(x, y);
+        if(intersectedObject != nullptr) {
+            std::cout << intersectedObject->name << std::endl;
+            if(intersectedObject->parent == transformWidget) {
+                std::cout << "Handle transform" << std::endl;
+            } else {
+                intersectedObject->isSelected = !intersectedObject->isSelected;
+                std::vector<Object3D*>::iterator it = std::find(selectedObjects.begin(), selectedObjects.end(), intersectedObject);
+                int objectInx = std::distance(selectedObjects.begin(), it); 
+                
+                if( it != selectedObjects.end()) {
+                    selectedObjects.erase(selectedObjects.begin() + objectInx);
+                } else {
+                    selectedObjects.push_back(intersectedObject);
+                }
+
+                TransformComponent* objectTransform = (TransformComponent*) intersectedObject->GetComponent("Transform");
+                TransformComponent* widgetTransform = (TransformComponent*) transformWidget->GetComponent("Transform");
+                widgetTransform->position = objectTransform->position;
+                
+                transformWidget->visible = selectedObjects.size() > 0;
+            }
+        } else {
+            selectedObjects.resize(0);
+            transformWidget->visible = false;
+        } 
+    }
+
 
     Object3D* Scene::GetIntersectObject(int x, int y) {
         Geometry::Ray ray = this->camera.GetRay(x, y);
         double minDistance = 99999999999999.0;
-        int intersectedInx=-1;
-        for(int i=0; i<objects3D.size(); i++) {
-            BoundingBoxComponent* bb = (BoundingBoxComponent*) objects3D[i]->GetComponent("BoundingBox");
-            if(bb != nullptr) {
-                glm::dvec3 min;
-                glm::dvec3 max;
-                bb->GetLocalBounds(&min, &max);
-            
-                TransformComponent* transform = (TransformComponent*) objects3D[i]->GetComponent("Transform");
-                glm::dmat4 transformMat = transform->GetTransRotMatrix();
-                glm::dvec3 minScale = min * transform->scale;
-                glm::dvec3 maxScale = max * transform->scale;
+        Object3D* closest = nullptr;
+        for(int i=0; i<objects3D.size(); i++) { 
+            double distance;
+            Object3D* intersectedObject = objects3D[i]->Intersects(ray, distance);
 
-                double distance;
-                bool intersect = Util::RayBoxTest(ray.origin, ray.direction, transformMat, minScale, maxScale, distance);
-
-                if(intersect && distance < minDistance) {
+            if(intersectedObject != nullptr) {
+                if(intersectedObject->parent == transformWidget) {
+                    closest = intersectedObject;
+                    break;
+                }
+                if(distance < minDistance) {
                     minDistance = distance;
-                    intersectedInx = i;
+                    closest = intersectedObject;
                 }
             }
         }
-
-        if(intersectedInx >= 0) return objects3D[intersectedInx];
-        else return nullptr;
+        return closest;
     }
 
 }

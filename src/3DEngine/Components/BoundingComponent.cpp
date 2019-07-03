@@ -11,16 +11,17 @@
 namespace KikooRenderer {
 namespace CoreEngine {
     BoundingBoxComponent::BoundingBoxComponent(Object3D* object) : Component("BoundingBox", object) {
-        inited = false;
-        min = glm::dvec3(9999, 9999, 9999);
-        max = glm::dvec3(-9999, -9999, -9999);
     }
    
     void BoundingBoxComponent::OnStart() {    }
    
     void BoundingBoxComponent::OnEnable() {
+        inited = false;
+        min = glm::dvec3(9999, 9999, 9999);
+        max = glm::dvec3(-9999, -9999, -9999);
         MeshFilterComponent* mesh = (MeshFilterComponent*) this->object3D->GetComponent("MeshFilter");
         transform = (TransformComponent*) this->object3D->GetComponent("Transform");
+        
 
         for(int i=0; i<mesh->vertices.size(); i++) {
             if(mesh->vertices[i].position.x < min.x) min.x = mesh->vertices[i].position.x; 
@@ -31,6 +32,10 @@ namespace CoreEngine {
             if(mesh->vertices[i].position.y > max.y) max.y = mesh->vertices[i].position.y; 
             if(mesh->vertices[i].position.z > max.z) max.z = mesh->vertices[i].position.z;
         }
+        
+        
+        
+        
         
         glm::dvec3 position = (max + min) / 2.0;
         glm::dvec3 scale = max - min;

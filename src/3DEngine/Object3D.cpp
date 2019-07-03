@@ -1,5 +1,7 @@
 #include "Object3D.hpp"
 #include "Components/MaterialComponent.hpp"
+#include "Components/BoundingComponent.hpp"
+#include "Util.hpp"
 
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLFunctions_3_2_Core>
@@ -32,6 +34,7 @@ void Object3D::AddComponent(Component* component) {
 }
 
 void Object3D::AddObject(Object3D* object) {
+	object->parent = this;
     this->childObjects.push_back(object);
 }
 
@@ -100,6 +103,7 @@ Component* Object3D::GetComponent(std::string name) {
 
 void Object3D::Render(glm::mat4* modelMatrix) {
 	GETGL
+	if(!depthTest) ogl->glDisable(GL_DEPTH_TEST);
 	TransformComponent* transform = (TransformComponent*)(this->GetComponent("Transform")); 
 	
 	glm::mat4 currentModelMatrix;
@@ -137,6 +141,56 @@ void Object3D::Render(glm::mat4* modelMatrix) {
 	
 	//unbind shader program
 	ogl->glUseProgram(0);
+	if(!depthTest) ogl->glEnable(GL_DEPTH_TEST);
 }
+
+Object3D* Object3D::Intersects(Geometry::Ray ray, double& _distance) {
+	//get closest collision for childs and itself
+	double minDistance = 9999999999999999;
+	Object3D* closest = nullptr;
+
+
+	BoundingBoxComponent* bb = (BoundingBoxComponent*) this->GetComponent("BoundingBox");
+	if(bb != nullptr) {
+		glm::dvec3 min;
+		glm::dvec3 max;
+		bb->GetLocalBounds(&min, &max);
+
+		TransformComponent* transform = (TransformComponent*) this->GetComponent("Transform");
+		glm::dmat4 transformMat = transform->GetTransRotMatrix();
+		
+		Object3D* currentObject = this;
+		while(currentObject->parent != nullptr) {
+			TransformComponent* parentTransform = (TransformComponent*) currentObject->parent->GetComponent("Transform");
+			glm::dmat4 parentTransformMat = parentTransform->GetTransRotMatrix();
+			transformMat = parentTransformMat * transformMat;
+			currentObject = currentObject->parent;
+		}
+
+		glm::dvec3 minScale = min * transform->scale;
+		glm::dvec3 maxScale = max * transform->scale;
+
+		double distance;
+		bool intersect = Util::RayBoxTest(ray.origin, ray.direction, transformMat, minScale, maxScale, distance);
+
+		if(intersect && distance < minDistance) {
+			minDistance = distance;
+			closest = this;
+		}
+	}
+
+	for(int i=0; i<childObjects.size(); i++) {
+		double distance;
+		childObjects[i]->Intersects(ray, distance);
+		if(distance < minDistance) {
+			minDistance = distance;
+			closest = childObjects[i];
+		}
+	}
+	
+	_distance = minDistance;
+	return closest;
+}
+
 }
 }

@@ -43,6 +43,8 @@ class Scene {
 		virtual void OnMouseMoveEvent(QMouseEvent *e);
 		virtual void OnWheelEvent(QWheelEvent *event);       
 
+		void HandleSelection(int x, int y);
+
 		Object3D* FindObjectByName(std::string name);
 		void AddObject(Object3D* object);
 		void RemoveObject(Object3D* object);
@@ -56,6 +58,12 @@ class Scene {
 
 		clock_t previousTime=0;
 		double deltaTime;
+
+		std::vector<Object3D*> selectedObjects;
+
+		Object3D* transformWidget;
+		Object3D* scaleWidget;
+		Object3D* rotationWidget;
 
 	private:
 		Object3D* GetIntersectObject(int x, int y);

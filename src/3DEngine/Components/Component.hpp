@@ -18,8 +18,8 @@ class Component  {
         virtual void OnDestroy()=0;
         virtual void Recompute()=0;
 
-    protected: 
         bool inited;
+    protected: 
 };
 
 }
