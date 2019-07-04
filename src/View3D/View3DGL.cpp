@@ -76,6 +76,7 @@ namespace KikooRenderer {
             // ogl->glEnable(GL_CULL_FACE);  
             
             ogl->glEnable(GL_BLEND);
+            // ogl->glEnable(GL_MULTISAMPLE);  
             ogl->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
             //disable writting to depth buffer

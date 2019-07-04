@@ -14,7 +14,8 @@ namespace KikooRenderer {
 namespace CoreEngine {
     Scene::Scene() : camera(CameraScene(this, 1.0, 70 * DEGTORAD, 0.1, 1000.0, 1.0)){
         this->started = false;
-        
+        transformOffset = 0;
+        isFirstTransformFrame = false;
     }
 
     void Scene::Start() {
@@ -132,10 +133,18 @@ namespace CoreEngine {
 
     void Scene::OnMouseReleaseEvent(QMouseEvent *e) {
         this->camera.OnMouseReleaseEvent(e);  
+
+        if(isTransforming) { 
+            isTransforming = false;
+            isFirstTransformFrame = false;
+            transformOffset = 0;
+        }
     }
 
     void Scene::OnMouseMoveEvent(QMouseEvent *e) {
         this->camera.OnMouseMoveEvent(e);  
+        
+        if(isTransforming) TransformSelection(e);
     }
 
     void Scene::OnWheelEvent(QWheelEvent *event) {
@@ -156,12 +165,17 @@ namespace CoreEngine {
         if(intersectedObject != nullptr) {
             std::cout << intersectedObject->name << std::endl;
             if(intersectedObject->parent == transformWidget) {
-                std::cout << "Handle transform" << std::endl;
+                isTransforming = true;
+                isFirstTransformFrame = true;
+                if(intersectedObject->name == "coneX" || intersectedObject->name == "cubeX") transformAxis = TRANSFORM_AXIS::X;
+                else if(intersectedObject->name == "coneY" || intersectedObject->name == "cubeY") transformAxis = TRANSFORM_AXIS::Y;
+                else if(intersectedObject->name == "coneZ" || intersectedObject->name == "cubeZ") transformAxis = TRANSFORM_AXIS::Z;
             } else {
+                selectedObjects.resize(0);
                 intersectedObject->isSelected = !intersectedObject->isSelected;
+
                 std::vector<Object3D*>::iterator it = std::find(selectedObjects.begin(), selectedObjects.end(), intersectedObject);
                 int objectInx = std::distance(selectedObjects.begin(), it); 
-                
                 if( it != selectedObjects.end()) {
                     selectedObjects.erase(selectedObjects.begin() + objectInx);
                 } else {
@@ -173,6 +187,23 @@ namespace CoreEngine {
                 widgetTransform->position = objectTransform->position;
                 
                 transformWidget->visible = selectedObjects.size() > 0;
+
+                //MULTIPLE SELECTION : add CTRL + CLICK selection
+                // intersectedObject->isSelected = !intersectedObject->isSelected;
+                // std::vector<Object3D*>::iterator it = std::find(selectedObjects.begin(), selectedObjects.end(), intersectedObject);
+                // int objectInx = std::distance(selectedObjects.begin(), it); 
+                
+                // if( it != selectedObjects.end()) {
+                //     selectedObjects.erase(selectedObjects.begin() + objectInx);
+                // } else {
+                //     selectedObjects.push_back(intersectedObject);
+                // }
+
+                // TransformComponent* objectTransform = (TransformComponent*) intersectedObject->GetComponent("Transform");
+                // TransformComponent* widgetTransform = (TransformComponent*) transformWidget->GetComponent("Transform");
+                // widgetTransform->position = objectTransform->position;
+                
+                // transformWidget->visible = selectedObjects.size() > 0;
             }
         } else {
             selectedObjects.resize(0);
@@ -203,5 +234,77 @@ namespace CoreEngine {
         return closest;
     }
 
+    void Scene::TransformSelection(QMouseEvent *e) {
+        int newX = e->x();
+        int newY = e->y();
+
+        Geometry::Ray ray = this->camera.GetRay(newX, newY);
+        double dotX = glm::dot(ray.direction, glm::dvec3(1, 0, 0));
+        double dotY = glm::dot(ray.direction, glm::dvec3(0, 1, 0));
+        double dotZ = glm::dot(ray.direction, glm::dvec3(0, 0, 1));
+        
+        for(int i=0; i<selectedObjects.size(); i++) {
+            TransformComponent* objectTransform = (TransformComponent*) selectedObjects[i]->GetComponent("Transform"); 
+            TransformComponent* widgetTransform = (TransformComponent*) transformWidget->GetComponent("Transform"); 
+            if(objectTransform != nullptr) {
+                if(transformMode == TRANSFORM_MODE::TRANSLATE) {
+                    if(transformAxis == TRANSFORM_AXIS::X) {
+                        double ysign = widgetTransform->position.y > 0 ? 1 : -1;
+                        double zsign = widgetTransform->position.z > 0 ? 1 : -1;
+                        
+                        glm::dvec4 plane = (dotY > dotZ) ? glm::dvec4(0, ysign * 1, 0, widgetTransform->position.y) : glm::dvec4(0, 0, zsign * 1, -widgetTransform->position.z);
+                        
+                        double t= -glm::dot(plane, glm::dvec4(ray.origin, 1.0)) / glm::dot(plane, glm::dvec4(ray.direction, 0.0));
+                        glm::dvec3 position = ray.origin + t * ray.direction;
+                        
+                        if(isFirstTransformFrame) { //First frame of transformation, get offset btw click and origin of transform widget
+                            isFirstTransformFrame = false;
+                            //Get position of ray on the plane
+                            transformOffset = position.x - widgetTransform->position.x;
+                        } else {
+                            //Set transform to x position of intersection
+                            double newX = position.x - transformOffset;
+                            widgetTransform->position.x = newX;
+                            objectTransform->position.x= newX;
+                        }
+                    } else if(transformAxis == TRANSFORM_AXIS::Y) {
+                        double xsign = widgetTransform->position.x > 0 ? 1 : -1;
+                        double zsign = widgetTransform->position.z > 0 ? 1 : -1;
+                        
+                        glm::dvec4 plane = (dotX > dotZ) ? glm::dvec4(xsign * 1, 0, 0, widgetTransform->position.x) : glm::dvec4(0, 0,zsign *  1, widgetTransform->position.z);
+                        
+                        double t= -glm::dot(plane, glm::dvec4(ray.origin, 1.0)) / glm::dot(plane, glm::dvec4(ray.direction, 0.0));
+                        glm::dvec3 position = ray.origin + t * ray.direction;
+                        
+                        if(isFirstTransformFrame) { 
+                            isFirstTransformFrame = false;
+                            transformOffset = position.y - widgetTransform->position.y;
+                        } else {                                
+                            double newY = position.y - transformOffset;
+                            widgetTransform->position.y = newY;
+                            objectTransform->position.y = newY;
+                        }
+                    } else if(transformAxis == TRANSFORM_AXIS::Z) {
+                        double xsign = widgetTransform->position.x > 0 ? 1 : -1;
+                        double ysign = widgetTransform->position.y > 0 ? 1 : -1;
+                        glm::dvec4 plane = (dotX > dotY) ? glm::dvec4(xsign * 1, 0, 0, widgetTransform->position.x) : glm::dvec4(0, ysign * 1, 0, widgetTransform->position.y);
+                        
+                        double t= -glm::dot(plane, glm::dvec4(ray.origin, 1.0)) / glm::dot(plane, glm::dvec4(ray.direction, 0.0));
+                        glm::dvec3 position = ray.origin + t * ray.direction;
+                        
+                        if(isFirstTransformFrame) { 
+                            isFirstTransformFrame = false;
+                            
+                            transformOffset = position.z - widgetTransform->position.z;
+                        } else {                            
+                            double newZ = position.z - transformOffset;
+                            widgetTransform->position.z = newZ;
+                            objectTransform->position.z = newZ;
+                        }                        
+                    }
+                }
+            }
+        }
+    }
 }
 }

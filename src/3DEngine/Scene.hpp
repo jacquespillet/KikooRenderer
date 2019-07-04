@@ -13,6 +13,8 @@ namespace CoreEngine {
 class Object3D;
 class CameraScene;
 
+enum TRANSFORM_MODE {TRANSLATE, ROTATE, SCALE};		
+enum TRANSFORM_AXIS {X, Y, Z};		
 class Scene {
     public: 
         Scene();
@@ -65,12 +67,19 @@ class Scene {
 		Object3D* scaleWidget;
 		Object3D* rotationWidget;
 
-	private:
+		bool isTransforming = false;
+
+
+	protected:
 		Object3D* GetIntersectObject(int x, int y);
 
+		
+		void TransformSelection(QMouseEvent *e);
+		bool isFirstTransformFrame;
+		double transformOffset;
+		TRANSFORM_MODE transformMode = TRANSFORM_MODE::TRANSLATE;
+		TRANSFORM_AXIS transformAxis;
 };
-
-
 
 }
 }
