@@ -4,7 +4,14 @@ namespace KikooRenderer {
     MainWindow::MainWindow() {
         setWindowTitle("KikooRenderer");
         view3D= new View3D;
+        sceneTree= new SceneTree;
+
+        sceneTree->view3D = view3D;
+        view3D->sceneTree = sceneTree;
+
         setCentralWidget(view3D);
+        addDockWidget(Qt::LeftDockWidgetArea, sceneTree);
+
         setDockOptions(QMainWindow::AnimatedDocks);
 
 	    showNormal();

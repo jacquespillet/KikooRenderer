@@ -4,22 +4,24 @@ set(MainWindowSrc
 	
 	View3D/View3D.cpp
 	View3D/View3DGL.cpp
-
+	
 	3DEngine/Components/Component.cpp
 	3DEngine/Components/MeshFilterComponent.cpp
 	3DEngine/Components/TransformComponent.cpp
 	3DEngine/Components/MaterialComponent.cpp
 	3DEngine/Components/BoundingComponent.cpp
-
+	
 	3DEngine/Object3D.cpp
 	3DEngine/Scene.cpp
 	3DEngine/Shader.cpp
 	3DEngine/StandardShaders.cpp
 	3DEngine/CameraScene.cpp
 	3DEngine/Util.cpp
-
+	
 	3DEngine/BaseObjects.cpp
-
+	
+	SceneTree/SceneTree.cpp
+	
 	Geometry/Util.cpp	
 	Geometry/Ray.cpp	
 )

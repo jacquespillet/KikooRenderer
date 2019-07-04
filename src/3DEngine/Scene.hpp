@@ -46,7 +46,7 @@ class Scene {
 		void HandleSelection(int x, int y);
 
 		Object3D* FindObjectByName(std::string name);
-		void AddObject(Object3D* object);
+		std::string AddObject(Object3D* object);
 		void RemoveObject(Object3D* object);
 
 		void SetWindowSize(int w, int h);

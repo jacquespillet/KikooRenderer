@@ -27,16 +27,6 @@ namespace CoreEngine {
 
         Object3D* axes = GetAxes(this, "Axes");
         objects3D.push_back(axes);
-
-
-        Object3D* sphere1 = GetSphere(this,"Sphere", glm::dvec3(-1), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.4, 0.1, 0.1, 1.0));
-        AddObject(sphere1);
-        
-        Object3D* sphere2 = GetSphere(this,"Sphere", glm::dvec3(1, -1, 0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.1, 0.4, 0.1, 1.0));
-        AddObject(sphere2);
-
-        Object3D* cube = GetCube(this,"Cube", glm::dvec3(1, 10, 2), glm::dvec3(78, -45, 17), glm::dvec3(4.5), glm::dvec4(0.0, 0.1, 0.4, 1.0));
-        AddObject(cube);
         
         transformWidget = GetTranslateWidget(this, "TranslateWidget", glm::dvec3(0), glm::dvec3(0), glm::dvec3(1));
         transformWidget->visible = false;
@@ -88,7 +78,7 @@ namespace CoreEngine {
         return nullptr;
     }
 
-    void Scene::AddObject(Object3D* object) {
+    std::string Scene::AddObject(Object3D* object) {
         bool nameIsOk = false;
         std::string currentName = object->name;
         while(!nameIsOk) {
@@ -101,9 +91,10 @@ namespace CoreEngine {
                 }
             }
         }
-
         object->name = currentName;
         objects3D.push_back(object);
+
+        return currentName;
     }
 
     //RemoveObject

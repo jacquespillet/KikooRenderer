@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Common/Common.h"
-
+#include "SceneTree/SceneTree.hpp"
 #include "View3DGL.hpp"
 
 namespace KikooRenderer {
@@ -22,11 +22,14 @@ class View3DRoot: public QWidget
         void resizeEvent(QResizeEvent* event) {}
 };
 
+class SceneTree;
 class View3D : public QDockWidget
 {
     Q_OBJECT
     public: 
         View3D();
+        SceneTree* sceneTree;
+
         View3DGL* view3DGL;
         View3DRoot* root;
 		QWidget* layoutWindow;
