@@ -2,6 +2,7 @@
 #include "Util.hpp"
 #include "BaseObjects.hpp"
 #include "Components/BoundingComponent.hpp"
+#include "Components/MaterialComponent.hpp"
 #include "Geometry/Ray.hpp"
 
 #include <QtGui/QOpenGLFunctions>
@@ -51,14 +52,38 @@ namespace CoreEngine {
     void Scene::Render() {
         GETGL
         ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
-        ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+        ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
+        
+        ogl->glStencilFunc(GL_ALWAYS, 1, 0xFF); 
+        ogl->glStencilMask(0xFF); 
         // Render each object
         for(int i=0; i<objects3D.size(); i++) {
             if(objects3D[i]->visible) {
                 objects3D[i]->Render(); 
             }
         }
+
+        ogl->glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        ogl->glStencilMask(0x00); 
+        ogl->glDisable(GL_DEPTH_TEST);
+
+        //Use shader
+        for(int i=0; i<selectedObjects.size(); i++) {
+            if(selectedObjects[i]->visible) {
+                MaterialComponent* material = (MaterialComponent*)(selectedObjects[i]->GetComponent("Material"));
+                if(material) {
+                    material->SetShader(&standardShaders.selectedObjectShader);
+                    selectedObjects[i]->Render();
+                    material->SetShader(&standardShaders.unlitMeshShader);
+                }
+            }
+        }
+
+        
+        ogl->glStencilMask(0xFF);
+        ogl->glEnable(GL_DEPTH_TEST); 
+
+
     }
 
     void Scene::OnUpdate() {
@@ -239,9 +264,9 @@ namespace CoreEngine {
         int newY = e->y();
 
         Geometry::Ray ray = this->camera.GetRay(newX, newY);
-        double dotX = glm::dot(ray.direction, glm::dvec3(1, 0, 0));
-        double dotY = glm::dot(ray.direction, glm::dvec3(0, 1, 0));
-        double dotZ = glm::dot(ray.direction, glm::dvec3(0, 0, 1));
+        double dotX = std::abs(glm::dot(ray.direction, glm::dvec3(1, 0, 0)));
+        double dotY = std::abs(glm::dot(ray.direction, glm::dvec3(0, 1, 0)));
+        double dotZ = std::abs(glm::dot(ray.direction, glm::dvec3(0, 0, 1)));
         
         for(int i=0; i<selectedObjects.size(); i++) {
             TransformComponent* objectTransform = (TransformComponent*) selectedObjects[i]->GetComponent("Transform"); 
@@ -249,14 +274,13 @@ namespace CoreEngine {
             if(objectTransform != nullptr) {
                 if(transformMode == TRANSFORM_MODE::TRANSLATE) {
                     if(transformAxis == TRANSFORM_AXIS::X) {
-                        double ysign = widgetTransform->position.y > 0 ? 1 : -1;
-                        double zsign = widgetTransform->position.z > 0 ? 1 : -1;
+                        double ysign = widgetTransform->position.y > 0 ? -1 : 1;
+                        double zsign =  widgetTransform->position.z > 0 ? -1 : 1;
+
+                        glm::dvec4 plane = (dotY > dotZ) ? glm::dvec4(0, ysign * 1, 0, std::abs(widgetTransform->position.y)) : glm::dvec4(0, 0, zsign * 1, std::abs(widgetTransform->position.z));
+                        double t = -glm::dot(plane, glm::dvec4(ray.origin, 1.0)) / glm::dot(plane, glm::dvec4(ray.direction, 0.0));
                         
-                        glm::dvec4 plane = (dotY > dotZ) ? glm::dvec4(0, ysign * 1, 0, widgetTransform->position.y) : glm::dvec4(0, 0, zsign * 1, -widgetTransform->position.z);
-                        
-                        double t= -glm::dot(plane, glm::dvec4(ray.origin, 1.0)) / glm::dot(plane, glm::dvec4(ray.direction, 0.0));
                         glm::dvec3 position = ray.origin + t * ray.direction;
-                        
                         if(isFirstTransformFrame) { //First frame of transformation, get offset btw click and origin of transform widget
                             isFirstTransformFrame = false;
                             //Get position of ray on the plane
@@ -268,10 +292,10 @@ namespace CoreEngine {
                             objectTransform->position.x= newX;
                         }
                     } else if(transformAxis == TRANSFORM_AXIS::Y) {
-                        double xsign = widgetTransform->position.x > 0 ? 1 : -1;
-                        double zsign = widgetTransform->position.z > 0 ? 1 : -1;
-                        
-                        glm::dvec4 plane = (dotX > dotZ) ? glm::dvec4(xsign * 1, 0, 0, widgetTransform->position.x) : glm::dvec4(0, 0,zsign *  1, widgetTransform->position.z);
+                        double xsign = widgetTransform->position.x > 0 ? -1 : 1;
+                        double zsign = widgetTransform->position.z > 0 ? -1 : 1;
+
+                        glm::dvec4 plane = (dotX > dotZ) ? glm::dvec4(xsign * 1, 0, 0, std::abs(widgetTransform->position.x)) : glm::dvec4(0, 0,zsign *  1, std::abs(widgetTransform->position.z));
                         
                         double t= -glm::dot(plane, glm::dvec4(ray.origin, 1.0)) / glm::dot(plane, glm::dvec4(ray.direction, 0.0));
                         glm::dvec3 position = ray.origin + t * ray.direction;
@@ -285,9 +309,9 @@ namespace CoreEngine {
                             objectTransform->position.y = newY;
                         }
                     } else if(transformAxis == TRANSFORM_AXIS::Z) {
-                        double xsign = widgetTransform->position.x > 0 ? 1 : -1;
-                        double ysign = widgetTransform->position.y > 0 ? 1 : -1;
-                        glm::dvec4 plane = (dotX > dotY) ? glm::dvec4(xsign * 1, 0, 0, widgetTransform->position.x) : glm::dvec4(0, ysign * 1, 0, widgetTransform->position.y);
+                        double xsign = widgetTransform->position.x > 0 ? -1 : 1;
+                        double ysign = widgetTransform->position.y > 0 ? -1 : 1;
+                        glm::dvec4 plane = (dotX > dotY) ? glm::dvec4(xsign * 1, 0, 0, std::abs(widgetTransform->position.x)) : glm::dvec4(0, ysign * 1, 0, std::abs(widgetTransform->position.y));
                         
                         double t= -glm::dot(plane, glm::dvec4(ray.origin, 1.0)) / glm::dot(plane, glm::dvec4(ray.direction, 0.0));
                         glm::dvec3 position = ray.origin + t * ray.direction;

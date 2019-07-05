@@ -15,6 +15,7 @@ class StandardShaders
 {
     public:         
         Shader unlitMeshShader;
+        Shader selectedObjectShader;
         void Compile();
 };
 }
