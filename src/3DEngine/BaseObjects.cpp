@@ -771,7 +771,7 @@ Object3D* GetAxes(Scene* scene, std::string name) {
 }
 
 
-Object3D* GetCone(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
+Object3D* GetCone(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color, bool isScreenSize) {
     //Start each Object3D in scene
     Object3D* newObject = new Object3D(name, scene);
     std::vector<glm::dvec3> vertex;
@@ -829,7 +829,8 @@ Object3D* GetCone(Scene* scene, std::string name, glm::dvec3 _position, glm::dve
     transform->position = _position;
     transform->rotation = _rotation;
     transform->scale = _scale;
-    
+    transform->isScreenSize = isScreenSize;
+
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
     material->albedo = _color;
@@ -846,7 +847,7 @@ Object3D* GetCone(Scene* scene, std::string name, glm::dvec3 _position, glm::dve
 }
 
 
-Object3D* GetLine(Scene* scene, std::string name, glm::dvec3 position1, glm::dvec3 position2, glm::dvec4 color) {
+Object3D* GetLine(Scene* scene, std::string name, glm::dvec3 position1, glm::dvec3 position2, glm::dvec4 color, bool isScreenSize) {
     Object3D* newObject = new Object3D(name, scene);
     std::vector<glm::dvec3> vertex;
     std::vector<glm::dvec3> normals;
@@ -879,7 +880,7 @@ Object3D* GetLine(Scene* scene, std::string name, glm::dvec3 position1, glm::dve
 
     //Setup transform
     TransformComponent* transform = new TransformComponent(newObject );
-    
+    transform->isScreenSize = isScreenSize;
     
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
@@ -896,20 +897,26 @@ Object3D* GetLine(Scene* scene, std::string name, glm::dvec3 position1, glm::dve
 Object3D* GetTranslateWidget(Scene* scene, std::string name,glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale) {
     Object3D* widget = new Object3D(name, scene);
 
-    Object3D* xcone = GetCone(scene,"coneX", glm::dvec3(1, 0, 0), glm::dvec3(0,  90, 0), glm::dvec3(1), glm::dvec4(1.0, 0.0, 0.0, 1.0));
-    Object3D* xline = GetLine(scene,"lineX", glm::dvec3(0, 0, 0), glm::dvec3(1, 0, 0), glm::dvec4(1.0, 0.0, 0.0, 1.0));   
+    Object3D* xcone = GetCone(scene,"coneX", glm::dvec3(1, 0, 0), glm::dvec3(0,  90, 0), glm::dvec3(1), glm::dvec4(1.0, 0.0, 0.0, 1.0), true);
+    Object3D* xline = GetLine(scene,"lineX", glm::dvec3(0, 0, 0), glm::dvec3(1, 0, 0), glm::dvec4(1.0, 0.0, 0.0, 1.0), true);   
+    xcone->depthTest = false;
+    xline->depthTest = false;
 
     widget->AddObject(xcone);
     widget->AddObject(xline);
 
-    Object3D* ycone = GetCone(scene,"coneY", glm::dvec3(0, 1, 0), glm::dvec3(- 90,  0, 0), glm::dvec3(1), glm::dvec4(0.0, 1.0, 0.0, 1.0));
-    Object3D* yline = GetLine(scene,"lineY", glm::dvec3(0, 0, 0), glm::dvec3(0, 1, 0), glm::dvec4(0.0, 1.0, 0.0, 1.0));
+    Object3D* ycone = GetCone(scene,"coneY", glm::dvec3(0, 1, 0), glm::dvec3(- 90,  0, 0), glm::dvec3(1), glm::dvec4(0.0, 1.0, 0.0, 1.0), true);
+    Object3D* yline = GetLine(scene,"lineY", glm::dvec3(0, 0, 0), glm::dvec3(0, 1, 0), glm::dvec4(0.0, 1.0, 0.0, 1.0), true);
+    ycone->depthTest = false;
+    yline->depthTest = false;
 
     widget->AddObject(ycone);
     widget->AddObject(yline);
 
-    Object3D* zcone = GetCone(scene,"coneZ", glm::dvec3(0, 0, 1), glm::dvec3(0, 0, 0), glm::dvec3(1), glm::dvec4(0.0, 0.0, 1.0, 1.0));
-    Object3D* zline = GetLine(scene,"lineZ", glm::dvec3(0, 0, 0), glm::dvec3(0, 0, 1), glm::dvec4(0.0, 0.0, 1.0, 1.0));
+    Object3D* zcone = GetCone(scene,"coneZ", glm::dvec3(0, 0, 1), glm::dvec3(0, 0, 0), glm::dvec3(1), glm::dvec4(0.0, 0.0, 1.0, 1.0), true);
+    Object3D* zline = GetLine(scene,"lineZ", glm::dvec3(0, 0, 0), glm::dvec3(0, 0, 1), glm::dvec4(0.0, 0.0, 1.0, 1.0), true);
+    zcone->depthTest = false;
+    zline->depthTest = false;
 
     widget->AddObject(zcone);
     widget->AddObject(zline);
@@ -918,6 +925,7 @@ Object3D* GetTranslateWidget(Scene* scene, std::string name,glm::dvec3 _position
     transform->position = _position;
     transform->rotation = _rotation;
     transform->scale = _scale;
+    transform->isScreenSize = true;
 
     return widget;
 }
@@ -927,18 +935,24 @@ Object3D* GetScaleWidget(Scene* scene, std::string name,glm::dvec3 _position, gl
 
     Object3D* xcube = GetCube(scene, "cubeX", glm::dvec3(1, 0, 0), glm::dvec3(0,  0, 0), glm::dvec3(0.5), glm::dvec4(1.0, 0.0, 0.0, 1.0));
     Object3D* xline = GetLine(scene, "lineX", glm::dvec3(0, 0, 0), glm::dvec3(1, 0, 0), glm::dvec4(1.0, 0.0, 0.0, 1.0));   
+    xcube->depthTest = false;
+    xline->depthTest = false;
 
     widget->AddObject(xcube);
     widget->AddObject(xline);
 
     Object3D* ycube = GetCube(scene, "cubeY", glm::dvec3(0, 1, 0), glm::dvec3(0,  0, 0), glm::dvec3(0.5), glm::dvec4(0.0, 1.0, 0.0, 1.0));
     Object3D* yline = GetLine(scene, "lineY", glm::dvec3(0, 0, 0), glm::dvec3(0, 1, 0), glm::dvec4(0.0, 1.0, 0.0, 1.0));
+    ycube->depthTest = false;
+    yline->depthTest = false;
 
     widget->AddObject(ycube);
     widget->AddObject(yline);
 
     Object3D* zcube = GetCube(scene, "cubeZ", glm::dvec3(0, 0, 1), glm::dvec3(0, 0, 0), glm::dvec3(0.5), glm::dvec4(0.0, 0.0, 1.0, 1.0));
     Object3D* zline = GetLine(scene, "lineZ", glm::dvec3(0, 0, 0), glm::dvec3(0, 0, 1), glm::dvec4(0.0, 0.0, 1.0, 1.0));
+    zcube->depthTest = false;
+    zline->depthTest = false;
 
     widget->AddObject(zcube);
     widget->AddObject(zline);

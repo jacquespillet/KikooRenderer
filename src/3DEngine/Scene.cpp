@@ -25,15 +25,15 @@ namespace CoreEngine {
 
 
         Object3D* grid = GetGrid(this, "Grid");
-        objects3D.push_back(grid);
+        AddObject(grid);
 
         Object3D* axes = GetAxes(this, "Axes");
-        objects3D.push_back(axes);
+        AddObject(axes);
         
         transformWidget = GetTranslateWidget(this, "TranslateWidget", glm::dvec3(0), glm::dvec3(0), glm::dvec3(1));
         transformWidget->visible = false;
-        transformWidget->depthTest = false;
         AddObject(transformWidget);
+        
 
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
@@ -56,12 +56,15 @@ namespace CoreEngine {
         
         ogl->glStencilFunc(GL_ALWAYS, 1, 0xFF); 
         ogl->glStencilMask(0xFF); 
+
         // Render each object
         for(int i=0; i<objects3D.size(); i++) {
-            if(objects3D[i]->visible) {
+            if(objects3D[i]->visible && objects3D[i] != transformWidget ) {
                 objects3D[i]->Render(); 
             }
         }
+        
+        if(transformWidget->visible) transformWidget->Render();
 
         ogl->glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
         ogl->glStencilMask(0x00); 
@@ -78,12 +81,11 @@ namespace CoreEngine {
                 }
             }
         }
-
         
         ogl->glStencilMask(0xFF);
         ogl->glEnable(GL_DEPTH_TEST); 
 
-
+        
     }
 
     void Scene::OnUpdate() {
@@ -105,7 +107,7 @@ namespace CoreEngine {
     }
 
     std::string Scene::AddObject(Object3D* object) {
-        bool nameIsOk = false;
+        bool nameIsOk = (objects3D.size() == 0);
         std::string currentName = object->name;
         while(!nameIsOk) {
             for(int i=0; i<objects3D.size(); i++) {

@@ -20,6 +20,10 @@ CameraScene::CameraScene(Scene* _scene, double _eyeDistance, double _fov, double
 
 }
 
+glm::dvec3 CameraScene::GetPosition() {
+    return this->transform.position;
+}
+
 glm::dmat4 CameraScene::GetProjectionMatrix() {
     return this->projectionMatrix;
 }

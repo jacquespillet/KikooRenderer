@@ -25,11 +25,6 @@ void MeshFilterComponent::OnRender(){
 	//bind VAO	
 	ogl->glBindVertexArray(vertexArrayObject);
 	
-	//Draw
-	if(drawingMode == GL_LINES) {
-		// ogl->glLineWidth(10.0);
-	}
-
 	//draw elements
 	ogl->glDrawElements(drawingMode, triangles.size(), GL_UNSIGNED_INT, (void*)0);
 	

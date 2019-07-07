@@ -21,6 +21,11 @@ class TransformComponent : public Component {
 
         glm::dmat4 GetModelMatrix(); 
         glm::dmat4 GetTransRotMatrix(); 
+        glm::dvec3 GetScale(); 
+        glm::mat4 GetWorldModelMatrix();
+        
+
+        bool isScreenSize = false;
 };
 }
 }

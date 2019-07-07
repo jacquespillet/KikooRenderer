@@ -58,16 +58,15 @@ void Object3D::Enable() {
 void Object3D::Update() {
 	if(hasToRecompute) {
 		Recompute();
+		
+		for(int i=0; i<components.size(); i++) {
+			components[i]->OnUpdate();
+		}
 	}
 	
 	for(int i=0; i<childObjects.size(); i++) {
 		childObjects[i]->Update();
 	}
-
-    for(int i=0; i<components.size(); i++) {
-        components[i]->OnUpdate();
-    }
-
 }
 
 void Object3D::Recompute() {
@@ -104,6 +103,7 @@ Component* Object3D::GetComponent(std::string name) {
 void Object3D::Render(glm::mat4* modelMatrix) {
 	GETGL
 	if(!depthTest) ogl->glDisable(GL_DEPTH_TEST);
+
 	TransformComponent* transform = (TransformComponent*)(this->GetComponent("Transform")); 
 	
 	glm::mat4 currentModelMatrix;
@@ -141,7 +141,7 @@ void Object3D::Render(glm::mat4* modelMatrix) {
 	
 	//unbind shader program
 	ogl->glUseProgram(0);
-	if(!depthTest) ogl->glEnable(GL_DEPTH_TEST);
+	ogl->glEnable(GL_DEPTH_TEST);
 }
 
 Object3D* Object3D::Intersects(Geometry::Ray ray, double& _distance) {
@@ -166,7 +166,8 @@ Object3D* Object3D::Intersects(Geometry::Ray ray, double& _distance) {
 			transformMat = parentTransformMat * transformMat;
 			currentObject = currentObject->parent;
 		}
-
+		// glm::dvec3 minScale = min * transform->GetScale();
+		// glm::dvec3 maxScale = max * transform->GetScale();
 		glm::dvec3 minScale = min * transform->scale;
 		glm::dvec3 maxScale = max * transform->scale;
 

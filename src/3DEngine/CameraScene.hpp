@@ -26,6 +26,7 @@ class CameraScene{
         glm::dmat4 GetProjectionMatrix();
         glm::dmat4 GetViewMatrix();
         glm::dmat4 GetModelTransform();
+        glm::dvec3 GetPosition();
         
         void UpdateProjectionMatrix();
 
@@ -33,7 +34,7 @@ class CameraScene{
 		void OnMousePressEvent(QMouseEvent *e);
 		void OnMouseReleaseEvent(QMouseEvent *e);
 		void OnMouseMoveEvent(QMouseEvent *e);
-		void OnWheelEvent(QWheelEvent *event); 
+		void OnWheelEvent(QWheelEvent *event);
 
         Geometry::Ray GetRay(int x, int y);
 
