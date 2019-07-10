@@ -33,9 +33,25 @@ void Object3D::AddComponent(Component* component) {
 	}
 }
 
-void Object3D::AddObject(Object3D* object) {
+std::string Object3D::AddObject(Object3D* object) {
 	object->parent = this;
-    this->childObjects.push_back(object);
+
+	bool nameIsOk = (childObjects.size() == 0);
+	std::string currentName = object->name;
+	while(!nameIsOk) {
+		for(int i=0; i<childObjects.size(); i++) {
+			std::string otherName=childObjects[i]->name;
+			if(otherName == currentName) {
+				currentName = currentName + " (1)";
+			} else {
+				nameIsOk = true;
+			}
+		}
+	}
+	object->name = currentName;
+	childObjects.push_back(object);
+	
+	return currentName;
 }
 
 void Object3D::Start() {

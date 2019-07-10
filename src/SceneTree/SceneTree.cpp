@@ -32,7 +32,7 @@ void SceneTree::ShowContextMenu(const QPoint& pos)
         //             QStandardItem *child = new QStandardItem( QString("Item %0").arg(i) );
         //             child->setEditable( false );
         //             item->appendRow( child );
-
+    
     QString cubeStr = "Cube";
     QString sphereStr = "Sphere";
     QString circleStr = "Circle";
@@ -54,10 +54,17 @@ void SceneTree::ShowContextMenu(const QPoint& pos)
         if(selectedItem->text() == cubeStr) {
             QString name = QString("New ") + cubeStr;
             CoreEngine::Object3D* cube = CoreEngine::GetCube(view3D->view3DGL->scene, name.toStdString(),  glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.5, 0.5, 0.5, 1));   
-            std::string finalName = view3D->view3DGL->scene->AddObject(cube);
-            name = QString::fromStdString(finalName);
-            TreeItem *item = new TreeItem( name );
-            model->appendRow(item);
+            if(tree->currentIndex().isValid()) {
+                QStandardItem *child = new QStandardItem(QString("Item"));
+                
+                QStandardItem *item = model->itemFromIndex(tree->currentIndex());
+                item->appendRow(child);
+            } else {
+                std::string finalName = view3D->view3DGL->scene->AddObject(cube);
+                name = QString::fromStdString(finalName);
+                TreeItem *item = new TreeItem( name );
+                model->appendRow(item);
+            }
         } else if(selectedItem->text() == sphereStr) {
             QString name = QString("New ") + sphereStr;
             CoreEngine::Object3D* Sphere = CoreEngine::GetSphere(view3D->view3DGL->scene, name.toStdString(),  glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.5, 0.5, 0.5, 1));   

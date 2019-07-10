@@ -29,7 +29,7 @@ class Object3D {
 
         Object3D(std::string name, Scene* scene);
         void AddComponent(Component* component);
-        void AddObject(Object3D* object);
+        std::string AddObject(Object3D* object);
         Component*  GetComponent(std::string name);
 
         void Start();

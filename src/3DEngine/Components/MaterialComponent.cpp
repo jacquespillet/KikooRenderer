@@ -12,6 +12,7 @@ namespace CoreEngine {
 MaterialComponent::MaterialComponent(Object3D* object) : Component("Material", object) {
     inited= false;
     influence = 1.0;
+    albedo = glm::dvec4(0.8, 0.8, 0.8, 1.0);
 }
 void MaterialComponent::OnStart(){}
 void MaterialComponent::OnEnable(){}

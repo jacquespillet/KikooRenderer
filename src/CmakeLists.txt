@@ -24,6 +24,8 @@ set(MainWindowSrc
 	
 	Geometry/Util.cpp	
 	Geometry/Ray.cpp	
+
+	Util/ModelLoader.cpp
 )
 
 add_executable(MainWindow ${MainWindowSrc})

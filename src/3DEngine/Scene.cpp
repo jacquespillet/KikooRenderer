@@ -4,6 +4,7 @@
 #include "Components/BoundingComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Geometry/Ray.hpp"
+#include "Util/ModelLoader.hpp"
 
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLFunctions_3_2_Core>
@@ -33,7 +34,10 @@ namespace CoreEngine {
         transformWidget = GetTranslateWidget(this, "TranslateWidget", glm::dvec3(0), glm::dvec3(0), glm::dvec3(1));
         transformWidget->visible = false;
         AddObject(transformWidget);
-        
+
+
+        Object3D* dragon = KikooRenderer::Util::FileIO::ObjectFromOBJ("C:/Users/Jacques/Documents/Boulot/2019/3D Models/DragonBlender.obj", this);
+        AddObject(dragon); 
 
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {

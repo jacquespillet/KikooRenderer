@@ -52,7 +52,7 @@ Object3D* GetCube(Scene* scene, std::string name, glm::dvec3 _position, glm::dve
     vertex.push_back(glm::dvec3(0.5, 0.5, -0.5)); // top right
     vertex.push_back(glm::dvec3(0.5, 0.5, 0.5)); //bottom right
 
-    // Bottom ?????
+    // Bottom
     vertex.push_back(glm::dvec3( 0.5, -0.5,  0.5)); //bottom left
     vertex.push_back(glm::dvec3( 0.5, -0.5, -0.5)); // top left
     vertex.push_back(glm::dvec3(-0.5, -0.5, -0.5)); //Top right
