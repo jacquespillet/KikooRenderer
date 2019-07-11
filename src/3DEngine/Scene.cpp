@@ -37,7 +37,7 @@ namespace CoreEngine {
         AddObject(transformWidget);
 
 
-        Object3D* dragon = KikooRenderer::Util::FileIO::ObjectFromOBJ("C:/Users/Jacques/Documents/Boulot/2019/3D Models/Cobblestones/Files/untitled2.obj", this);
+        Object3D* dragon = KikooRenderer::Util::FileIO::ObjectFromOBJ("C:/Users/Jacques/Documents/Boulot/2019/3D Models/E-45-Aircraft/E 45 Aircraft_obj2.obj", this);
         AddObject(dragon); 
 
         Object3D* dirLight = GetCube(this, "DirLight", glm::dvec3(3, 3, -3), glm::dvec3(-180, 0, 0), glm::dvec3(0.2, 0.2, 0.2), glm::dvec4(1, 1, 1, 1));

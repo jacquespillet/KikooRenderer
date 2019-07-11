@@ -3,6 +3,7 @@
 #include "Component.hpp"
 #include "../Shader.hpp"
 #include "../Scene.hpp"
+#include "../Texture.hpp"
 
 namespace KikooRenderer {
 namespace CoreEngine {
@@ -15,7 +16,6 @@ class MaterialComponent : public Component {
         void OnRender();
         void OnDestroy();
         void Recompute(){}
-        void SetTexture(std::string path);
         
         void SetShader(Shader* shader);
         void SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 viewMatrix, glm::dmat4 projectionMatrix, Scene* scene);
@@ -26,8 +26,9 @@ class MaterialComponent : public Component {
 
         glm::vec4 albedo;
 
-        int width, height, nrChannels;
-        unsigned int texture;
+        Texture albedoTex;
+        Texture specularTex;
+        Texture normalTex;
 };
 }
 }

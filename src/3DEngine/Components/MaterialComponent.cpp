@@ -9,51 +9,21 @@
 #define GLV QOpenGLFunctions_3_2_Core
 #define GETGL GLV* ogl = QOpenGLContext::currentContext()->versionFunctions<GLV>(); if(ogl==NULL){std::cout << "could not get opengl context";}
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
 
 namespace KikooRenderer {
 namespace CoreEngine {
 
-MaterialComponent::MaterialComponent(Object3D* object) : Component("Material", object) {
+MaterialComponent::MaterialComponent(Object3D* object) : Component("Material", object), specularTex(), albedoTex(), normalTex() {
     inited= false;
     influence = 1.0;
     albedo = glm::dvec4(1.0, 1.0, 1.0, 1.0);
-    this->SetTexture("C:/Users/Jacques/Documents/Boulot/2019/3D Models/Cobblestones/Textures/BrickRound0105_5_S.jpg");
-
 }
+
 void MaterialComponent::OnStart(){}
 void MaterialComponent::OnEnable(){}
 void MaterialComponent::OnUpdate(){}
 void MaterialComponent::OnRender(){} 
 void MaterialComponent::OnDestroy(){} 
-
-void MaterialComponent::SetTexture(std::string path){
-    GETGL
-    ogl->glActiveTexture(GL_TEXTURE0);
-    ogl->glGenTextures(1, &texture);  
-    ogl->glBindTexture(GL_TEXTURE_2D, texture); 
-
-    ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-    ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-    
-    ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    stbi_set_flip_vertically_on_load(true);  
-    unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0); 
-    if (data)
-    {
-        ogl->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        ogl->glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    } 
-    stbi_image_free(data);
-    ogl->glBindTexture(GL_TEXTURE_2D, 0); 
-} 
 
 void MaterialComponent::SetShader(Shader* shader) {
     this->shader = shader;
@@ -62,7 +32,6 @@ void MaterialComponent::SetShader(Shader* shader) {
 
 void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 viewMatrix, glm::dmat4 projectionMatrix, Scene* scene) {
     GETGL
-    
 	glm::mat4 mvpMatrix = projectionMatrix * viewMatrix * modelMatrix;
 	
     ogl->glUseProgram(shader->programShaderObject);
@@ -79,16 +48,30 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
     
 	int albedoLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "albedo"); 
 	ogl->glUniform4fv(albedoLocation, 1, glm::value_ptr(albedo));
-
-    //Set albedo texture
-    ogl->glBindTexture(GL_TEXTURE_2D, texture);
-    int texLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "ourTexture"); 
-	ogl->glUniform1i(texLocation, 0);
-    ogl->glBindTexture(GL_TEXTURE_2D, 0);
+ 
 
     if(this->shader->GetId() != SHADER_IDS::UNLIT) {
         int modelMatrixLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "modelMatrix"); 
         ogl->glUniformMatrix4fv(modelMatrixLocation, 1, false, glm::value_ptr(glm::mat4(modelMatrix)));
+
+   
+        if(albedoTex.loaded) {
+            albedoTex.Use();
+            int texLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "albedoTexture"); 
+            ogl->glUniform1i(texLocation, 0); 
+        }
+
+        if(specularTex.loaded) {
+            specularTex.Use();
+            int texLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "specularTexture"); 
+            ogl->glUniform1i(texLocation, 1); 
+        }   
+
+        if(normalTex.loaded) {
+            normalTex.Use();
+            int texLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "normalTexture"); 
+            ogl->glUniform1i(texLocation, 2); 
+        }      
 
         int numLights = 0;
         for(int i=0; i<scene->lightObjects.size(); i++) {

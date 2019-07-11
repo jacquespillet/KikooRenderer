@@ -14,9 +14,9 @@ CameraScene::CameraScene(Scene* _scene, double _eyeDistance, double _fov, double
 
     UpdateProjectionMatrix();
 
-    this->transform.position.z = -10;
-    this->transform.position.x = 2.5;
-    this->transform.position.y = 5;
+    this->transform.position.z = -5;
+    this->transform.position.y = 2.5;
+    this->transform.position.x = 0;
 
 }
 

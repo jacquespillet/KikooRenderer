@@ -108,9 +108,10 @@ uniform vec3 cameraPos;
 uniform LightSource lights[4];
 uniform int numLights;
 uniform sampler2D albedoTexture;
+uniform sampler2D specularTexture;
+uniform sampler2D normalTexture;
 
 out vec4 fragColor;
-out vec2 fragUv;
 void main()
 {
 	vec4 finalPosition = modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
@@ -118,9 +119,10 @@ void main()
 	vec3 toCam = cameraPos - worldPosition.xyz;
 
 	vec4 textureAlbedo = albedo * texture(albedoTexture, uv);
+	vec4 textureNormal = texture(normalTexture, uv);
 
 	vec4 finalColor = vec4(0, 0, 0, 1);
-	finalColor.rgb += 0.5 * textureAlbedo.rgb;
+	finalColor.rgb += 0.2 * textureAlbedo.rgb;
 	for(int i=0; i<numLights; i++) {
 
 		float attenuation = 1;
@@ -140,16 +142,15 @@ void main()
 		vec3 toLight = -lightDirection;
 
 		vec4 diffuse = textureAlbedo * lights[i].color * max(dot(normal, toLight), 0);
-		diffuse.rgb *= 0.5;
 
 		// Specular
+		float specularFactor = texture(specularTexture, uv).x;
 		vec3 halfwayVec = normalize(toLight + toCam);
-		vec4 specular = textureAlbedo * lights[i].color * pow(max(dot(normal, halfwayVec),0), 32);
+		vec4 specular = specularFactor * textureAlbedo * lights[i].color * pow(max(dot(normal, halfwayVec),0), 32);
 
 		finalColor.rgb +=  attenuation * (diffuse + specular ).rgb;
 	}
 	fragColor = finalColor;
-	fragUv = uv;
 	gl_Position = vec4(finalPosition.x, finalPosition.y, finalPosition.z, finalPosition.w);
 }
 )";
@@ -159,7 +160,6 @@ gouraudShader.fragSrc = R"(
 layout(location = 0) out vec4 outputColor; 
 
 in vec4 fragColor;
-in vec2 fragUv;
 
 
 void main()
@@ -187,6 +187,7 @@ uniform vec3 cameraPos;
 out vec3 fragPos;
 out vec3 fragNormal;
 out vec3 fragToCam;
+out vec2 fragUv;
 
 void main()
 {
@@ -195,6 +196,7 @@ void main()
 	fragPos = (modelMatrix * vec4(position.x, position.y, position.z, 1.0f)).xyz;
 	fragNormal = normal;
 	fragToCam = normalize(cameraPos - fragPos.xyz);
+	fragUv = uv;
 }
 )";
 
@@ -214,15 +216,23 @@ layout(location = 0) out vec4 outputColor;
 uniform LightSource lights[4];
 uniform vec4 albedo; 
 uniform int numLights; 
+uniform sampler2D albedoTexture;
+uniform sampler2D specularTexture;
+uniform sampler2D normalTexture;
 
 in vec3 fragPos;
 in vec3 fragNormal;
 in vec3 fragToCam;
+in vec2 fragUv;
 
 void main()
 {
+	vec4 textureAlbedo = albedo * texture(albedoTexture, fragUv);
+	vec4 textureNormal = texture(normalTexture, fragUv);
+	
 	vec4 finalColor = vec4(0, 0, 0, 1);
-	finalColor.rgb += 0.2 * albedo.rgb;
+	finalColor.rgb += 0.2 * textureAlbedo.rgb;
+
 
 	for(int i=0; i<numLights; i++) {
 		float attenuation = 1;
@@ -242,16 +252,17 @@ void main()
 		
 		vec3 toLight = -lightDirection;
 
-		vec4 diffuse = albedo * lights[i].color * max(dot(normalize(fragNormal), toLight), 0);
-		diffuse.rgb *= 0.8;
+		vec4 diffuse = textureAlbedo * lights[i].color * max(dot(normalize(fragNormal), toLight), 0);
 
 		// Specular
 		vec3 halfwayVec = normalize(toLight + fragToCam);
-		vec4 specular = albedo * lights[i].color * pow(max(dot(normalize(fragNormal), halfwayVec),0), 32);
+		vec4 specular = textureAlbedo * lights[i].color * pow(max(dot(normalize(fragNormal), halfwayVec),0), 32);
 
 		finalColor.rgb +=  attenuation * (diffuse + specular ).rgb;
 	}
+	finalColor = vec4(fragNormal.xyz, 1);
 	outputColor = finalColor;
+	
 }
 )";
 
