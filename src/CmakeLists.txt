@@ -10,6 +10,7 @@ set(MainWindowSrc
 	3DEngine/Components/TransformComponent.cpp
 	3DEngine/Components/MaterialComponent.cpp
 	3DEngine/Components/BoundingComponent.cpp
+	3DEngine/Components/LightComponent.cpp
 	
 	3DEngine/Object3D.cpp
 	3DEngine/Scene.cpp

@@ -59,22 +59,22 @@ KikooRenderer::CoreEngine::Object3D* ObjectFromOBJ(std::string fileName, KikooRe
             vertexIndices.push_back(vertexIndex[0] - 1);
             vertexIndices.push_back(vertexIndex[1] - 1);
             vertexIndices.push_back(vertexIndex[2] - 1);
-            uvIndices    .push_back(uvIndex[0]);
-            uvIndices    .push_back(uvIndex[1]);
-            uvIndices    .push_back(uvIndex[2]);
-            normalIndices.push_back(normalIndex[0]);
-            normalIndices.push_back(normalIndex[1]);
-            normalIndices.push_back(normalIndex[2]);
+            uvIndices    .push_back(uvIndex[0] - 1);
+            uvIndices    .push_back(uvIndex[1] - 1);
+            uvIndices    .push_back(uvIndex[2] - 1);
+            normalIndices.push_back(normalIndex[0] - 1);
+            normalIndices.push_back(normalIndex[1] - 1);
+            normalIndices.push_back(normalIndex[2] - 1);
         }     
     }
     outVertex = tmpVertex;
     outNormals.resize(vertexIndices.size(), glm::dvec3(1, 0, 0));
     outUv.resize(vertexIndices.size(), glm::dvec2(0, 0));
-    outColors.resize(vertexIndices.size(), glm::dvec4(1, 0, 0, 1));
+    outColors.resize(vertexIndices.size(), glm::dvec4(1, 1, 1, 1));
 
     for(int i=0; i<vertexIndices.size(); i++) {
         outNormals[vertexIndices[i]] = tmpNormals[normalIndices[i]];
-        outUv[vertexIndices[i]] = tmpUv[normalIndices[i]];
+        outUv[vertexIndices[i]] = tmpUv[uvIndices[i]];
     }
 
     KikooRenderer::CoreEngine::MeshFilterComponent* mesh = new KikooRenderer::CoreEngine::MeshFilterComponent(newObject);
@@ -85,7 +85,7 @@ KikooRenderer::CoreEngine::Object3D* ObjectFromOBJ(std::string fileName, KikooRe
     
     //Setup material
     KikooRenderer::CoreEngine::MaterialComponent* material = new  KikooRenderer::CoreEngine::MaterialComponent(newObject);
-    material->SetShader(&scene->standardShaders.unlitMeshShader);
+    material->SetShader(&scene->standardShaders.gouraudShader);
 
     KikooRenderer::CoreEngine::BoundingBoxComponent* boundingBox = new  KikooRenderer::CoreEngine::BoundingBoxComponent(newObject);
 

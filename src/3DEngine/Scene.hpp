@@ -26,6 +26,7 @@ class Scene {
         bool started;
 
 		std::vector<Object3D*> objects3D; 
+		std::vector<Object3D*> lightObjects; 
 		StandardShaders standardShaders;
 		CameraScene camera;
 

@@ -15,6 +15,7 @@ class Shader
 {		
 	private:
 		bool compiled; 
+		int identifier = 0;
 
 	public:
 		std::string name; 
@@ -32,6 +33,10 @@ class Shader
 		//	ShaderUniformObjects->setAllUniforms();
 		
 		Shader();
+		
+		void SetId(int id) { this->identifier = id;}
+		int GetId() { return this->identifier;}
+
 		void Compile();
 };
 	

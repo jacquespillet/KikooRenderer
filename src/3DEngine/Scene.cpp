@@ -3,6 +3,7 @@
 #include "BaseObjects.hpp"
 #include "Components/BoundingComponent.hpp"
 #include "Components/MaterialComponent.hpp"
+#include "Components/LightComponent.hpp"
 #include "Geometry/Ray.hpp"
 #include "Util/ModelLoader.hpp"
 
@@ -36,8 +37,21 @@ namespace CoreEngine {
         AddObject(transformWidget);
 
 
-        Object3D* dragon = KikooRenderer::Util::FileIO::ObjectFromOBJ("C:/Users/Jacques/Documents/Boulot/2019/3D Models/DragonBlender.obj", this);
+        Object3D* dragon = KikooRenderer::Util::FileIO::ObjectFromOBJ("C:/Users/Jacques/Documents/Boulot/2019/3D Models/Cobblestones/Files/untitled2.obj", this);
         AddObject(dragon); 
+
+        Object3D* dirLight = GetCube(this, "DirLight", glm::dvec3(3, 3, -3), glm::dvec3(-180, 0, 0), glm::dvec3(0.2, 0.2, 0.2), glm::dvec4(1, 1, 1, 1));
+        LightComponent* lightComponent = new LightComponent(dirLight, glm::dvec4(1.0, 1.0, 1.0, 1), glm::dvec3(0.25, 0.05, 0.001), 0);
+        dirLight->AddComponent(lightComponent);
+        lightObjects.push_back(dirLight);
+        AddObject(dirLight); 
+
+        // Object3D* dirLight2 = GetCube(this, "DirLight", glm::dvec3(5, 10, -10), glm::dvec3(180, -48, 36), glm::dvec3(0.2, 0.2, 0.2), glm::dvec4(1, 1, 1, 1));
+        // LightComponent* lightComponent2 = new LightComponent(dirLight2, glm::dvec4(0, 0, 1, 1), glm::dvec3(2, 2, 2), 0);
+        // dirLight2->AddComponent(lightComponent2);
+        // lightObjects.push_back(dirLight2);
+        // AddObject(dirLight2);
+
 
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
@@ -79,9 +93,10 @@ namespace CoreEngine {
             if(selectedObjects[i]->visible) {
                 MaterialComponent* material = (MaterialComponent*)(selectedObjects[i]->GetComponent("Material"));
                 if(material) {
+                    Shader* tmpShader = material->shader;
                     material->SetShader(&standardShaders.selectedObjectShader);
                     selectedObjects[i]->Render();
-                    material->SetShader(&standardShaders.unlitMeshShader);
+                    material->SetShader(tmpShader);
                 }
             }
         }

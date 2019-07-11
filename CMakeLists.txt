@@ -21,12 +21,15 @@ set(QT_BUILD_DIR  "C:/Qt/5.11.2/msvc2017_64")
 set(GLM_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/glm)
 include_directories(${GLM_INC_DIR})
 
-#eigen
-set(EIGEN_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/eigen)
-include_directories(${EIGEN_INC_DIR})
+#glm
+set(STBI_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/STB_image)
+include_directories(${STBI_INC_DIR})
+
+# #eigen
+# set(EIGEN_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/eigen)
+# include_directories(${EIGEN_INC_DIR})
 
 include_directories(src)
-
 add_subdirectory(src)
 
 install(FILES ${QT_BIN_DIR}/Qt5Core.dll
@@ -63,6 +66,6 @@ install(FILES ${QT_BIN_DIR}/Qt5Core.dll
 
 install(DIRECTORY ${QT_BUILD_DIR}/plugins/platforms
 		DESTINATION bin
-		COMPONENT CompressionResearchDist
+		COMPONENT MainWindowDist
 )
 

@@ -15,16 +15,19 @@ class MaterialComponent : public Component {
         void OnRender();
         void OnDestroy();
         void Recompute(){}
+        void SetTexture(std::string path);
         
         void SetShader(Shader* shader);
         void SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 viewMatrix, glm::dmat4 projectionMatrix, Scene* scene);
 
         Shader* shader;
 
-
         float influence;
 
         glm::vec4 albedo;
+
+        int width, height, nrChannels;
+        unsigned int texture;
 };
 }
 }
