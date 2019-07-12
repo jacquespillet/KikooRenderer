@@ -179,6 +179,7 @@ layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normal;
 layout(location = 2) in vec2 uv;
 layout(location = 3) in vec4 color;
+layout(location = 4) in vec3 tangent;
 
 uniform mat4 modelViewProjectionMatrix;
 uniform mat4 modelMatrix;
@@ -186,8 +187,10 @@ uniform vec3 cameraPos;
 
 out vec3 fragPos;
 out vec3 fragNormal;
-out vec3 fragToCam;
 out vec2 fragUv;
+out vec3 fragTangent;
+out vec3 toCamTangentSpace; 
+out vec3 toLightTangentSpace; 
 
 void main()
 {
@@ -195,8 +198,12 @@ void main()
 	gl_Position = vec4(finalPosition.x, finalPosition.y, finalPosition.z, finalPosition.w);
 	fragPos = (modelMatrix * vec4(position.x, position.y, position.z, 1.0f)).xyz;
 	fragNormal = normal;
-	fragToCam = normalize(cameraPos - fragPos.xyz);
 	fragUv = uv;
+	fragTangent = tangent;
+
+	vec3 fragToCam = cameraPos - fragPos;
+	vec3 bitangent = cross(normal, tangent); 
+    toCamTangentSpace = vec3(dot(tangent, fragToCam), dot(bitangent, fragToCam), dot(normal, fragToCam));
 }
 )";
 
@@ -216,25 +223,35 @@ layout(location = 0) out vec4 outputColor;
 uniform LightSource lights[4];
 uniform vec4 albedo; 
 uniform int numLights; 
+uniform vec3 cameraPos;
+
 uniform sampler2D albedoTexture;
 uniform sampler2D specularTexture;
 uniform sampler2D normalTexture;
+uniform int hasAlbedoTex;
+uniform int hasSpecularTex;
+uniform int hasNormalTex;
 
 in vec3 fragPos;
 in vec3 fragNormal;
-in vec3 fragToCam;
 in vec2 fragUv;
+in vec3 fragTangent;
+in vec3 toCamTangentSpace; 
 
 void main()
 {
+	vec3 fragToCam = cameraPos - fragPos;
+
 	vec4 textureAlbedo = albedo * texture(albedoTexture, fragUv);
-	vec4 textureNormal = texture(normalTexture, fragUv);
+	vec3 finalNormal = (hasNormalTex==1) ? texture(normalTexture, fragUv).xyz : fragNormal;
 	
 	vec4 finalColor = vec4(0, 0, 0, 1);
-	finalColor.rgb += 0.2 * textureAlbedo.rgb;
-
+	finalColor.rgb += 0.1 * textureAlbedo.rgb;
 
 	for(int i=0; i<numLights; i++) {
+		vec3 fragBitangent = normalize(cross(fragNormal, fragTangent)); 
+ 		vec3 toLightTangentSpace = vec3(dot(fragTangent, lights[i].direction),    dot(fragBitangent, lights[i].direction), dot(fragNormal, lights[i].direction)); 
+
 		float attenuation = 1;
 		vec3 lightDirection = normalize(lights[i].direction);
 		
@@ -252,15 +269,22 @@ void main()
 		
 		vec3 toLight = -lightDirection;
 
-		vec4 diffuse = textureAlbedo * lights[i].color * max(dot(normalize(fragNormal), toLight), 0);
+		//Redefinition of vectors in tangent space
+		if(hasNormalTex == 1) {
+			toLight = toLightTangentSpace;
+			fragToCam = toCamTangentSpace;
+		}
+
+
+		vec4 diffuse = textureAlbedo * lights[i].color * max(dot(normalize(finalNormal.xyz), toLight), 0);
 
 		// Specular
 		vec3 halfwayVec = normalize(toLight + fragToCam);
-		vec4 specular = textureAlbedo * lights[i].color * pow(max(dot(normalize(fragNormal), halfwayVec),0), 32);
+		vec4 specular = textureAlbedo * lights[i].color * pow(max(dot(normalize(finalNormal.xyz), halfwayVec),0), 64);
 
 		finalColor.rgb +=  attenuation * (diffuse + specular ).rgb;
 	}
-	finalColor = vec4(fragNormal.xyz, 1);
+	// finalColor = vec4(fragTangent.xyz, 1);
 	outputColor = finalColor;
 	
 }

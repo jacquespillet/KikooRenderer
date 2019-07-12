@@ -749,7 +749,7 @@ Object3D* GetAxes(Scene* scene, std::string name) {
     
     //Setup mesh
     MeshFilterComponent* mesh = new MeshFilterComponent(newObject);
-    mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles);
+    mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles, false);
     mesh->drawingMode = GL_LINES;
     mesh->primitiveSize = 10;
 

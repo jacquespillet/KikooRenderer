@@ -79,7 +79,7 @@ KikooRenderer::CoreEngine::Object3D* ObjectFromOBJ(std::string fileName, KikooRe
     }
 
     KikooRenderer::CoreEngine::MeshFilterComponent* mesh = new KikooRenderer::CoreEngine::MeshFilterComponent(newObject);
-    mesh->LoadFromBuffers( outVertex, outNormals, outUv, outColors, vertexIndices);
+    mesh->LoadFromBuffers( outVertex, outNormals, outUv, outColors, vertexIndices, true);
 
     //Setup transform
     KikooRenderer::CoreEngine::TransformComponent* transform = new  KikooRenderer::CoreEngine::TransformComponent(newObject );

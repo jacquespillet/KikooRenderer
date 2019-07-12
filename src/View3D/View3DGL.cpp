@@ -81,7 +81,7 @@ namespace KikooRenderer {
             ogl->glStencilFunc(GL_ALWAYS, 1, 0xFF); // all fragments should update the stencil buffer
             ogl->glStencilMask(0xFF); // enable writing to the stencil buffer
             
-            // ogl->glEnable(GL_MULTISAMPLE);  
+            ogl->glEnable(GL_MULTISAMPLE);  
             ogl->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
             //disable writting to depth buffer
