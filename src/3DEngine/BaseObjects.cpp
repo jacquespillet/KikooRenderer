@@ -1,6 +1,7 @@
 #include "BaseObjects.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/BoundingComponent.hpp"
+#include "Components/FluidComponent.hpp"
 
 
 namespace KikooRenderer {
@@ -963,6 +964,82 @@ Object3D* GetScaleWidget(Scene* scene, std::string name,glm::dvec3 _position, gl
     transform->scale = _scale;
 
     return widget;
+}
+
+
+Object3D* GetTerrain(Scene* scene, std::string name,glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color, float width, float height, int subdivisionsX, int subdivisionsY) {
+ //Start each Object3D in scene
+    Object3D* newObject = new Object3D(name, scene);
+    std::vector<glm::dvec3> vertex;
+    std::vector<glm::dvec3> normals;
+    std::vector<glm::dvec2> uv;
+    std::vector<glm::dvec4> colors;
+    std::vector<int> triangles;
+
+    float xOffset = width / subdivisionsX;
+    float yOffset = height / subdivisionsY;
+
+    //
+    ///Vertices
+    //
+    std::cout << xOffset << std::endl;
+    std::cout << yOffset << std::endl;
+    std::cout << subdivisionsX << std::endl;
+    std::cout << subdivisionsY << std::endl;
+    int numAdded=0;
+    for(float y=0, yInx=0; yInx<subdivisionsY; y+=yOffset, yInx++) {
+        for(float x=0, xInx=0; xInx<subdivisionsX; x+= xOffset, xInx++) {
+            vertex.push_back(glm::dvec3(x, 0, y));
+            normals.push_back(glm::dvec3(0, 1, 0));
+            uv.push_back(glm::dvec2(0, 0));
+            colors.push_back(glm::dvec4(255, 255, 255, 255));  
+
+            if(xInx < subdivisionsX-1 && yInx < subdivisionsY-1) {
+                triangles.push_back(numAdded);
+                triangles.push_back(numAdded + subdivisionsX);
+                triangles.push_back(numAdded + subdivisionsX + 1);
+                
+                triangles.push_back(numAdded);
+                triangles.push_back(numAdded + 1);
+                triangles.push_back(numAdded + subdivisionsX + 1);
+                // std::cout << "position " << glm::to_string(glm::dvec3(x, 0, y)) << std::endl;
+                // std::cout << "adding " << numAdded << " " << (numAdded + subdivisionsX) << " " << (numAdded + subdivisionsX + 1) << std::endl; 
+            }
+            numAdded++;
+        }
+    }
+    
+    //Setup mesh
+    MeshFilterComponent* mesh = new MeshFilterComponent(newObject);
+    // mesh->drawingMode = GL_TRIANGLE_FAN;
+    
+    // mesh->drawingMode = GL_LINES;
+    mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles);
+
+    //Setup transform
+    TransformComponent* transform = new TransformComponent(newObject );
+    transform->position = _position;
+    transform->rotation = _rotation;
+    transform->scale = _scale;
+    
+    //Setup material
+    MaterialComponent* material = new MaterialComponent(newObject);
+    material->albedo = _color;
+    material->SetShader(&scene->standardShaders.blinnPhongShader);
+
+
+    BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
+
+    FluidComponent* fluid = new FluidComponent(newObject);
+
+    newObject->AddComponent(fluid);
+    newObject->AddComponent(material);
+    newObject->AddComponent(transform);
+    newObject->AddComponent(boundingBox);
+    newObject->AddComponent(mesh);
+
+
+    return newObject;    
 }
 
 }

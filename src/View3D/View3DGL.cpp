@@ -54,22 +54,7 @@ namespace KikooRenderer {
     void View3DGL::initializeGL() {
 
         if(!scene->started) {
-            scene->Start();
-        }
-        scene->Enable();
-
-        connect(timer, &QTimer::timeout, [this]() {
-            std::time_t result = std::time(nullptr);
-            
-            clock_t currentTime = clock();
-            scene->deltaTime =  double( clock () - scene->previousTime ) /  CLOCKS_PER_SEC;
-            scene->previousTime = currentTime; 
-
-            makeCurrent();
-            scene->OnUpdate();  
-
-            GETGL 
-
+            GETGL
             //
             //Set GL states
             //
@@ -87,11 +72,25 @@ namespace KikooRenderer {
             //disable writting to depth buffer
             ogl->glEnable(GL_DEPTH_TEST);
             //glDepthMask(GL_FALSE);
-            
+            // ogl->glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
             //enable blending
             //glBlendFunc(GL_ZERO, GL_SRC_COLOR);
             //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-            //glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+            //glBlendFunc(GL_SRC_ALPHA, GL_ONE);            
+            scene->Start();
+        }
+        scene->Enable();
+
+        connect(timer, &QTimer::timeout, [this]() {
+            std::time_t result = std::time(nullptr);
+            
+            clock_t currentTime = clock();
+            scene->deltaTime =  double( clock () - scene->previousTime ) /  CLOCKS_PER_SEC;
+            scene->previousTime = currentTime; 
+
+            makeCurrent();
+            scene->OnUpdate();  
 
             if(scene->triggerRefresh) {
                 Refresh();

@@ -27,5 +27,8 @@ namespace CoreEngine {
     Object3D* GetTranslateWidget(Scene* scene, std::string name,glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale);
 
     Object3D* GetScaleWidget(Scene* scene, std::string name,glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale);
+    
+    Object3D* GetTerrain(Scene* scene, std::string name,glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color, float width, float height, int subdivisionsX, int subdivisionsY);
+    
 }
 }

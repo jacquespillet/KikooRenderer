@@ -118,33 +118,35 @@ void main()
 	vec4 worldPosition = modelMatrix * vec4(position.x, position.y, position.z, 1.0f);
 	vec3 toCam = cameraPos - worldPosition.xyz;
 
-	vec4 textureAlbedo = albedo * texture(albedoTexture, uv);
+	// vec4 textureAlbedo = albedo * texture(albedoTexture, uv);
+	vec4 textureAlbedo = albedo ;
 	vec4 textureNormal = texture(normalTexture, uv);
 
 	vec4 finalColor = vec4(0, 0, 0, 1);
-	finalColor.rgb += 0.2 * textureAlbedo.rgb;
+	finalColor.rgb += 0.1 * textureAlbedo.rgb;
 	for(int i=0; i<numLights; i++) {
 
 		float attenuation = 1;
 		vec3 lightDirection = normalize(lights[i].direction);
-		if(lights[i].type == 1) { //Point light
-			float distance = distance(worldPosition.xyz, lights[i].position);
-			attenuation = 1 / (lights[i].attenuation.x + lights[i].attenuation.y * distance + lights[i].attenuation.z * (distance * distance));
-			lightDirection = normalize(worldPosition.xyz - lights[i].position);
-		}
-		if(lights[i].type == 2) { //Spot light
-			lightDirection = normalize(worldPosition.xyz - lights[i].position);
-			float distance = distance(worldPosition.xyz, lights[i].position);
-			float numerator = pow(max(dot(-normalize(lights[i].direction), -lightDirection), 0), 64);
-			attenuation = numerator / (lights[i].attenuation.x + lights[i].attenuation.y * distance + lights[i].attenuation.z * (distance * distance));
-		}
+		// if(lights[i].type == 1) { //Point light
+		// 	float distance = distance(worldPosition.xyz, lights[i].position);
+		// 	attenuation = 1 / (lights[i].attenuation.x + lights[i].attenuation.y * distance + lights[i].attenuation.z * (distance * distance));
+		// 	lightDirection = normalize(worldPosition.xyz - lights[i].position);
+		// }
+		// if(lights[i].type == 2) { //Spot light
+		// 	lightDirection = normalize(worldPosition.xyz - lights[i].position);
+		// 	float distance = distance(worldPosition.xyz, lights[i].position);
+		// 	float numerator = pow(max(dot(-normalize(lights[i].direction), -lightDirection), 0), 64);
+		// 	attenuation = numerator / (lights[i].attenuation.x + lights[i].attenuation.y * distance + lights[i].attenuation.z * (distance * distance));
+		// }
 		
 		vec3 toLight = -lightDirection;
 
-		vec4 diffuse = textureAlbedo * lights[i].color * max(dot(normal, toLight), 0);
+		vec4 diffuse = 0.5 * textureAlbedo * lights[i].color * max(dot(normal, toLight), 0);
 
 		// Specular
 		float specularFactor = texture(specularTexture, uv).x;
+		specularFactor = 1;
 		vec3 halfwayVec = normalize(toLight + toCam);
 		vec4 specular = specularFactor * textureAlbedo * lights[i].color * pow(max(dot(normal, halfwayVec),0), 32);
 
@@ -242,7 +244,8 @@ void main()
 {
 	vec3 fragToCam = cameraPos - fragPos;
 
-	vec4 textureAlbedo = albedo * texture(albedoTexture, fragUv);
+	// vec4 textureAlbedo = albedo * texture(albedoTexture, fragUv);
+	vec4 textureAlbedo = albedo;
 	vec3 finalNormal = (hasNormalTex==1) ? texture(normalTexture, fragUv).xyz : fragNormal;
 	
 	vec4 finalColor = vec4(0, 0, 0, 1);

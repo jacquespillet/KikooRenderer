@@ -74,10 +74,9 @@ void Object3D::Enable() {
 void Object3D::Update() {
 	if(hasToRecompute) {
 		Recompute();
-		
-		for(int i=0; i<components.size(); i++) {
-			components[i]->OnUpdate();
-		}
+	}
+	for(int i=0; i<components.size(); i++) {
+		components[i]->OnUpdate();
 	}
 	
 	for(int i=0; i<childObjects.size(); i++) {
