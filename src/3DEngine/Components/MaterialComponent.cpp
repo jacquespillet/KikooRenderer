@@ -62,6 +62,9 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
             
             int hasAlbedoTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasAlbedoTex"); 
             ogl->glUniform1i(hasAlbedoTexLocation, 1);
+        } else {
+            int hasAlbedoTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasAlbedoTex"); 
+            ogl->glUniform1i(hasAlbedoTexLocation, 0);
         }
 
         if(specularTex.loaded) {
@@ -71,7 +74,10 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 
             int hasSpecularTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasSpecularTex"); 
             ogl->glUniform1i(hasSpecularTexLocation, 1);
-        }   
+        }   else {
+            int hasSpecularTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasSpecularTex"); 
+            ogl->glUniform1i(hasSpecularTexLocation, 0);
+        }
 
         if(normalTex.loaded) {
             normalTex.Use();
@@ -80,7 +86,10 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
             
             int hasNormalTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasNormalTex"); 
             ogl->glUniform1i(hasNormalTexLocation, 1);
-        }   
+        }  else {
+            int hasNormalTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasNormalTex"); 
+            ogl->glUniform1i(hasNormalTexLocation, 0);
+        } 
 
         int numLights = 0;
         for(int i=0; i<scene->lightObjects.size(); i++) {

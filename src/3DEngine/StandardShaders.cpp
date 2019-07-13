@@ -244,12 +244,11 @@ void main()
 {
 	vec3 fragToCam = cameraPos - fragPos;
 
-	// vec4 textureAlbedo = albedo * texture(albedoTexture, fragUv);
-	vec4 textureAlbedo = albedo;
+	vec4 finalAlbedo = (hasAlbedoTex==1) ? albedo * texture(albedoTexture, fragUv) : albedo;
 	vec3 finalNormal = (hasNormalTex==1) ? texture(normalTexture, fragUv).xyz : fragNormal;
 	
 	vec4 finalColor = vec4(0, 0, 0, 1);
-	finalColor.rgb += 0.1 * textureAlbedo.rgb;
+	finalColor.rgb += 0.1 * finalAlbedo.rgb;
 
 	for(int i=0; i<numLights; i++) {
 		vec3 fragBitangent = normalize(cross(fragNormal, fragTangent)); 
@@ -279,16 +278,17 @@ void main()
 		}
 
 
-		vec4 diffuse = textureAlbedo * lights[i].color * max(dot(normalize(finalNormal.xyz), toLight), 0);
+		vec4 diffuse = 0.5 * finalAlbedo * lights[i].color * max(dot(normalize(finalNormal.xyz), toLight), 0);
 
 		// Specular
 		vec3 halfwayVec = normalize(toLight + fragToCam);
-		vec4 specular = textureAlbedo * lights[i].color * pow(max(dot(normalize(finalNormal.xyz), halfwayVec),0), 64);
+		vec4 specular = finalAlbedo * lights[i].color * pow(max(dot(normalize(finalNormal.xyz), halfwayVec),0), 64);
 
-		finalColor.rgb +=  attenuation * (diffuse + specular ).rgb;
+		finalColor.rgb +=  attenuation * (diffuse + specular).rgb;
 	}
 	// finalColor = vec4(fragTangent.xyz, 1);
 	outputColor = finalColor;
+	outputColor.a = finalAlbedo.a;
 	
 }
 )";

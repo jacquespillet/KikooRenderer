@@ -29,14 +29,12 @@ namespace CoreEngine {
         std::vector<glm::dvec3> normal;
         std::vector<glm::dvec3> tangent;
 
-        float t = 0.01; //time interval
-        float c = 0.1; //velocity
+        float t = 0.1; //time interval
+        float c = 0.4; //velocity
         float d = 0.1; //Distance btw vert
         float mu = 0.01;
 
         float k1, k2, k3;
-
-
     };
 }
 }

@@ -34,16 +34,14 @@ namespace CoreEngine {
                 float z = 0;
                 glm::dvec2 position= glm::dvec2(d * i, y);
                 float distanceWithCenter = glm::distance(position, center);
-                if(distanceWithCenter < 2) {
-                    z = -2;
+                if(distanceWithCenter < 1) {
+                    z = -(1-distanceWithCenter) * 10;
                 }
- 
-                if(j==0 || i ==0 || j== width-1 || i ==height-1) z = 0;
                 buffer[0][a] = glm::dvec3(d * i, y, z);
                 buffer[1][a] = buffer[0][a];
                 
-                normal[a] = glm::dvec3(0.0F, 0.0F, 2.0F * d);
-                tangent[a] = glm::dvec3(2.0F * d, 0.0F, 0.0F);
+                normal[a] = glm::dvec3(0.0F, 0.0F, 1.0F * d);
+                tangent[a] = glm::dvec3(1.0F * d, 0.0F, 0.0F);
                 a++;
             }
         }        
@@ -77,7 +75,7 @@ namespace CoreEngine {
                 normal[inx].x = buffer[renderBuffer][inx - 1].z - buffer[renderBuffer][inx + 1].z;    
                 normal[inx].y = buffer[renderBuffer][inx - width].z - buffer[renderBuffer][inx + width].z;    
                 tangent[inx].z = buffer[renderBuffer][inx + 1].z - buffer[renderBuffer][inx - 1].z;   
-            }  
+            }
         }
 
         for(int i=0; i<meshFilter->vertices.size(); i++) {
