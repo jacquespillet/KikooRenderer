@@ -38,18 +38,19 @@ namespace CoreEngine {
         transformWidget = GetTranslateWidget(this, "TranslateWidget", glm::dvec3(0), glm::dvec3(0), glm::dvec3(1));
         transformWidget->visible = false;
         AddObject(transformWidget);
-        
-        Object3D* terrain = GetTerrain(this, "Terrain",glm::dvec3(-5, 0, -5), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.1, 0.3, 0.8, 1), 10, 10, 100, 100);
-        AddObject(terrain);
-        
-        Object3D* dragon2 = KikooRenderer::Util::FileIO::ObjectFromOBJ("C:/Users/Jacques/Documents/Boulot/2019/3D Models/E-45-Aircraft/E 45 Aircraft_obj2.obj", this);
-        AddObject(dragon2);
 
-        Object3D* dirLight = GetCube(this, "DirLight", glm::dvec3(3, 3, -3), glm::dvec3(45, 45, 35), glm::dvec3(0.2, 0.2, 0.2), glm::dvec4(1, 1, 1, 1));
-        LightComponent* lightComponent = new LightComponent(dirLight, glm::dvec4(1.0, 1.0, 1.0, 1), glm::dvec3(0.25, 0.05, 0.001), 0);
-        dirLight->AddComponent(lightComponent);
-        lightObjects.push_back(dirLight);
-        AddObject(dirLight);
+        // Object3D* curve = GetBezierCurve(this, "curve",glm::dvec3(0, 1, 0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1), glm::dvec3(-1, 1, 0), glm::dvec3(-0.5, 4, 1), glm::dvec3(0.5, -4, -1), glm::dvec3(1, 1, 0));
+        // AddObject(curve);
+
+        std::vector<glm::dvec4> points;
+        points.push_back(glm::dvec4(1, 2, 0, 1.0));
+        points.push_back(glm::dvec4(2, 0, 0, 1.0));
+        points.push_back(glm::dvec4(3, -1, 0, 1.0));
+        points.push_back(glm::dvec4(5, -2, 0, 1.0));
+        
+        Object3D* curve = GetBezierSurface(this, "curve",glm::dvec3(0, 1, 0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1), points);
+        AddObject(curve);
+
 
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
@@ -67,7 +68,7 @@ namespace CoreEngine {
 
     void Scene::Render() {
         GETGL
-        ogl->glClearColor(0.6, 0.6, 0.6, 1.0);
+        ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
         ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
         
         ogl->glStencilFunc(GL_ALWAYS, 1, 0xFF); 
