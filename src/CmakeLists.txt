@@ -20,8 +20,12 @@ set(MainWindowSrc
 	3DEngine/StandardShaders.cpp
 	3DEngine/CameraScene.cpp
 	3DEngine/Util.cpp
-	
 	3DEngine/BaseObjects.cpp
+	
+	Renderer/RayTracer.cpp
+	Renderer/Camera.cpp
+	Renderer/Material.cpp
+	Renderer/Shapes.cpp	
 	
 	SceneTree/SceneTree.cpp
 	
@@ -29,6 +33,7 @@ set(MainWindowSrc
 	Geometry/Ray.cpp	
 
 	Util/ModelLoader.cpp
+	Util/Image.cpp
 )
 
 add_executable(MainWindow ${MainWindowSrc})

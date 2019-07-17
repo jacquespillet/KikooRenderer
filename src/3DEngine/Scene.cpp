@@ -39,19 +39,6 @@ namespace CoreEngine {
         transformWidget->visible = false;
         AddObject(transformWidget);
 
-        // Object3D* curve = GetBezierCurve(this, "curve",glm::dvec3(0, 1, 0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1), glm::dvec3(-1, 1, 0), glm::dvec3(-0.5, 4, 1), glm::dvec3(0.5, -4, -1), glm::dvec3(1, 1, 0));
-        // AddObject(curve);
-
-        std::vector<glm::dvec4> points;
-        points.push_back(glm::dvec4(1, 2, 0, 1.0));
-        points.push_back(glm::dvec4(2, 0, 0, 1.0));
-        points.push_back(glm::dvec4(3, -1, 0, 1.0));
-        points.push_back(glm::dvec4(5, -2, 0, 1.0));
-        
-        Object3D* curve = GetBezierSurface(this, "curve",glm::dvec3(0, 1, 0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1), points);
-        AddObject(curve);
-
-
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
             objects3D[i]->Start();

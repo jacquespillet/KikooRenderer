@@ -1392,7 +1392,7 @@ Object3D* GetNURBS(Scene* scene, std::string name,glm::dvec3 _position, glm::dve
 
 
 Object3D* GetBezierSurface(Scene* scene, std::string name,glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color, std::vector<glm::dvec4> controlPoints) {
-
+    return nullptr;
 }
 
 }
