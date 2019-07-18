@@ -16,9 +16,6 @@ struct Point {
 };
 
 //TODO
-    //Add material to shape
-    //Set point material at shape.hit
-    //Add material to shape constructor
     //scatter when hit
 
 class Shape {
@@ -32,9 +29,9 @@ class Sphere : public Shape {
     public:
         glm::dvec3 position;
         double radius;
-        // Material material;
-        // Sphere(glm::dvec3 position, double radius, Material material);
-        Sphere(glm::dvec3 position, double radius);
+        Material material;
+        Sphere(glm::dvec3 position, double radius, Material material);
+        // Sphere(glm::dvec3 position, double radius);
         double HitRay(KikooRenderer::Geometry::Ray ray, double tMin, double tMax, Point& hitPoint);
 };
 }

@@ -2,8 +2,7 @@
 
 namespace KikooRenderer {
 namespace Renderer {
-    // Sphere::Sphere(glm::dvec3 position, double radius, Material material) : material(material){
-    Sphere::Sphere(glm::dvec3 position, double radius){
+    Sphere::Sphere(glm::dvec3 position, double radius, Material material) : material(material){
         this->position = position;
         this->radius = radius;
     };
@@ -23,7 +22,8 @@ namespace Renderer {
                 hitPoint = {
                     t, 
                     hitPosition,
-                    glm::normalize(hitPosition - this->position)
+                    glm::normalize(hitPosition - this->position),
+                    &material
                 };
                 return t;
             } else {

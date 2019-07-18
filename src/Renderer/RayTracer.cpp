@@ -2,6 +2,7 @@
 #include "Camera.hpp"
 #include "Material.hpp"
 #include "Util/Image.hpp"
+#include "Geometry/Util.h"
 
 namespace KikooRenderer {
 namespace Renderer {
@@ -32,8 +33,17 @@ namespace Renderer {
         if(hit) {
             KikooRenderer::Geometry::Ray scattered;
             glm::dvec3 attenuation;
+            std::cout << " point out " << glm::to_string(closestPoint.position) << std::endl;
+            closestPoint.material->Scatter(ray, closestPoint, attenuation, scattered);
+
+            glm::dvec3 target = closestPoint.position + closestPoint.normal + Geometry::randomInSphere();
+            Geometry::Ray ray(closestPoint.position, target-closestPoint.position);
+
+            return 0.5 * GetColor(scattered, depth +1);
             // if(depth < 50 && closestPoint.material->Scatter(ray, closestPoint, attenuation, scattered)) {
             //     return attenuation * GetColor(scattered, depth+1);
+            // } else {
+            //     return glm::dvec3(0, 0, 0);
             // }
         } else {                   
              glm::dvec3 direction = glm::normalize(ray.direction);
@@ -52,11 +62,11 @@ namespace Renderer {
         Camera camera;
 
         Material material(glm::dvec4(0.8, 0.3, 0.3, 1.0));
-        // Sphere* sphere = new Sphere(glm::dvec3(0, 0, -1), 0.5, material);
-        Sphere* sphere = new Sphere(glm::dvec3(0, 0, -1), 0.5);
+        Sphere* sphere = new Sphere(glm::dvec3(0, 0, -1), 0.5, material);
+        // Sphere* sphere = new Sphere(glm::dvec3(0, 0, -1), 0.5);
         objects.push_back(sphere);
-        // Sphere* sphere2 = new Sphere(glm::dvec3(0, -100.5, -1), 100, material);
-        Sphere* sphere2 = new Sphere(glm::dvec3(0, -100.5, -1), 100);
+        Sphere* sphere2 = new Sphere(glm::dvec3(0, -100.5, -1), 100, material);
+        // Sphere* sphere2 = new Sphere(glm::dvec3(0, -100.5, -1), 100);
         objects.push_back(sphere2);
 
         for(int y=0; y<height; y++) {
