@@ -5,7 +5,7 @@ namespace KikooRenderer {
 namespace CoreEngine {
 
 CameraScene::CameraScene(Scene* _scene, double _eyeDistance, double _fov, double _near, double _far, double _aspect) :  transform(TransformComponent(nullptr))  {
-    this->scene = _scene;
+    // this->scene = _scene;
     this->eyeDistance = _eyeDistance;
     this->fov = _fov;
     this->nearClip = _near;
@@ -14,9 +14,9 @@ CameraScene::CameraScene(Scene* _scene, double _eyeDistance, double _fov, double
 
     UpdateProjectionMatrix();
 
-    this->transform.position.z = -5;
-    this->transform.position.y = 2.5;
-    this->transform.position.x = 0;
+    this->transform.position.x = -2;
+    this->transform.position.y = 2;
+    this->transform.position.z = 1;
 
 }
 
@@ -157,6 +157,21 @@ Geometry::Ray CameraScene::GetRay(int x, int y) {
     return ray;
 }
 
+Geometry::Ray CameraScene::GetRay(double x, double y) {
+    Geometry::Ray ray;
+    glm::dmat4 localToWorld = this->transform.GetModelMatrix();
+
+    int width = this->scene->windowWidth;
+    int height = this->scene->windowHeight;
+    double ndcX = (((x / (double)width) * 2.0) - 1.0) * this->aspect;
+    double ndcY = 1.0 - ((y / (double)height) * 2.0);
+    double ndcZ = 1 / std::tan(this->fov/2.0);
+
+    ray.origin = localToWorld *  glm::dvec4(0, 0, 0, 1);
+    ray.direction = glm::normalize(localToWorld * glm::dvec4(ndcX, ndcY, ndcZ, 0));
+
+    return ray;
+}
 
 }
 }

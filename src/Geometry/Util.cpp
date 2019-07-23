@@ -13,5 +13,37 @@ namespace Geometry {
 
         return result;
     }
+
+    glm::dvec3 RandomInDisk() {
+        glm::dvec3 p;
+        do {
+            double randomX = ((double) rand()) / (double) RAND_MAX;
+            double randomY = ((double) rand()) / (double) RAND_MAX;
+            p = 2.0 * glm::dvec3(randomX, randomY, 0) - glm::dvec3(1, 1, 0);
+        } while(glm::dot(p, p) >= 1.0);
+        return p;
+    }
+
+
+    double Schlick(double cosine, double inx) {
+        double r0 = (1.0 - inx) / (1.0 + inx);
+        r0 = r0 * r0;
+        return r0 + (1.0-r0) * std::pow((1.0 - cosine), 5);
+    }
+
+    bool Refract(glm::vec3 v, glm::dvec3 n, double niOverNt, glm::dvec3& refracted) {
+        glm::dvec3 uv = glm::normalize(v);
+
+        double dt = glm::dot(uv, n);
+        double delta = 1.0 - niOverNt * niOverNt * (1.0 - dt*dt);
+        if(delta > 0) {
+            refracted = niOverNt * (uv - n * dt) - n * std::sqrt(delta);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
 }
 }

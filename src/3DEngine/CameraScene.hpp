@@ -37,6 +37,7 @@ class CameraScene{
 		void OnWheelEvent(QWheelEvent *event);
 
         Geometry::Ray GetRay(int x, int y);
+        Geometry::Ray GetRay(double x, double y);
 
     private: 
         bool isRightClicked = false;

@@ -26,10 +26,20 @@ namespace Renderer {
                     &material
                 };
                 return t;
-            } else {
-                return -1;
+            }
+            t = (- b + sqrt(delta)) / (2 * a);
+            if(t > tMin && t < tMax) {
+                glm::dvec3 hitPosition = ray.pointAtPosition(t);
+                hitPoint = {
+                    t, 
+                    hitPosition,
+                    glm::normalize(hitPosition - this->position),
+                    &material
+                };
+                return t;
             }
         }
+        return -1;
     }
 }
 }
