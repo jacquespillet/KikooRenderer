@@ -31,15 +31,15 @@ namespace Renderer {
                 probability = Geometry::Schlick(cosine, refInx);
              }
              else {
-                scattered = Geometry::Ray(point.position, reflected);
+                scattered = Geometry::Ray(point.position, reflected, in.time);
                 probability = 1.0;
              }
             double random = ((double) rand()) / (double) RAND_MAX;
              if (random < probability) {
-                scattered = Geometry::Ray(point.position, reflected);
+                scattered = Geometry::Ray(point.position, reflected, in.time);
              }
              else {
-                scattered = Geometry::Ray(point.position, refracted);
+                scattered = Geometry::Ray(point.position, refracted, in.time);
              }
              return true;
         } else if(!metallic) {

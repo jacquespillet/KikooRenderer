@@ -4,7 +4,9 @@
 namespace KikooRenderer{
 namespace Renderer {
 
-    Camera::Camera(glm::dvec3 lookfrom, glm::dvec3 lookat, glm::dvec3 up, double fovy, double aspectRatio, double aperture, double focusDistance) {
+    Camera::Camera(glm::dvec3 lookfrom, glm::dvec3 lookat, glm::dvec3 up, double fovy, double aspectRatio, double aperture, double focusDistance, double t0, double t1) {
+        time0 = t0;
+        time1 = t1;
         lensRadius = aperture / 2.0;
 
         double theta = fovy * M_PI / 180;
@@ -26,8 +28,8 @@ namespace Renderer {
     KikooRenderer::Geometry::Ray Camera::GetRay(double s, double t) {
         glm::dvec3 rd = lensRadius * Geometry::RandomInDisk();
         glm::dvec3 offset =  rd.x * u  + rd.y * v;
-
-        return KikooRenderer::Geometry::Ray(position + offset, lowerLeft + s * horizontal + t*vertical - position - offset);
+        double time = time0 + ((double) rand() / (double) RAND_MAX) * (time1 - time0);
+        return KikooRenderer::Geometry::Ray(position + offset, lowerLeft + s * horizontal + t*vertical - position - offset, time);
     }
 
 

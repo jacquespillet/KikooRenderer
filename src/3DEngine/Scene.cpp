@@ -39,6 +39,9 @@ namespace CoreEngine {
         transformWidget->visible = false;
         AddObject(transformWidget);
 
+        Object3D* dirLight = GetCube(this, "DirLight", glm::dvec3(3, 3, -3), glm::dvec3(45, 45, 35), glm::dvec3(0.2, 0.2, 0.2), glm::dvec4(1, 1, 1, 1));
+        AddObject(dirLight);         
+
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
             objects3D[i]->Start();

@@ -2,9 +2,10 @@
 
 namespace KikooRenderer {
 namespace Geometry {
-    Ray::Ray(glm::dvec3 origin, glm::dvec3 direction) {
+    Ray::Ray(glm::dvec3 origin, glm::dvec3 direction, float time) {
         this->origin = origin;
         this->direction = direction;
+        this->time = time;
     }
 
 

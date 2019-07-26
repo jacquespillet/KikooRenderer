@@ -48,15 +48,15 @@ namespace Renderer {
     }
 
     void RayTracer::WriteImage() {
-        int width = 1000;
-        int height = 800;
+        int width = 300;
+        int height = 150;
         int numSamples = 100;
 
         KikooRenderer::Util::FileIO::Image image(width, height); 
         glm::dvec3 camPos = glm::dvec3(1, 1, 1.5);
         glm::dvec3 lookAt = glm::dvec3(0, 0, 0);
         double distanceToFocus = glm::distance(camPos, lookAt);
-        Camera camera(camPos, lookAt, glm::dvec3(0, 1, 0), 90, (double)width/(double)height, 0.0001, distanceToFocus);
+        Camera camera(camPos, lookAt, glm::dvec3(0, 1, 0), 90, (double)width/(double)height, 0.0001, distanceToFocus, 0, 1);
         
         {
             Material material(glm::dvec4(0.2, 0.2, 0.2, 1.0), false);
@@ -64,8 +64,8 @@ namespace Renderer {
             objects.push_back(sphere);
         }
 
-        for(float x = -11; x<11; x++) {
-            for(float z = -11; z<11; z++) {
+        for(float x = -11; x<11; x+=2) {
+            for(float z = -11; z<11; z+=2) {
                 double materialRandom = ((double) rand()) / (double) RAND_MAX;   
                 double xPos = x + (((double) rand()) / (double) RAND_MAX) * 0.9;   
                 double zPos = z + (((double) rand()) / (double) RAND_MAX) * 0.9;   

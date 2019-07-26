@@ -22,6 +22,7 @@ class Shape {
     public: 
         Shape(){}
         virtual double HitRay(KikooRenderer::Geometry::Ray ray, double tMin, double tMax, Point& hitPoint) = 0;
+        virtual glm::dvec3 GetPosition(double time) = 0;
 };
 
 
@@ -31,8 +32,8 @@ class Sphere : public Shape {
         double radius;
         Material material;
         Sphere(glm::dvec3 position, double radius, Material material);
-        // Sphere(glm::dvec3 position, double radius);
         double HitRay(KikooRenderer::Geometry::Ray ray, double tMin, double tMax, Point& hitPoint);
+        glm::dvec3 GetPosition(double time);
 };
 }
 }

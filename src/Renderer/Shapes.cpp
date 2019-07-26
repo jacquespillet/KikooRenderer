@@ -7,8 +7,14 @@ namespace Renderer {
         this->radius = radius;
     };
 
+    glm::dvec3 Sphere::GetPosition(double time) {
+        //If moving : set position at time
+        return this->position;
+    }
+
+
     double Sphere::HitRay(KikooRenderer::Geometry::Ray ray, double tMin, double tMax, Point& hitPoint) {
-        glm::dvec3 oc = ray.origin - position;
+        glm::dvec3 oc = ray.origin - GetPosition(ray.time);
         float a = glm::dot(ray.direction, ray.direction);
         float b = 2 * dot(oc, ray.direction);
         float c = dot(oc, oc) - radius * radius;
@@ -22,7 +28,7 @@ namespace Renderer {
                 hitPoint = {
                     t, 
                     hitPosition,
-                    glm::normalize(hitPosition - this->position),
+                    glm::normalize(hitPosition -  GetPosition(ray.time)),
                     &material
                 };
                 return t;
@@ -33,7 +39,7 @@ namespace Renderer {
                 hitPoint = {
                     t, 
                     hitPosition,
-                    glm::normalize(hitPosition - this->position),
+                    glm::normalize(hitPosition -  GetPosition(ray.time)),
                     &material
                 };
                 return t;
