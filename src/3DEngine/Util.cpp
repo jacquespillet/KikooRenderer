@@ -27,6 +27,11 @@ namespace Util {
             distance = -1; 
         return raybox;
     }
+    
+    bool cameraBoxTest(CameraScene& camera, glm::dvec3 position, glm::dvec3 size) {
+        return true;
+    }
+
 }
     
 }

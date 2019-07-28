@@ -21,6 +21,8 @@ set(MainWindowSrc
 	3DEngine/CameraScene.cpp
 	3DEngine/Util.cpp
 	3DEngine/BaseObjects.cpp
+
+	3DEngine/SpatialPartitioning/Octree.cpp
 	
 	Renderer/RayTracer.cpp
 	Renderer/Camera.cpp
@@ -31,6 +33,7 @@ set(MainWindowSrc
 	
 	Geometry/Util.cpp	
 	Geometry/Ray.cpp	
+	Geometry/Box.cpp	
 
 	Util/ModelLoader.cpp
 	Util/Image.cpp
