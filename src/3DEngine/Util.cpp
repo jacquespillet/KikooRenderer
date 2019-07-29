@@ -29,6 +29,13 @@ namespace Util {
     }
     
     bool cameraBoxTest(CameraScene& camera, glm::dvec3 position, glm::dvec3 size) {
+        //Get all points from the plane
+        //Transform them
+
+        //For each plane
+            //Compute the effective radius
+            //Dot the plane with center of the BB
+            //if dot < -Reff, point not visible
         return true;
     }
 
