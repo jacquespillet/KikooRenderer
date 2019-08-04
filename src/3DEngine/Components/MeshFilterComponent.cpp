@@ -21,7 +21,6 @@ void MeshFilterComponent::OnEnable(){
 void MeshFilterComponent::OnUpdate(){}
 void MeshFilterComponent::OnRender(){
 	GETGL
-
 	//bind VAO	
 	ogl->glBindVertexArray(vertexArrayObject);
 	

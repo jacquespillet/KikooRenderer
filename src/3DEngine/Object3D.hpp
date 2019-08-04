@@ -4,6 +4,7 @@
 #include "Scene.hpp"
 #include "Geometry/Ray.hpp"
 #include "Components/TransformComponent.hpp"
+#include "Framebuffer.hpp"
 
 namespace KikooRenderer {
 
@@ -43,6 +44,9 @@ class Object3D {
         void Recompute();
 
         Object3D* Intersects(Geometry::Ray ray, double& distance);
+
+		//Useful ? 
+		//Framebuffer* frameBuffer;
 };
 }
 

@@ -12,8 +12,7 @@ class CameraScene{
     public: 
         CameraScene(Scene* scene, double eyeDistance, double fov, double near, double far, double aspect);
         
-        CameraScene() :  transform(TransformComponent(nullptr)) {
-        }
+        CameraScene() :  transform(TransformComponent(nullptr)) {}
         Scene* scene;
         double eyeDistance;
         double fov;

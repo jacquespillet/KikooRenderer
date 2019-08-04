@@ -16,6 +16,7 @@ namespace CoreEngine {
 Object3D::Object3D(std::string _name, Scene* _scene) {
     this->name = _name;
     this->scene = _scene;
+	//this->frameBuffer = nullptr;
 
 	transform = new TransformComponent(this);
 	this->AddComponent(transform);
@@ -117,9 +118,10 @@ Component* Object3D::GetComponent(std::string name) {
 
 void Object3D::Render(glm::mat4* modelMatrix) {
 	GETGL
+
 	if(!depthTest) ogl->glDisable(GL_DEPTH_TEST);
 
-	TransformComponent* transform = (TransformComponent*)(this->GetComponent("Transform")); 
+	TransformComponent* transform = (TransformComponent*)(this->transform); 
 	
 	glm::mat4 currentModelMatrix;
 	if(modelMatrix != nullptr) currentModelMatrix = (*modelMatrix); //If child of object, modelMatrix is the local coordinate matrix of the parent
@@ -127,7 +129,7 @@ void Object3D::Render(glm::mat4* modelMatrix) {
 
 	//Render child objects
 	for(int i=0; i<childObjects.size(); i++) {
-		TransformComponent* childTransform = (TransformComponent*)childObjects[i]->GetComponent("Transform");
+		TransformComponent* childTransform = childObjects[i]->transform;
 		glm::mat4 newModelMat = currentModelMatrix *  (glm::mat4)childTransform->GetModelMatrix(); 
 		childObjects[i]->Render(&newModelMat);
 	}
@@ -171,12 +173,12 @@ Object3D* Object3D::Intersects(Geometry::Ray ray, double& _distance) {
 		glm::dvec3 max;
 		bb->GetLocalBounds(&min, &max);
 
-		TransformComponent* transform = (TransformComponent*) this->GetComponent("Transform");
+		TransformComponent* transform = this->transform;
 		glm::dmat4 transformMat = transform->GetTransRotMatrix();
 		
 		Object3D* currentObject = this;
 		while(currentObject->parent != nullptr) {
-			TransformComponent* parentTransform = (TransformComponent*) currentObject->parent->GetComponent("Transform");
+			TransformComponent* parentTransform = currentObject->parent->transform;
 			glm::dmat4 parentTransformMat = parentTransform->GetTransRotMatrix();
 			transformMat = parentTransformMat * transformMat;
 			currentObject = currentObject->parent;

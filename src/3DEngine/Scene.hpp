@@ -70,6 +70,8 @@ class Scene {
 
 		bool isTransforming = false;
 
+		GLint defaultFBO;
+
 
 	protected:
 		Object3D* GetIntersectObject(int x, int y);

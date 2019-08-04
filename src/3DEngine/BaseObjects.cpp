@@ -255,7 +255,7 @@ Object3D* GetCube(Scene* scene, std::string name, glm::dvec3 _position, glm::dve
 
 
     newObject->AddComponent(material);
-    newObject->AddComponent(transform);
+	newObject->transform = transform;
     newObject->AddComponent(mesh);
     newObject->AddComponent(boundingBox);
 
@@ -400,7 +400,7 @@ Object3D* GetWireFrameBox(Scene* scene, std::string name, glm::dvec3 _position, 
     material->SetShader(&scene->standardShaders.unlitMeshShader);
 
     newObject->AddComponent(material);
-    newObject->AddComponent(transform);
+	newObject->transform = transform;
     newObject->AddComponent(mesh);
 
     return newObject;
@@ -442,10 +442,10 @@ Object3D* GetQuad(Scene* scene, std::string name, glm::dvec3 _position, glm::dve
     //
 
     //Front
+    uv.push_back(glm::dvec2(0, 1));
     uv.push_back(glm::dvec2(0, 0));
-    uv.push_back(glm::dvec2(0, 0));
-    uv.push_back(glm::dvec2(0, 0));
-    uv.push_back(glm::dvec2(0, 0));
+    uv.push_back(glm::dvec2(1, 0));
+    uv.push_back(glm::dvec2(1, 1));
 
 
     //
@@ -492,7 +492,7 @@ Object3D* GetQuad(Scene* scene, std::string name, glm::dvec3 _position, glm::dve
 
     newObject->AddComponent(material);
     newObject->AddComponent(mesh);
-    newObject->AddComponent(transform);
+	newObject->transform = transform;
     newObject->AddComponent(boundingBox);
 
 
@@ -554,7 +554,7 @@ Object3D* GetCircle(Scene* scene, std::string name, glm::dvec3 _position, glm::d
 
     newObject->AddComponent(material);
     newObject->AddComponent(mesh);
-    newObject->AddComponent(transform);
+	newObject->transform = transform;
     newObject->AddComponent(boundingBox);
 
 
@@ -615,7 +615,7 @@ Object3D* GetSphere(Scene* scene, std::string name, glm::dvec3 _position, glm::d
 
     newObject->AddComponent(material);
     newObject->AddComponent(mesh);
-    newObject->AddComponent(transform);
+	newObject->transform = transform;
     newObject->AddComponent(boundingBox);
 
     return newObject;
@@ -683,7 +683,7 @@ Object3D* GetGrid(Scene* scene, std::string name) {
     material->SetShader(&scene->standardShaders.unlitMeshShader);
 
     newObject->AddComponent(material);
-    newObject->AddComponent(transform);
+	newObject->transform = transform;
     newObject->AddComponent(mesh);
 
     return newObject;
@@ -765,7 +765,7 @@ Object3D* GetAxes(Scene* scene, std::string name) {
     material->SetShader(&scene->standardShaders.unlitMeshShader);
 
     newObject->AddComponent(material);
-    newObject->AddComponent(transform);
+	newObject->transform = transform;
     newObject->AddComponent(mesh);
 
     return newObject;
@@ -841,7 +841,7 @@ Object3D* GetCone(Scene* scene, std::string name, glm::dvec3 _position, glm::dve
 
     newObject->AddComponent(material);
     newObject->AddComponent(mesh);
-    newObject->AddComponent(transform);
+	newObject->transform = transform;
     newObject->AddComponent(boundingBox);
 
     return newObject;
@@ -889,7 +889,7 @@ Object3D* GetLine(Scene* scene, std::string name, glm::dvec3 position1, glm::dve
     material->SetShader(&scene->standardShaders.unlitMeshShader);
 
     newObject->AddComponent(material);
-    newObject->AddComponent(transform);
+	newObject->transform = transform;
     newObject->AddComponent(mesh);
 
     return newObject;
@@ -922,11 +922,10 @@ Object3D* GetTranslateWidget(Scene* scene, std::string name,glm::dvec3 _position
     widget->AddObject(zcone);
     widget->AddObject(zline);
 
-    TransformComponent* transform =  (TransformComponent*)widget->GetComponent("Transform");
-    transform->position = _position;
-    transform->rotation = _rotation;
-    transform->scale = _scale;
-    transform->isScreenSize = true;
+	widget->transform->position = _position;
+	widget->transform->rotation = _rotation;
+	widget->transform->scale = _scale;
+	widget->transform->isScreenSize = true;
 
     return widget;
 }
@@ -958,10 +957,9 @@ Object3D* GetScaleWidget(Scene* scene, std::string name,glm::dvec3 _position, gl
     widget->AddObject(zcube);
     widget->AddObject(zline);
 
-    TransformComponent* transform =  (TransformComponent*)widget->GetComponent("Transform");
-    transform->position = _position;
-    transform->rotation = _rotation;
-    transform->scale = _scale;
+    widget->transform->position = _position;
+    widget->transform->rotation = _rotation;
+    widget->transform->scale = _scale;
 
     return widget;
 }
@@ -1034,7 +1032,7 @@ Object3D* GetTerrain(Scene* scene, std::string name,glm::dvec3 _position, glm::d
 
     newObject->AddComponent(fluid);
     newObject->AddComponent(material);
-    newObject->AddComponent(transform);
+	newObject->transform = transform;
     newObject->AddComponent(boundingBox);
     newObject->AddComponent(mesh);
 
@@ -1085,7 +1083,7 @@ Object3D* GetHermiteCurve(Scene* scene, std::string name,glm::dvec3 _position, g
     material->SetShader(&scene->standardShaders.unlitMeshShader);
 
     newObject->AddComponent(material);
-    newObject->AddComponent(transform);
+	newObject->transform = transform;
     newObject->AddComponent(mesh);
 
     return newObject;
@@ -1137,7 +1135,7 @@ Object3D* GetBezierCurve(Scene* scene, std::string name,glm::dvec3 _position, gl
     material->SetShader(&scene->standardShaders.unlitMeshShader);
 
     newObject->AddComponent(material);
-    newObject->AddComponent(transform);
+	newObject->transform = transform;
     newObject->AddComponent(mesh);
 
     return newObject;
@@ -1210,7 +1208,7 @@ Object3D* GetCatmutRollSpline(Scene* scene, std::string name,glm::dvec3 _positio
     material->SetShader(&scene->standardShaders.unlitMeshShader);
 
     newObject->AddComponent(material);
-    newObject->AddComponent(transform);
+	newObject->transform = transform;
     newObject->AddComponent(mesh);
 
     return newObject;
@@ -1308,9 +1306,10 @@ Object3D* GetNonUniformBSpline(Scene* scene, std::string name,glm::dvec3 _positi
     material->albedo = _color;
     material->SetShader(&scene->standardShaders.unlitMeshShader);
 
+
     newObject->AddComponent(material);
-    newObject->AddComponent(transform);
-    newObject->AddComponent(mesh);
+	newObject->transform = transform;
+	newObject->AddComponent(mesh);
 
     return newObject;
 }
@@ -1384,7 +1383,7 @@ Object3D* GetNURBS(Scene* scene, std::string name,glm::dvec3 _position, glm::dve
     material->SetShader(&scene->standardShaders.unlitMeshShader);
 
     newObject->AddComponent(material);
-    newObject->AddComponent(transform);
+	newObject->transform = transform;
     newObject->AddComponent(mesh);
 
     return newObject;

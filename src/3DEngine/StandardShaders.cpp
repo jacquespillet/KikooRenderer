@@ -23,6 +23,7 @@ uniform float materialInfluence;
 
 //outputs
 out vec4 fragmentColor;  
+out vec2 fragmentUv;
 //main
 void main()
 {
@@ -30,6 +31,7 @@ void main()
 	fragmentColor = materialInfluence * albedo + (1.0 - materialInfluence) * color;
 	vec4 finalPosition = modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
 	gl_Position = vec4(finalPosition.x, finalPosition.y, finalPosition.z, finalPosition.w);
+	fragmentUv = uv;
 }
 )";
 
@@ -37,13 +39,17 @@ unlitMeshShader.fragSrc = R"(
 //inputs
 #version 440
 in vec4 fragmentColor; 
+in vec2 fragmentUv;
 //uniforms
+uniform int hasAlbedoTex;
+uniform sampler2D albedoTexture;
 //output
 layout(location = 0) out vec4 outputColor; 
 //main
 void main()
 {
-	outputColor = fragmentColor;
+	outputColor = (hasAlbedoTex==1) ? texture(albedoTexture, fragmentUv) : fragmentColor;
+
 }
 )";
 

@@ -23,7 +23,6 @@ class Texture
 		Texture(std::string path, GLuint _texIndex);
 		void Use();
 		void LoadFromFile(std::string path);
-
 };
 	
 	

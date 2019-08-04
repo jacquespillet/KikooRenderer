@@ -50,22 +50,22 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 	ogl->glUniform4fv(albedoLocation, 1, glm::value_ptr(albedo));
  
 
+	if (albedoTex.loaded) {
+		albedoTex.Use();
+		int texLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "albedoTexture");
+		ogl->glUniform1i(texLocation, 0);
+
+		int hasAlbedoTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasAlbedoTex");
+		ogl->glUniform1i(hasAlbedoTexLocation, 1);
+	}
+	else {
+		int hasAlbedoTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasAlbedoTex");
+		ogl->glUniform1i(hasAlbedoTexLocation, 0);
+	}
+
     if(this->shader->GetId() != SHADER_IDS::UNLIT) {
         int modelMatrixLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "modelMatrix"); 
         ogl->glUniformMatrix4fv(modelMatrixLocation, 1, false, glm::value_ptr(glm::mat4(modelMatrix)));
-
-   
-        if(albedoTex.loaded) {
-            albedoTex.Use();
-            int texLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "albedoTexture"); 
-            ogl->glUniform1i(texLocation, 0); 
-            
-            int hasAlbedoTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasAlbedoTex"); 
-            ogl->glUniform1i(hasAlbedoTexLocation, 1);
-        } else {
-            int hasAlbedoTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasAlbedoTex"); 
-            ogl->glUniform1i(hasAlbedoTexLocation, 0);
-        }
 
         if(specularTex.loaded) {
             specularTex.Use();
@@ -94,7 +94,7 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
         int numLights = 0;
         for(int i=0; i<scene->lightObjects.size(); i++) {
             LightComponent* lightComponent = (LightComponent*) scene->lightObjects[i]->GetComponent("Light"); 
-            TransformComponent* transformComponent = (TransformComponent*) scene->lightObjects[i]->GetComponent("Transform"); 
+            TransformComponent* transformComponent = scene->lightObjects[i]->transform; 
             
             if(lightComponent != nullptr) {
                 std::string varName = "lights[" + std::to_string(i) + "].type";

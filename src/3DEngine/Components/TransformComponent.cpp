@@ -66,7 +66,7 @@ glm::mat4 TransformComponent::GetWorldModelMatrix() {
 	glm::dmat4 transformMat = GetModelMatrix();
 	Object3D* currentObject = object3D;
 	while(currentObject->parent != nullptr) {
-		TransformComponent* parentTransform = (TransformComponent*) currentObject->parent->GetComponent("Transform");
+		TransformComponent* parentTransform = currentObject->parent->transform;
 		glm::dmat4 parentTransformMat = parentTransform->GetModelMatrix();
 		transformMat = parentTransformMat * transformMat;
 		currentObject = currentObject->parent;

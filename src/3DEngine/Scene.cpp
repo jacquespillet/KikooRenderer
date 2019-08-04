@@ -7,6 +7,7 @@
 #include "Geometry/Ray.hpp"
 #include "Util/ModelLoader.hpp"
 #include "SpatialPartitioning/Octree.hpp"
+#include "Framebuffer.hpp"
 
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLFunctions_3_2_Core>
@@ -16,14 +17,21 @@
 namespace KikooRenderer {
 
 namespace CoreEngine {
-	Object3D* dirLight;
     Scene::Scene() : camera(CameraScene(this, 1.0, 70 * DEGTORAD, 0.1, 1000.0, 1.0)){
         this->started = false;
         transformOffset = 0;
         isFirstTransformFrame = false;
     }
+	Framebuffer* alternateFBO;
+	Object3D* quad;
+	void Scene::Start() {
+		GETGL
+		ogl->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &defaultFBO);
+		std::cout << defaultFBO << std::endl;
 
-    void Scene::Start() {
+		alternateFBO = new Framebuffer;
+		std::cout << alternateFBO->defaultFBO << std::endl;
+
         this->started = true;
         OnStart();
 
@@ -41,40 +49,19 @@ namespace CoreEngine {
         transformWidget->visible = false;
         AddObject(transformWidget);
 
+		quad = GetQuad(this, "plane", glm::dvec3(0), glm::dvec3(0), glm::dvec3(5), glm::dvec4(1, 1, 1, 1));
 		
+		Texture albedoTex = Texture("C:\\Users\\Jacques\\Pictures\\Voyage\\IMG_20181116_200017.jpg", GL_TEXTURE0);
+		//MaterialComponent* material =(MaterialComponent *) quad->GetComponent("Material");
+		//material->albedoTex = albedoTex;
+		quad->Enable();
+		//AddObject(quad);
 
-		for (int i = 0; i < 50; i++) {
-			double posX = ((double)rand()) / (double)RAND_MAX * 20 - 10;
-			double posY = ((double)rand()) / (double)RAND_MAX * 20 - 10;
-			double posZ = ((double)rand()) / (double)RAND_MAX * 20 - 10;
-
-			double rotX = ((double)rand()) / (double)RAND_MAX * 360;
-			double rotY = ((double)rand()) / (double)RAND_MAX * 360;
-			double rotZ = ((double)rand()) / (double)RAND_MAX * 360;
-
-			double scaleX = ((double)rand()) / (double)RAND_MAX + 1;
-			double scaleY = ((double)rand()) / (double)RAND_MAX + 1;
-			double scaleZ = ((double)rand()) / (double)RAND_MAX + 1;
-			
-			dirLight = GetCube(this, "cube" +i , glm::dvec3(posX, posY, posZ), glm::dvec3(rotX, rotY, rotZ), glm::dvec3(scaleX, scaleY, scaleZ), glm::dvec4(1, 1, 1, 1));
-			AddObject(dirLight);
-		
-			
-			dirLight->Enable();
-
-			BoundingBoxComponent* bb = (BoundingBoxComponent*)(dirLight->GetComponent("BoundingBox"));
-			Object3D* boundingBox = bb->GetBoxObject();		
-			dirLight->AddObject(boundingBox);
-		}
-
-
-
-
+	
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
             objects3D[i]->Start();
         } 
-
     }
 
     void Scene::Enable() {
@@ -83,33 +70,54 @@ namespace CoreEngine {
             if(!objects3D[i]->started) objects3D[i]->Start(); 
             objects3D[i]->Enable();
         }
-
+		/*
 		SpatialPartition::Octree octree;
 		octree.Build(this, objects3D, 3);
+		*/
     }
 
     void Scene::Render() {
-        GETGL
+		GETGL
+
         ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
         ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
         
         ogl->glStencilFunc(GL_ALWAYS, 1, 0xFF); 
         ogl->glStencilMask(0xFF); 
 
+
+		
+		ogl->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &defaultFBO);
+		alternateFBO->Enable();
         // Render each object
         for(int i=0; i<objects3D.size(); i++) {
             if(objects3D[i]->visible && objects3D[i] != transformWidget ) {
                 objects3D[i]->Render(); 
             }
         }
-        
+		alternateFBO->Disable();
+		ogl->glBindFramebuffer(GL_FRAMEBUFFER, defaultFBO);
+				
+		Texture albedoTex;
+		albedoTex.glTex = alternateFBO->texture;
+		albedoTex.loaded = true;
+		albedoTex.texIndex = GL_TEXTURE0;
+
+		MaterialComponent* material = (MaterialComponent*)quad->GetComponent("Material");
+		material->albedoTex = albedoTex;
+		
+		quad->Render();
+
+
+
+
         if(transformWidget->visible) transformWidget->Render();
 
         ogl->glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
         ogl->glStencilMask(0x00); 
         ogl->glDisable(GL_DEPTH_TEST);
 
-        //Use shader
+        //Render selected objects
         for(int i=0; i<selectedObjects.size(); i++) {
             if(selectedObjects[i]->visible) {
                 MaterialComponent* material = (MaterialComponent*)(selectedObjects[i]->GetComponent("Material"));
@@ -134,8 +142,6 @@ namespace CoreEngine {
             if(!objects3D[i]->enabled) objects3D[i]->Enable(); 
             objects3D[i]->Update();
         }
-
-		//std::cout << Util::CameraBoxTest(camera, (TransformComponent*)(dirLight->GetComponent("Transform"))) << std::endl;
     }
 
 
@@ -149,28 +155,20 @@ namespace CoreEngine {
     }
 
     std::string Scene::AddObject(Object3D* object) {
-		//std::cout << "here" << std::endl;
         bool nameIsOk = (objects3D.size() == 0);
-		//std::cout << "here1" << std::endl;
         std::string currentName = object->name;
-		//std::cout << "here2" << std::endl;
         while(!nameIsOk) {
             for(int i=0; i<objects3D.size(); i++) {
-				//	std::cout << "here3" << std::endl;
                 std::string otherName=objects3D[i]->name;
-				//std::cout << "here4" << std::endl;
                 if(otherName == currentName) {
                     currentName = currentName + " (1)";
                 } else {
                     nameIsOk = true;
                 }
-				//std::cout << "here5" << std::endl;
             }
         }
         object->name = currentName;
-		//std::cout << "here6" << std::endl;
         objects3D.push_back(object);
-		//	std::cout << "here7" << std::endl;
 
         return currentName;
     }
@@ -195,6 +193,8 @@ namespace CoreEngine {
             objects3D[i]->Destroy();
             delete objects3D[i];
         }
+
+		alternateFBO->Destroy();
     }
 
 
@@ -259,8 +259,8 @@ namespace CoreEngine {
                     selectedObjects.push_back(intersectedObject);
                 }
 
-                TransformComponent* objectTransform = (TransformComponent*) intersectedObject->GetComponent("Transform");
-                TransformComponent* widgetTransform = (TransformComponent*) transformWidget->GetComponent("Transform");
+                TransformComponent* objectTransform =  intersectedObject->transform;
+                TransformComponent* widgetTransform =  transformWidget->transform;
                 widgetTransform->position = objectTransform->position;
                 
                 transformWidget->visible = selectedObjects.size() > 0;
@@ -321,8 +321,8 @@ namespace CoreEngine {
         double dotZ = std::abs(glm::dot(ray.direction, glm::dvec3(0, 0, 1)));
         
         for(int i=0; i<selectedObjects.size(); i++) {
-            TransformComponent* objectTransform = (TransformComponent*) selectedObjects[i]->GetComponent("Transform"); 
-            TransformComponent* widgetTransform = (TransformComponent*) transformWidget->GetComponent("Transform"); 
+            TransformComponent* objectTransform = selectedObjects[i]->transform; 
+            TransformComponent* widgetTransform = transformWidget->transform; 
             if(objectTransform != nullptr) {
                 if(transformMode == TRANSFORM_MODE::TRANSLATE) {
                     if(transformAxis == TRANSFORM_AXIS::X) {

@@ -21,6 +21,7 @@ set(MainWindowSrc
 	3DEngine/CameraScene.cpp
 	3DEngine/Util.cpp
 	3DEngine/BaseObjects.cpp
+	3DEngine/Framebuffer.cpp
 
 	3DEngine/SpatialPartitioning/Octree.cpp
 	

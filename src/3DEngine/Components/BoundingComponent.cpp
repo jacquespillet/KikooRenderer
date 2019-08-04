@@ -22,7 +22,7 @@ namespace CoreEngine {
 
 
         MeshFilterComponent* mesh = (MeshFilterComponent*) this->object3D->GetComponent("MeshFilter");
-        transform = (TransformComponent*) this->object3D->GetComponent("Transform");
+        transform = this->object3D->transform;
         
         for(int i=0; i<mesh->vertices.size(); i++) {
             if(mesh->vertices[i].position.x < min.x) min.x = mesh->vertices[i].position.x; 
