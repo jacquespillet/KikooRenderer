@@ -1,5 +1,5 @@
 #pragma once
-#include "Common/Common.h"
+#include "Util/Common.h"
 #include "Geometry/Ray.hpp"
 #include "Material.hpp"
 

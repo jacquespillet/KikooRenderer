@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Common/Common.h"
+#include "Util/Common.h"
 #include "Components/TransformComponent.hpp"
 #include "Geometry/Ray.hpp"
 #include "Geometry/Planes.hpp"

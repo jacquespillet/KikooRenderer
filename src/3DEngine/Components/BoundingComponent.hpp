@@ -2,7 +2,7 @@
 #include "Component.hpp"
 #include "../Object3D.hpp"
 
-#include "Common/Common.h"
+#include "Util/Common.h"
 
 namespace KikooRenderer {
 namespace CoreEngine {

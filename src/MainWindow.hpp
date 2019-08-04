@@ -1,8 +1,9 @@
 #pragma once
 
-#include "Common/Common.h"
+#include "Util/Common.h"
 #include "View3D/View3D.hpp"
 #include "SceneTree/SceneTree.hpp"
+#include "ObjectDetails/ObjectDetails.hpp"
 #include "Renderer/RayTracer.hpp"
 
 namespace KikooRenderer 
@@ -15,6 +16,7 @@ class MainWindow : public QMainWindow
         void ExpandToFitScreen();
         View3D* view3D;
         SceneTree* sceneTree;
+		 ObjectDetails* objectDetails;
 
         KikooRenderer::Renderer::RayTracer rayTracer;
 };

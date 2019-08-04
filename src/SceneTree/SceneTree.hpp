@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Common/Common.h"
+#include "Util/Common.h"
 #include "View3D/View3D.hpp"
+#include "3DEngine/BaseObjects.hpp"
 
 namespace KikooRenderer {
 
@@ -27,6 +28,7 @@ class TreeItem : public QObject, public QStandardItem  {
     public:
         TreeItem(QString name) : QStandardItem(name) {
         }
+		CoreEngine::Object3D* object3D;
 
 
 	public slots:   

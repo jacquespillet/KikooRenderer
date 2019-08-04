@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Common/Common.h"
+#include "Util/Common.h"
 #include "SceneTree/SceneTree.hpp"
 #include "View3DGL.hpp"
 

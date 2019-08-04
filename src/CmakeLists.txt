@@ -32,6 +32,8 @@ set(MainWindowSrc
 	
 	SceneTree/SceneTree.cpp
 	
+	ObjectDetails/ObjectDetails.cpp
+
 	Geometry/Util.cpp	
 	Geometry/Ray.cpp	
 	Geometry/Box.cpp	

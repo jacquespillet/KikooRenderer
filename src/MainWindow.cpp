@@ -5,15 +5,17 @@ namespace KikooRenderer {
         setWindowTitle("KikooRenderer");
         view3D= new View3D;
         sceneTree= new SceneTree;
+		 objectDetails = new ObjectDetails;
 
         sceneTree->view3D = view3D;
         view3D->sceneTree = sceneTree;
 
         //Run raytracer scene
-        // rayTracer.WriteImage();
+         //rayTracer.WriteImage();
 
         setCentralWidget(view3D);
         addDockWidget(Qt::LeftDockWidgetArea, sceneTree);
+        addDockWidget(Qt::RightDockWidgetArea, objectDetails);
 
         setDockOptions(QMainWindow::AnimatedDocks);
 

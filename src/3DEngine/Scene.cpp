@@ -26,11 +26,6 @@ namespace CoreEngine {
 	Object3D* quad;
 	void Scene::Start() {
 		GETGL
-		ogl->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &defaultFBO);
-		std::cout << defaultFBO << std::endl;
-
-		alternateFBO = new Framebuffer;
-		std::cout << alternateFBO->defaultFBO << std::endl;
 
         this->started = true;
         OnStart();
@@ -86,30 +81,12 @@ namespace CoreEngine {
         ogl->glStencilMask(0xFF); 
 
 
-		
-		ogl->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &defaultFBO);
-		alternateFBO->Enable();
-        // Render each object
+		// Render each object
         for(int i=0; i<objects3D.size(); i++) {
             if(objects3D[i]->visible && objects3D[i] != transformWidget ) {
                 objects3D[i]->Render(); 
             }
         }
-		alternateFBO->Disable();
-		ogl->glBindFramebuffer(GL_FRAMEBUFFER, defaultFBO);
-				
-		Texture albedoTex;
-		albedoTex.glTex = alternateFBO->texture;
-		albedoTex.loaded = true;
-		albedoTex.texIndex = GL_TEXTURE0;
-
-		MaterialComponent* material = (MaterialComponent*)quad->GetComponent("Material");
-		material->albedoTex = albedoTex;
-		
-		quad->Render();
-
-
-
 
         if(transformWidget->visible) transformWidget->Render();
 

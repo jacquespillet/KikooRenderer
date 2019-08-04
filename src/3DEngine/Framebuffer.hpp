@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Common/Common.h"
+#include "Util/Common.h"
 
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLFunctions_3_2_Core>

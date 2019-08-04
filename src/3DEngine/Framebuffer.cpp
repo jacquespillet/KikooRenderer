@@ -5,8 +5,7 @@ namespace CoreEngine {
 
 	Framebuffer::Framebuffer() {
 		GETGL
-		ogl->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &defaultFBO);
-
+		
 
 		ogl->glGenFramebuffers(1, &fbo);
 		ogl->glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -54,7 +53,7 @@ namespace CoreEngine {
 
 	void Framebuffer::Disable() {
 		GETGL
-		ogl->glBindFramebuffer(GL_FRAMEBUFFER, defaultFBO);
+		ogl->glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		ogl->glBindRenderbuffer(GL_RENDERBUFFER, 0);
 		ogl->glBindTexture(GL_TEXTURE_2D, 0);
 	}

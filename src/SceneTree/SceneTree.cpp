@@ -1,6 +1,5 @@
 #include "SceneTree.hpp"
 
-#include "3DEngine/BaseObjects.hpp"
 // #include "3DEngine/BaseObjects.hpp"
 
 namespace KikooRenderer 
@@ -55,14 +54,16 @@ void SceneTree::ShowContextMenu(const QPoint& pos)
             QString name = QString("New ") + cubeStr;
             CoreEngine::Object3D* cube = CoreEngine::GetCube(view3D->view3DGL->scene, name.toStdString(),  glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.5, 0.5, 0.5, 1));   
             if(tree->currentIndex().isValid()) {
-                QStandardItem *child = new QStandardItem(QString("Item"));
-                
-                QStandardItem *item = model->itemFromIndex(tree->currentIndex());
+				TreeItem*item = (TreeItem*) model->itemFromIndex(tree->currentIndex());
+				item->object3D->AddObject(cube);
+				TreeItem*child = new TreeItem(QString(name));
+				child->object3D = cube;
                 item->appendRow(child);
             } else {
                 std::string finalName = view3D->view3DGL->scene->AddObject(cube);
                 name = QString::fromStdString(finalName);
-                TreeItem *item = new TreeItem( name );
+				TreeItem*item = new TreeItem( name );
+				item->object3D = cube;
                 model->appendRow(item);
             }
         } else if(selectedItem->text() == sphereStr) {
