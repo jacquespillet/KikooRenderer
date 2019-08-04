@@ -3,6 +3,7 @@
 // #include "Component.hpp"
 #include "Scene.hpp"
 #include "Geometry/Ray.hpp"
+#include "Components/TransformComponent.hpp"
 
 namespace KikooRenderer {
 
@@ -13,6 +14,8 @@ class Object3D {
     public: 
         std::string name;
         std::vector<Component*> components;
+		TransformComponent* transform;
+
         Scene* scene;
         std::vector<Object3D*> childObjects;
         Object3D* parent = nullptr;

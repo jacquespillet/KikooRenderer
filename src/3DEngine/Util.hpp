@@ -11,7 +11,7 @@ namespace Util {
     bool RayBoxTest(glm::dvec3 rayOrig, glm::dvec3 rayDir, glm::dmat4 transform, glm::dvec3 minScale,glm::dvec3 maxScale, double& distance);
 
     
-    bool cameraBoxTest(CameraScene& camera, glm::dvec3 position, glm::dvec3 size);
+    bool CameraBoxTest(CameraScene& camera, TransformComponent* transform);
 }
 }
 }

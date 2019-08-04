@@ -1,7 +1,9 @@
 #pragma once
 
 #include "../Object3D.hpp"
+#include "../Scene.hpp"
 #include "Common/Common.h"
+
 
 
 namespace KikooRenderer {
@@ -13,12 +15,13 @@ struct Node {
     std::vector<CoreEngine::Object3D*> objects;
     glm::dvec3 position;
     glm::dvec3 size;
+	int level;
 };
 
 class Octree {
     public:
         Octree();
-        void Build(std::vector<CoreEngine::Object3D*> objects, int maxLevel);
+        void Build(CoreEngine::Scene* scene, std::vector<CoreEngine::Object3D*> objects, int maxLevel);
         
 
         //When check 
@@ -29,7 +32,14 @@ class Octree {
 
 
 
-        std::vector<Node> nodes;
+        std::vector<Node> nodes;	
+
+private:
+	int maxLevel;
+	void Subdivide(Node node);
+	CoreEngine::Scene* scene;
+
+	bool isInside(Node node, CoreEngine::Object3D* object);
 };
 }
 }

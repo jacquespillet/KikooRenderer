@@ -1,6 +1,7 @@
 #build folder
 build/
 ext/
+.vs/
 
 # Compiled Object files
 *.slo

@@ -28,14 +28,74 @@ namespace Util {
         return raybox;
     }
     
-    bool cameraBoxTest(CameraScene& camera, glm::dvec3 position, glm::dvec3 size) {
-        //Get all points from the plane
-        //Transform them
+    bool CameraBoxTest(CameraScene& camera, TransformComponent* transform) {
+		Geometry::Planes planes = camera.GetPlanes();
 
-        //For each plane
-            //Compute the effective radius
-            //Dot the plane with center of the BB
-            //if dot < -Reff, point not visible
+		glm::dvec3 position = transform->position;
+		glm::dmat4 cubeTransform = transform->GetModelMatrix();
+        //Transform them
+		glm::dvec3 S = glm::normalize(glm::column(cubeTransform, 0)) * transform->scale.x;
+		glm::dvec3 R = glm::normalize(glm::column(cubeTransform, 1)) * transform->scale.x;
+		glm::dvec3 T = glm::normalize(glm::column(cubeTransform, 2)) * transform->scale.x;
+
+        //Right plane
+		glm::dvec3 N = glm::dvec3(planes.rightPlane);
+		double effectiveRadius = 0.5 * (std::abs(glm::dot(R, N)) + std::abs(glm::dot(S, N)) + std::abs(glm::dot(T, N)));
+		double dotPlaneCenter = glm::dot(planes.rightPlane, glm::dvec4(position, 1));
+		
+		//std::cout << dotPlaneCenter << " " << effectiveRadius << std::endl;
+		if (dotPlaneCenter <= -effectiveRadius) {
+			return false;
+		}
+
+		//Left plane
+		N = glm::dvec3(planes.leftPlane);
+		effectiveRadius = 0.5 * (std::abs(glm::dot(R, N)) + std::abs(glm::dot(S, N)) + std::abs(glm::dot(T, N)));
+		dotPlaneCenter = glm::dot(planes.leftPlane, glm::dvec4(position, 1));
+
+		if (dotPlaneCenter <= -effectiveRadius) {
+			return false;
+		}
+
+
+		//top plane
+		N = glm::dvec3(planes.topPlane);
+		effectiveRadius = 0.5 * (std::abs(glm::dot(R, N)) + std::abs(glm::dot(S, N)) + std::abs(glm::dot(T, N)));
+		dotPlaneCenter = glm::dot(planes.topPlane, glm::dvec4(position, 1));
+
+		if (dotPlaneCenter <= -effectiveRadius) {
+			return false;
+		}
+
+		//bottomplane
+		N = glm::dvec3(planes.bottomPlane);
+		effectiveRadius = 0.5 * (std::abs(glm::dot(R, N)) + std::abs(glm::dot(S, N)) + std::abs(glm::dot(T, N)));
+		dotPlaneCenter = glm::dot(planes.bottomPlane, glm::dvec4(position, 1));
+
+		if (dotPlaneCenter <= -effectiveRadius) {
+			return false;
+		}
+
+
+		//near plane
+		N = glm::dvec3(planes.nearPlane);
+		effectiveRadius = 0.5 * (std::abs(glm::dot(R, N)) + std::abs(glm::dot(S, N)) + std::abs(glm::dot(T, N)));
+		dotPlaneCenter = glm::dot(planes.nearPlane, glm::dvec4(position, 1));
+
+		if (dotPlaneCenter <= -effectiveRadius) {
+			return false;
+		}
+
+
+		//farplane
+		N = glm::dvec3(planes.farPlane);
+		effectiveRadius = 0.5 * (std::abs(glm::dot(R, N)) + std::abs(glm::dot(S, N)) + std::abs(glm::dot(T, N)));
+		dotPlaneCenter = glm::dot(planes.farPlane, glm::dvec4(position, 1));
+
+		if (dotPlaneCenter <= effectiveRadius) {
+			return false;
+		}
+
         return true;
     }
 

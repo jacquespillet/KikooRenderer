@@ -6,6 +6,7 @@
 #include "Components/LightComponent.hpp"
 #include "Geometry/Ray.hpp"
 #include "Util/ModelLoader.hpp"
+#include "SpatialPartitioning/Octree.hpp"
 
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLFunctions_3_2_Core>
@@ -15,6 +16,7 @@
 namespace KikooRenderer {
 
 namespace CoreEngine {
+	Object3D* dirLight;
     Scene::Scene() : camera(CameraScene(this, 1.0, 70 * DEGTORAD, 0.1, 1000.0, 1.0)){
         this->started = false;
         transformOffset = 0;
@@ -39,13 +41,40 @@ namespace CoreEngine {
         transformWidget->visible = false;
         AddObject(transformWidget);
 
-        Object3D* dirLight = GetCube(this, "DirLight", glm::dvec3(3, 3, -3), glm::dvec3(45, 45, 35), glm::dvec3(0.2, 0.2, 0.2), glm::dvec4(1, 1, 1, 1));
-        AddObject(dirLight);         
+		
+
+		for (int i = 0; i < 50; i++) {
+			double posX = ((double)rand()) / (double)RAND_MAX * 20 - 10;
+			double posY = ((double)rand()) / (double)RAND_MAX * 20 - 10;
+			double posZ = ((double)rand()) / (double)RAND_MAX * 20 - 10;
+
+			double rotX = ((double)rand()) / (double)RAND_MAX * 360;
+			double rotY = ((double)rand()) / (double)RAND_MAX * 360;
+			double rotZ = ((double)rand()) / (double)RAND_MAX * 360;
+
+			double scaleX = ((double)rand()) / (double)RAND_MAX + 1;
+			double scaleY = ((double)rand()) / (double)RAND_MAX + 1;
+			double scaleZ = ((double)rand()) / (double)RAND_MAX + 1;
+			
+			dirLight = GetCube(this, "cube" +i , glm::dvec3(posX, posY, posZ), glm::dvec3(rotX, rotY, rotZ), glm::dvec3(scaleX, scaleY, scaleZ), glm::dvec4(1, 1, 1, 1));
+			AddObject(dirLight);
+		
+			
+			dirLight->Enable();
+
+			BoundingBoxComponent* bb = (BoundingBoxComponent*)(dirLight->GetComponent("BoundingBox"));
+			Object3D* boundingBox = bb->GetBoxObject();		
+			dirLight->AddObject(boundingBox);
+		}
+
+
+
 
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
             objects3D[i]->Start();
         } 
+
     }
 
     void Scene::Enable() {
@@ -54,6 +83,9 @@ namespace CoreEngine {
             if(!objects3D[i]->started) objects3D[i]->Start(); 
             objects3D[i]->Enable();
         }
+
+		SpatialPartition::Octree octree;
+		octree.Build(this, objects3D, 3);
     }
 
     void Scene::Render() {
@@ -102,6 +134,8 @@ namespace CoreEngine {
             if(!objects3D[i]->enabled) objects3D[i]->Enable(); 
             objects3D[i]->Update();
         }
+
+		//std::cout << Util::CameraBoxTest(camera, (TransformComponent*)(dirLight->GetComponent("Transform"))) << std::endl;
     }
 
 
@@ -115,20 +149,28 @@ namespace CoreEngine {
     }
 
     std::string Scene::AddObject(Object3D* object) {
+		//std::cout << "here" << std::endl;
         bool nameIsOk = (objects3D.size() == 0);
+		//std::cout << "here1" << std::endl;
         std::string currentName = object->name;
+		//std::cout << "here2" << std::endl;
         while(!nameIsOk) {
             for(int i=0; i<objects3D.size(); i++) {
+				//	std::cout << "here3" << std::endl;
                 std::string otherName=objects3D[i]->name;
+				//std::cout << "here4" << std::endl;
                 if(otherName == currentName) {
                     currentName = currentName + " (1)";
                 } else {
                     nameIsOk = true;
                 }
+				//std::cout << "here5" << std::endl;
             }
         }
         object->name = currentName;
+		//std::cout << "here6" << std::endl;
         objects3D.push_back(object);
+		//	std::cout << "here7" << std::endl;
 
         return currentName;
     }

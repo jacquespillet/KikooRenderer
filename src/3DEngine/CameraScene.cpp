@@ -14,9 +14,9 @@ CameraScene::CameraScene(Scene* _scene, double _eyeDistance, double _fov, double
 
     UpdateProjectionMatrix();
 
-    this->transform.position.x = -2;
-    this->transform.position.y = 2;
-    this->transform.position.z = 1;
+    this->transform.position.x = 0;
+    this->transform.position.y = 10;
+    this->transform.position.z = -30;
 
 }
 
@@ -171,6 +171,33 @@ Geometry::Ray CameraScene::GetRay(double x, double y) {
     ray.direction = glm::normalize(localToWorld * glm::dvec4(ndcX, ndcY, ndcZ, 0));
 
     return ray;
+}
+
+Geometry::Planes CameraScene::GetPlanes()
+{
+	glm::dmat4 transformMatrix = glm::inverseTranspose(transform.GetModelMatrix());
+	
+	glm::dmat4 projectionMatrix = GetProjectionMatrix();
+
+	glm::dvec4 nearPlane = glm::normalize(glm::row(projectionMatrix, 3) + glm::row(projectionMatrix, 2));
+	glm::dvec4 farPlane = glm::normalize(glm::row(projectionMatrix, 3) - glm::row(projectionMatrix, 2));
+
+	glm::dvec4 leftPlane = glm::normalize(glm::row(projectionMatrix, 3) + glm::row(projectionMatrix, 0));
+	glm::dvec4 rightPlane = glm::normalize(glm::row(projectionMatrix, 3) - glm::row(projectionMatrix, 0));
+
+	glm::dvec4 bottomPlane = glm::normalize(glm::row(projectionMatrix, 3) + glm::row(projectionMatrix, 1));
+	glm::dvec4 topPlane = glm::normalize(glm::row(projectionMatrix, 3) - glm::row(projectionMatrix, 1));
+
+	Geometry::Planes planes = {
+		transformMatrix * rightPlane,
+		transformMatrix * leftPlane,
+		transformMatrix * topPlane,
+		transformMatrix * bottomPlane,
+		transformMatrix * nearPlane,
+		transformMatrix * farPlane
+	};
+
+	return planes;
 }
 
 }

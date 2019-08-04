@@ -3,6 +3,7 @@
 #include "Common/Common.h"
 #include "Components/TransformComponent.hpp"
 #include "Geometry/Ray.hpp"
+#include "Geometry/Planes.hpp"
 
 namespace KikooRenderer {
 namespace CoreEngine {
@@ -38,6 +39,7 @@ class CameraScene{
 
         Geometry::Ray GetRay(int x, int y);
         Geometry::Ray GetRay(double x, double y);
+		Geometry::Planes GetPlanes();
 
     private: 
         bool isRightClicked = false;

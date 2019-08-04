@@ -27,6 +27,11 @@ namespace CoreEngine {
         glm::dvec3 min;
         glm::dvec3 max;
 
+        glm::dvec3 wmin;
+        glm::dvec3 wmax;
+
+		std::vector<glm::dvec3> positions;
+
         Object3D* GetBoxObject();
         private: 
         Object3D* boxObject;
