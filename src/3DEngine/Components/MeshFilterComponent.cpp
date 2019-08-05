@@ -15,7 +15,7 @@ MeshFilterComponent::MeshFilterComponent(Object3D* object) : Component("MeshFilt
 }
 void MeshFilterComponent::OnStart(){}
 void MeshFilterComponent::OnEnable(){
-    InitBuffers();
+	InitBuffers();
 	RebuildBuffers();
 }
 void MeshFilterComponent::OnUpdate(){}
@@ -108,7 +108,12 @@ void MeshFilterComponent::LoadFromBuffers(std::vector<glm::dvec3> _vertex,
 }
 
 void MeshFilterComponent::InitBuffers() {
-    GETGL
+	QOpenGLContext* context = QOpenGLContext::currentContext();
+	if (context == nullptr) { std::cout << "could not get opengl context"; }
+
+	QOpenGLFunctions_3_2_Core* ogl = context->versionFunctions<QOpenGLFunctions_3_2_Core>();
+	if (ogl == nullptr) { std::cout << "could not get opengl functions"; }
+
 	ogl->glGenBuffers(1, &vertexBuffer);
 	ogl->glGenBuffers(1, &elementBuffer);
 	ogl->glGenVertexArrays(1, &vertexArrayObject);

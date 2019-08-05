@@ -12,10 +12,12 @@ SceneTree::SceneTree() : QDockWidget("Scene")
     tree->setObjectName("DirView");
     tree->setUniformRowHeights(true);
     tree->setHeaderHidden(true);
+	tree->sceneTree = this;
     
     model = new QStandardItemModel(0, 1);
-    
     tree->setModel( model ); 
+	tree->model = model;
+
     tree->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(tree, SIGNAL(customContextMenuRequested(const QPoint&)),
         this, SLOT(ShowContextMenu(const QPoint&)));
@@ -23,19 +25,14 @@ SceneTree::SceneTree() : QDockWidget("Scene")
     setWidget(tree);
 }
 
+//Handles menu Creation
 void SceneTree::ShowContextMenu(const QPoint& pos)
-{
-    //For adding nested objects
-    // std::cout << tree->currentIndex().row() << std::endl;
-    // std::cout << tree->currentIndex().isValid() << std::endl;
-        //             QStandardItem *child = new QStandardItem( QString("Item %0").arg(i) );
-        //             child->setEditable( false );
-        //             item->appendRow( child );
-    
+{   
     QString cubeStr = "Cube";
     QString sphereStr = "Sphere";
     QString circleStr = "Circle";
     QString quadStr = "Quad";
+	QString emptyStr = "Empty";
 
     QPoint globalPos = tree->mapToGlobal(pos);
 
@@ -68,29 +65,52 @@ void SceneTree::ShowContextMenu(const QPoint& pos)
             }
         } else if(selectedItem->text() == sphereStr) {
             QString name = QString("New ") + sphereStr;
-            CoreEngine::Object3D* Sphere = CoreEngine::GetSphere(view3D->view3DGL->scene, name.toStdString(),  glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.5, 0.5, 0.5, 1));   
+            CoreEngine::Object3D* Sphere = CoreEngine::GetSphere(view3D->view3DGL->scene, name.toStdString(),  glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.5, 0.5, 0.5, 1));  
+
             std::string finalName = view3D->view3DGL->scene->AddObject(Sphere);
+
             name = QString::fromStdString(finalName);
             TreeItem *item = new TreeItem(name);
-            model->appendRow(item);
+			item->object3D = Sphere;
+			model->appendRow(item);
         } else if(selectedItem->text() == circleStr) {
             QString name = QString("New ") + circleStr;
             CoreEngine::Object3D* circle = CoreEngine::GetCircle(view3D->view3DGL->scene, name.toStdString(),  glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.5, 0.5, 0.5, 1));   
-            std::string finalName = view3D->view3DGL->scene->AddObject(circle);
+            
+			std::string finalName = view3D->view3DGL->scene->AddObject(circle);
             name = QString::fromStdString(finalName);
             TreeItem *item = new TreeItem(name);
+			item->object3D = circle;
             model->appendRow(item);
         } else if(selectedItem->text() == quadStr) {
             QString name = QString("New ") + quadStr;
             CoreEngine::Object3D* cone = CoreEngine::GetQuad(view3D->view3DGL->scene, name.toStdString(),  glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.5, 0.5, 0.5, 1));   
+
             std::string finalName = view3D->view3DGL->scene->AddObject(cone);
             name = QString::fromStdString(finalName);
             TreeItem *item = new TreeItem(name);
+			item->object3D = cone;
             model->appendRow(item);
         }
+		view3D->view3DGL->scene->triggerRefresh = true;
     }
 }
 
 
-
+void SceneTreeView::mousePressEvent(QMouseEvent *event) {
+	QModelIndex index = indexAt(event->pos());
+	if (index.isValid()) {
+		bool selected = selectionModel()->isSelected(index);
+		QTreeView::mousePressEvent(event);
+		
+		TreeItem* item = (TreeItem*)model->itemFromIndex(index);
+		sceneTree->view3D->view3DGL->scene->AddObjectToSelection(true, item->object3D);
+		sceneTree->view3D->view3DGL->scene->triggerRefresh = true;
+	}
+	else {
+		selectionModel()->clearSelection();
+		sceneTree->view3D->view3DGL->scene->ClearSelection();
+		sceneTree->view3D->view3DGL->scene->triggerRefresh = true;
+	}
+}
 }

@@ -7,6 +7,8 @@
 namespace KikooRenderer {
 
 class View3D;
+class SceneTreeView;
+
 class SceneTree : public QDockWidget
 {
     Q_OBJECT
@@ -15,7 +17,7 @@ class SceneTree : public QDockWidget
         // View3DGL* view3DGL;
 		QWidget* layoutWindow;
         View3D* view3D;
-        QTreeView *tree;
+		SceneTreeView *tree;
         QStandardItemModel* model;
 
 
@@ -29,8 +31,6 @@ class TreeItem : public QObject, public QStandardItem  {
         TreeItem(QString name) : QStandardItem(name) {
         }
 		CoreEngine::Object3D* object3D;
-
-
 	public slots:   
 };
 
@@ -39,21 +39,12 @@ class SceneTreeView : public QTreeView
 public:
     SceneTreeView() : QTreeView() {}
     virtual ~SceneTreeView() {}
+	SceneTree* sceneTree;	
+	QStandardItemModel* model;
+
 
 private:
-    virtual void mousePressEvent(QMouseEvent *event)
-    {
-        QModelIndex item = indexAt(event->pos());
-        if(item.isValid()) {
-            bool selected = selectionModel()->isSelected(item);
-            QTreeView::mousePressEvent(event);
-            if (selected)
-                selectionModel()->select(item, QItemSelectionModel::Deselect);
-        } else {
-            selectionModel()->clearSelection();
-        }
-    }
-
+	virtual void mousePressEvent(QMouseEvent *event);
 };
 
 

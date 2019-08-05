@@ -43,15 +43,7 @@ namespace CoreEngine {
         transformWidget = GetTranslateWidget(this, "TranslateWidget", glm::dvec3(0), glm::dvec3(0), glm::dvec3(1));
         transformWidget->visible = false;
         AddObject(transformWidget);
-
-		quad = GetQuad(this, "plane", glm::dvec3(0), glm::dvec3(0), glm::dvec3(5), glm::dvec4(1, 1, 1, 1));
 		
-		Texture albedoTex = Texture("C:\\Users\\Jacques\\Pictures\\Voyage\\IMG_20181116_200017.jpg", GL_TEXTURE0);
-		//MaterialComponent* material =(MaterialComponent *) quad->GetComponent("Material");
-		//material->albedoTex = albedoTex;
-		quad->Enable();
-		//AddObject(quad);
-
 	
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
@@ -109,8 +101,6 @@ namespace CoreEngine {
         
         ogl->glStencilMask(0xFF);
         ogl->glEnable(GL_DEPTH_TEST); 
-
-        
     }
 
     void Scene::OnUpdate() {
@@ -225,22 +215,7 @@ namespace CoreEngine {
                 else if(intersectedObject->name == "coneY" || intersectedObject->name == "cubeY") transformAxis = TRANSFORM_AXIS::Y;
                 else if(intersectedObject->name == "coneZ" || intersectedObject->name == "cubeZ") transformAxis = TRANSFORM_AXIS::Z;
             } else {
-                selectedObjects.resize(0);
-                intersectedObject->isSelected = !intersectedObject->isSelected;
-
-                std::vector<Object3D*>::iterator it = std::find(selectedObjects.begin(), selectedObjects.end(), intersectedObject);
-                int objectInx = std::distance(selectedObjects.begin(), it); 
-                if( it != selectedObjects.end()) {
-                    selectedObjects.erase(selectedObjects.begin() + objectInx);
-                } else {
-                    selectedObjects.push_back(intersectedObject);
-                }
-
-                TransformComponent* objectTransform =  intersectedObject->transform;
-                TransformComponent* widgetTransform =  transformWidget->transform;
-                widgetTransform->position = objectTransform->position;
-                
-                transformWidget->visible = selectedObjects.size() > 0;
+				AddObjectToSelection(true, intersectedObject);
 
                 //MULTIPLE SELECTION : add CTRL + CLICK selection
                 // intersectedObject->isSelected = !intersectedObject->isSelected;
@@ -264,6 +239,33 @@ namespace CoreEngine {
             transformWidget->visible = false;
         } 
     }
+
+	void Scene::AddObjectToSelection(bool erasePrevious, Object3D* intersectedObject) {
+		
+		if(erasePrevious) selectedObjects.resize(0);
+	
+		intersectedObject->isSelected = !intersectedObject->isSelected;
+
+		std::vector<Object3D*>::iterator it = std::find(selectedObjects.begin(), selectedObjects.end(), intersectedObject);
+		int objectInx = std::distance(selectedObjects.begin(), it);
+		if (it != selectedObjects.end()) {
+			selectedObjects.erase(selectedObjects.begin() + objectInx);
+		}
+		else {
+			selectedObjects.push_back(intersectedObject);
+		}
+
+		TransformComponent* objectTransform = intersectedObject->transform;
+		TransformComponent* widgetTransform = transformWidget->transform;
+		widgetTransform->position = objectTransform->position;
+
+		transformWidget->visible = selectedObjects.size() > 0;
+	}
+
+	void Scene::ClearSelection() {
+		selectedObjects.resize(0);
+		transformWidget->visible = false;
+	}
 
 
     Object3D* Scene::GetIntersectObject(int x, int y) {

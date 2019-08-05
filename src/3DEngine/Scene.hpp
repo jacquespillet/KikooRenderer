@@ -72,6 +72,9 @@ class Scene {
 
 		GLint defaultFBO;
 
+		void AddObjectToSelection(bool erasePrevious, Object3D* selectedObject);
+		void ClearSelection();
+
 
 	protected:
 		Object3D* GetIntersectObject(int x, int y);
