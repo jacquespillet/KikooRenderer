@@ -22,6 +22,7 @@ set(MainWindowSrc
 	3DEngine/Util.cpp
 	3DEngine/BaseObjects.cpp
 	3DEngine/Framebuffer.cpp
+	3DEngine/TransformWidget.cpp
 
 	3DEngine/SpatialPartitioning/Octree.cpp
 	
@@ -44,18 +45,18 @@ set(MainWindowSrc
 
 add_executable(MainWindow ${MainWindowSrc})
 #target_link_libraries(MainWindow lib file name)
-target_link_libraries(MainWindow Qt5::Core Qt5::Widgets Qt5::OpenGL Qt5::3DCore Qt5::3DExtras Qt5::3DRender Qt5::3DInput)
-# target_link_libraries(MainWindow debug Qt5Cored optimized Qt5Core)
-# target_link_libraries(MainWindow debug Qt5Guid optimized Qt5Gui)
-# target_link_libraries(MainWindow debug Qt5Widgetsd optimized Qt5Widgets)
-# target_link_libraries(MainWindow debug Qt5Chartsd optimized Qt5Charts)
-# target_link_libraries(MainWindow debug Qt5OpenGLd optimized Qt5OpenGL)
-# target_link_libraries(MainWindow debug Qt53DCored optimized Qt53DCore)
-# target_link_libraries(MainWindow debug Qt53DRenderd optimized Qt53DRender)
-# target_link_libraries(MainWindow debug Qt53DInputd optimized Qt53DInput)
-# target_link_libraries(MainWindow debug Qt53DLogicd optimized Qt53DLogic)
-# target_link_libraries(MainWindow debug Qt53DExtrasd optimized Qt53DExtras)
-# target_link_libraries(MainWindow debug Qt53DAnimationd optimized Qt53DAnimation)
+#target_link_libraries(MainWindow Qt5::Core Qt5::Widgets Qt5::OpenGL Qt5::3DCore Qt5::3DExtras Qt5::3DRender Qt5::3DInput)
+target_link_libraries(MainWindow debug Qt5Cored optimized Qt5Core)
+target_link_libraries(MainWindow debug Qt5Widgetsd optimized Qt5Widgets)
+target_link_libraries(MainWindow debug Qt5OpenGLd optimized Qt5OpenGL)
+target_link_libraries(MainWindow debug Qt53DCored optimized Qt53DCore)
+target_link_libraries(MainWindow debug Qt53DExtrasd optimized Qt53DExtras)
+target_link_libraries(MainWindow debug Qt53DRenderd optimized Qt53DRender)
+target_link_libraries(MainWindow debug Qt53DInputd optimized Qt53DInput)
+target_link_libraries(MainWindow debug Qt5Guid optimized Qt5Gui)
+target_link_libraries(MainWindow debug Qt5Chartsd optimized Qt5Charts)
+target_link_libraries(MainWindow debug Qt53DLogicd optimized Qt53DLogic)
+target_link_libraries(MainWindow debug Qt53DAnimationd optimized Qt53DAnimation)
 
 install(TARGETS MainWindow
 		RUNTIME DESTINATION bin

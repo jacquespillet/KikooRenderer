@@ -1,9 +1,9 @@
 #pragma once
 #include "Util/Common.h"
+#include "Components/TransformComponent.hpp"
 // #include "Component.hpp"
 #include "Scene.hpp"
 #include "Geometry/Ray.hpp"
-#include "Components/TransformComponent.hpp"
 #include "Framebuffer.hpp"
 
 namespace KikooRenderer {
@@ -38,7 +38,7 @@ class Object3D {
 
         void Start();
         void Enable();
-        void Render(glm::mat4* modelMatrix=nullptr);
+        void Render();
         void Update();
         void Destroy();
         void Recompute();

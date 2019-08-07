@@ -88,6 +88,8 @@
 #include "Geometry/Planes.hpp"
 
 
+#include "3DEngine/Components/Component.hpp"
+
 #define TWO_PI 6.28318530717958647692529
 #define PI 3.1415926535897932384626433
 #define DEGTORAD 0.0174533

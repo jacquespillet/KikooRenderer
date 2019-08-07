@@ -83,7 +83,7 @@ void Object3D::Update() {
 	for(int i=0; i<childObjects.size(); i++) {
 		childObjects[i]->Update();
 	}
-}
+}	
 
 void Object3D::Recompute() {
 	for(int i=0; i<childObjects.size(); i++) {
@@ -99,6 +99,7 @@ void Object3D::Destroy() {
 	for(int i=0; i<childObjects.size(); i++) {
 		childObjects[i]->Destroy();
 	}
+
     for(int i=0; i<components.size(); i++) {
         components[i]->OnDestroy();
 		delete components[i];
@@ -116,22 +117,20 @@ Component* Object3D::GetComponent(std::string name) {
 	return nullptr;
 }
 
-void Object3D::Render(glm::mat4* modelMatrix) {
+void Object3D::Render() {
 	GETGL
 
 	if(!depthTest) ogl->glDisable(GL_DEPTH_TEST);
 
-	TransformComponent* transform = (TransformComponent*)(this->transform); 
+	//TransformComponent* transform = (TransformComponent*)(this->transform); 
 	
-	glm::mat4 currentModelMatrix;
-	if(modelMatrix != nullptr) currentModelMatrix = (*modelMatrix); //If child of object, modelMatrix is the local coordinate matrix of the parent
-	else currentModelMatrix = transform->GetModelMatrix(); //If child of scene, get world position
+	glm::mat4 currentModelMatrix = transform->GetWorldModelMatrix();
 
 	//Render child objects
 	for(int i=0; i<childObjects.size(); i++) {
-		TransformComponent* childTransform = childObjects[i]->transform;
-		glm::mat4 newModelMat = currentModelMatrix *  (glm::mat4)childTransform->GetModelMatrix(); 
-		childObjects[i]->Render(&newModelMat);
+		if (!childObjects[i]->started) childObjects[i]->Start();
+		if (!childObjects[i]->enabled) childObjects[i]->Enable();
+		childObjects[i]->Render();
 	}
 	
 
@@ -183,8 +182,6 @@ Object3D* Object3D::Intersects(Geometry::Ray ray, double& _distance) {
 			transformMat = parentTransformMat * transformMat;
 			currentObject = currentObject->parent;
 		}
-		// glm::dvec3 minScale = min * transform->GetScale();
-		// glm::dvec3 maxScale = max * transform->GetScale();
 		glm::dvec3 minScale = min * transform->scale;
 		glm::dvec3 maxScale = max * transform->scale;
 

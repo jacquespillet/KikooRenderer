@@ -1,6 +1,5 @@
 #pragma once
 #include "BoundingComponent.hpp"
-#include "Component.hpp"
 #include "../Object3D.hpp"
 
 #include "Util/Common.h"

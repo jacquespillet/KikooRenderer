@@ -74,5 +74,39 @@ glm::mat4 TransformComponent::GetWorldModelMatrix() {
 	return transformMat;
 }
 
+glm::dvec3 TransformComponent::GetWorldPosition() {
+	glm::dvec3 pos = glm::column(GetWorldModelMatrix(), 3);
+	return pos;
+}
+
+void TransformComponent::SetWorldX(double x) {
+	if (object3D->parent == nullptr) {
+		this->position.x = x;
+	}
+	else {
+		glm::dvec3 parentPos = object3D->parent->transform->GetWorldPosition();
+		this->position.x = x - parentPos.x;
+	}
+}
+
+void TransformComponent::SetWorldY(double y) {
+	if (object3D->parent == nullptr) {
+		this->position.y = y;
+	}
+	else {
+		glm::dvec3 parentPos = object3D->parent->transform->GetWorldPosition();
+		this->position.y = y - parentPos.y;
+	}
+}
+
+void TransformComponent::SetWorldZ(double z) {
+	if (object3D->parent == nullptr) {
+		this->position.z = z;
+	}
+	else {
+		glm::dvec3 parentPos = object3D->parent->transform->GetWorldPosition();
+		this->position.z = z - parentPos.z;
+	}
+}
 }
 }

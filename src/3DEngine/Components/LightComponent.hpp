@@ -1,6 +1,5 @@
 #pragma once
 #include "Util/Common.h"
-#include "Component.hpp"
 #include "../Scene.hpp"
 
 namespace KikooRenderer {

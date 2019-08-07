@@ -1,6 +1,5 @@
 #pragma once 
 #include "Util/Common.h"
-#include "Component.hpp"
 
 namespace KikooRenderer {
 namespace CoreEngine {
@@ -24,6 +23,10 @@ class TransformComponent : public Component {
         glm::dvec3 GetScale(); 
         glm::mat4 GetWorldModelMatrix();
         
+		glm::dvec3 GetWorldPosition();
+		void SetWorldX(double x);
+		void SetWorldY(double y);
+		void SetWorldZ(double z);
 
         bool isScreenSize = false;
 };

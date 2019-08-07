@@ -4,9 +4,8 @@
 #include "Components/BoundingComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/LightComponent.hpp"
+#include "Components/MeshFilterComponent.hpp"
 #include "Geometry/Ray.hpp"
-#include "Util/ModelLoader.hpp"
-#include "SpatialPartitioning/Octree.hpp"
 #include "Framebuffer.hpp"
 
 #include <QtGui/QOpenGLFunctions>
@@ -19,7 +18,7 @@ namespace KikooRenderer {
 namespace CoreEngine {
     Scene::Scene() : camera(CameraScene(this, 1.0, 70 * DEGTORAD, 0.1, 1000.0, 1.0)){
         this->started = false;
-        transformOffset = 0;
+        //transformOffset = 0;
         isFirstTransformFrame = false;
     }
 	Framebuffer* alternateFBO;
@@ -30,19 +29,19 @@ namespace CoreEngine {
         this->started = true;
         OnStart();
 
-        transformWidget = GetTranslateWidget(this, "TranslateWidget", glm::dvec3(0), glm::dvec3(0), glm::dvec3(1));
+        /*transformWidget = GetTranslateWidget(this, "TranslateWidget", glm::dvec3(0), glm::dvec3(0), glm::dvec3(1));
         transformWidget->visible = false;
         AddObject(transformWidget);
-
+*/
         Object3D* grid = GetGrid(this, "Grid");
         AddObject(grid);
 
         Object3D* axes = GetAxes(this, "Axes");
         AddObject(axes);
 
-        transformWidget = GetTranslateWidget(this, "TranslateWidget", glm::dvec3(0), glm::dvec3(0), glm::dvec3(1));
-        transformWidget->visible = false;
-        AddObject(transformWidget);
+		//TransformWidget* transformWidget = new TransformWidget(this);
+		//AddObject(transformWidget);
+
 		
 	
         //Start each object
@@ -57,10 +56,6 @@ namespace CoreEngine {
             if(!objects3D[i]->started) objects3D[i]->Start(); 
             objects3D[i]->Enable();
         }
-		/*
-		SpatialPartition::Octree octree;
-		octree.Build(this, objects3D, 3);
-		*/
     }
 
     void Scene::Render() {
@@ -80,7 +75,7 @@ namespace CoreEngine {
             }
         }
 
-        if(transformWidget->visible) transformWidget->Render();
+        //if(transformWidget->visible) transformWidget->Render();
 
         ogl->glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
         ogl->glStencilMask(0x00); 
@@ -178,11 +173,11 @@ namespace CoreEngine {
     void Scene::OnMouseReleaseEvent(QMouseEvent *e) {
         this->camera.OnMouseReleaseEvent(e);  
 
-        if(isTransforming) { 
-            isTransforming = false;
-            isFirstTransformFrame = false;
-            transformOffset = 0;
-        }
+        //if(isTransforming) { 
+        //    isTransforming = false;
+        //    isFirstTransformFrame = false;
+        //    transformOffset = 0;
+        //}
     }
 
     void Scene::OnMouseMoveEvent(QMouseEvent *e) {
@@ -209,11 +204,11 @@ namespace CoreEngine {
         if(intersectedObject != nullptr) {
             std::cout << intersectedObject->name << std::endl;
             if(intersectedObject->parent == transformWidget) {
-                isTransforming = true;
-                isFirstTransformFrame = true;
-                if(intersectedObject->name == "coneX" || intersectedObject->name == "cubeX") transformAxis = TRANSFORM_AXIS::X;
-                else if(intersectedObject->name == "coneY" || intersectedObject->name == "cubeY") transformAxis = TRANSFORM_AXIS::Y;
-                else if(intersectedObject->name == "coneZ" || intersectedObject->name == "cubeZ") transformAxis = TRANSFORM_AXIS::Z;
+                //isTransforming = true;
+                //isFirstTransformFrame = true;
+                //if(intersectedObject->name == "coneX" || intersectedObject->name == "cubeX") transformAxis = TRANSFORM_AXIS::X;
+                //else if(intersectedObject->name == "coneY" || intersectedObject->name == "cubeY") transformAxis = TRANSFORM_AXIS::Y;
+                //else if(intersectedObject->name == "coneZ" || intersectedObject->name == "cubeZ") transformAxis = TRANSFORM_AXIS::Z;
             } else {
 				AddObjectToSelection(true, intersectedObject);
 
@@ -236,7 +231,7 @@ namespace CoreEngine {
             }
         } else {
             selectedObjects.resize(0);
-            transformWidget->visible = false;
+            //transformWidget->visible = false;
         } 
     }
 
@@ -256,15 +251,15 @@ namespace CoreEngine {
 		}
 
 		TransformComponent* objectTransform = intersectedObject->transform;
-		TransformComponent* widgetTransform = transformWidget->transform;
-		widgetTransform->position = objectTransform->position;
+		//TransformComponent* widgetTransform = transformWidget->transform;
+		//widgetTransform->position = objectTransform->GetWorldPosition();
 
-		transformWidget->visible = selectedObjects.size() > 0;
+		//transformWidget->visible = selectedObjects.size() > 0;
 	}
 
 	void Scene::ClearSelection() {
 		selectedObjects.resize(0);
-		transformWidget->visible = false;
+		//transformWidget->visible = false;
 	}
 
 
@@ -291,75 +286,79 @@ namespace CoreEngine {
     }
 
     void Scene::TransformSelection(QMouseEvent *e) {
-        int newX = e->x();
-        int newY = e->y();
+       // int newX = e->x();
+       // int newY = e->y();
 
-        Geometry::Ray ray = this->camera.GetRay(newX, newY);
-        double dotX = std::abs(glm::dot(ray.direction, glm::dvec3(1, 0, 0)));
-        double dotY = std::abs(glm::dot(ray.direction, glm::dvec3(0, 1, 0)));
-        double dotZ = std::abs(glm::dot(ray.direction, glm::dvec3(0, 0, 1)));
-        
-        for(int i=0; i<selectedObjects.size(); i++) {
-            TransformComponent* objectTransform = selectedObjects[i]->transform; 
-            TransformComponent* widgetTransform = transformWidget->transform; 
-            if(objectTransform != nullptr) {
-                if(transformMode == TRANSFORM_MODE::TRANSLATE) {
-                    if(transformAxis == TRANSFORM_AXIS::X) {
-                        double ysign = widgetTransform->position.y > 0 ? -1 : 1;
-                        double zsign =  widgetTransform->position.z > 0 ? -1 : 1;
+       // Geometry::Ray ray = this->camera.GetRay(newX, newY);
+       // double dotX = std::abs(glm::dot(ray.direction, glm::dvec3(1, 0, 0)));
+       // double dotY = std::abs(glm::dot(ray.direction, glm::dvec3(0, 1, 0)));
+       // double dotZ = std::abs(glm::dot(ray.direction, glm::dvec3(0, 0, 1)));
+       // 
+       // for(int i=0; i<selectedObjects.size(); i++) {
+       //     TransformComponent* objectTransform = selectedObjects[i]->transform; 
+       //     //TransformComponent* widgetTransform = transformWidget->transform; 
+       //     if(objectTransform != nullptr) {
+       //         if(transformMode == TRANSFORM_MODE::TRANSLATE) {
+       //             if(transformAxis == TRANSFORM_AXIS::X) {
+       //                 double ysign = widgetTransform->position.y > 0 ? -1 : 1;
+       //                 double zsign =  widgetTransform->position.z > 0 ? -1 : 1;
 
-                        glm::dvec4 plane = (dotY > dotZ) ? glm::dvec4(0, ysign * 1, 0, std::abs(widgetTransform->position.y)) : glm::dvec4(0, 0, zsign * 1, std::abs(widgetTransform->position.z));
-                        double t = -glm::dot(plane, glm::dvec4(ray.origin, 1.0)) / glm::dot(plane, glm::dvec4(ray.direction, 0.0));
-                        
-                        glm::dvec3 position = ray.origin + t * ray.direction;
-                        if(isFirstTransformFrame) { //First frame of transformation, get offset btw click and origin of transform widget
-                            isFirstTransformFrame = false;
-                            //Get position of ray on the plane
-                            transformOffset = position.x - widgetTransform->position.x;
-                        } else {
-                            //Set transform to x position of intersection
-                            double newX = position.x - transformOffset;
-                            widgetTransform->position.x = newX;
-                            objectTransform->position.x= newX;
-                        }
-                    } else if(transformAxis == TRANSFORM_AXIS::Y) {
-                        double xsign = widgetTransform->position.x > 0 ? -1 : 1;
-                        double zsign = widgetTransform->position.z > 0 ? -1 : 1;
+       //                 glm::dvec4 plane = (dotY > dotZ) ? glm::dvec4(0, ysign * 1, 0, std::abs(widgetTransform->position.y)) : glm::dvec4(0, 0, zsign * 1, std::abs(widgetTransform->position.z));
+       //                 double t = -glm::dot(plane, glm::dvec4(ray.origin, 1.0)) / glm::dot(plane, glm::dvec4(ray.direction, 0.0));
+       //                 
+       //                 glm::dvec3 position = ray.origin + t * ray.direction;
+       //                 if(isFirstTransformFrame) { //First frame of transformation, get offset btw click and origin of transform widget
+       //                     isFirstTransformFrame = false;
+       //                     //Get position of ray on the plane
+       //                     transformOffset = position.x - widgetTransform->position.x;
+							//std::cout << transformOffset << std::endl;	
+       //                 } else {
+       //                     //Set transform to x position of intersection
+       //                     double newX = position.x - transformOffset;
+							//widgetTransform->position.x = newX;
+							//glm::dvec3 worldPos = glm::dvec3(newX, objectTransform->position.y, objectTransform->position.z);
+							//objectTransform->SetWorldX(newX);
+       //                 }
+       //             } else if(transformAxis == TRANSFORM_AXIS::Y) {
+       //                 double xsign = widgetTransform->position.x > 0 ? -1 : 1;
+       //                 double zsign = widgetTransform->position.z > 0 ? -1 : 1;
 
-                        glm::dvec4 plane = (dotX > dotZ) ? glm::dvec4(xsign * 1, 0, 0, std::abs(widgetTransform->position.x)) : glm::dvec4(0, 0,zsign *  1, std::abs(widgetTransform->position.z));
-                        
-                        double t= -glm::dot(plane, glm::dvec4(ray.origin, 1.0)) / glm::dot(plane, glm::dvec4(ray.direction, 0.0));
-                        glm::dvec3 position = ray.origin + t * ray.direction;
-                        
-                        if(isFirstTransformFrame) { 
-                            isFirstTransformFrame = false;
-                            transformOffset = position.y - widgetTransform->position.y;
-                        } else {                                
-                            double newY = position.y - transformOffset;
-                            widgetTransform->position.y = newY;
-                            objectTransform->position.y = newY;
-                        }
-                    } else if(transformAxis == TRANSFORM_AXIS::Z) {
-                        double xsign = widgetTransform->position.x > 0 ? -1 : 1;
-                        double ysign = widgetTransform->position.y > 0 ? -1 : 1;
-                        glm::dvec4 plane = (dotX > dotY) ? glm::dvec4(xsign * 1, 0, 0, std::abs(widgetTransform->position.x)) : glm::dvec4(0, ysign * 1, 0, std::abs(widgetTransform->position.y));
-                        
-                        double t= -glm::dot(plane, glm::dvec4(ray.origin, 1.0)) / glm::dot(plane, glm::dvec4(ray.direction, 0.0));
-                        glm::dvec3 position = ray.origin + t * ray.direction;
-                        
-                        if(isFirstTransformFrame) { 
-                            isFirstTransformFrame = false;
-                            
-                            transformOffset = position.z - widgetTransform->position.z;
-                        } else {                            
-                            double newZ = position.z - transformOffset;
-                            widgetTransform->position.z = newZ;
-                            objectTransform->position.z = newZ;
-                        }                        
-                    }
-                }
-            }
-        }
+       //                 glm::dvec4 plane = (dotX > dotZ) ? glm::dvec4(xsign * 1, 0, 0, std::abs(widgetTransform->position.x)) : glm::dvec4(0, 0,zsign *  1, std::abs(widgetTransform->position.z));
+       //                 
+       //                 double t= -glm::dot(plane, glm::dvec4(ray.origin, 1.0)) / glm::dot(plane, glm::dvec4(ray.direction, 0.0));
+       //                 glm::dvec3 position = ray.origin + t * ray.direction;
+       //                 
+       //                 if(isFirstTransformFrame) { 
+       //                     isFirstTransformFrame = false;
+       //                     transformOffset = position.y - widgetTransform->position.y;
+       //                 } else {                                
+       //                     double newY = position.y - transformOffset;
+       //                     widgetTransform->position.y = newY;
+							//glm::dvec3 worldPos = glm::dvec3(newX, objectTransform->position.y, objectTransform->position.z);
+							//objectTransform->SetWorldY(newY);
+       //                 }
+       //             } else if(transformAxis == TRANSFORM_AXIS::Z) {
+       //                 double xsign = widgetTransform->position.x > 0 ? -1 : 1;
+       //                 double ysign = widgetTransform->position.y > 0 ? -1 : 1;
+       //                 glm::dvec4 plane = (dotX > dotY) ? glm::dvec4(xsign * 1, 0, 0, std::abs(widgetTransform->position.x)) : glm::dvec4(0, ysign * 1, 0, std::abs(widgetTransform->position.y));
+       //                 
+       //                 double t= -glm::dot(plane, glm::dvec4(ray.origin, 1.0)) / glm::dot(plane, glm::dvec4(ray.direction, 0.0));
+       //                 glm::dvec3 position = ray.origin + t * ray.direction;
+       //                 
+       //                 if(isFirstTransformFrame) { 
+       //                     isFirstTransformFrame = false;
+       //                     
+       //                     transformOffset = position.z - widgetTransform->position.z;
+       //                 } else {                            
+       //                     double newZ = position.z - transformOffset;
+       //                     widgetTransform->position.z = newZ;
+							//glm::dvec3 worldPos = glm::dvec3(newX, objectTransform->position.y, objectTransform->position.z);
+							//objectTransform->SetWorldZ(newZ);
+       //                 }                        
+       //             }
+       //         }
+       //     }
+       // }
     }
 }
 }
