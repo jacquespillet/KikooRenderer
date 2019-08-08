@@ -1,7 +1,10 @@
 #include "BaseObjects.hpp"
+#include "Scene.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/BoundingComponent.hpp"
 #include "Components/FluidComponent.hpp"
+#include "Components/MeshFilterComponent.hpp"
+#include "Components/TransformComponent.hpp"
 
 
 namespace KikooRenderer {

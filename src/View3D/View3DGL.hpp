@@ -12,7 +12,8 @@
 #include <QtCore/QTimer>
 #include <QtGui/QPainter>
 
-#include "../3DEngine/Scene.hpp"
+#include "3DEngine/Scene.hpp"
+
 
 namespace KikooRenderer {
     

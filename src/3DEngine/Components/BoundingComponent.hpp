@@ -1,6 +1,7 @@
 #pragma once
 #include "Util/Common.h"
-#include "../Object3D.hpp"
+#include "Component.hpp"
+#include "3DEngine/Object3D.hpp"
 
 
 namespace KikooRenderer {

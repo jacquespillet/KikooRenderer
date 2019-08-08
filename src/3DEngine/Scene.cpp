@@ -1,12 +1,9 @@
 #include "Scene.hpp"
 #include "Util.hpp"
 #include "BaseObjects.hpp"
-#include "Components/BoundingComponent.hpp"
-#include "Components/MaterialComponent.hpp"
-#include "Components/LightComponent.hpp"
-#include "Components/MeshFilterComponent.hpp"
 #include "Geometry/Ray.hpp"
 #include "Framebuffer.hpp"
+#include "Components/MaterialComponent.hpp"
 
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLFunctions_3_2_Core>
@@ -16,7 +13,9 @@
 namespace KikooRenderer {
 
 namespace CoreEngine {
-    Scene::Scene() : camera(CameraScene(this, 1.0, 70 * DEGTORAD, 0.1, 1000.0, 1.0)){
+    Scene::Scene(){
+		camera = new CameraScene(this, 1.0, 70 * DEGTORAD, 0.1, 1000.0, 1.0);
+
         this->started = false;
         //transformOffset = 0;
         isFirstTransformFrame = false;
@@ -27,7 +26,6 @@ namespace CoreEngine {
 		GETGL
 
         this->started = true;
-        OnStart();
 
         /*transformWidget = GetTranslateWidget(this, "TranslateWidget", glm::dvec3(0), glm::dvec3(0), glm::dvec3(1));
         transformWidget->visible = false;
@@ -161,17 +159,18 @@ namespace CoreEngine {
 
 
     void Scene::OnKeyPressEvent(QKeyEvent *e){
-        this->camera.OnKeyPressEvent(e);
+        this->camera->OnKeyPressEvent(e);
 
     }
 
     void Scene::OnMousePressEvent(QMouseEvent *e) {
-        this->camera.OnMousePressEvent(e);
+        this->camera->OnMousePressEvent(e);
         if(e->button() == Qt::LeftButton) HandleSelection(e->x(), e->y());
     }
+	void Scene::OnKeyReleaseEvent(QKeyEvent* e) {}
 
     void Scene::OnMouseReleaseEvent(QMouseEvent *e) {
-        this->camera.OnMouseReleaseEvent(e);  
+        this->camera->OnMouseReleaseEvent(e);  
 
         //if(isTransforming) { 
         //    isTransforming = false;
@@ -181,13 +180,13 @@ namespace CoreEngine {
     }
 
     void Scene::OnMouseMoveEvent(QMouseEvent *e) {
-        this->camera.OnMouseMoveEvent(e);  
+        this->camera->OnMouseMoveEvent(e);  
         
         if(isTransforming) TransformSelection(e);
     }
 
     void Scene::OnWheelEvent(QWheelEvent *event) {
-        this->camera.OnWheelEvent(event);  
+        this->camera->OnWheelEvent(event);  
     }
 
     void Scene::SetWindowSize(int w, int h) {
@@ -195,8 +194,8 @@ namespace CoreEngine {
         this->windowHeight = h;
         float aspectRatio = w/h;
 
-        this->camera.aspect = aspectRatio;
-        this->camera.UpdateProjectionMatrix();
+        this->camera->aspect = aspectRatio;
+        this->camera->UpdateProjectionMatrix();
     }
 
     void Scene::HandleSelection(int x, int y) {
@@ -264,7 +263,7 @@ namespace CoreEngine {
 
 
     Object3D* Scene::GetIntersectObject(int x, int y) {
-        Geometry::Ray ray = this->camera.GetRay(x, y);
+        Geometry::Ray ray = this->camera->GetRay(x, y);
         double minDistance = 99999999999999.0;
         Object3D* closest = nullptr;
         for(int i=0; i<objects3D.size(); i++) { 
@@ -289,7 +288,7 @@ namespace CoreEngine {
        // int newX = e->x();
        // int newY = e->y();
 
-       // Geometry::Ray ray = this->camera.GetRay(newX, newY);
+       // Geometry::Ray ray = this->camera->GetRay(newX, newY);
        // double dotX = std::abs(glm::dot(ray.direction, glm::dvec3(1, 0, 0)));
        // double dotY = std::abs(glm::dot(ray.direction, glm::dvec3(0, 1, 0)));
        // double dotZ = std::abs(glm::dot(ray.direction, glm::dvec3(0, 0, 1)));

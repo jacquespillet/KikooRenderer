@@ -1,8 +1,10 @@
 #pragma once
 #include "Util/Common.h"
+#include "Component.hpp"
 
 namespace KikooRenderer {
 namespace CoreEngine {
+
 class MeshFilterComponent : public Component {
     public:
 
@@ -21,7 +23,7 @@ class MeshFilterComponent : public Component {
         void OnUpdate();
         void OnRender();
         void OnDestroy();
-        void Recompute(){}
+		void Recompute();
         
 
         void LoadFromBuffers(std::vector<glm::dvec3> _vertex,

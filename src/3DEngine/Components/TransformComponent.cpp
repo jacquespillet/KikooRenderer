@@ -1,10 +1,10 @@
 #include "TransformComponent.hpp"
+#include "3DEngine/Object3D.hpp"
+#include "3DEngine/Scene.hpp"
 
-#include "../Object3D.hpp"
 
 namespace KikooRenderer {
 namespace CoreEngine {
-
 TransformComponent::TransformComponent(Object3D* object) : Component("Transform", object) {
     position = glm::dvec3(0, 0, 0);
     rotation = glm::dvec3(0, 0, 0);
@@ -15,6 +15,7 @@ void TransformComponent::OnEnable(){}
 void TransformComponent::OnUpdate(){}
 void TransformComponent::OnRender(){} 
 void TransformComponent::OnDestroy(){} 
+void TransformComponent::Recompute() {}
 
 glm::dmat4 TransformComponent::GetModelMatrix() {
 	glm::dmat4 translateM = glm::translate(glm::dmat4(1.0f), this->position);
@@ -54,7 +55,7 @@ glm::dvec3 TransformComponent::GetScale() {
 	glm::dvec4 worldPosition = transformMat * glm::dvec4(0, 0, 0, 1);
 
 	if(isScreenSize) {
-		distanceFactor = 0.1 * glm::distance( object3D->scene->camera.GetPosition(), glm::dvec3(worldPosition));		
+		distanceFactor = 0.1 * glm::distance( object3D->scene->camera->GetPosition(), glm::dvec3(worldPosition));		
 	}
 	
 	return distanceFactor * scale;

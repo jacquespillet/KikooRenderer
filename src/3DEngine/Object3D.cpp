@@ -1,6 +1,7 @@
 #include "Object3D.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/BoundingComponent.hpp"
+#include "Components/TransformComponent.hpp"
 #include "Util.hpp"
 
 #include <QtGui/QOpenGLFunctions>
@@ -135,8 +136,8 @@ void Object3D::Render() {
 	
 
 	if(transform != nullptr) {
-		glm::mat4 vMatrix = scene->camera.GetViewMatrix();
-		glm::mat4 pMatrix = scene->camera.GetProjectionMatrix();
+		glm::mat4 vMatrix = scene->camera->GetViewMatrix();
+		glm::mat4 pMatrix = scene->camera->GetProjectionMatrix();
 		glm::mat4 mvpMatrix = pMatrix * vMatrix * currentModelMatrix;
 
 		

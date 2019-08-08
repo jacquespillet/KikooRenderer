@@ -1,8 +1,5 @@
 #pragma once
 #include "Util/Common.h"
-#include "Components/TransformComponent.hpp"
-// #include "Component.hpp"
-#include "Scene.hpp"
 #include "Geometry/Ray.hpp"
 #include "Framebuffer.hpp"
 
@@ -10,6 +7,7 @@ namespace KikooRenderer {
 
 namespace CoreEngine {
 class Component;
+class TransformComponent;
 class Scene;
 class Object3D {
     public: 

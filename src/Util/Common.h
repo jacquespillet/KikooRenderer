@@ -85,10 +85,16 @@
 #include <numeric>
 #include <random>
 
-#include "Geometry/Planes.hpp"
-
-
-#include "3DEngine/Components/Component.hpp"
+	////OpenGL 
+	//#include "3DEngine/Shader.hpp"
+	//#include "3DEngine/StandardShaders.hpp"
+	//
+	//#include "Geometry/Planes.hpp"
+	//
+	//#include "3DEngine/Scene.hpp"
+	//#include "3DEngine/Components/Component.hpp"
+	//#include "3DEngine/Object3D.hpp"
+	//#include "3DEngine/CameraScene.hpp"
 
 #define TWO_PI 6.28318530717958647692529
 #define PI 3.1415926535897932384626433

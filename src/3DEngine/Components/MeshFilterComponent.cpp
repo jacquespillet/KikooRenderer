@@ -34,6 +34,7 @@ void MeshFilterComponent::OnRender(){
 void MeshFilterComponent::OnDestroy() {
 	DestroyBuffers();
 }
+void MeshFilterComponent::Recompute() {}
 
 void MeshFilterComponent::CalculateTangents(std::vector<glm::vec3>& tangents ,std::vector<glm::dvec3> _vertices,  std::vector<glm::dvec3> normals, std::vector<glm::dvec2> uv,std::vector<int> triangles) {
 	std::vector<glm::vec3> tan1(_vertices.size(), glm::vec3(0));

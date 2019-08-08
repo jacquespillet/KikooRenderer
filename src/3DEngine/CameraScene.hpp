@@ -1,18 +1,18 @@
 #pragma once
 
 #include "Util/Common.h"
-#include "Components/TransformComponent.hpp"
 #include "Geometry/Ray.hpp"
 #include "Geometry/Planes.hpp"
 
 namespace KikooRenderer {
 namespace CoreEngine {
+class TransformComponent;
 class Scene;
 class CameraScene{
     public: 
         CameraScene(Scene* scene, double eyeDistance, double fov, double near, double far, double aspect);
         
-        CameraScene() :  transform(TransformComponent(nullptr)) {}
+		CameraScene();
         Scene* scene;
         double eyeDistance;
         double fov;
@@ -20,7 +20,7 @@ class CameraScene{
         double farClip;
         double aspect;
         glm::mat4 projectionMatrix;
-        TransformComponent transform;
+        TransformComponent* transform;
 
 
         glm::dmat4 GetProjectionMatrix();

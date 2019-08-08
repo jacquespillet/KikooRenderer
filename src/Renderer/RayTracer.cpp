@@ -1,6 +1,5 @@
 #include "RayTracer.hpp"
 #include "Camera.hpp"
-#include "3DEngine/CameraScene.hpp"
 #include "Material.hpp"
 #include "Util/Image.hpp"
 #include "Geometry/Util.h"

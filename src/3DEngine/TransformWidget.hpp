@@ -1,12 +1,10 @@
 #pragma once 
 #include "Util/Common.h"
-#include "Scene.hpp"
-#include "Object3D.hpp"
+#include "3DEngine/Object3D.hpp"
 
 
 namespace KikooRenderer {
 namespace CoreEngine {
-class Object3D;
 
 class TransformWidget : public Object3D {
 

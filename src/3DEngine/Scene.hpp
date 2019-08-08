@@ -1,17 +1,13 @@
 #pragma once
 
 #include "Util/Common.h"
-#include "Object3D.hpp"
 #include "StandardShaders.hpp"
 #include "CameraScene.hpp"
-#include "Components/MeshFilterComponent.hpp"
-//#include "TransformWidget.hpp"
-
+#include "Object3D.hpp"
+#include "TransformWidget.hpp"
 
 namespace KikooRenderer {
 namespace CoreEngine {
-class Object3D;
-class CameraScene;
 
 class Scene {
     public: 
@@ -26,19 +22,15 @@ class Scene {
 		std::vector<Object3D*> objects3D; 
 		std::vector<Object3D*> lightObjects; 
 		StandardShaders standardShaders;
-		CameraScene camera;
+		CameraScene* camera;
 
 		bool test = false;
 
-		void virtual OnStart(){};
 		void virtual OnUpdate();
-		void virtual OnRender(){};
-		void virtual OnEnable(){};
-		void virtual OnDisable(){};
 		void virtual OnDestroy();
 		
 		virtual void OnKeyPressEvent(QKeyEvent *e);
-		virtual void OnKeyReleaseEvent(QKeyEvent *e){}
+		virtual void OnKeyReleaseEvent(QKeyEvent *e);
 		virtual void OnMousePressEvent(QMouseEvent *e);
 		virtual void OnMouseReleaseEvent(QMouseEvent *e);
 		virtual void OnMouseMoveEvent(QMouseEvent *e);
@@ -62,7 +54,7 @@ class Scene {
 
 		std::vector<Object3D*> selectedObjects;
 
-		//TransformWidget* transformWidget;
+		TransformWidget* tg;
 		Object3D* transformWidget;
 
 		Object3D* scaleWidget;

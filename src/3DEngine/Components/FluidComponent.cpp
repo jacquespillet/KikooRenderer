@@ -1,5 +1,6 @@
 #include "FluidComponent.hpp"
 #include "MeshFilterComponent.hpp"
+#include "3DEngine/Scene.hpp"
 
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLFunctions_3_2_Core>
@@ -49,7 +50,10 @@ namespace CoreEngine {
    
     void FluidComponent::OnStart() {
     }
-   
+
+	void FluidComponent::Recompute() {
+	}
+
     void FluidComponent::OnEnable() {
         
     }

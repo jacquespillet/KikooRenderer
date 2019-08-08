@@ -1,6 +1,7 @@
 #include "BoundingComponent.hpp"
-#include "MeshFilterComponent.hpp"
 #include "../BaseObjects.hpp"
+#include "MeshFilterComponent.hpp"
+#include "TransformComponent.hpp"
 
 
 #include <QtGui/QOpenGLFunctions>

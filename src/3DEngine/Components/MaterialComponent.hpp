@@ -1,8 +1,9 @@
 #pragma once
 #include "Util/Common.h"
-#include "../Shader.hpp"
-#include "../Scene.hpp"
-#include "../Texture.hpp"
+#include "Component.hpp"
+#include "3DEngine/Shader.hpp"
+#include "3DEngine/Texture.hpp"
+#include "3DEngine/Scene.hpp"
 
 namespace KikooRenderer {
 namespace CoreEngine {
@@ -14,7 +15,7 @@ class MaterialComponent : public Component {
         void OnUpdate();
         void OnRender();
         void OnDestroy();
-        void Recompute(){}
+		void Recompute();
         
         void SetShader(Shader* shader);
         void SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 viewMatrix, glm::dmat4 projectionMatrix, Scene* scene);

@@ -1,6 +1,7 @@
 #include "Octree.hpp"
 #include "../Components/BoundingComponent.hpp"
 #include "../BaseObjects.hpp"
+#include "3DEngine/Scene.hpp"
 
 namespace KikooRenderer {
 namespace SpatialPartition {

@@ -34,8 +34,8 @@ class Shader
 		
 		Shader();
 		
-		void SetId(int id) { this->identifier = id;}
-		int GetId() { return this->identifier;}
+		void SetId(int id);
+		int GetId();
 
 		void Compile();
 };

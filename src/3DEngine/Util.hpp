@@ -1,6 +1,7 @@
 #pragma once
 #include "Util/Common.h"
-#include "3DEngine/CameraScene.hpp"
+#include "CameraScene.hpp"
+#include "Components/TransformComponent.hpp"
 
 
 namespace KikooRenderer

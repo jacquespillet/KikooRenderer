@@ -1,7 +1,7 @@
 #include "MaterialComponent.hpp"
 #include "LightComponent.hpp"
 #include "TransformComponent.hpp"
-#include "../StandardShaders.hpp"
+#include "3DEngine/Object3D.hpp"
 
 
 #include <QtGui/QOpenGLFunctions>
@@ -24,6 +24,8 @@ void MaterialComponent::OnEnable(){}
 void MaterialComponent::OnUpdate(){}
 void MaterialComponent::OnRender(){} 
 void MaterialComponent::OnDestroy(){} 
+void MaterialComponent::Recompute(){} 
+
 
 void MaterialComponent::SetShader(Shader* shader) {
     this->shader = shader;
@@ -42,7 +44,7 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 	int modelViewProjectionMatrixLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "modelViewProjectionMatrix"); 
 	ogl->glUniformMatrix4fv(modelViewProjectionMatrixLocation, 1, false, glm::value_ptr(mvpMatrix));
 
-    glm::vec3 camPos = scene->camera.transform.position;
+    glm::vec3 camPos = scene->camera->transform->position;
     int cameraPosLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "cameraPos"); 
 	ogl->glUniform3fv(cameraPosLocation,1, glm::value_ptr(camPos));
     

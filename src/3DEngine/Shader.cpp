@@ -69,9 +69,11 @@ void Shader::Compile()
 		std::cout << "Shader:compile success " << std::endl;
 		compiled = true; 
 	}
-	
 }
-	
+
+void Shader::SetId(int id) { this->identifier = id; }
+
+int Shader::GetId() { return this->identifier; }
 	
 }
 

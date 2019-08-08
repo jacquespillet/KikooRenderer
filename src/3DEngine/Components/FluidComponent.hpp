@@ -1,11 +1,12 @@
 #pragma once
-#include "BoundingComponent.hpp"
-#include "../Object3D.hpp"
-
 #include "Util/Common.h"
+#include "BoundingComponent.hpp"
+#include "Component.hpp"
+
 
 namespace KikooRenderer {
 namespace CoreEngine {
+	class MeshFilterComponent;
     class FluidComponent : public Component {
         public:
         FluidComponent(Object3D* object);
@@ -14,7 +15,7 @@ namespace CoreEngine {
         void OnUpdate();
         void OnRender();
         void OnDestroy();
-        void Recompute(){}
+		void Recompute();
 
         MeshFilterComponent* meshFilter;
 

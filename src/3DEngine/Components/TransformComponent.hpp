@@ -1,9 +1,11 @@
 #pragma once 
 #include "Util/Common.h"
+#include "Component.hpp"
 
 namespace KikooRenderer {
 namespace CoreEngine {
-class Component;
+class Object3D;
+
 class TransformComponent : public Component {
     public: 
         TransformComponent(Object3D* object);
@@ -12,7 +14,7 @@ class TransformComponent : public Component {
         void OnUpdate();
         void OnRender();
         void OnDestroy();
-        void Recompute(){}
+		void Recompute();
 
         glm::dvec3 position;
         glm::dvec3 rotation;
