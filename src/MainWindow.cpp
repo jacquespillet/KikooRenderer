@@ -5,7 +5,8 @@ namespace KikooRenderer {
         setWindowTitle("KikooRenderer");
         view3D= new View3D;
         sceneTree= new SceneTree;
-		 objectDetails = new ObjectDetails;
+		objectDetails = new ObjectDetailsPanel;
+		view3D->objectDetailsPanel = objectDetails;
 
         sceneTree->view3D = view3D;
         view3D->sceneTree = sceneTree;

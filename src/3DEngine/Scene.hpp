@@ -5,8 +5,10 @@
 #include "CameraScene.hpp"
 #include "Object3D.hpp"
 #include "TransformWidget.hpp"
+#include "ObjectDetails/ObjectDetails.hpp"
 
 namespace KikooRenderer {
+class ObjectDetailsPanel;
 namespace CoreEngine {
 
 class Scene {
@@ -23,6 +25,7 @@ class Scene {
 		std::vector<Object3D*> lightObjects; 
 		StandardShaders standardShaders;
 		CameraScene* camera;
+		KikooRenderer::ObjectDetailsPanel* objectDetailsPanel;
 
 		bool test = false;
 

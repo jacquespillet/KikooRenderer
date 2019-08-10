@@ -16,7 +16,7 @@ class MainWindow : public QMainWindow
         void ExpandToFitScreen();
         View3D* view3D;
         SceneTree* sceneTree;
-		ObjectDetails* objectDetails;
+		ObjectDetailsPanel* objectDetails;
 
         Renderer::RayTracer rayTracer;
 };

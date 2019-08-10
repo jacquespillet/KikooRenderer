@@ -1,20 +1,34 @@
 #pragma once
 
 #include "Util/Common.h"
-#include "View3D/View3D.hpp"
+#include "3DEngine/Object3D.hpp"
 
 namespace KikooRenderer {
 
 	class View3D;
-	class ObjectDetails : public QDockWidget
+
+	class ObjectDetails : public QWidget {
+	public: 
+		ObjectDetails(CoreEngine::Object3D* object) : QWidget() {
+			QHBoxLayout* mainLayout = new QHBoxLayout();
+
+			QLabel* label = new QLabel(QString::fromStdString(object->name));
+			QCheckBox* checkBox = new QCheckBox();
+			mainLayout->addWidget(label);
+			mainLayout->addWidget(checkBox);
+
+			setLayout(mainLayout);
+		}
+	};
+
+
+	class ObjectDetailsPanel : public QDockWidget
 	{
 		Q_OBJECT
 	public:
-		 ObjectDetails();
+		ObjectDetailsPanel();
 
-		QWidget* layoutWindow;
-		
-		View3D* view3D;
-		SceneTree* sceneTree;
+		QWidget* mainWidget;
+		QVBoxLayout* mainLayout;
 	};
 }
