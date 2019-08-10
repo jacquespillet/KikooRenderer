@@ -109,4 +109,18 @@ void SceneTreeView::mousePressEvent(QMouseEvent *event) {
 		sceneTree->view3D->view3DGL->scene->triggerRefresh = true;
 	}
 }
+
+void SceneTree::keyPressEvent(QKeyEvent* e) {
+
+	if (e->key() == Qt::Key_Delete) {
+		QModelIndexList	selectedIndexes = tree->selectionModel()->selectedIndexes();
+		if (selectedIndexes.size() > 0) {
+			TreeItem* parentItem = (TreeItem*)model->itemFromIndex(selectedIndexes[0]);
+			view3D->view3DGL->scene->RemoveObject(parentItem->object3D);
+			model->removeRow(selectedIndexes[0].row());
+			view3D->view3DGL->scene->triggerRefresh = true;
+		}
+	}
+}
+
 }

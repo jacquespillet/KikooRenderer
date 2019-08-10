@@ -19,7 +19,8 @@ class SceneTree : public QDockWidget
 		SceneTreeView *tree;
         QStandardItemModel* model;
 
-
+	protected:
+		virtual void keyPressEvent(QKeyEvent* e);
 	public slots:
         void ShowContextMenu(const QPoint& pos, bool fromMainWindow=false);
 		void OnItemChanged(QStandardItem* item);
