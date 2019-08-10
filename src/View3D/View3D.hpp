@@ -34,6 +34,8 @@ class View3D : public QDockWidget
         View3DRoot* root;
 		QWidget* layoutWindow;
 
+protected:
+	void keyPressEvent(QKeyEvent* e);
 };
 
 }

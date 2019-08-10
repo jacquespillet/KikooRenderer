@@ -18,6 +18,10 @@ SceneTree::SceneTree() : QDockWidget("Scene")
     tree->setModel( model ); 
 	tree->model = model;
 
+	connect(tree->model, SIGNAL(itemChanged(QStandardItem*)),
+		this, SLOT(OnItemChanged(QStandardItem*)));
+
+
     tree->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(tree, SIGNAL(customContextMenuRequested(const QPoint&)),
         this, SLOT(ShowContextMenu(const QPoint&)));
@@ -25,8 +29,13 @@ SceneTree::SceneTree() : QDockWidget("Scene")
     setWidget(tree);
 }
 
+void SceneTree::OnItemChanged(QStandardItem* item) {
+	TreeItem* treeItem = (TreeItem*)item;
+	treeItem->object3D->name = treeItem->text().toStdString();
+}
+
 //Handles menu Creation
-void SceneTree::ShowContextMenu(const QPoint& pos)
+void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
 {   
     QString cubeStr = "Cube";
     QString sphereStr = "Sphere";
@@ -34,7 +43,9 @@ void SceneTree::ShowContextMenu(const QPoint& pos)
     QString quadStr = "Quad";
 	QString emptyStr = "Empty";
 
-    QPoint globalPos = tree->mapToGlobal(pos);
+	QPoint menuPos;
+	if(!fromMainWindow) menuPos = tree->mapToGlobal(pos);
+	else menuPos = tree->mapFromParent(pos);
 
     QMenu myMenu;
 
@@ -45,99 +56,38 @@ void SceneTree::ShowContextMenu(const QPoint& pos)
     addObjectMenu->addAction(quadStr);
     addObjectMenu->addAction(emptyStr);
     myMenu.addMenu(addObjectMenu);
-    QAction* selectedItem = myMenu.exec(globalPos);
+    QAction* selectedItem = myMenu.exec(menuPos);
+
+
     if (selectedItem)
     {
-        if(selectedItem->text() == cubeStr) {
-            QString name = QString("New ") + cubeStr;
-            CoreEngine::Object3D* cube = CoreEngine::GetCube(view3D->view3DGL->scene, name.toStdString(),  glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.5, 0.5, 0.5, 1));   
-            if(tree->currentIndex().isValid()) {
-				TreeItem*item = (TreeItem*) model->itemFromIndex(tree->currentIndex());
-				item->object3D->AddObject(cube);
-				
-				TreeItem*child = new TreeItem(QString(name));
-				child->object3D = cube;
-                item->appendRow(child);
-            } else {
-                std::string finalName = view3D->view3DGL->scene->AddObject(cube);
-                name = QString::fromStdString(finalName);
-				TreeItem*item = new TreeItem( name );
-				item->object3D = cube;
-                model->appendRow(item);
-            }
-        } else if(selectedItem->text() == sphereStr) {
-            QString name = QString("New ") + sphereStr;
-            CoreEngine::Object3D* sphere = CoreEngine::GetSphere(view3D->view3DGL->scene, name.toStdString(),  glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.5, 0.5, 0.5, 1));  
-			if (tree->currentIndex().isValid()) {
-				TreeItem* item = (TreeItem*)model->itemFromIndex(tree->currentIndex());
-				item->object3D->AddObject(sphere);
+		QModelIndexList	selectedIndexes = tree->selectionModel()->selectedIndexes();
+		
+		CoreEngine::Object3D* objectToAdd = nullptr;
+		QString name = QString("New ") + selectedItem->text();
+		if (selectedItem->text() == cubeStr) objectToAdd = CoreEngine::GetCube(view3D->view3DGL->scene, name.toStdString(), glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.5, 0.5, 0.5, 1));
+		if (selectedItem->text() == sphereStr) objectToAdd = CoreEngine::GetSphere(view3D->view3DGL->scene, name.toStdString(), glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.5, 0.5, 0.5, 1));
+		if (selectedItem->text() == circleStr) objectToAdd = CoreEngine::GetCircle(view3D->view3DGL->scene, name.toStdString(), glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.5, 0.5, 0.5, 1));
+		if (selectedItem->text() == quadStr) objectToAdd = CoreEngine::GetQuad(view3D->view3DGL->scene, name.toStdString(), glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.5, 0.5, 0.5, 1));
+		if (selectedItem->text() == emptyStr) objectToAdd = new CoreEngine::Object3D(name.toStdString(), view3D->view3DGL->scene);
+		
+		if (selectedIndexes.size() > 0) {
+			TreeItem* parentItem = (TreeItem*)model->itemFromIndex(selectedIndexes[0]);
+			parentItem->object3D->AddObject(objectToAdd);
 
-				TreeItem* child = new TreeItem(QString(name));
-				child->object3D = sphere;
-				item->appendRow(child);
-			}
-			else {
-				std::string finalName = view3D->view3DGL->scene->AddObject(sphere);
-				name = QString::fromStdString(finalName);
-				TreeItem *item = new TreeItem(name);
-				item->object3D = sphere;
-				model->appendRow(item);
-			}
-        } else if(selectedItem->text() == circleStr) {
-            QString name = QString("New ") + circleStr;
-            CoreEngine::Object3D* circle = CoreEngine::GetCircle(view3D->view3DGL->scene, name.toStdString(),  glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.5, 0.5, 0.5, 1));   
-			if (tree->currentIndex().isValid()) {
-				TreeItem* item = (TreeItem*)model->itemFromIndex(tree->currentIndex());
-				item->object3D->AddObject(circle);
-
-				TreeItem* child = new TreeItem(QString(name));
-				child->object3D = circle;
-				item->appendRow(child);
-			}
-			else {
-				std::string finalName = view3D->view3DGL->scene->AddObject(circle);
-				name = QString::fromStdString(finalName);
-				TreeItem *item = new TreeItem(name);
-				item->object3D = circle;
-				model->appendRow(item);
-			}
-        } else if(selectedItem->text() == quadStr) {
-            QString name = QString("New ") + quadStr;
-            CoreEngine::Object3D* cone = CoreEngine::GetQuad(view3D->view3DGL->scene, name.toStdString(),  glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.5, 0.5, 0.5, 1));   
-			if (tree->currentIndex().isValid()) {
-				TreeItem* item = (TreeItem*)model->itemFromIndex(tree->currentIndex());
-				item->object3D->AddObject(cone);
-
-				TreeItem* child = new TreeItem(QString(name));
-				child->object3D = cone;
-				item->appendRow(child);
-			}
-			else {
-				std::string finalName = view3D->view3DGL->scene->AddObject(cone);
-				name = QString::fromStdString(finalName);
-				TreeItem *item = new TreeItem(name);
-				item->object3D = cone;
-				model->appendRow(item);
-			}
-		} else if (selectedItem->text() == emptyStr) {
-			QString name = QString("New ") + emptyStr;
-			CoreEngine::Object3D* emptyObj = new CoreEngine::Object3D(name.toStdString(), view3D->view3DGL->scene);
-			if (tree->currentIndex().isValid()) {
-				TreeItem* item = (TreeItem*)model->itemFromIndex(tree->currentIndex());
-				item->object3D->AddObject(emptyObj);
-
-				TreeItem* child = new TreeItem(QString(name));
-				child->object3D = emptyObj;
-				item->appendRow(child);
-			}
-			else {
-				std::string finalName = view3D->view3DGL->scene->AddObject(emptyObj);
-				name = QString::fromStdString(finalName);
-				TreeItem* item = new TreeItem(name);
-				item->object3D = emptyObj;
-				model->appendRow(item);
-			}
+			TreeItem* itemToAdd = new TreeItem(QString(name));
+			itemToAdd->object3D = objectToAdd;
+			parentItem->appendRow(itemToAdd);
 		}
+		else {
+			std::string finalName = view3D->view3DGL->scene->AddObject(objectToAdd);
+			name = QString::fromStdString(finalName);
+			TreeItem* itemToAdd = new TreeItem(name);
+
+			itemToAdd->object3D = objectToAdd;
+			model->appendRow(itemToAdd);
+		}
+
 		view3D->view3DGL->scene->triggerRefresh = true;
     }
 }

@@ -3,6 +3,7 @@
 
 namespace KikooRenderer 
 {
+
 View3D::View3D() : QDockWidget("3D View")
 {
     setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea | Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
@@ -15,6 +16,17 @@ View3D::View3D() : QDockWidget("3D View")
     
     root->setLayout(layout);
     setWidget(root);
+
+	setFocusPolicy(Qt::StrongFocus);
+	
         
 }
+void View3D::keyPressEvent(QKeyEvent* e) {
+	if (e->key() == Qt::Key_Space) {
+		QPoint pos = QCursor::pos();
+		sceneTree->ShowContextMenu(pos, true);
+	}
+
+	view3DGL->OnkeyPressEvent(e);
 }
+}	

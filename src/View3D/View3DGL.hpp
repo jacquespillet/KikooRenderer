@@ -25,6 +25,7 @@ class View3DGL: public QOpenGLWidget {
 
 		CoreEngine::Scene* scene; 
 
+		virtual void OnkeyPressEvent(QKeyEvent* e);
     protected: 
         int windowWidth;
         int windowHeight;
@@ -37,17 +38,16 @@ class View3DGL: public QOpenGLWidget {
         void paintGL();
 
 
-        //Event Listeners
-        virtual void keyPressEvent(QKeyEvent *e);
+        ////Event Listeners
         virtual void keyReleaseEvent(QKeyEvent *e);
         virtual void mousePressEvent(QMouseEvent *e);
         virtual void mouseReleaseEvent(QMouseEvent *e);
         virtual void mouseMoveEvent(QMouseEvent *e);
         virtual void wheelEvent(QWheelEvent *e);
 
-    //public slots: ??  
         void Refresh();
         void OnCloseEvent();
+
 };
 
 }

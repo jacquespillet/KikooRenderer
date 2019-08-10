@@ -82,9 +82,9 @@ namespace CoreEngine {
                 }
             }
         }
-        
+
         ogl->glStencilMask(0xFF);
-        ogl->glEnable(GL_DEPTH_TEST); 
+        ogl->glEnable(GL_DEPTH_TEST);
     }
 
     void Scene::OnUpdate() {
@@ -118,6 +118,7 @@ namespace CoreEngine {
                 }
             }
         }
+
         object->name = currentName;
         objects3D.push_back(object);
 
@@ -205,6 +206,7 @@ namespace CoreEngine {
     void Scene::HandleSelection(int x, int y) {
         Object3D* intersectedObject = GetIntersectObject(x, y);
         if(intersectedObject != nullptr) {
+			std::cout << intersectedObject->name << std::endl;
 			AddObjectToSelection(true, intersectedObject);
         } else if(!transformWidget->visible) { 
 			selectedObjects.resize(0); 

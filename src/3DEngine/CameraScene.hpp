@@ -10,6 +10,11 @@ class TransformComponent;
 class Scene;
 class CameraScene{
     public: 
+		enum ProjectionType {
+			Perspective,
+			Orthographic
+		};
+
         CameraScene(Scene* scene, double eyeDistance, double fov, double near, double far, double aspect);
         
 		CameraScene();
@@ -21,6 +26,8 @@ class CameraScene{
         double aspect;
         glm::mat4 projectionMatrix;
         TransformComponent* transform;
+
+		ProjectionType projectionType;
 
 
         glm::dmat4 GetProjectionMatrix();

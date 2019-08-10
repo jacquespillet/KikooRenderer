@@ -23,9 +23,10 @@ void MeshFilterComponent::OnRender(){
 	GETGL
 	//bind VAO	
 	ogl->glBindVertexArray(vertexArrayObject);
-	
-	//draw elements
-	ogl->glDrawElements(drawingMode, triangles.size(), GL_UNSIGNED_INT, (void*)0);
+
+	if (inited) {
+		ogl->glDrawElements(drawingMode, triangles.size(), GL_UNSIGNED_INT, (void*)0);
+	}
 	
 	//unbind VAO
 	ogl->glBindVertexArray(0);

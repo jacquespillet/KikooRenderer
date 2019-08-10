@@ -14,7 +14,6 @@ class SceneTree : public QDockWidget
     Q_OBJECT
     public: 
         SceneTree();
-        // View3DGL* view3DGL;
 		QWidget* layoutWindow;
         View3D* view3D;
 		SceneTreeView *tree;
@@ -22,13 +21,17 @@ class SceneTree : public QDockWidget
 
 
 	public slots:
-        void ShowContextMenu(const QPoint& pos);
+        void ShowContextMenu(const QPoint& pos, bool fromMainWindow=false);
+		void OnItemChanged(QStandardItem* item);
 };
 
 class TreeItem : public QObject, public QStandardItem  {
     Q_OBJECT
     public:
         TreeItem(QString name) : QStandardItem(name) {
+			setDragEnabled(true);
+			setDropEnabled(true);
+			setEditable(true);
         }
 		CoreEngine::Object3D* object3D;
 	public slots:   

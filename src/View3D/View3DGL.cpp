@@ -1,6 +1,8 @@
 #include "View3DGL.hpp"
 #include <ctime>
 
+#include "3DEngine/BaseObjects.hpp"
+
 
 #include <QOpenGLFunctions_3_2_Core>
 #define GLV QOpenGLFunctions_3_2_Core
@@ -130,22 +132,21 @@ namespace KikooRenderer {
         if(errstr != "NO ERROR") std::cerr << "View3DGL:GL ERROR " << errstr << std::endl;
     }
 
-
-
     void View3DGL::Refresh() {
         repaint();
         update();
     }
 
     //Event Listeners
-    void View3DGL::keyPressEvent(QKeyEvent *e) {
+    void View3DGL::OnkeyPressEvent(QKeyEvent *e) {
         scene->OnKeyPressEvent(e);
         Refresh();
     }
 
     void View3DGL::keyReleaseEvent(QKeyEvent *e) {
         scene->OnKeyReleaseEvent(e);
-    }
+		Refresh();
+	}
 
     void View3DGL::mousePressEvent(QMouseEvent *e) {
         scene->OnMousePressEvent(e);

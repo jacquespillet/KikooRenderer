@@ -21,6 +21,8 @@ CameraScene::CameraScene(Scene* _scene, double _eyeDistance, double _fov, double
     this->transform->position.y = 10;
     this->transform->position.z = -30;
 
+	projectionType = ProjectionType::Perspective;
+
 }
 
 glm::dvec3 CameraScene::GetPosition() {
@@ -40,7 +42,8 @@ glm::dmat4 CameraScene::GetModelTransform() {
 }
 
 void CameraScene::UpdateProjectionMatrix() {
-    this->projectionMatrix = glm::perspectiveLH(this->fov, this->aspect, this->nearClip, this->farClip);     
+	if(projectionType == ProjectionType::Perspective)  this->projectionMatrix = glm::perspectiveLH(this->fov, this->aspect, this->nearClip, this->farClip);     
+	else this->projectionMatrix = glm::orthoLH(-10.0, 10.0, -10.0, 10.0, 0.01, this->farClip);
 }
 
 void CameraScene::OnKeyPressEvent(QKeyEvent *e){
@@ -66,8 +69,18 @@ void CameraScene::OnKeyPressEvent(QKeyEvent *e){
             this->transform->position.x += glm::column(transform, 0).x * speedFactor;
             this->transform->position.y += glm::column(transform, 0).y * speedFactor;
             this->transform->position.z += glm::column(transform, 0).z * speedFactor;
-        } 
+        }
+
+
     }  
+
+	if (e->key() == Qt::Key_5) {
+		if (projectionType == ProjectionType::Perspective) projectionType = ProjectionType::Orthographic;
+		else projectionType = ProjectionType::Perspective;
+			
+		UpdateProjectionMatrix();
+
+	}
 }
 
 void CameraScene::OnMousePressEvent(QMouseEvent *e) {
