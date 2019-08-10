@@ -170,7 +170,7 @@ Object3D* Object3D::Intersects(Geometry::Ray ray, double& _distance) {
 	double minDistance = 9999999999999999;
 	Object3D* closest = nullptr;
 
-
+	//This code should be in bounding box : bb->intersectsRay();
 	BoundingBoxComponent* bb = (BoundingBoxComponent*) this->GetComponent("BoundingBox");
 	if(bb != nullptr) {
 		glm::dvec3 min;
@@ -178,17 +178,11 @@ Object3D* Object3D::Intersects(Geometry::Ray ray, double& _distance) {
 		bb->GetLocalBounds(&min, &max);
 
 		TransformComponent* transform = this->transform;
-		glm::dmat4 transformMat = transform->GetTransRotMatrix();
+		glm::dmat4 transformMat = transform->GetWorldTransRotMatrix();
 		
-		Object3D* currentObject = this;
-		while(currentObject->parent != nullptr) {
-			TransformComponent* parentTransform = currentObject->parent->transform;
-			glm::dmat4 parentTransformMat = parentTransform->GetTransRotMatrix();
-			transformMat = parentTransformMat * transformMat;
-			currentObject = currentObject->parent;
-		}
-		glm::dvec3 minScale = min * transform->scale;
-		glm::dvec3 maxScale = max * transform->scale;
+		glm::dvec3 worldScale = transform->GetWorldScale();
+		glm::dvec3 minScale = min * worldScale;
+		glm::dvec3 maxScale = max * worldScale;
 
 		double distance;
 		bool intersect = Util::RayBoxTest(ray.origin, ray.direction, transformMat, minScale, maxScale, distance);

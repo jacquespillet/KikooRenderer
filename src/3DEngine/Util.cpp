@@ -43,7 +43,6 @@ namespace Util {
 		double effectiveRadius = 0.5 * (std::abs(glm::dot(R, N)) + std::abs(glm::dot(S, N)) + std::abs(glm::dot(T, N)));
 		double dotPlaneCenter = glm::dot(planes.rightPlane, glm::dvec4(position, 1));
 		
-		//std::cout << dotPlaneCenter << " " << effectiveRadius << std::endl;
 		if (dotPlaneCenter <= -effectiveRadius) {
 			return false;
 		}

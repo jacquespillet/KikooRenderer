@@ -20,11 +20,12 @@ class TransformComponent : public Component {
         glm::dvec3 rotation;
         glm::dvec3 scale;
 
-        glm::dmat4 GetModelMatrix(); 
         glm::dmat4 GetTransRotMatrix(); 
+        glm::dmat4 GetModelMatrix(); 
         glm::dvec3 GetScale(); 
-        glm::mat4 GetWorldModelMatrix();
         
+        glm::mat4 GetWorldModelMatrix();
+        glm::dmat4 GetWorldTransRotMatrix(); 
 		glm::dvec3 GetWorldPosition();
 		glm::dvec3 GetWorldScale();
 

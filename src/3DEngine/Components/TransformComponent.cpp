@@ -81,13 +81,33 @@ glm::dvec3 TransformComponent::GetWorldPosition() {
 }
 
 glm::dvec3 TransformComponent::GetWorldScale() {
-	glm::dmat4 worldModelMat = GetWorldModelMatrix();
-	double x = worldModelMat[0][0];
-	double y = worldModelMat[1][1];
-	double z = worldModelMat[2][2];
-
-	return glm::dvec3(x, y, z);
+	glm::dvec3 worldScale = scale;
+	Object3D* currentObject = object3D;
+	while (currentObject->parent != nullptr) {
+		glm::dvec3 parentScale = currentObject->parent->transform->scale;
+		worldScale *= parentScale ;
+		currentObject = currentObject->parent;
+	}
+	return worldScale;
 }
+
+glm::dmat4 TransformComponent::GetWorldTransRotMatrix() {
+	glm::dmat4 transformMat = GetTransRotMatrix();
+	Object3D* currentObject = object3D;
+	while (currentObject->parent != nullptr) {
+		glm::dmat4 parentTransformMat = currentObject->parent->transform->GetTransRotMatrix();
+		transformMat = parentTransformMat * transformMat;		
+		currentObject = currentObject->parent;
+	}
+
+	glm::dvec3 wPos = GetWorldPosition();
+
+	transformMat[3][0] = wPos.x;
+	transformMat[3][1] = wPos.y;
+	transformMat[3][2] = wPos.z;
+	return transformMat;
+}
+
 
 void TransformComponent::SetWorldX(double x) {
 	if (object3D->parent == nullptr) {
@@ -117,7 +137,7 @@ void TransformComponent::SetWorldZ(double z) {
 	}
 	else {
 		glm::dvec3 parentPos = object3D->parent->transform->GetWorldPosition();
-		double scaleFac = object3D->parent->transform->GetWorldScale().y;
+		double scaleFac = object3D->parent->transform->GetWorldScale().z;
 		this->position.z = (z - parentPos.z) / scaleFac;
 	}
 }
