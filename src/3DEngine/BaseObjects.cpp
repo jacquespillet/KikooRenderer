@@ -591,9 +591,6 @@ Object3D* GetWireCircle(Scene* scene, std::string name, glm::dvec3 _position, gl
 		triangles.push_back(i - 1);
 	}
 
-	triangles.push_back(numSlices);
-	triangles.push_back(1);
-	triangles.push_back(0);
 	//Setup mesh
 	MeshFilterComponent* mesh = new MeshFilterComponent(newObject);
 	mesh->LoadFromBuffers(vertex, normals, uv, colors, triangles);

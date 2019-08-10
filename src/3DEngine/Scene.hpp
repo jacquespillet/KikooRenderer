@@ -54,11 +54,7 @@ class Scene {
 
 		std::vector<Object3D*> selectedObjects;
 
-		TransformWidget* tg;
-		Object3D* transformWidget;
-
-		Object3D* scaleWidget;
-		Object3D* rotationWidget;
+		TransformWidget* transformWidget;
 
 		bool isTransforming = false;
 
@@ -67,16 +63,11 @@ class Scene {
 		void AddObjectToSelection(bool erasePrevious, Object3D* selectedObject);
 		void ClearSelection();
 
+		bool isControlKey = false;
+
 
 	protected:
 		Object3D* GetIntersectObject(int x, int y);
-
-		
-		void TransformSelection(QMouseEvent *e);
-		bool isFirstTransformFrame;
-		//double transformOffset;
-		//TRANSFORM_MODE transformMode = TRANSFORM_MODE::TRANSLATE;
-		//TRANSFORM_AXIS transformAxis;
 };
 
 }

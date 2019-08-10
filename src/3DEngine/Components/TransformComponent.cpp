@@ -80,13 +80,23 @@ glm::dvec3 TransformComponent::GetWorldPosition() {
 	return pos;
 }
 
+glm::dvec3 TransformComponent::GetWorldScale() {
+	glm::dmat4 worldModelMat = GetWorldModelMatrix();
+	double x = worldModelMat[0][0];
+	double y = worldModelMat[1][1];
+	double z = worldModelMat[2][2];
+
+	return glm::dvec3(x, y, z);
+}
+
 void TransformComponent::SetWorldX(double x) {
 	if (object3D->parent == nullptr) {
 		this->position.x = x;
 	}
 	else {
 		glm::dvec3 parentPos = object3D->parent->transform->GetWorldPosition();
-		this->position.x = x - parentPos.x;
+		double scaleFac = object3D->parent->transform->GetWorldScale().x;
+		this->position.x = (x - parentPos.x) / scaleFac;
 	}
 }
 
@@ -96,7 +106,8 @@ void TransformComponent::SetWorldY(double y) {
 	}
 	else {
 		glm::dvec3 parentPos = object3D->parent->transform->GetWorldPosition();
-		this->position.y = y - parentPos.y;
+		double scaleFac = object3D->parent->transform->GetWorldScale().y;
+		this->position.y = (y - parentPos.y) / scaleFac;
 	}
 }
 
@@ -106,7 +117,8 @@ void TransformComponent::SetWorldZ(double z) {
 	}
 	else {
 		glm::dvec3 parentPos = object3D->parent->transform->GetWorldPosition();
-		this->position.z = z - parentPos.z;
+		double scaleFac = object3D->parent->transform->GetWorldScale().y;
+		this->position.z = (z - parentPos.z) / scaleFac;
 	}
 }
 }

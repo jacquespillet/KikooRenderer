@@ -144,7 +144,7 @@ namespace KikooRenderer {
     }
 
     void View3DGL::keyReleaseEvent(QKeyEvent *e) {
-
+        scene->OnKeyReleaseEvent(e);
     }
 
     void View3DGL::mousePressEvent(QMouseEvent *e) {

@@ -26,6 +26,8 @@ class TransformComponent : public Component {
         glm::mat4 GetWorldModelMatrix();
         
 		glm::dvec3 GetWorldPosition();
+		glm::dvec3 GetWorldScale();
+
 		void SetWorldX(double x);
 		void SetWorldY(double y);
 		void SetWorldZ(double z);

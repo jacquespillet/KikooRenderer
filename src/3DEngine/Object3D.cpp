@@ -56,6 +56,10 @@ std::string Object3D::AddObject(Object3D* object) {
 	return currentName;
 }
 
+void Object3D::ClearObjects() {
+	childObjects.resize(0);
+}
+
 void Object3D::Start() {
 	for(int i=0; i<childObjects.size(); i++) {
 		childObjects[i]->Start();

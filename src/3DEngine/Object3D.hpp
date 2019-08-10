@@ -32,6 +32,7 @@ class Object3D {
         Object3D(std::string name, Scene* scene);
         void AddComponent(Component* component);
         std::string AddObject(Object3D* object);
+		void ClearObjects();
         Component*  GetComponent(std::string name);
 
         void Start();
