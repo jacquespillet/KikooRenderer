@@ -35,29 +35,40 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 	shaderLayout->addWidget(shaderList);
 	mainLayout->addLayout(shaderLayout);
 
-	connect(shaderList, SIGNAL(currentIndexChanged(int)), [this](int index) {
-
+	connect(shaderList, static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged), this, [this, materialComponent](int index) {
+		std::cout << "Changge shader" << index << std::endl;
+		materialComponent->shader = &scene->standardShaders.gouraudShader;
 	});
-
 
 	ColorPicker* albedoPicker = new ColorPicker("Albedo", 210, 15, 60, 255);
-	connect(albedoPicker, &ColorPicker::ColorPicked, this, [this](QColor color) {
-		//Change albedo color here
+	connect(albedoPicker, &ColorPicker::ColorPicked, this, [this, materialComponent](QColor color) {
+		glm::dvec4 albedoVec = glm::dvec4(color.red(), color.green(), color.blue(), color.alpha()) * 0.00392156;
+		materialComponent->albedo = albedoVec;
 	});
+
 	mainLayout->addWidget(albedoPicker);
 
 	//Albedo tex
 	FilePicker* albedoTexPicker = new FilePicker("Albedo Texture");
 	mainLayout->addWidget(albedoTexPicker);
+	connect(albedoTexPicker, &FilePicker::FileModified, this, [this](QString string) {
+		std::cout << "laod qlbedo texture" << string.toStdString() << std::endl;
+	});
+
 
 	//Albedo Map
 	FilePicker* specularPicker = new FilePicker("Specular Texture");
 	mainLayout->addWidget(specularPicker);
+	connect(specularPicker, &FilePicker::FileModified, this, [this](QString string) {
+		std::cout << "laod specular texture" << string.toStdString() << std::endl;
+	});
 
 	//Normal Map
 	FilePicker* normalTexPicker = new FilePicker("Normal Texture");
 	mainLayout->addWidget(normalTexPicker);
-
+	connect(normalTexPicker, &FilePicker::FileModified, this, [this](QString string) {
+		std::cout << "laod normal texture" << string.toStdString() << std::endl;
+	});
 }
 
 void MaterialInspector::Refresh() {}
