@@ -24,6 +24,7 @@ class View3DRoot: public QWidget
 };
 
 class SceneTree;
+class View3DGL;
 class View3D : public QDockWidget
 {
     Q_OBJECT

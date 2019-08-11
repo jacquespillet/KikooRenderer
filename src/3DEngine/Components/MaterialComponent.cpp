@@ -13,11 +13,61 @@
 namespace KikooRenderer {
 namespace CoreEngine {
 
+MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGroupBox("Material") {
+	this->materialComponent = materialComponent;
+	Object3D* object = materialComponent->object3D;
+	scene = object->scene;
+
+	QVBoxLayout* mainLayout = new QVBoxLayout();
+	setLayout(mainLayout);
+
+	//Shader
+	QHBoxLayout* shaderLayout = new QHBoxLayout();
+	QComboBox* shaderList = new QComboBox();
+	QLabel* shaderLabel = new QLabel("Shader");
+	for (int i = 0; i < scene->standardShaders.numShaders; i++) {
+		shaderList->addItem(QString::fromStdString(scene->standardShaders.ids[i]));
+
+	}
+	int shaderInx = materialComponent->shader->GetId();
+	shaderList->setCurrentIndex(shaderInx);
+	shaderLayout->addWidget(shaderLabel);
+	shaderLayout->addWidget(shaderList);
+	mainLayout->addLayout(shaderLayout);
+
+	connect(shaderList, SIGNAL(currentIndexChanged(int)), [this](int index) {
+
+	});
+
+
+	ColorPicker* albedoPicker = new ColorPicker("Albedo", 210, 15, 60, 255);
+	connect(albedoPicker, &ColorPicker::ColorPicked, this, [this](QColor color) {
+		//Change albedo color here
+	});
+	mainLayout->addWidget(albedoPicker);
+
+	//Albedo tex
+	FilePicker* albedoTexPicker = new FilePicker("Albedo Texture");
+	mainLayout->addWidget(albedoTexPicker);
+
+	//Albedo Map
+	FilePicker* specularPicker = new FilePicker("Specular Texture");
+	mainLayout->addWidget(specularPicker);
+
+	//Normal Map
+	FilePicker* normalTexPicker = new FilePicker("Normal Texture");
+	mainLayout->addWidget(normalTexPicker);
+
+}
+
+void MaterialInspector::Refresh() {}
+
 MaterialComponent::MaterialComponent(Object3D* object) : Component("Material", object), specularTex(), albedoTex(), normalTex() {
     inited= false;
     influence = 1.0;
     albedo = glm::dvec4(1.0, 1.0, 1.0, 1.0);
 }
+
 
 void MaterialComponent::OnStart(){}
 void MaterialComponent::OnEnable(){}
@@ -25,6 +75,12 @@ void MaterialComponent::OnUpdate(){}
 void MaterialComponent::OnRender(){} 
 void MaterialComponent::OnDestroy(){} 
 void MaterialComponent::Recompute(){} 
+
+MaterialInspector* MaterialComponent::GetInspector() {
+	materialInspector = new MaterialInspector(this);
+	return materialInspector;
+}
+
 
 
 void MaterialComponent::SetShader(Shader* shader) {

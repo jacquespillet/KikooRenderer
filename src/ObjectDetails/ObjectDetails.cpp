@@ -1,6 +1,7 @@
 #include "ObjectDetails.hpp"
 #include "3DEngine/Scene.hpp"
 #include "3DEngine/Components/TransformComponent.hpp"
+#include "3DEngine/Components/MaterialComponent.hpp"
 
 namespace KikooRenderer
 {
@@ -79,6 +80,13 @@ namespace KikooRenderer
 
 		CoreEngine::TransformInspector* transformInspector = currentObject->transform->GetInspector();
 		rootWidget->mainLayout->addWidget(transformInspector);
+
+		CoreEngine::MaterialComponent * material = (CoreEngine::MaterialComponent*)(currentObject->GetComponent("Material"));
+		CoreEngine::MaterialInspector* materialInspector = material->GetInspector();
+		rootWidget->mainLayout->addWidget(materialInspector);
+
+
+
 	}
 
 	void ObjectDetailsPanel::Refresh() {
