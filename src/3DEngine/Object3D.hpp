@@ -24,6 +24,7 @@ class Object3D {
         bool enabled;
         bool started;
         bool depthTest = true;
+		bool isStatic = true;
 
         bool hasToRecompute=false;
 

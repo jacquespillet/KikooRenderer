@@ -6,8 +6,9 @@ namespace KikooRenderer {
         view3D= new View3D;
         sceneTree= new SceneTree;
 		objectDetails = new ObjectDetailsPanel;
-		view3D->objectDetailsPanel = objectDetails;
 
+		view3D->view3DGL->scene->objectDetailsPanel = objectDetails;
+		objectDetails->sceneTree = sceneTree;
         sceneTree->view3D = view3D;
         view3D->sceneTree = sceneTree;
 

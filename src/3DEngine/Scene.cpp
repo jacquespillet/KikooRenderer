@@ -59,12 +59,12 @@ namespace CoreEngine {
 
 		// Render each object
         for(int i=0; i<objects3D.size(); i++) {
-            if(objects3D[i]->visible && objects3D[i]) {
+            if(objects3D[i] && objects3D[i]->visible ) {
                 objects3D[i]->Render(); 
             }
         }
 
-        if(transformWidget->visible) transformWidget->Render();
+        if(transformWidget->visible && selectedObjects.size() > 0 && selectedObjects[0]->visible) transformWidget->Render();
 
         ogl->glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
         ogl->glStencilMask(0x00); 
@@ -230,14 +230,16 @@ namespace CoreEngine {
 		else {
 			selectedObjects.push_back(intersectedObject);
 		}
-
 		TransformComponent* objectTransform = intersectedObject->transform;
 		transformWidget->SetObject(intersectedObject);
+
+		objectDetailsPanel->SetObject(intersectedObject);
 	}
 
 	void Scene::ClearSelection() {
 		selectedObjects.resize(0);
 		transformWidget->Disable();
+		objectDetailsPanel->Clear();
 	}
 
 

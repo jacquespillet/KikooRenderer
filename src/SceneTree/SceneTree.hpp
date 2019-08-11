@@ -19,6 +19,8 @@ class SceneTree : public QDockWidget
 		SceneTreeView *tree;
         QStandardItemModel* model;
 
+		void Refresh();
+
 	protected:
 		virtual void keyPressEvent(QKeyEvent* e);
 	public slots:
@@ -34,8 +36,14 @@ class TreeItem : public QObject, public QStandardItem  {
 			setDropEnabled(true);
 			setEditable(true);
         }
+		void Refresh() {
+			setText(QString::fromStdString(object3D->name));
+			for (int i = 0; i < rowCount(); i++) {
+				TreeItem* child = (TreeItem*) this->child(i, 0);
+				child->Refresh();
+			}
+		}
 		CoreEngine::Object3D* object3D;
-	public slots:   
 };
 
 class SceneTreeView : public QTreeView

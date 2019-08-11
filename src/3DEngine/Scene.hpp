@@ -25,7 +25,6 @@ class Scene {
 		std::vector<Object3D*> lightObjects; 
 		StandardShaders standardShaders;
 		CameraScene* camera;
-		KikooRenderer::ObjectDetailsPanel* objectDetailsPanel;
 
 		bool test = false;
 
@@ -68,6 +67,7 @@ class Scene {
 
 		bool isControlKey = false;
 
+		KikooRenderer::ObjectDetailsPanel* objectDetailsPanel;
 
 	protected:
 		Object3D* GetIntersectObject(int x, int y);

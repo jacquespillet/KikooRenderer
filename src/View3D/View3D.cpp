@@ -10,8 +10,8 @@ View3D::View3D() : QDockWidget("3D View")
     root = new View3DRoot;
     QVBoxLayout* layout = new QVBoxLayout;
 
+
     view3DGL = new View3DGL;
-	view3DGL->scene->objectDetailsPanel = objectDetailsPanel;
 
     layout->addWidget(view3DGL);
 

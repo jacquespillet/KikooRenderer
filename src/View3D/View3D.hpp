@@ -30,7 +30,6 @@ class View3D : public QDockWidget
     public: 
         View3D();
         SceneTree* sceneTree;
-		ObjectDetailsPanel* objectDetailsPanel;
 
         View3DGL* view3DGL;
         View3DRoot* root;

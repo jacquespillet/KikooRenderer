@@ -2,33 +2,63 @@
 
 #include "Util/Common.h"
 #include "3DEngine/Object3D.hpp"
+#include "SceneTree/SceneTree.hpp"
 
 namespace KikooRenderer {
+class View3D;
+class SceneTree;
+class ObjectDetailRoot;
+class ObjectDetailsPanel;
 
-	class View3D;
+//Widget for object "general" parameters
+class ObjectDetails : public QGroupBox {
+	Q_OBJECT
+public:
+	ObjectDetails(CoreEngine::Object3D* _object, ObjectDetailRoot* _root);
 
-	class ObjectDetails : public QWidget {
-	public: 
-		ObjectDetails(CoreEngine::Object3D* object) : QWidget() {
-			QHBoxLayout* mainLayout = new QHBoxLayout();
-
-			QLabel* label = new QLabel(QString::fromStdString(object->name));
-			QCheckBox* checkBox = new QCheckBox();
-			mainLayout->addWidget(label);
-			mainLayout->addWidget(checkBox);
-
-			setLayout(mainLayout);
-		}
-	};
+	CoreEngine::Object3D* object;
+	ObjectDetailRoot* root;
 
 
-	class ObjectDetailsPanel : public QDockWidget
-	{
-		Q_OBJECT
-	public:
-		ObjectDetailsPanel();
+signals:
+	void InspectorModified();
+};
 
-		QWidget* mainWidget;
-		QVBoxLayout* mainLayout;
-	};
+//Root widget of the dock
+class ObjectDetailRoot : public QWidget {
+	Q_OBJECT
+public:
+	ObjectDetailRoot();
+	
+	ObjectDetailsPanel* dockWidget;
+
+	QVBoxLayout* mainLayout;
+	void ClearWidgets();
+
+	QSize sizeHint() const {
+		return QSize(200, 0);
+	}
+
+
+signals:
+	void InspectorModified();
+};
+
+//Dock widget
+class ObjectDetailsPanel : public QDockWidget
+{
+	Q_OBJECT
+public:
+	ObjectDetailsPanel();
+	void SetObject(CoreEngine::Object3D* _object);
+	void Clear();
+
+	SceneTree* sceneTree;
+
+	ObjectDetailRoot* rootWidget;
+	CoreEngine::Object3D* currentObject;
+
+signals: 
+	void InspectorModified();
+};
 }

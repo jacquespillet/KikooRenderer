@@ -34,6 +34,13 @@ void SceneTree::OnItemChanged(QStandardItem* item) {
 	treeItem->object3D->name = treeItem->text().toStdString();
 }
 
+void SceneTree::Refresh() {
+	for (int i = 0; i < model->rowCount(); i++) {
+		TreeItem* item = (TreeItem*) model->item(i, 0);
+		item->Refresh();
+	}
+}
+
 //Handles menu Creation
 void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
 {   
@@ -111,7 +118,6 @@ void SceneTreeView::mousePressEvent(QMouseEvent *event) {
 }
 
 void SceneTree::keyPressEvent(QKeyEvent* e) {
-
 	if (e->key() == Qt::Key_Delete) {
 		QModelIndexList	selectedIndexes = tree->selectionModel()->selectedIndexes();
 		if (selectedIndexes.size() > 0) {
