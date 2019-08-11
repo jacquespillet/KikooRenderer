@@ -36,7 +36,7 @@ public:
 	void ClearWidgets();
 
 	QSize sizeHint() const {
-		return QSize(200, 0);
+		return QSize(250, 0);
 	}
 
 
@@ -57,6 +57,8 @@ public:
 
 	ObjectDetailRoot* rootWidget;
 	CoreEngine::Object3D* currentObject;
+
+	void Refresh();
 
 signals: 
 	void InspectorModified();

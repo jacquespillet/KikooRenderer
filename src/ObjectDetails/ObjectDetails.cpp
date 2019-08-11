@@ -1,5 +1,6 @@
 #include "ObjectDetails.hpp"
 #include "3DEngine/Scene.hpp"
+#include "3DEngine/Components/TransformComponent.hpp"
 
 namespace KikooRenderer
 {
@@ -75,6 +76,13 @@ namespace KikooRenderer
 		connect(rootWidget, &ObjectDetailRoot::InspectorModified, [this]() {
 			currentObject->scene->triggerRefresh = true;
 		});
+
+		CoreEngine::TransformInspector* transformInspector = currentObject->transform->GetInspector();
+		rootWidget->mainLayout->addWidget(transformInspector);
+	}
+
+	void ObjectDetailsPanel::Refresh() {
+		currentObject->transform->transformInspector->Refresh();
 	}
 
 	void ObjectDetailsPanel::Clear() {

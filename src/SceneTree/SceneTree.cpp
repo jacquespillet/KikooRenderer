@@ -4,6 +4,36 @@
 
 namespace KikooRenderer 
 {
+
+void TreeItem::Refresh() {
+	setText(QString::fromStdString(object3D->name));
+	for (int i = 0; i < rowCount(); i++) {
+		TreeItem* child = (TreeItem*)this->child(i, 0);
+		child->Refresh();
+	}
+}
+
+void TreeItem::Delete() {
+	CoreEngine::Scene* scene = object3D->scene;
+	scene->RemoveObject(object3D);
+
+	for (int i = 0; i < rowCount(); i++) {
+		TreeItem* item =(TreeItem*) child(i, 0);
+		item->Delete();
+	}
+
+	if (QStandardItem* parent = QStandardItem::parent()) {
+		parent->removeRow(row());
+	}
+	else {
+		model()->removeRow(row());
+	}
+
+
+	scene->triggerRefresh = true;
+	scene->transformWidget->Disable();
+}
+
 SceneTree::SceneTree() : QDockWidget("Scene")
 {
     setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea | Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
@@ -32,6 +62,7 @@ SceneTree::SceneTree() : QDockWidget("Scene")
 void SceneTree::OnItemChanged(QStandardItem* item) {
 	TreeItem* treeItem = (TreeItem*)item;
 	treeItem->object3D->name = treeItem->text().toStdString();
+	treeItem->object3D->scene->objectDetailsPanel->Refresh();
 }
 
 void SceneTree::Refresh() {
@@ -122,9 +153,8 @@ void SceneTree::keyPressEvent(QKeyEvent* e) {
 		QModelIndexList	selectedIndexes = tree->selectionModel()->selectedIndexes();
 		if (selectedIndexes.size() > 0) {
 			TreeItem* parentItem = (TreeItem*)model->itemFromIndex(selectedIndexes[0]);
-			view3D->view3DGL->scene->RemoveObject(parentItem->object3D);
-			model->removeRow(selectedIndexes[0].row());
-			view3D->view3DGL->scene->triggerRefresh = true;
+			parentItem->Delete();
+
 		}
 	}
 }

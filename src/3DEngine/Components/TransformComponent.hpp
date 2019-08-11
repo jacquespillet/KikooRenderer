@@ -5,6 +5,41 @@
 namespace KikooRenderer {
 namespace CoreEngine {
 class Object3D;
+class TransformComponent;
+class Scene;
+
+class TransformInspector : public QGroupBox {
+	Q_OBJECT
+public:
+	TransformInspector(TransformComponent* transformComponent);
+	TransformComponent* transformComponent;
+	Scene* scene;
+
+	QDoubleSpinBox* xPositionSpinBox;
+	QDoubleSpinBox* yPositionSpinBox;
+	QDoubleSpinBox* zPositionSpinBox;
+	QDoubleSpinBox* xRotationSpinBox;
+	QDoubleSpinBox* yRotationSpinBox;
+	QDoubleSpinBox* zRotationSpinBox;
+	QDoubleSpinBox* xScaleSpinBox;
+	QDoubleSpinBox* yScaleSpinBox;
+	QDoubleSpinBox* zScaleSpinBox;
+
+
+	void Refresh();
+public slots:
+	void SetScaleX(double x);
+	void SetScaleY(double y);
+	void SetScaleZ(double z);
+
+	void SetRotationX(double x);
+	void SetRotationY(double y);
+	void SetRotationZ(double z);
+
+	void SetPositionX(double x);
+	void SetPositionY(double y);
+	void SetPositionZ(double z);
+};
 
 class TransformComponent : public Component {
     public: 
@@ -15,6 +50,8 @@ class TransformComponent : public Component {
         void OnRender();
         void OnDestroy();
 		void Recompute();
+
+		TransformInspector* GetInspector();
 
         glm::dvec3 position;
         glm::dvec3 rotation;
@@ -34,6 +71,8 @@ class TransformComponent : public Component {
 		void SetWorldZ(double z);
 
         bool isScreenSize = false;
+
+		TransformInspector* transformInspector;
 };
 }
 }

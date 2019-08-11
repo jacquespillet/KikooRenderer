@@ -36,13 +36,9 @@ class TreeItem : public QObject, public QStandardItem  {
 			setDropEnabled(true);
 			setEditable(true);
         }
-		void Refresh() {
-			setText(QString::fromStdString(object3D->name));
-			for (int i = 0; i < rowCount(); i++) {
-				TreeItem* child = (TreeItem*) this->child(i, 0);
-				child->Refresh();
-			}
-		}
+		void Refresh();
+		void Delete();
+
 		CoreEngine::Object3D* object3D;
 };
 

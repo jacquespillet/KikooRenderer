@@ -126,6 +126,7 @@ namespace CoreEngine {
 				} else if (transformMode == TransformMode::ROTATE) {
 					HandleRotate(e, objectTransform);
 				}
+				scene->objectDetailsPanel->Refresh();
 			}
 		}
 	}

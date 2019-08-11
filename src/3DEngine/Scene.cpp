@@ -64,7 +64,10 @@ namespace CoreEngine {
             }
         }
 
-        if(transformWidget->visible && selectedObjects.size() > 0 && selectedObjects[0]->visible) transformWidget->Render();
+		if (transformWidget->visible && selectedObjects.size() > 0 && selectedObjects[0]->visible) {
+			transformWidget->transform = selectedObjects[0]->transform;
+			transformWidget->Render();
+		}
 
         ogl->glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
         ogl->glStencilMask(0x00); 
