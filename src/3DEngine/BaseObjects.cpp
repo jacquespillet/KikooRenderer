@@ -5,6 +5,7 @@
 #include "Components/FluidComponent.hpp"
 #include "Components/MeshFilterComponent.hpp"
 #include "Components/TransformComponent.hpp"
+#include "Components/LightComponent.hpp"
 
 
 namespace KikooRenderer {
@@ -1382,6 +1383,38 @@ Object3D* GetNURBS(Scene* scene, std::string name,glm::dvec3 _position, glm::dve
 
 Object3D* GetBezierSurface(Scene* scene, std::string name,glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color, std::vector<glm::dvec4> controlPoints) {
     return nullptr;
+}
+
+
+Object3D* GetDirectionalLight(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
+	Object3D* dirLight = new Object3D(name, scene);
+	dirLight->transform->position = _position;
+	dirLight->transform->rotation = _rotation;
+	dirLight->transform->scale = _scale;
+	LightComponent* lightComponent = new LightComponent(dirLight, _color, glm::dvec3(0.25, 0.05, 0.001), 0);
+	dirLight->AddComponent(lightComponent);
+	return dirLight;
+}
+
+Object3D* GetPointLight(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
+	Object3D* pointLight = new Object3D(name, scene);
+	pointLight->transform->position = _position;
+	pointLight->transform->rotation = _rotation;
+	pointLight->transform->scale = _scale;
+	LightComponent* lightComponent = new LightComponent(pointLight, _color, glm::dvec3(0.25, 0.05, 0.001), 1);
+	pointLight->AddComponent(lightComponent);
+	return pointLight;
+}
+
+Object3D* GetSpotLight(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color, double FOV) {
+	Object3D* spotLight = new Object3D(name, scene);
+	spotLight->transform->position = _position;
+	spotLight->transform->rotation = _rotation;
+	spotLight->transform->scale = _scale;
+	LightComponent* lightComponent = new LightComponent(spotLight, _color, glm::dvec3(0.25, 0.05, 0.001), 2);
+	lightComponent->fov = FOV;
+	spotLight->AddComponent(lightComponent);
+	return spotLight;
 }
 
 }

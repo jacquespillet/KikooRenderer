@@ -4,6 +4,7 @@
 #include "Geometry/Ray.hpp"
 #include "Framebuffer.hpp"
 #include "Components/MaterialComponent.hpp"
+#include "Components/LightComponent.hpp"
 
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLFunctions_3_2_Core>
@@ -31,7 +32,9 @@ namespace CoreEngine {
 
 		transformWidget = new TransformWidget(this);
 		transformWidget->Enable();
-		
+
+		Object3D* dirLight = GetDirectionalLight(this, "Main light", glm::dvec3(0), glm::dvec3(40, 170, 0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
+		AddObject(dirLight);
 	
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
@@ -65,7 +68,6 @@ namespace CoreEngine {
         }
 
 		if (transformWidget->visible && selectedObjects.size() > 0 && selectedObjects[0]->visible) {
-			transformWidget->transform = selectedObjects[0]->transform;
 			transformWidget->Render();
 		}
 
@@ -125,6 +127,11 @@ namespace CoreEngine {
         object->name = currentName;
         objects3D.push_back(object);
 
+		LightComponent* light = (LightComponent*) object->GetComponent("Light");
+		if (light != nullptr) {
+			lightObjects.push_back(object);
+		}
+
         return currentName;
     }
 
@@ -140,6 +147,17 @@ namespace CoreEngine {
                 break;
             }
         }
+
+		LightComponent* light = (LightComponent*)object->GetComponent("Light");
+		if (light != nullptr) {
+			for (int i = 0; i < lightObjects.size(); i++) {
+				if (objects3D[i] == object) {
+					delete lightObjects[i];
+					objects3D.erase(objects3D.begin() + i);
+					break;
+				}
+			}
+		}
     }
 
 

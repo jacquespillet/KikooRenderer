@@ -42,5 +42,12 @@ namespace CoreEngine {
 
     Object3D* GetBezierSurface(Scene* scene, std::string name,glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color, std::vector<glm::dvec4> controlPoints);
 
+	//Lights
+	Object3D* GetDirectionalLight(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color);
+
+	Object3D* GetPointLight(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color);
+
+	Object3D* GetSpotLight(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color, double FOV);
+
 }
 }

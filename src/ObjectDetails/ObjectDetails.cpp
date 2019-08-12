@@ -82,8 +82,10 @@ namespace KikooRenderer
 		rootWidget->mainLayout->addWidget(transformInspector);
 
 		CoreEngine::MaterialComponent * material = (CoreEngine::MaterialComponent*)(currentObject->GetComponent("Material"));
-		CoreEngine::MaterialInspector* materialInspector = material->GetInspector();
-		rootWidget->mainLayout->addWidget(materialInspector);
+		if (material != nullptr) {
+			CoreEngine::MaterialInspector* materialInspector = material->GetInspector();
+			rootWidget->mainLayout->addWidget(materialInspector);
+		}
 
 
 

@@ -18,6 +18,7 @@ class LightComponent : public Component {
         int type; //0 directional, 1 point, 2 spot
         glm::dvec3 attenuation;
         glm::dvec4 color;
+		double fov;
 };
 }
 }

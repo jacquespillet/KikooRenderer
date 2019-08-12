@@ -9,6 +9,11 @@ namespace CoreEngine
 {
 enum SHADER_IDS { UNLIT=0, SELECTED = 1, GOURAUD = 2, BLINNPHONG = 3, PBR = 4};
 
+struct gouraudParams {
+	float albedoInfluence;
+	std::string textureStr;
+};
+
 class StandardShaders
 {
     public:         

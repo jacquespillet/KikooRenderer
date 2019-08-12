@@ -36,7 +36,6 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 	mainLayout->addLayout(shaderLayout);
 
 	connect(shaderList, static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged), this, [this, materialComponent](int index) {
-		std::cout << "Changge shader" << index << std::endl;
 		materialComponent->shader = &scene->standardShaders.gouraudShader;
 	});
 
@@ -51,8 +50,8 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 	//Albedo tex
 	FilePicker* albedoTexPicker = new FilePicker("Albedo Texture");
 	mainLayout->addWidget(albedoTexPicker);
-	connect(albedoTexPicker, &FilePicker::FileModified, this, [this](QString string) {
-		std::cout << "laod qlbedo texture" << string.toStdString() << std::endl;
+	connect(albedoTexPicker, &FilePicker::FileModified, this, [this, &materialComponent](QString string) {
+		Texture tex = KikooRenderer::CoreEngine::Texture(string.toStdString(), GL_TEXTURE0);
 	});
 
 
@@ -76,7 +75,12 @@ void MaterialInspector::Refresh() {}
 MaterialComponent::MaterialComponent(Object3D* object) : Component("Material", object), specularTex(), albedoTex(), normalTex() {
     inited= false;
     influence = 1.0;
-    albedo = glm::dvec4(1.0, 1.0, 1.0, 1.0);
+    albedo = glm::dvec4(0.75, 0.75, 0.75, 1.0);
+
+	ambientFactor = 0.2;
+	diffuseFactor = 0.3;
+	specularFactor = 1.0;
+	shininess = 128;
 }
 
 
@@ -107,6 +111,19 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 	
     int influenceLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "materialInfluence"); 
 	ogl->glUniform1f(influenceLocation, influence);
+
+	int ambientFactorLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "ambientFactor");
+	ogl->glUniform1f(ambientFactorLocation, ambientFactor);
+
+	int diffuseFactorLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "diffuseFactor");
+	ogl->glUniform1f(diffuseFactorLocation, diffuseFactor);
+
+	int specularFactorLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "specularFactor");
+	ogl->glUniform1f(specularFactorLocation, specularFactor);
+
+	int shininessLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "shininess");
+	ogl->glUniform1f(shininessLocation, shininess);
+
 
 	int modelViewProjectionMatrixLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "modelViewProjectionMatrix"); 
 	ogl->glUniformMatrix4fv(modelViewProjectionMatrixLocation, 1, false, glm::value_ptr(mvpMatrix));
@@ -143,7 +160,7 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 
             int hasSpecularTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasSpecularTex"); 
             ogl->glUniform1i(hasSpecularTexLocation, 1);
-        }   else {
+        } else {
             int hasSpecularTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasSpecularTex"); 
             ogl->glUniform1i(hasSpecularTexLocation, 0);
         }
@@ -177,6 +194,7 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
                 varName = "lights[" + std::to_string(i) + "].direction";
                 loc = ogl->glGetUniformLocation(this->shader->programShaderObject, varName.c_str());
                 ogl->glUniform3fv(loc, 1, glm::value_ptr(glm::vec3(glm::column(transformComponent->GetModelMatrix(), 2))));
+				//std::cout << glm::to_string(transformComponent->GetModelMatrix()) << std::endl;
 
 
                 varName = "lights[" + std::to_string(i) + "].attenuation";

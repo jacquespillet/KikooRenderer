@@ -42,7 +42,6 @@ public:
 
 		setLayout(mainLayout);
 	}
-
 signals:
 	QColor ColorPicked(QColor color);
 
@@ -128,6 +127,11 @@ class MaterialComponent : public Component {
         Texture albedoTex;
         Texture specularTex;
         Texture normalTex;
+
+		float ambientFactor;
+		float diffuseFactor;
+		float specularFactor;
+		int shininess;
 
 		MaterialInspector* materialInspector;
 };

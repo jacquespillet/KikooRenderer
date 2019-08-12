@@ -52,6 +52,7 @@ std::string Object3D::AddObject(Object3D* object) {
 	}
 	object->name = currentName;
 	childObjects.push_back(object);
+
 	
 	return currentName;
 }

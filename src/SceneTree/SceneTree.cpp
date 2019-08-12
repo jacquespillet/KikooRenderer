@@ -80,6 +80,9 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
     QString circleStr = "Circle";
     QString quadStr = "Quad";
 	QString emptyStr = "Empty";
+	QString dirLightStr = "Directional Light";
+	QString pointLightStr = "Point Light";
+	QString spotLightStr = "Spot Light";
 
 	QPoint menuPos;
 	if(!fromMainWindow) menuPos = tree->mapToGlobal(pos);
@@ -93,6 +96,14 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
     addObjectMenu->addAction(circleStr);
     addObjectMenu->addAction(quadStr);
     addObjectMenu->addAction(emptyStr);
+
+	addObjectMenu->addSeparator();
+
+    addObjectMenu->addAction(dirLightStr);
+    addObjectMenu->addAction(pointLightStr);
+    addObjectMenu->addAction(spotLightStr);
+
+
     myMenu.addMenu(addObjectMenu);
     QAction* selectedItem = myMenu.exec(menuPos);
 
@@ -108,6 +119,9 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
 		if (selectedItem->text() == circleStr) objectToAdd = CoreEngine::GetCircle(view3D->view3DGL->scene, name.toStdString(), glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.5, 0.5, 0.5, 1));
 		if (selectedItem->text() == quadStr) objectToAdd = CoreEngine::GetQuad(view3D->view3DGL->scene, name.toStdString(), glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.5, 0.5, 0.5, 1));
 		if (selectedItem->text() == emptyStr) objectToAdd = new CoreEngine::Object3D(name.toStdString(), view3D->view3DGL->scene);
+		if (selectedItem->text() == dirLightStr) objectToAdd = CoreEngine::GetDirectionalLight(view3D->view3DGL->scene, name.toStdString(), glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.5, 0.5, 0.5, 1));
+		if (selectedItem->text() == pointLightStr) objectToAdd = CoreEngine::GetPointLight(view3D->view3DGL->scene, name.toStdString(), glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.5, 0.5, 0.5, 1));
+		if (selectedItem->text() == spotLightStr) objectToAdd = CoreEngine::GetSpotLight(view3D->view3DGL->scene, name.toStdString(), glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.5, 0.5, 0.5, 1), 90);
 		
 		if (selectedIndexes.size() > 0) {
 			TreeItem* parentItem = (TreeItem*)model->itemFromIndex(selectedIndexes[0]);
