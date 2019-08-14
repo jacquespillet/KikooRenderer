@@ -17,7 +17,6 @@ namespace CoreEngine
 	Texture::Texture(std::string path, GLuint _texIndex) { 
 		texIndex = _texIndex;
 		LoadFromFile(path);
-		std::cout << "5" << std::endl;
 	}
 
 	void Texture::Use() {
@@ -27,19 +26,16 @@ namespace CoreEngine
 	}
 
 	void Texture::LoadFromFile(std::string path) {
-		std::cout << "0" << std::endl;
 		GETGL
 		ogl->glActiveTexture(texIndex);
 		ogl->glGenTextures(1, &glTex);  
 		ogl->glBindTexture(GL_TEXTURE_2D, glTex);
-		std::cout << "1" << std::endl;
 
 		ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
 		ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 		
 		ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		std::cout << "2" << std::endl;
 
 		stbi_set_flip_vertically_on_load(true);  
 		unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
@@ -54,11 +50,9 @@ namespace CoreEngine
 			std::cout << "Failed to load texture" << std::endl;
 			return;
 		} 
-		std::cout << "3" << std::endl;
 		stbi_image_free(data);
 		ogl->glBindTexture(GL_TEXTURE_2D, 0);
 		loaded = true;  
-		std::cout << "4" << std::endl;
 	}
 }
 

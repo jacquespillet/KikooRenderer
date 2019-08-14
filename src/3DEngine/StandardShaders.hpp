@@ -17,8 +17,11 @@ struct gouraudParams {
 class StandardShaders
 {
     public:         
+		StandardShaders();
 		int numShaders = 5;
 		std::string ids[5] = { "unlit", "selected", "gouraud", "blinn phong", "pbr" };
+		std::vector<Shader*> shaders;
+
 		Shader unlitMeshShader;
         Shader selectedObjectShader;
         Shader gouraudShader;

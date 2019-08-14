@@ -13,12 +13,13 @@
 namespace KikooRenderer {
 namespace CoreEngine {
 
+
 MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGroupBox("Material") {
 	this->materialComponent = materialComponent;
 	Object3D* object = materialComponent->object3D;
 	scene = object->scene;
 
-	QVBoxLayout* mainLayout = new QVBoxLayout();
+	mainLayout = new QVBoxLayout();
 	setLayout(mainLayout);
 
 	//Shader
@@ -36,13 +37,16 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 	mainLayout->addLayout(shaderLayout);
 
 	connect(shaderList, static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged), this, [this, materialComponent](int index) {
-		materialComponent->shader = &scene->standardShaders.gouraudShader;
+		materialComponent->shader = scene->standardShaders.shaders[index];
+		UpdateShaderParameters();
+		scene->triggerRefresh = true;
 	});
 
 	ColorPicker* albedoPicker = new ColorPicker("Albedo", 210, 15, 60, 255);
 	connect(albedoPicker, &ColorPicker::ColorPicked, this, [this, materialComponent](QColor color) {
 		glm::dvec4 albedoVec = glm::dvec4(color.red(), color.green(), color.blue(), color.alpha()) * 0.00392156;
 		materialComponent->albedo = albedoVec;
+		scene->triggerRefresh = true;
 	});
 
 	mainLayout->addWidget(albedoPicker);
@@ -50,8 +54,9 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 	//Albedo tex
 	FilePicker* albedoTexPicker = new FilePicker("Albedo Texture");
 	mainLayout->addWidget(albedoTexPicker);
-	connect(albedoTexPicker, &FilePicker::FileModified, this, [this, &materialComponent](QString string) {
-		Texture tex = KikooRenderer::CoreEngine::Texture(string.toStdString(), GL_TEXTURE0);
+	connect(albedoTexPicker, &FilePicker::FileModified, this, [this, materialComponent](QString string) {
+		materialComponent->albedoTexStr = string.toStdString();
+		scene->triggerRefresh = true;
 	});
 
 
@@ -60,6 +65,7 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 	mainLayout->addWidget(specularPicker);
 	connect(specularPicker, &FilePicker::FileModified, this, [this](QString string) {
 		std::cout << "laod specular texture" << string.toStdString() << std::endl;
+		scene->triggerRefresh = true;
 	});
 
 	//Normal Map
@@ -67,10 +73,82 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 	mainLayout->addWidget(normalTexPicker);
 	connect(normalTexPicker, &FilePicker::FileModified, this, [this](QString string) {
 		std::cout << "laod normal texture" << string.toStdString() << std::endl;
+		scene->triggerRefresh = true;
 	});
+
+	// shaderParametersLayout = new QVBoxLayout();
+	// mainLayout->addLayout(shaderParametersLayout);
 }
 
 void MaterialInspector::Refresh() {}
+
+void EmptyLayout(QLayout* layout) {
+	if (!layout)
+		return;
+	
+	while (layout->count() > 0) {
+		std::cout << "Try get new item0"<<std::endl;
+		QLayoutItem* item = layout->takeAt(0);
+		std::cout << "Try get new item1"<<std::endl;
+		if(item != nullptr) {
+			std::cout << "Got item "<<std::endl;
+			QWidget* widget = item->widget(); 
+			if(widget != nullptr) {
+				std::cout << "got widget"<<std::endl;
+				delete item->widget();
+			}
+			
+			QLayout* layout = item->layout(); 
+			if(layout != nullptr) {
+				std::cout << "got layout"<<std::endl;
+				EmptyLayout(item->layout());
+				delete item->layout();
+			}
+			delete item;
+		}
+	}
+}
+
+void MaterialInspector::UpdateShaderParameters() {
+	
+	EmptyLayout(shaderParametersLayout);
+
+	// shaderParametersLayout = new QVBoxLayout();
+	// if(materialComponent->shader->GetId() == SHADER_IDS::GOURAUD) {
+	// 	mainLayout->addLayout(shaderParametersLayout);
+	// 	//For Gouraud
+	// 	if (materialComponent->shader->GetId() == SHADER_IDS::GOURAUD) {
+	// 		CustomSlider* ambientSlider = new CustomSlider(0, 1, 0.01, "Ambient Factor", materialComponent->ambientFactor);
+	// 		shaderParametersLayout->addLayout(ambientSlider);
+	// 		connect(ambientSlider, &CustomSlider::Modified, this, [this, &ambientSlider](double val) {
+	// 			materialComponent->ambientFactor = val;
+	// 			scene->triggerRefresh = true;
+	// 		});
+
+	// 		CustomSlider* diffuseSlider = new CustomSlider(0, 1, 0.01, "Diffuse Factor", materialComponent->diffuseFactor);
+	// 		shaderParametersLayout->addLayout(diffuseSlider);
+	// 		connect(diffuseSlider, &CustomSlider::Modified, this, [this, &diffuseSlider](double val) {
+	// 			materialComponent->diffuseFactor = val;
+	// 			scene->triggerRefresh = true;
+	// 		});
+
+	// 		CustomSlider* specularSlider = new CustomSlider(0, 1, 0.01, "Specular Factor", materialComponent->specularFactor);
+	// 		shaderParametersLayout->addLayout(specularSlider);
+	// 		connect(specularSlider, &CustomSlider::Modified, this, [this, &specularSlider](double val) {
+	// 			materialComponent->specularFactor = val;
+	// 			scene->triggerRefresh = true;
+	// 		});
+
+	// 		CustomSlider* smoothnessSlider = new CustomSlider(0, 2048, 10, "Smoothness", materialComponent->smoothness);
+	// 		shaderParametersLayout->addLayout(smoothnessSlider);
+	// 		connect(smoothnessSlider, &CustomSlider::Modified, this, [this, &smoothnessSlider](double val) {
+	// 			materialComponent->smoothness = val;
+	// 			scene->triggerRefresh = true;
+	// 		});
+	// 		mainLayout->addLayout(shaderParametersLayout);
+	// 	}
+	// }
+}
 
 MaterialComponent::MaterialComponent(Object3D* object) : Component("Material", object), specularTex(), albedoTex(), normalTex() {
     inited= false;
@@ -80,13 +158,18 @@ MaterialComponent::MaterialComponent(Object3D* object) : Component("Material", o
 	ambientFactor = 0.2;
 	diffuseFactor = 0.3;
 	specularFactor = 1.0;
-	shininess = 128;
+	smoothness = 8;
 }
 
 
 void MaterialComponent::OnStart(){}
 void MaterialComponent::OnEnable(){}
-void MaterialComponent::OnUpdate(){}
+void MaterialComponent::OnUpdate(){
+	//std::cout << "isloaded " << albedoTex.loaded << " tex " << albedoTexStr << std::endl;
+	if (!albedoTex.loaded && albedoTexStr != "") {
+	//	albedoTex = KikooRenderer::CoreEngine::Texture(albedoTexStr, GL_TEXTURE0);
+	}
+}
 void MaterialComponent::OnRender(){} 
 void MaterialComponent::OnDestroy(){} 
 void MaterialComponent::Recompute(){} 
@@ -121,8 +204,8 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 	int specularFactorLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "specularFactor");
 	ogl->glUniform1f(specularFactorLocation, specularFactor);
 
-	int shininessLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "shininess");
-	ogl->glUniform1f(shininessLocation, shininess);
+	int smoothnessLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "smoothness");
+	ogl->glUniform1f(smoothnessLocation, smoothness);
 
 
 	int modelViewProjectionMatrixLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "modelViewProjectionMatrix"); 

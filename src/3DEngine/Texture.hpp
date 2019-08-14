@@ -19,7 +19,7 @@ class Texture
 		GLint texIndex;
 		int width, height, nrChannels;
 		
-		Texture(){}
+		Texture() { loaded = false; }
 		Texture(std::string path, GLuint _texIndex);
 		void Use();
 		void LoadFromFile(std::string path);

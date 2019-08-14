@@ -5,10 +5,15 @@ namespace KikooRenderer
 {
 namespace CoreEngine
 {
+StandardShaders::StandardShaders() {
+	shaders = std::vector<Shader*>();
+}
 
 void StandardShaders::Compile()
 {
-unlitMeshShader.SetId(SHADER_IDS::UNLIT);	
+
+unlitMeshShader.SetId(SHADER_IDS::UNLIT);
+shaders.push_back(&unlitMeshShader);
 unlitMeshShader.vertSrc= R"(
 //attribs
 #version 440
@@ -57,6 +62,7 @@ std::cout << "StandardShaders: Compiling unlitMeshShader" << std::endl;
 unlitMeshShader.Compile();
 
 selectedObjectShader.SetId(SHADER_IDS::SELECTED);
+shaders.push_back(&selectedObjectShader);
 selectedObjectShader.vertSrc= R"(
 #version 440
 
@@ -88,6 +94,7 @@ std::cout << "StandardShaders: Compiling selectedObjectShader" << std::endl;
 selectedObjectShader.Compile();
 
 gouraudShader.SetId(SHADER_IDS::GOURAUD);
+shaders.push_back(&gouraudShader);
 gouraudShader.vertSrc= R"(
 #version 440
 
@@ -126,7 +133,7 @@ uniform int hasSpecularTex;
 uniform float ambientFactor;
 uniform float diffuseFactor;
 uniform float specularFactor;
-uniform float shininess;
+uniform float smoothness;
 
 out vec4 fragColor;
 void main()
@@ -146,24 +153,13 @@ void main()
 		float attenuation = 1;
 		vec3 lightDirection = normalize(lights[i].direction);
 		
-		// if(lights[i].type == 1) { //Point light
-		// 	float distance = distance(worldPosition.xyz, lights[i].position);
-		// 	attenuation = 1 / (lights[i].attenuation.x + lights[i].attenuation.y * distance + lights[i].attenuation.z * (distance * distance));
-		// 	lightDirection = normalize(worldPosition.xyz - lights[i].position);
-		// }
-		// if(lights[i].type == 2) { //Spot light
-		// 	lightDirection = normalize(worldPosition.xyz - lights[i].position);
-		// 	float distance = distance(worldPosition.xyz, lights[i].position);
-		// 	float numerator = pow(max(dot(-normalize(lights[i].direction), -lightDirection), 0), 64);
-		// 	attenuation = numerator / (lights[i].attenuation.x + lights[i].attenuation.y * distance + lights[i].attenuation.z * (distance * distance));
-		// }
-				
 		vec3 fragToLight = -lightDirection;
 
 		vec4 diffuse = diffuseFactor * mainAlbedo * lights[i].color * max(dot(mainNormal, fragToLight ), 0);
 
 		vec3 halfwayVec = normalize(fragToLight  + fragToCam);
-		vec4 specular = specularFactor * mainAlbedo * lights[i].color * pow(max(dot(normal, halfwayVec),0), shininess);
+		vec4 specular = specularFactor * mainAlbedo * lights[i].color * pow(max(dot(normal, halfwayVec),0), smoothness);
+		//vec4 specular = vec4(1, 1, 1, 1) * pow(max(dot(mainNormal, halfwayVec),0), smoothness);
 
 		finalColor.rgb +=  attenuation * (diffuse + specular ).rgb;
 	}
@@ -190,6 +186,7 @@ std::cout << "StandardShaders: Compiling gouraudShader" << std::endl;
 gouraudShader.Compile();
 
 blinnPhongShader.SetId(SHADER_IDS::BLINNPHONG);
+shaders.push_back(&blinnPhongShader);
 blinnPhongShader.vertSrc= R"(
 #version 440
 
@@ -314,6 +311,7 @@ blinnPhongShader.Compile();
 
 
 PBRShader.SetId(SHADER_IDS::PBR);
+shaders.push_back(&PBRShader);
 PBRShader.vertSrc= R"(
 #version 440
 
@@ -444,7 +442,6 @@ void main()
 std::cout << "StandardShaders: Compiling PBRShader" << std::endl; 
 PBRShader.Compile();
 
-
-}	
+}
 }
 }

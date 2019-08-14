@@ -9,6 +9,62 @@ namespace KikooRenderer {
 namespace CoreEngine {
 class MaterialComponent;
 
+void EmptyLayout(QLayout* layout);
+
+class CustomSlider : public QHBoxLayout {
+	Q_OBJECT
+public:
+	QSlider* slider;
+	QDoubleSpinBox* spinBox;
+	float step;
+	CustomSlider(float min, float max, float step, std::string label, float initialValue) : QHBoxLayout() {
+		this->step = step;
+
+		slider = new QSlider(Qt::Horizontal);
+		// slider->setFocusPolicy(Qt::StrongFocus);
+		slider->setTickPosition(QSlider::TicksBothSides);
+		slider->setTickInterval(10);
+		slider->setMinimum(min / step);
+		slider->setMaximum(max / step);
+		slider->setSingleStep(1);
+		slider->setValue(initialValue);
+		connect(slider, SIGNAL(valueChanged(int)), this, SLOT(OnSliderChanged(int)));
+		addWidget(slider);
+		QLabel* labelWidget = new QLabel(QString::fromStdString(label));
+		addWidget(labelWidget);
+
+		spinBox = new QDoubleSpinBox();
+		spinBox->setMinimum(min);
+		spinBox->setMaximum(max);
+		spinBox->setSingleStep(step);
+		spinBox->setValue(initialValue);
+
+		connect(spinBox, SIGNAL(valueChanged(double)), this, SLOT(OnSpinBoxChanged(double)));
+		addWidget(spinBox);
+	}
+
+	int GetValue() {
+		double value = spinBox->value();
+		return 0;
+	}
+
+public slots:
+	void OnSpinBoxChanged(double i)
+	{
+		slider->setValue(i / step);
+	}
+
+	void OnSliderChanged(int i)
+	{
+		double val = (double)i * step;
+		spinBox->setValue(val);
+		emit Modified(val);
+	}
+
+signals:
+	void Modified(double val);
+};
+
 class ColorPicker : public QWidget {
 	Q_OBJECT
 public:
@@ -99,7 +155,11 @@ class MaterialInspector : public QGroupBox {
 		MaterialComponent* materialComponent;
 		Scene* scene;
 
+		QVBoxLayout* mainLayout;
+		QVBoxLayout* shaderParametersLayout;
+
 		void Refresh();
+		void UpdateShaderParameters();
 
 };
 
@@ -128,10 +188,14 @@ class MaterialComponent : public Component {
         Texture specularTex;
         Texture normalTex;
 
+		std::string albedoTexStr = "";
+		std::string specularTexStr = "";
+		std::string normalTexStr = "";
+
 		float ambientFactor;
 		float diffuseFactor;
 		float specularFactor;
-		int shininess;
+		int smoothness;
 
 		MaterialInspector* materialInspector;
 };
