@@ -39,6 +39,7 @@ set(MainWindowSrc
 	Geometry/Ray.cpp	
 	Geometry/Box.cpp	
 
+	Util/QtUtil.cpp
 	Util/ModelLoader.cpp
 	Util/Image.cpp
 )

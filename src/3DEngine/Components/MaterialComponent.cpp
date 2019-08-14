@@ -3,7 +3,6 @@
 #include "TransformComponent.hpp"
 #include "3DEngine/Object3D.hpp"
 
-
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLFunctions_3_2_Core>
 #define GLV QOpenGLFunctions_3_2_Core
@@ -30,6 +29,7 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 		shaderList->addItem(QString::fromStdString(scene->standardShaders.ids[i]));
 
 	}
+
 	int shaderInx = materialComponent->shader->GetId();
 	shaderList->setCurrentIndex(shaderInx);
 	shaderLayout->addWidget(shaderLabel);
@@ -76,78 +76,49 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 		scene->triggerRefresh = true;
 	});
 
-	// shaderParametersLayout = new QVBoxLayout();
-	// mainLayout->addLayout(shaderParametersLayout);
+	shaderParametersLayout = new QVBoxLayout();
 }
 
 void MaterialInspector::Refresh() {}
 
-void EmptyLayout(QLayout* layout) {
-	if (!layout)
-		return;
-	
-	while (layout->count() > 0) {
-		std::cout << "Try get new item0"<<std::endl;
-		QLayoutItem* item = layout->takeAt(0);
-		std::cout << "Try get new item1"<<std::endl;
-		if(item != nullptr) {
-			std::cout << "Got item "<<std::endl;
-			QWidget* widget = item->widget(); 
-			if(widget != nullptr) {
-				std::cout << "got widget"<<std::endl;
-				delete item->widget();
-			}
-			
-			QLayout* layout = item->layout(); 
-			if(layout != nullptr) {
-				std::cout << "got layout"<<std::endl;
-				EmptyLayout(item->layout());
-				delete item->layout();
-			}
-			delete item;
-		}
-	}
-}
-
 void MaterialInspector::UpdateShaderParameters() {
-	
 	EmptyLayout(shaderParametersLayout);
 
-	// shaderParametersLayout = new QVBoxLayout();
-	// if(materialComponent->shader->GetId() == SHADER_IDS::GOURAUD) {
-	// 	mainLayout->addLayout(shaderParametersLayout);
-	// 	//For Gouraud
-	// 	if (materialComponent->shader->GetId() == SHADER_IDS::GOURAUD) {
-	// 		CustomSlider* ambientSlider = new CustomSlider(0, 1, 0.01, "Ambient Factor", materialComponent->ambientFactor);
-	// 		shaderParametersLayout->addLayout(ambientSlider);
-	// 		connect(ambientSlider, &CustomSlider::Modified, this, [this, &ambientSlider](double val) {
-	// 			materialComponent->ambientFactor = val;
-	// 			scene->triggerRefresh = true;
-	// 		});
+	shaderParametersLayout = new QVBoxLayout();
+	if(materialComponent->shader->GetId() == SHADER_IDS::GOURAUD) {
+		mainLayout->addLayout(shaderParametersLayout);
+		//For Gouraud
+		if (materialComponent->shader->GetId() == SHADER_IDS::GOURAUD) {
+			CustomSlider* ambientSlider = new CustomSlider(0, 1, 0.01, "Ambient Factor", materialComponent->ambientFactor);
+			shaderParametersLayout->addLayout(ambientSlider);
+			connect(ambientSlider, &CustomSlider::Modified, this, [this, &ambientSlider](double val) {
+				materialComponent->ambientFactor = val;
+				scene->triggerRefresh = true;
+			});
 
-	// 		CustomSlider* diffuseSlider = new CustomSlider(0, 1, 0.01, "Diffuse Factor", materialComponent->diffuseFactor);
-	// 		shaderParametersLayout->addLayout(diffuseSlider);
-	// 		connect(diffuseSlider, &CustomSlider::Modified, this, [this, &diffuseSlider](double val) {
-	// 			materialComponent->diffuseFactor = val;
-	// 			scene->triggerRefresh = true;
-	// 		});
+			CustomSlider* diffuseSlider = new CustomSlider(0, 1, 0.01, "Diffuse Factor", materialComponent->diffuseFactor);
+			shaderParametersLayout->addLayout(diffuseSlider);
+			connect(diffuseSlider, &CustomSlider::Modified, this, [this, &diffuseSlider](double val) {
+				materialComponent->diffuseFactor = val;
+				scene->triggerRefresh = true;
+			});
 
-	// 		CustomSlider* specularSlider = new CustomSlider(0, 1, 0.01, "Specular Factor", materialComponent->specularFactor);
-	// 		shaderParametersLayout->addLayout(specularSlider);
-	// 		connect(specularSlider, &CustomSlider::Modified, this, [this, &specularSlider](double val) {
-	// 			materialComponent->specularFactor = val;
-	// 			scene->triggerRefresh = true;
-	// 		});
+			CustomSlider* specularSlider = new CustomSlider(0, 1, 0.01, "Specular Factor", materialComponent->specularFactor);
+			shaderParametersLayout->addLayout(specularSlider);
+			connect(specularSlider, &CustomSlider::Modified, this, [this, &specularSlider](double val) {
+				materialComponent->specularFactor = val;
+				scene->triggerRefresh = true;
+			});
 
-	// 		CustomSlider* smoothnessSlider = new CustomSlider(0, 2048, 10, "Smoothness", materialComponent->smoothness);
-	// 		shaderParametersLayout->addLayout(smoothnessSlider);
-	// 		connect(smoothnessSlider, &CustomSlider::Modified, this, [this, &smoothnessSlider](double val) {
-	// 			materialComponent->smoothness = val;
-	// 			scene->triggerRefresh = true;
-	// 		});
-	// 		mainLayout->addLayout(shaderParametersLayout);
-	// 	}
-	// }
+			CustomSlider* smoothnessSlider = new CustomSlider(0, 2048, 10, "Smoothness", materialComponent->smoothness);
+			shaderParametersLayout->addLayout(smoothnessSlider);
+			connect(smoothnessSlider, &CustomSlider::Modified, this, [this, &smoothnessSlider](double val) {
+				materialComponent->smoothness = val;
+				scene->triggerRefresh = true;
+			});
+			mainLayout->addLayout(shaderParametersLayout);
+		}
+	}
 }
 
 MaterialComponent::MaterialComponent(Object3D* object) : Component("Material", object), specularTex(), albedoTex(), normalTex() {
