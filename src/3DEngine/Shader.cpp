@@ -1,6 +1,5 @@
 #include "Shader.hpp"
 
-
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLFunctions_3_2_Core>
 #define GLV QOpenGLFunctions_3_2_Core
@@ -19,7 +18,7 @@ Shader::Shader()
 {
 	compiled = false; 
 }
-	
+
 	
 void Shader::Compile()
 {
@@ -71,11 +70,12 @@ void Shader::Compile()
 	}
 }
 
-void Shader::SetId(int id) { this->identifier = id; }
-
-int Shader::GetId() { return this->identifier; }
-	
+void Shader::SetId(int id) { 
+	this->identifier = id; 
 }
 
+int Shader::GetId() { return this->identifier; }
 
+
+}
 }

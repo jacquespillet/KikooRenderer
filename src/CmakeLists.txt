@@ -24,6 +24,13 @@ set(MainWindowSrc
 	3DEngine/Framebuffer.cpp
 	3DEngine/TransformWidget.cpp
 
+	3DEngine/Shaders/ShaderParams.cpp
+	3DEngine/Shaders/BlinnPhongShader.cpp
+	3DEngine/Shaders/GouraudShader.cpp
+	3DEngine/Shaders/PBRShader.cpp
+	3DEngine/Shaders/UnlitShader.cpp
+	3DEngine/Shaders/SelectedShader.cpp
+
 	3DEngine/SpatialPartitioning/Octree.cpp
 	
 	Renderer/RayTracer.cpp

@@ -17,6 +17,8 @@ namespace CoreEngine {
     Scene::Scene(){
 		camera = new CameraScene(this, 1.0, 70 * DEGTORAD, 0.1, 1000.0, 1.0);
         this->started = false;
+
+        // standardShaders->scene = this;
     }
 
 	void Scene::Start() {
@@ -81,9 +83,12 @@ namespace CoreEngine {
                 MaterialComponent* material = (MaterialComponent*)(selectedObjects[i]->GetComponent("Material"));
                 if(material) {
                     Shader* tmpShader = material->shader;
+                    ShaderParams* tmpParams = material->params;
+
                     material->SetShader(&standardShaders.selectedObjectShader);
                     selectedObjects[i]->Render();
                     material->SetShader(tmpShader);
+                    material->params = tmpParams;
                 }
             }
         }

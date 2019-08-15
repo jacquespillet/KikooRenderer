@@ -1,10 +1,22 @@
 #include "StandardShaders.hpp"
-
+#include "Shaders/UnlitShader.hpp"
+#include "Shaders/BlinnPhongShader.hpp"
+#include "Shaders/PBRShader.hpp"
+#include "Shaders/GouraudShader.hpp"
+#include "Shaders/SelectedShader.hpp"
 
 namespace KikooRenderer
 {
 namespace CoreEngine
 {
+ShaderParams* StandardShaders::GetParamsById(int id) {
+	if(id == SHADER_IDS::UNLIT)   return new UnlitMeshParams();
+	if(id == SHADER_IDS::GOURAUD) return new GouraudParams();
+	if(id == SHADER_IDS::BLINNPHONG) return new BlinnPhongParams();
+	if(id == SHADER_IDS::PBR) return new PBRParams();
+	if(id == SHADER_IDS::SELECTED) return new SelectedShaderParams();
+}
+
 StandardShaders::StandardShaders() {
 	shaders = std::vector<Shader*>();
 }
@@ -12,435 +24,46 @@ StandardShaders::StandardShaders() {
 void StandardShaders::Compile()
 {
 
+//Unlit
+unlitMeshShader = GetUnlitShader();
 unlitMeshShader.SetId(SHADER_IDS::UNLIT);
+unlitMeshShader.name = "Unlit";
 shaders.push_back(&unlitMeshShader);
-unlitMeshShader.vertSrc= R"(
-//attribs
-#version 440
-layout(location = 0) in vec3 position;
-layout(location = 1) in vec3 normal;
-layout(location = 2) in vec2 uv;
-layout(location = 3) in vec4 color;
-//transforms
-uniform mat4 modelViewProjectionMatrix;
-uniform vec4 albedo; 
-uniform float materialInfluence;
-
-//outputs
-out vec4 fragmentColor;  
-out vec2 fragmentUv;
-//main
-void main()
-{
-	//compute outputs
-	fragmentColor = materialInfluence * albedo + (1.0 - materialInfluence) * color;
-	vec4 finalPosition = modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
-	gl_Position = vec4(finalPosition.x, finalPosition.y, finalPosition.z, finalPosition.w);
-	fragmentUv = uv;
-}
-)";
-
-unlitMeshShader.fragSrc = R"(
-//inputs
-#version 440
-in vec4 fragmentColor; 
-in vec2 fragmentUv;
-//uniforms
-uniform int hasAlbedoTex;
-uniform sampler2D albedoTexture;
-//output
-layout(location = 0) out vec4 outputColor; 
-//main
-void main()
-{
-	outputColor = (hasAlbedoTex==1) ? texture(albedoTexture, fragmentUv) : fragmentColor;
-
-}
-)";
-
 std::cout << "StandardShaders: Compiling unlitMeshShader" << std::endl; 
 unlitMeshShader.Compile();
 
-selectedObjectShader.SetId(SHADER_IDS::SELECTED);
-shaders.push_back(&selectedObjectShader);
-selectedObjectShader.vertSrc= R"(
-#version 440
-
-layout(location = 0) in vec3 position;
-layout(location = 1) in vec3 normal;
-layout(location = 2) in vec2 uv;
-layout(location = 3) in vec4 color;
-
-uniform mat4 modelViewProjectionMatrix;
-
-void main()
-{
-	vec3 scaledPosition = position * 1.05;
-	vec4 finalPosition = modelViewProjectionMatrix * vec4(scaledPosition.x, scaledPosition.y, scaledPosition.z, 1.0f);
-	gl_Position = vec4(finalPosition.x, finalPosition.y, finalPosition.z, finalPosition.w);
-}
-)";
-
-selectedObjectShader.fragSrc = R"(
-#version 440
-layout(location = 0) out vec4 outputColor; 
-void main()
-{
-	outputColor = vec4(1.0, 0.549, 0.0, 1.0);
-}
-)";
-
-std::cout << "StandardShaders: Compiling selectedObjectShader" << std::endl; 
-selectedObjectShader.Compile();
-
+//Gouraud
+GetGouraudShader(&gouraudShader);
 gouraudShader.SetId(SHADER_IDS::GOURAUD);
+gouraudShader.name = "Gouraud";
 shaders.push_back(&gouraudShader);
-gouraudShader.vertSrc= R"(
-#version 440
-
-struct LightSource
-{
-        int type;
-        vec3 position;
-        vec3 attenuation;
-        vec3 direction;
-        vec4 color;
-};
-
-layout(location = 0) in vec3 position;
-layout(location = 1) in vec3 normal;
-layout(location = 2) in vec2 uv;
-layout(location = 3) in vec4 color;
-
-//transforms
-uniform mat4 modelViewProjectionMatrix;
-uniform mat4 modelMatrix;
-
-uniform vec4 albedo; 
-uniform vec3 cameraPos;
-
-uniform LightSource lights[4];
-uniform int numLights;
-
-uniform sampler2D albedoTexture;
-uniform sampler2D specularTexture;
-uniform sampler2D normalTexture;
-
-uniform int hasNormalTex;
-uniform int hasAlbedoTex;
-uniform int hasSpecularTex;
-
-uniform float ambientFactor;
-uniform float diffuseFactor;
-uniform float specularFactor;
-uniform float smoothness;
-
-out vec4 fragColor;
-void main()
-{
-	vec4 finalPosition = modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
-	vec4 worldPosition = modelMatrix * vec4(position.x, position.y, position.z, 1.0f);
-	
-	vec3 fragToCam = cameraPos - worldPosition.xyz;
-
-	vec4 mainAlbedo = albedo;
-	vec3 mainNormal = normal;
-
-	vec4 finalColor = vec4(0, 0, 0, 1);
-	finalColor.rgb += ambientFactor * mainAlbedo.rgb;
-
-	for(int i=0; i<numLights; i++) {
-		float attenuation = 1;
-		vec3 lightDirection = normalize(lights[i].direction);
-		
-		vec3 fragToLight = -lightDirection;
-
-		vec4 diffuse = diffuseFactor * mainAlbedo * lights[i].color * max(dot(mainNormal, fragToLight ), 0);
-
-		vec3 halfwayVec = normalize(fragToLight  + fragToCam);
-		vec4 specular = specularFactor * mainAlbedo * lights[i].color * pow(max(dot(normal, halfwayVec),0), smoothness);
-		//vec4 specular = vec4(1, 1, 1, 1) * pow(max(dot(mainNormal, halfwayVec),0), smoothness);
-
-		finalColor.rgb +=  attenuation * (diffuse + specular ).rgb;
-	}
-
-	fragColor = finalColor;
-	gl_Position = vec4(finalPosition.x, finalPosition.y, finalPosition.z, finalPosition.w);
-}
-)";
-
-gouraudShader.fragSrc = R"(
-#version 440
-layout(location = 0) out vec4 outputColor; 
-
-in vec4 fragColor;
-
-
-void main()
-{
-	outputColor = fragColor;
-}
-)";
-
+std::cout << "In vector " << &gouraudShader << std::endl;
 std::cout << "StandardShaders: Compiling gouraudShader" << std::endl; 
 gouraudShader.Compile();
 
+//Blinn phong
+blinnPhongShader = GetBlinnPhongShader();
 blinnPhongShader.SetId(SHADER_IDS::BLINNPHONG);
+blinnPhongShader.name = "Blinn Phong";
 shaders.push_back(&blinnPhongShader);
-blinnPhongShader.vertSrc= R"(
-#version 440
-
-layout(location = 0) in vec3 position;
-layout(location = 1) in vec3 normal;
-layout(location = 2) in vec2 uv;
-layout(location = 3) in vec4 color;
-layout(location = 4) in vec3 tangent;
-
-uniform mat4 modelViewProjectionMatrix;
-uniform mat4 modelMatrix;
-uniform vec3 cameraPos;
-
-out vec3 fragPos;
-out vec3 fragNormal;
-out vec2 fragUv;
-out vec3 fragTangent;
-out vec3 toCamTangentSpace; 
-out vec3 toLightTangentSpace; 
-
-void main()
-{
-	vec4 finalPosition = modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
-	gl_Position = vec4(finalPosition.x, finalPosition.y, finalPosition.z, finalPosition.w);
-	fragPos = (modelMatrix * vec4(position.x, position.y, position.z, 1.0f)).xyz;
-	fragNormal = normal;
-	fragUv = uv;
-	fragTangent = tangent;
-
-	vec3 fragToCam = cameraPos - fragPos;
-	vec3 bitangent = cross(normal, tangent); 
-    toCamTangentSpace = vec3(dot(tangent, fragToCam), dot(bitangent, fragToCam), dot(normal, fragToCam));
-}
-)";
-
-blinnPhongShader.fragSrc = R"(
-#version 440
-
-struct LightSource
-{
-        int type;
-        vec3 position;
-        vec3 attenuation;
-        vec3 direction;
-        vec4 color;
-};
-
-layout(location = 0) out vec4 outputColor; 
-uniform LightSource lights[4];
-uniform vec4 albedo; 
-uniform int numLights; 
-uniform vec3 cameraPos;
-
-uniform sampler2D albedoTexture;
-uniform sampler2D specularTexture;
-uniform sampler2D normalTexture;
-uniform int hasAlbedoTex;
-uniform int hasSpecularTex;
-uniform int hasNormalTex;
-
-in vec3 fragPos;
-in vec3 fragNormal;
-in vec2 fragUv;
-in vec3 fragTangent;
-in vec3 toCamTangentSpace; 
-
-void main()
-{
-	vec3 fragToCam = cameraPos - fragPos;
-
-	vec4 finalAlbedo = (hasAlbedoTex==1) ? albedo * texture(albedoTexture, fragUv) : albedo;
-	vec3 finalNormal = (hasNormalTex==1) ? texture(normalTexture, fragUv).xyz : fragNormal;
-	
-	vec4 finalColor = vec4(0, 0, 0, 1);
-	finalColor.rgb += 0.1 * finalAlbedo.rgb;
-
-	for(int i=0; i<numLights; i++) {
-		vec3 fragBitangent = normalize(cross(fragNormal, fragTangent)); 
- 		vec3 toLightTangentSpace = vec3(dot(fragTangent, lights[i].direction),    dot(fragBitangent, lights[i].direction), dot(fragNormal, lights[i].direction)); 
-
-		float attenuation = 1;
-		vec3 lightDirection = normalize(lights[i].direction);
-		
-		if(lights[i].type == 1) { //Point light
-			float distance = distance(fragPos.xyz, lights[i].position);
-			attenuation = 1 / (lights[i].attenuation.x + lights[i].attenuation.y * distance + lights[i].attenuation.z * (distance * distance));
-			lightDirection = normalize(fragPos.xyz - lights[i].position);
-		}
-		if(lights[i].type == 2) { //Spot light
-			lightDirection = normalize(fragPos.xyz - lights[i].position);
-			float distance = distance(fragPos.xyz, lights[i].position);
-			float numerator = pow(max(dot(-normalize(lights[i].direction), -lightDirection), 0), 64);
-			attenuation = numerator / (lights[i].attenuation.x + lights[i].attenuation.y * distance + lights[i].attenuation.z * (distance * distance));
-		}
-		
-		vec3 toLight = -lightDirection;
-
-		//Redefinition of vectors in tangent space
-		if(hasNormalTex == 1) {
-			toLight = toLightTangentSpace;
-			fragToCam = toCamTangentSpace;
-		}
-
-
-		vec4 diffuse = 0.5 * finalAlbedo * lights[i].color * max(dot(normalize(finalNormal.xyz), toLight), 0);
-
-		// Specular
-		vec3 halfwayVec = normalize(toLight + fragToCam);
-		vec4 specular = finalAlbedo * lights[i].color * pow(max(dot(normalize(finalNormal.xyz), halfwayVec),0), 64);
-
-		finalColor.rgb +=  attenuation * (diffuse + specular).rgb;
-	}
-	// finalColor = vec4(fragTangent.xyz, 1);
-	outputColor = finalColor;
-	outputColor.a = finalAlbedo.a;
-	
-}
-)";
-
 std::cout << "StandardShaders: Compiling blinnPhongShader" << std::endl; 
 blinnPhongShader.Compile();
 
-
+//Physically based rendering
+PBRShader = GetPBRShader();
 PBRShader.SetId(SHADER_IDS::PBR);
+PBRShader.name = "PBR";
 shaders.push_back(&PBRShader);
-PBRShader.vertSrc= R"(
-#version 440
-
-layout(location = 0) in vec3 position;
-layout(location = 1) in vec3 normal;
-layout(location = 2) in vec2 uv;
-layout(location = 3) in vec4 color;
-
-uniform mat4 modelViewProjectionMatrix;
-uniform mat4 modelMatrix;
-uniform vec3 cameraPos;
-
-out vec3 fragPos;
-out vec3 fragNormal;
-out vec3 fragToCam;
-
-void main()
-{
-	vec4 finalPosition = modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
-	gl_Position = vec4(finalPosition.x, finalPosition.y, finalPosition.z, finalPosition.w);
-	fragPos = (modelMatrix * vec4(position.x, position.y, position.z, 1.0f)).xyz;
-	fragNormal = normal;
-	fragToCam = normalize(cameraPos - fragPos.xyz);
-}
-)";
-
-PBRShader.fragSrc = R"(
-#version 440
-
-struct LightSource
-{
-        int type;
-        vec3 position;
-        vec3 attenuation;
-        vec3 direction;
-        vec4 color;
-};
-
-float Fresnel(vec3 toLight, vec3 toCamera) {
-	vec3 halfwayVec = normalize(toLight + toCamera);
-	float dotLH =  max(dot(toLight, halfwayVec), 0);
-	float refractionInx = (1.0 + sqrt(0.8)) / (1.0 - sqrt(0.8));
-
-	float g = sqrt(refractionInx * refractionInx - 1.0 + pow(dotLH, 2.0)); 
-
-	float firstTerm = 0.5 * (pow(g - dotLH, 2.0) / pow(g + dotLH, 2.0));
-	float secondTermNumerator = pow(dotLH * (g + dotLH) - 1, 2.0); 
-	float secondTermDenominator = pow(dotLH * (g - dotLH) + 1, 2.0);
-
-	float result = firstTerm * (secondTermNumerator / secondTermDenominator + 1.0); 
-
-	return result;
-}
-
-
-float MicrofacetsDistrib(vec3 toLight, vec3 toCamera, vec3 normal, float roughness) {
-	vec3 halfwayVec = normalize(toLight + toCamera);
-	float dotNH = max(dot(normal, halfwayVec), 0);
-
-	float result = (1 / (4 * roughness * roughness * pow(dotNH, 4))) * exp( (dotNH * dotNH -1) / (roughness * roughness * dotNH * dotNH ));
-	return result;
-}
-
-float GeometricalAttenuation(vec3 toLight, vec3 toCamera, vec3 normal) {
-	vec3 halfwayVec = normalize(toLight + toCamera);
-	float dotNH = dot(normal, halfwayVec);
-	float dotNV = dot(normal, toCamera);
-	float dotNL = dot(normal, toLight);
-	float dotLH = dot(toLight, halfwayVec);
-	
-	
-	float G1 = (2 * dotNH * dotNV) / dotLH;
-	float G2 = (2 * dotNH * dotNL) / dotLH;
-
-	return min (1, min(G1, G2));
-}
-
-layout(location = 0) out vec4 outputColor; 
-
-uniform LightSource lights[4];
-uniform int numLights; 
-uniform vec4 albedo; 
-uniform float roughness;
-uniform float specularFrac;
-
-in vec3 fragPos;
-in vec3 fragNormal;
-in vec3 fragToCam;
-
-void main()
-{
-	// float roughness = 0.5;
-	// float specularFrac = 0.5;
-	float diffuseFrac = 1 - specularFrac;
-
-	vec4 finalColor = vec4(0, 0, 0, 1);
-	for(int i=0; i<numLights; i++) {
-		vec3 lightDirection = normalize(lights[i].direction);
-		float attenuation = 1;
-		if(lights[i].type == 1) { //Point light
-			float distance = distance(fragPos.xyz, lights[i].position);
-			attenuation = 1 / (lights[i].attenuation.x + lights[i].attenuation.y * distance + lights[i].attenuation.z * (distance * distance));
-			lightDirection = normalize(fragPos.xyz - lights[i].position);
-		}
-		if(lights[i].type == 2) { //Spot light
-			lightDirection = normalize(fragPos.xyz - lights[i].position);
-			float distance = distance(fragPos.xyz, lights[i].position);
-			float numerator = pow(max(dot(-normalize(lights[i].direction), -lightDirection), 0), 64);
-			attenuation = numerator / (lights[i].attenuation.x + lights[i].attenuation.y * distance + lights[i].attenuation.z * (distance * distance));
-		}
-		vec3 toLight = -lightDirection;
-
-		float fresnelFactor = Fresnel(toLight, fragToCam);
-		float microfacetsDistribution = MicrofacetsDistrib(toLight, fragToCam, fragNormal, roughness);
-		float geometricalAttenuation = GeometricalAttenuation(toLight, fragToCam, fragNormal);
-		float finalFactor = fresnelFactor * ( (microfacetsDistribution * geometricalAttenuation) / (3.14 * dot(fragNormal, fragToCam) * dot(fragNormal, toLight) ) ); 
-		
-		float diffuseFactor = diffuseFrac * max(dot(normalize(fragNormal), toLight), 0);
-		finalColor.rgb += attenuation * (diffuseFactor * lights[i].color.rgb * albedo.rgb +  specularFrac * lights[i].color.rgb * albedo.rgb * finalFactor);
-	}
-
-
-
-	outputColor = finalColor;
-}
-)";
-
 std::cout << "StandardShaders: Compiling PBRShader" << std::endl; 
 PBRShader.Compile();
+
+
+selectedObjectShader = GetSelectedShader();
+selectedObjectShader.SetId(SHADER_IDS::SELECTED);
+selectedObjectShader.name = "Selected";
+shaders.push_back(&selectedObjectShader);
+std::cout << "StandardShaders: Compiling selectedObjectShader" << std::endl; 
+selectedObjectShader.Compile();
 
 }
 }

@@ -22,7 +22,6 @@ class MaterialInspector : public QGroupBox {
 
 		void Refresh();
 		void UpdateShaderParameters();
-
 };
 
 class MaterialComponent : public Component {
@@ -39,6 +38,12 @@ class MaterialComponent : public Component {
         
         void SetShader(Shader* shader);
         void SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 viewMatrix, glm::dmat4 projectionMatrix, Scene* scene);
+
+		// void SetSelectedShader();
+		// void ResetShader();
+		// ShaderParams* tmpParams;
+		// Shader* tmpShader;
+
 
         Shader* shader;
 
@@ -60,6 +65,8 @@ class MaterialComponent : public Component {
 		int smoothness;
 
 		MaterialInspector* materialInspector;
+		
+		ShaderParams* params;
 };
 }
 }

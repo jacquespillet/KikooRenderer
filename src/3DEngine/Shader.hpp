@@ -2,7 +2,6 @@
 
 #include "Util/Common.h"
 
-
 namespace KikooRenderer
 {
 	
@@ -16,7 +15,7 @@ class Shader
 	private:
 		bool compiled; 
 		int identifier = 0;
-
+		
 	public:
 		std::string name; 
 		
@@ -28,16 +27,18 @@ class Shader
 		int programShaderObject;
 		int vertexShaderObject;
 		int fragmentShaderObject;
-
-		//ShaderUniformsObject
-		//	ShaderUniformObjects->setAllUniforms();
 		
+
 		Shader();
 		
 		void SetId(int id);
 		int GetId();
 
 		void Compile();
+
+		// QLayout* GetParamsLayout();
+		// void SetParams(ShaderParams* params);
+		// void SetParamsUniforms();
 };
 	
 	
