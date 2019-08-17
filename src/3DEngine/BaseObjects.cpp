@@ -631,33 +631,48 @@ Object3D* GetSphere(Scene* scene, std::string name, glm::dvec3 _position, glm::d
     std::vector<int> triangles;
 
 
-    uint32_t numSlices = 32;
+    uint32_t numSlices =64;
     float radius = 1.0;
 
-    for(int x=0, inx = 0; x<numSlices; x++) {
-        for(int y=0; y<numSlices * 2; y++, inx++) {
-            float yAngle = ((float)y / (float)numSlices * 2) * TWO_PI;
+    for(int x=0, inx = 0; x<=numSlices; x++) {
+        for(int y=0; y<=numSlices; y++, inx++) {
             float xAngle = ((float)x / (float)numSlices) * PI;
+            float yAngle = ((float)y / (float)numSlices) * TWO_PI;
             
             float posx = radius * std::sin(xAngle) * std::cos(yAngle);
-            float posy = radius * std::sin(xAngle) * std::sin(yAngle);
-            float posz = radius * std::cos(xAngle);
+            float posz = radius * std::sin(xAngle) * std::sin(yAngle);
+            float posy = radius * std::cos(xAngle);
 
             vertex.push_back(glm::dvec3(posx, posy, posz));
             normals.push_back(glm::dvec3(posx, posy, posz));
             uv.push_back(glm::dvec2(0, 0));
             colors.push_back(glm::dvec4(255, 255, 255, 255));
-            
-            triangles.push_back(inx);
-            triangles.push_back(inx + numSlices * 2);
-            triangles.push_back(inx + (numSlices * 2 + 1));
+
+            if(y < numSlices) {
+                triangles.push_back(inx + 1);
+                triangles.push_back(inx);
+                triangles.push_back(inx + numSlices+1);
+
+                triangles.push_back(inx + numSlices + 1);
+                triangles.push_back(inx);
+                triangles.push_back(inx + numSlices);
+            } else { // If last of the row
+                triangles.push_back(inx);
+                triangles.push_back(inx - numSlices);
+                triangles.push_back(inx + 1);
+
+                triangles.push_back(inx);
+                triangles.push_back(inx + 1);
+                triangles.push_back(inx + numSlices);
+            }
+
         }        
     }
 
     //Setup mesh
     MeshFilterComponent* mesh = new MeshFilterComponent(newObject);
     mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles);
-    mesh->drawingMode = GL_TRIANGLE_FAN;
+    mesh->drawingMode = GL_TRIANGLES;
 
     //Setup transform
     TransformComponent* transform = new TransformComponent(newObject );
