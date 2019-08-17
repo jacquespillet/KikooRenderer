@@ -36,7 +36,7 @@ Shader GetBlinnPhongShader() {
         fragPos = (modelMatrix * vec4(position.x, position.y, position.z, 1.0f)).xyz;
         fragNormal = normal;
         fragUv = uv;
-        fragTangent = -tangent;
+        fragTangent = tangent;
     }
     )";
 
@@ -80,8 +80,8 @@ Shader GetBlinnPhongShader() {
     {
         vec3 fragToCam = cameraPos - fragPos;
 
-        vec4 finalAlbedo = (hasAlbedoTex==1) ? albedo * texture(albedoTexture, fragUv) : albedo;
-        vec3 finalNormal = (hasNormalTex==1) ? texture(normalTexture, fragUv).xyz : fragNormal;
+        vec4 finalAlbedo   = (hasAlbedoTex==1) ? albedo * texture(albedoTexture, fragUv) : albedo;
+        vec3 finalNormal   = (hasNormalTex==1) ? texture(normalTexture, fragUv).xyz : fragNormal;
         vec4 specularColor = vec4(1, 1, 1, 1);
         
         float finalSpecularFactor = (hasSpecularTex==1) ? texture(specularTexture, fragUv).x : specularFactor;
@@ -89,7 +89,7 @@ Shader GetBlinnPhongShader() {
         vec4 finalColor = vec4(0, 0, 0, 1);
         finalColor.rgb += ambientFactor * finalAlbedo.rgb;
 
-        vec3 fragBitangent = -normalize(cross(fragNormal, fragTangent.xyz) * fragTangent.w); 
+        vec3 fragBitangent = normalize(cross(fragNormal, fragTangent.xyz) * fragTangent.w); 
 
         for(int i=0; i<numLights; i++) {
             float attenuation = 1;
@@ -97,23 +97,21 @@ Shader GetBlinnPhongShader() {
             
             if(lights[i].type == 1) { //Point light
                 float distance = distance(fragPos.xyz, lights[i].position);
-                attenuation = 1 / (lights[i].attenuation.x + lights[i].attenuation.y * distance + lights[i].attenuation.z * (distance * distance));
+                attenuation    = 1 / (lights[i].attenuation.x + lights[i].attenuation.y * distance + lights[i].attenuation.z * (distance * distance));
                 lightDirection = normalize(fragPos.xyz - lights[i].position);
             }
             if(lights[i].type == 2) { //Spot light
-                lightDirection = normalize(fragPos.xyz - lights[i].position);
-                float distance = distance(fragPos.xyz, lights[i].position);
+                lightDirection  = normalize(fragPos.xyz - lights[i].position);
+                float distance  = distance(fragPos.xyz, lights[i].position);
                 float numerator = pow(max(dot(-normalize(lights[i].direction), -lightDirection), 0), 64);
-                attenuation = numerator / (lights[i].attenuation.x + lights[i].attenuation.y * distance + lights[i].attenuation.z * (distance * distance));
+                attenuation     = numerator / (lights[i].attenuation.x + lights[i].attenuation.y * distance + lights[i].attenuation.z * (distance * distance));
             }
             
             vec3 toLight = -lightDirection;
-
             //Redefinition of vectors in tangent space
             if(hasNormalTex == 1) {
-                toLight = -normalize(vec3(dot(fragTangent.xyz, lights[i].direction),    dot(fragBitangent, lights[i].direction), dot(fragNormal, lights[i].direction)));
-                fragToCam = -normalize(vec3(dot(fragTangent.xyz, fragToCam), dot(fragBitangent, fragToCam), dot(fragNormal, fragToCam)));
-                finalNormal = vec3(0, 0, 1);
+                toLight     = normalize(vec3(dot(fragTangent.xyz, toLight),dot(fragBitangent, toLight), dot(fragNormal, toLight)));
+                fragToCam   = normalize(vec3(dot(fragTangent.xyz, fragToCam), dot(fragBitangent, fragToCam), dot(fragNormal, fragToCam)));
             }
 
 
@@ -124,14 +122,8 @@ Shader GetBlinnPhongShader() {
             // Specular factor * specular color * lightColor * specularity of fragment
             vec4 specular = finalSpecularFactor * specularColor * lights[i].color * pow(max(dot(normalize(finalNormal.xyz), halfwayVec),0), smoothness);
 
-            // finalColor.rgb +=  attenuation * (diffuse).rgb;
-            finalColor.rgb +=  attenuation * (diffuse + specular).rgb;
-            // finalColor = vec4(fragToCam.xyz, 1);
+            finalColor.rgb +=  attenuation * (diffuse + specular).rgb;  
         }
-        // finalColor.xyz = tangent;
-        // finalColor.xyz = fragBitangent;
-        // finalColor.xyz = fragNormal;
-        // finalColor.xy = fragUv;
         outputColor = finalColor;
         outputColor.a = finalAlbedo.a;
     }
