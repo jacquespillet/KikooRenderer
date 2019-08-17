@@ -43,6 +43,10 @@ class Scene {
 		Object3D* FindObjectByName(std::string name);
 		std::string AddObject(Object3D* object);
 		void RemoveObject(Object3D* object);
+		void AddObjectToSelection(bool erasePrevious, Object3D* selectedObject);
+		void ClearSelection();
+		void DeleteSelection();
+
 
 		void SetWindowSize(int w, int h);
 
@@ -62,8 +66,6 @@ class Scene {
 
 		GLint defaultFBO;
 
-		void AddObjectToSelection(bool erasePrevious, Object3D* selectedObject);
-		void ClearSelection();
 
 		bool isControlKey = false;
 

@@ -168,9 +168,12 @@ void SceneTree::keyPressEvent(QKeyEvent* e) {
 		if (selectedIndexes.size() > 0) {
 			TreeItem* parentItem = (TreeItem*)model->itemFromIndex(selectedIndexes[0]);
 			parentItem->Delete();
-
 		}
 	}
+}
+
+void SceneTree::DeleteObject(CoreEngine::Object3D* object) {
+	std::cout << "delete " <<std::endl;
 }
 
 }

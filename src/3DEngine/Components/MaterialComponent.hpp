@@ -59,11 +59,6 @@ class MaterialComponent : public Component {
 		std::string specularTexStr = "";
 		std::string normalTexStr = "";
 
-		float ambientFactor;
-		float diffuseFactor;
-		float specularFactor;
-		int smoothness;
-
 		MaterialInspector* materialInspector;
 		
 		ShaderParams* params;

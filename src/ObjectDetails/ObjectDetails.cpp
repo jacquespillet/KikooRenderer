@@ -1,7 +1,5 @@
 #include "ObjectDetails.hpp"
 #include "3DEngine/Scene.hpp"
-#include "3DEngine/Components/TransformComponent.hpp"
-#include "3DEngine/Components/MaterialComponent.hpp"
 
 namespace KikooRenderer
 {
@@ -45,18 +43,20 @@ namespace KikooRenderer
 	}
 
 	ObjectDetailRoot::ObjectDetailRoot() : QWidget() {
-		mainLayout = new QVBoxLayout();			
+		mainLayout = new QVBoxLayout();	
+		mainLayout->setAlignment(Qt::AlignTop);	
 		setLayout(mainLayout);
 	}
 
 	void ObjectDetailRoot::ClearWidgets() {
-		if (!mainLayout)
-			return;
+		// if (!mainLayout)
+		// 	return;
 		
-		while (QLayoutItem* item = mainLayout->takeAt(0)) {
-			delete item->widget();
-			delete item;
-		}
+		// while (QLayoutItem* item = mainLayout->takeAt(0)) {
+		// 	delete item->widget();
+		// 	delete item;
+		// }
+		EmptyLayout(mainLayout);
 	}
 
 	ObjectDetailsPanel::ObjectDetailsPanel() : QDockWidget("Object Details")
@@ -78,10 +78,10 @@ namespace KikooRenderer
 			currentObject->scene->triggerRefresh = true;
 		});
 
-		CoreEngine::TransformInspector* transformInspector = currentObject->transform->GetInspector();
+		transformInspector = currentObject->transform->GetInspector();
 		rootWidget->mainLayout->addWidget(transformInspector);
 
-		CoreEngine::MaterialComponent * material = (CoreEngine::MaterialComponent*)(currentObject->GetComponent("Material"));
+		material = (CoreEngine::MaterialComponent*)(currentObject->GetComponent("Material"));
 		if (material != nullptr) {
 			CoreEngine::MaterialInspector* materialInspector = material->GetInspector();
 			rootWidget->mainLayout->addWidget(materialInspector);

@@ -27,16 +27,17 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 	QHBoxLayout* shaderLayout = new QHBoxLayout();
 	QComboBox* shaderList = new QComboBox();
 	QLabel* shaderLabel = new QLabel("Shader");
-	for (int i = 0; i < scene->standardShaders.numShaders; i++) {
-		shaderList->addItem(QString::fromStdString(scene->standardShaders.ids[i]));
+	for (int i = 0; i < scene->standardShaders.shaders.size(); i++) {
+		
+		shaderList->addItem(QString::fromStdString(scene->standardShaders.shaders[i]->name));
 	}
-
 	int shaderInx = materialComponent->shader->GetId();
 	shaderList->setCurrentIndex(shaderInx);
+
 	shaderLayout->addWidget(shaderLabel);
 	shaderLayout->addWidget(shaderList);
-	mainLayout->addLayout(shaderLayout);
 
+	mainLayout->addLayout(shaderLayout);
 	connect(shaderList, static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged), this, [this, materialComponent](int index) {
 		materialComponent->shader = scene->standardShaders.shaders[index];
 		UpdateShaderParameters();
@@ -44,13 +45,13 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 	});
 
 	ColorPicker* albedoPicker = new ColorPicker("Albedo", 210, 15, 60, 255);
+	mainLayout->addWidget(albedoPicker);
 	connect(albedoPicker, &ColorPicker::ColorPicked, this, [this, materialComponent](QColor color) {
 		glm::dvec4 albedoVec = glm::dvec4(color.red(), color.green(), color.blue(), color.alpha()) * 0.00392156;
 		materialComponent->albedo = albedoVec;
 		scene->triggerRefresh = true;
 	});
 
-	mainLayout->addWidget(albedoPicker);
 
 	//Albedo tex
 	FilePicker* albedoTexPicker = new FilePicker("Albedo Texture");
@@ -78,6 +79,11 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 	});
 
 	shaderParametersLayout = new QVBoxLayout();
+		
+	QLayout* paramsLayout = materialComponent->params->GetLayout(); 
+	shaderParametersLayout->addLayout(paramsLayout);
+
+	mainLayout->addLayout(shaderParametersLayout);
 }
 
 void MaterialInspector::Refresh() {}
@@ -102,10 +108,6 @@ MaterialComponent::MaterialComponent(Object3D* object) : Component("Material", o
     influence = 1.0;
     albedo = glm::dvec4(0.75, 0.75, 0.75, 1.0);
 
-	ambientFactor = 0.2;
-	diffuseFactor = 0.3;
-	specularFactor = 1.0;
-	smoothness = 8;
 }
 
 
@@ -113,11 +115,6 @@ void MaterialComponent::OnStart(){}
 void MaterialComponent::OnEnable(){
 	params = StandardShaders::GetParamsById(shader->GetId());
 	params->shader = shader;
-	if(params == nullptr) {
-		std::cout << "PROBLEM " << std::endl;
-		std::cout << shader->GetId() << std::endl;
-	}
-	
 	inited = true;
 }
 void MaterialComponent::OnUpdate(){
@@ -156,19 +153,20 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 		int influenceLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "materialInfluence"); 
 		ogl->glUniform1f(influenceLocation, influence);
 		
-		// if(params){
-		params->SetUniforms();
-		// }
-
 		int modelViewProjectionMatrixLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "modelViewProjectionMatrix"); 
 		ogl->glUniformMatrix4fv(modelViewProjectionMatrixLocation, 1, false, glm::value_ptr(mvpMatrix));
 
 		glm::vec3 camPos = scene->camera->transform->position;
 		int cameraPosLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "cameraPos"); 
 		ogl->glUniform3fv(cameraPosLocation,1, glm::value_ptr(camPos));
-		
+
 		int albedoLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "albedo"); 
 		ogl->glUniform4fv(albedoLocation, 1, glm::value_ptr(albedo));
+
+		params->SetUniforms();
+
+
+		
 	
 
 		if (albedoTex.loaded) {
@@ -178,8 +176,7 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 
 			int hasAlbedoTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasAlbedoTex");
 			ogl->glUniform1i(hasAlbedoTexLocation, 1);
-		}
-		else {
+		} else {
 			int hasAlbedoTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasAlbedoTex");
 			ogl->glUniform1i(hasAlbedoTexLocation, 0);
 		}
@@ -243,17 +240,18 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 					numLights++;
 				}
 			}
+
 			int numLightsLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "numLights"); 
 			ogl->glUniform1i(numLightsLocation, numLights);
 
 
-			if(this->shader->GetId() == SHADER_IDS::PBR) {         
-				GLuint loc = ogl->glGetUniformLocation(this->shader->programShaderObject, "roughness");
-				ogl->glUniform1f(loc, 0.5);
+			// if(this->shader->GetId() == SHADER_IDS::PBR) {         
+			// 	GLuint loc = ogl->glGetUniformLocation(this->shader->programShaderObject, "roughness");
+			// 	ogl->glUniform1f(loc, 0.5);
 
-				loc = ogl->glGetUniformLocation(this->shader->programShaderObject, "specularFrac");
-				ogl->glUniform1f(loc, 0.5);
-			}
+			// 	loc = ogl->glGetUniformLocation(this->shader->programShaderObject, "specularFrac");
+			// 	ogl->glUniform1f(loc, 0.5);
+			// }
 		}
 	}
 }

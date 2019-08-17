@@ -3,8 +3,14 @@
 #include "Util/Common.h"
 #include "3DEngine/Object3D.hpp"
 #include "SceneTree/SceneTree.hpp"
+#include "3DEngine/Components/TransformComponent.hpp"
+#include "3DEngine/Components/MaterialComponent.hpp"
 
 namespace KikooRenderer {
+namespace CoreEngine {
+	class MaterialComponent;
+}
+
 class View3D;
 class SceneTree;
 class ObjectDetailRoot;
@@ -57,6 +63,11 @@ public:
 
 	ObjectDetailRoot* rootWidget;
 	CoreEngine::Object3D* currentObject;
+
+	//Component inspectors
+	CoreEngine::TransformInspector* transformInspector;
+	CoreEngine::MaterialComponent * material;
+
 
 	void Refresh();
 

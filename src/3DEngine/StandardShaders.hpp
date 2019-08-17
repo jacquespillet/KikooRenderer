@@ -8,7 +8,7 @@ namespace KikooRenderer
 {
 namespace CoreEngine
 {
-enum SHADER_IDS { UNLIT=0, SELECTED = 1, GOURAUD = 2, BLINNPHONG = 3, PBR = 4};
+enum SHADER_IDS { UNLIT=0,  GOURAUD = 1, BLINNPHONG = 2, PBR = 3, SELECTED = 4};
 class ShaderParams;
 
 class StandardShaders
@@ -17,8 +17,6 @@ class StandardShaders
 		// Scene* scene;
 
 		StandardShaders();
-		int numShaders = 5;
-		std::string ids[5] = { "unlit", "gouraud", "blinn phong", "pbr", "selected"};
 		std::vector<Shader*> shaders;
 
 		Shader unlitMeshShader;

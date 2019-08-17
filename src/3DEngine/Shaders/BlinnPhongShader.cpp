@@ -9,11 +9,6 @@ namespace CoreEngine
 Shader GetBlinnPhongShader() {
     Shader blinnPhongShader;
 
-
-    // BlinnPhongParams* params = new BlinnPhongParams();
-    // params->shader = &blinnPhongShader;
-    // blinnPhongShader.SetParams(params);
-
     blinnPhongShader.vertSrc= R"(
     #version 440
 
@@ -74,6 +69,11 @@ Shader GetBlinnPhongShader() {
     uniform int hasSpecularTex;
     uniform int hasNormalTex;
 
+    uniform float ambientFactor;
+    uniform float diffuseFactor;
+    uniform float specularFactor;
+    uniform float smoothness;
+
     in vec3 fragPos;
     in vec3 fragNormal;
     in vec2 fragUv;
@@ -82,13 +82,16 @@ Shader GetBlinnPhongShader() {
 
     void main()
     {
+
+
         vec3 fragToCam = cameraPos - fragPos;
+
 
         vec4 finalAlbedo = (hasAlbedoTex==1) ? albedo * texture(albedoTexture, fragUv) : albedo;
         vec3 finalNormal = (hasNormalTex==1) ? texture(normalTexture, fragUv).xyz : fragNormal;
         
         vec4 finalColor = vec4(0, 0, 0, 1);
-        finalColor.rgb += 0.1 * finalAlbedo.rgb;
+        finalColor.rgb += ambientFactor * finalAlbedo.rgb;
 
         for(int i=0; i<numLights; i++) {
             vec3 fragBitangent = normalize(cross(fragNormal, fragTangent)); 
@@ -118,11 +121,11 @@ Shader GetBlinnPhongShader() {
             }
 
 
-            vec4 diffuse = 0.5 * finalAlbedo * lights[i].color * max(dot(normalize(finalNormal.xyz), toLight), 0);
+            vec4 diffuse = diffuseFactor * finalAlbedo * lights[i].color * max(dot(normalize(finalNormal.xyz), toLight), 0);
 
             // Specular
             vec3 halfwayVec = normalize(toLight + fragToCam);
-            vec4 specular = finalAlbedo * lights[i].color * pow(max(dot(normalize(finalNormal.xyz), halfwayVec),0), 64);
+            vec4 specular = specularFactor * finalAlbedo * lights[i].color * pow(max(dot(normalize(finalNormal.xyz), halfwayVec),0), smoothness);
 
             finalColor.rgb +=  attenuation * (diffuse + specular).rgb;
         }

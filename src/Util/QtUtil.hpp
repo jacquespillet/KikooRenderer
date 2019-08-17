@@ -21,7 +21,7 @@ public:
 		slider->setMinimum(min / step);
 		slider->setMaximum(max / step);
 		slider->setSingleStep(1);
-		slider->setValue(initialValue);
+		slider->setValue(initialValue/ step);
 		connect(slider, SIGNAL(valueChanged(int)), this, SLOT(OnSliderChanged(int)));
 		addWidget(slider);
 		QLabel* labelWidget = new QLabel(QString::fromStdString(label));

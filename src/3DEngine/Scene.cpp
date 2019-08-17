@@ -82,6 +82,7 @@ namespace CoreEngine {
             if(selectedObjects[i]->visible) {
                 MaterialComponent* material = (MaterialComponent*)(selectedObjects[i]->GetComponent("Material"));
                 if(material) {
+                    //Save shader state to set it back after this pass
                     Shader* tmpShader = material->shader;
                     ShaderParams* tmpParams = material->params;
 
@@ -196,6 +197,9 @@ namespace CoreEngine {
 			transformWidget->SetTransformMode(TransformWidget::TransformMode::ROTATE);
 		}
 
+        if (e->key() == Qt::Key_Delete) {
+            DeleteSelection();
+        }   
 	}
 
     void Scene::OnMousePressEvent(QMouseEvent *e) {
@@ -238,7 +242,7 @@ namespace CoreEngine {
 			std::cout << intersectedObject->name << std::endl;
 			AddObjectToSelection(true, intersectedObject);
         } else if(!transformWidget->visible) { 
-			selectedObjects.resize(0); 
+            ClearSelection();
 		}
     }
 
@@ -267,6 +271,13 @@ namespace CoreEngine {
 		transformWidget->Disable();
 		objectDetailsPanel->Clear();
 	}
+
+    void Scene::DeleteSelection() {
+        for(int i=0; i<selectedObjects.size(); i++) {
+            RemoveObject(selectedObjects[i]);
+        }
+        ClearSelection();
+    }
 
 
     Object3D* Scene::GetIntersectObject(int x, int y) {
