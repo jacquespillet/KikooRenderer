@@ -1,5 +1,6 @@
 #build folder
 build/
+Install/
 ext/
 .vs/
 
@@ -8,6 +9,7 @@ ext/
 *.lo
 *.o
 *.obj
+*.pdb
 
 # Precompiled Headers
 *.gch
