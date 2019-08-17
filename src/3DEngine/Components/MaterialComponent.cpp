@@ -58,6 +58,7 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 	mainLayout->addWidget(albedoTexPicker);
 	connect(albedoTexPicker, &FilePicker::FileModified, this, [this, materialComponent](QString string) {
 		materialComponent->albedoTexStr = string.toStdString();
+		materialComponent->shouldLoadAlbedo = true;
 		scene->triggerRefresh = true;
 	});
 
@@ -65,16 +66,18 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 	//Albedo Map
 	FilePicker* specularPicker = new FilePicker("Specular Texture");
 	mainLayout->addWidget(specularPicker);
-	connect(specularPicker, &FilePicker::FileModified, this, [this](QString string) {
-		std::cout << "laod specular texture" << string.toStdString() << std::endl;
+	connect(specularPicker, &FilePicker::FileModified, this, [this, materialComponent](QString string) {
+		materialComponent->specularTexStr = string.toStdString();
+		materialComponent->shouldLoadSpecular = true;
 		scene->triggerRefresh = true;
 	});
 
 	//Normal Map
 	FilePicker* normalTexPicker = new FilePicker("Normal Texture");
 	mainLayout->addWidget(normalTexPicker);
-	connect(normalTexPicker, &FilePicker::FileModified, this, [this](QString string) {
-		std::cout << "laod normal texture" << string.toStdString() << std::endl;
+	connect(normalTexPicker, &FilePicker::FileModified, this, [this, materialComponent](QString string) {
+		materialComponent->normalTexStr = string.toStdString();
+		materialComponent->shouldLoadNormal = true;
 		scene->triggerRefresh = true;
 	});
 
@@ -118,10 +121,19 @@ void MaterialComponent::OnEnable(){
 	inited = true;
 }
 void MaterialComponent::OnUpdate(){
-	// //std::cout << "isloaded " << albedoTex.loaded << " tex " << albedoTexStr << std::endl;
-	// if (!albedoTex.loaded && albedoTexStr != "") {
-	// //	albedoTex = KikooRenderer::CoreEngine::Texture(albedoTexStr, GL_TEXTURE0);
-	// }
+	// std::cout << "isloaded " << albedoTex.loaded << " tex " << albedoTexStr << std::endl;
+	if (shouldLoadAlbedo ) {
+		albedoTex = KikooRenderer::CoreEngine::Texture(albedoTexStr, GL_TEXTURE0);
+		shouldLoadAlbedo = false;
+	}
+	if (shouldLoadSpecular ) {
+		specularTex = KikooRenderer::CoreEngine::Texture(specularTexStr, GL_TEXTURE1);
+		shouldLoadSpecular = false;
+	}
+	if (shouldLoadNormal ) {
+		normalTex = KikooRenderer::CoreEngine::Texture(normalTexStr, GL_TEXTURE2);
+		shouldLoadNormal = false;
+	}
 }
 void MaterialComponent::OnRender(){} 
 void MaterialComponent::OnDestroy(){} 
@@ -164,10 +176,6 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 		ogl->glUniform4fv(albedoLocation, 1, glm::value_ptr(albedo));
 
 		params->SetUniforms();
-
-
-		
-	
 
 		if (albedoTex.loaded) {
 			albedoTex.Use();

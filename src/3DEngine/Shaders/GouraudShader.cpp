@@ -70,7 +70,6 @@ void GetGouraudShader(Shader* gouraudShader) {
 
                 vec3 halfwayVec = normalize(fragToLight  + fragToCam);
                 vec4 specular = specularFactor * mainAlbedo * lights[i].color * pow(max(dot(normal, halfwayVec),0), smoothness);
-                //vec4 specular = vec4(1, 1, 1, 1) * pow(max(dot(mainNormal, halfwayVec),0), smoothness);
 
                 finalColor.rgb +=  attenuation * (diffuse + specular ).rgb;
             }

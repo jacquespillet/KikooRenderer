@@ -37,9 +37,9 @@ void MeshFilterComponent::OnDestroy() {
 }
 void MeshFilterComponent::Recompute() {}
 
-void MeshFilterComponent::CalculateTangents(std::vector<glm::vec3>& tangents ,std::vector<glm::dvec3> _vertices,  std::vector<glm::dvec3> normals, std::vector<glm::dvec2> uv,std::vector<int> triangles) {
-	std::vector<glm::vec3> tan1(_vertices.size(), glm::vec3(0));
-	std::vector<glm::vec3> tan2(_vertices.size(), glm::vec3(0));
+void MeshFilterComponent::CalculateTangents(std::vector<glm::vec4>& tangents ,std::vector<glm::dvec3> _vertices,  std::vector<glm::dvec3> normals, std::vector<glm::dvec2> uv,std::vector<int> triangles) {
+	std::vector<glm::vec4> tan1(_vertices.size(), glm::vec4(0));
+	std::vector<glm::vec4> tan2(_vertices.size(), glm::vec4(0));
 	for(uint64_t i=0; i<triangles.size(); i+=3) {
 		glm::vec3 v1 = _vertices[triangles[i]];
 		glm::vec3 v2 = _vertices[triangles[i + 1]];
@@ -62,8 +62,8 @@ void MeshFilterComponent::CalculateTangents(std::vector<glm::vec3>& tangents ,st
 		double t2 = w3.y - w1.y;
 
   		double r = 1.0F / (s1 * t2 - s2 * t1);
-		glm::vec3 sdir((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r,    (t2 * z1 - t1 * z2) * r);
-		glm::vec3 tdir((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r,    (s1 * z2 - s2 * z1) * r);
+		glm::vec4 sdir((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r, (t2 * z1 - t1 * z2) * r, 0);
+		glm::vec4 tdir((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r, (s1 * z2 - s2 * z1) * r, 0);
 
 		tan1[triangles[i]] += sdir;
 		tan1[triangles[i + 1]] += sdir;
@@ -72,13 +72,17 @@ void MeshFilterComponent::CalculateTangents(std::vector<glm::vec3>& tangents ,st
 		tan2[triangles[i]] += tdir;
 		tan2[triangles[i + 1]] += tdir;
 		tan2[triangles[i + 2]] += tdir;
+
 	}
 
 	for(uint64_t i=0; i<_vertices.size(); i++) { 
 		glm::vec3 n = normals[i];
-		glm::vec3 t = tan1[i];
+		glm::vec3 t = glm::vec3(tan1[i]);
 
-		tangents[i] = glm::normalize((t - n * glm::dot(n, t)));
+		tangents[i] = glm::vec4(glm::normalize((t - n * glm::dot(n, t))), 1);
+		
+		tangents[i].w = (glm::dot(glm::cross(n, t), glm::vec3(tan2[i])) < 0.0F) ? -1.0F : 1.0F;
+		// std::cout << "Normal " << glm::to_string(normals[i]) << " Tangent " << glm::to_string(tan1[i]) << " Tan 2 " << glm::to_string(tan2[i]) << " Handedness " << handedness << std::endl;
 	}
 }
 
@@ -89,7 +93,7 @@ void MeshFilterComponent::LoadFromBuffers(std::vector<glm::dvec3> _vertex,
         std::vector<glm::dvec4> _colors,
         std::vector<int> _triangles, 
         bool calculateTangents) {
-	std::vector<glm::vec3> tangents(_normals.size(), glm::vec3(0, 0, 0));
+	std::vector<glm::vec4> tangents(_normals.size(), glm::vec4(0, 0, 0, 0));
     this->triangles = _triangles;
 	
 	if(calculateTangents) CalculateTangents(tangents, _vertex, _normals, _uv, _triangles);
@@ -137,7 +141,7 @@ void MeshFilterComponent::InitBuffers() {
 	ogl->glVertexAttribPointer(1, 3, GL_FLOAT, false, sizeof(Vertex), (void*)((uintptr_t)12));
 	ogl->glVertexAttribPointer(2, 2, GL_FLOAT, false, sizeof(Vertex), (void*)((uintptr_t)24));
 	ogl->glVertexAttribPointer(3, 4, GL_UNSIGNED_BYTE, true, sizeof(Vertex), (void*)((uintptr_t)32));
-	ogl->glVertexAttribPointer(4, 3, GL_FLOAT, true, sizeof(Vertex), (void*)((uintptr_t)36));
+	ogl->glVertexAttribPointer(4, 4, GL_FLOAT, true, sizeof(Vertex), (void*)((uintptr_t)36));
 	
 	//Unbind VAO
 	ogl->glBindVertexArray(0);

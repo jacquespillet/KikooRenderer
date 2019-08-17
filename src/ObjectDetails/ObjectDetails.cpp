@@ -3,62 +3,28 @@
 
 namespace KikooRenderer
 {
-	
-	ObjectDetails::ObjectDetails(CoreEngine::Object3D* _object, ObjectDetailRoot* _root) : QGroupBox("Object") {
-		object = _object;
-		root = _root;
 
-		QVBoxLayout* mainLayout = new QVBoxLayout();
 
-		QHBoxLayout* nameLayout = new QHBoxLayout();
-		
-		QCheckBox* isVisibleChecbBox = new QCheckBox(); 
-		if (object->visible) isVisibleChecbBox->setCheckState(Qt::Checked);
-		else isVisibleChecbBox->setCheckState(Qt::Unchecked);
-
-		nameLayout->addWidget(isVisibleChecbBox);
-		connect(isVisibleChecbBox, &QCheckBox::stateChanged, [this](int state) {
-			object->visible = state > 0;
-			emit root->InspectorModified();
-		});
-
-		QLineEdit* label = new QLineEdit(QString::fromStdString(object->name));
-		nameLayout->addWidget(label);
-		connect(label, &QLineEdit::textChanged, [this](const QString &text) {
-			object->name = text.toStdString();
-			emit root->InspectorModified();
-			root->dockWidget->sceneTree->Refresh();
-		});
-
-		mainLayout->addLayout(nameLayout);
-
-		QCheckBox* isStaticCheckBox = new QCheckBox("Static");
-		mainLayout->addWidget(isStaticCheckBox);
-		connect(isStaticCheckBox, &QCheckBox::stateChanged, [this](int state) {
-			object->isStatic = state > 0;
-			emit root->InspectorModified();
-		});
-
-		setLayout(mainLayout);
-	}
-
+	/*
+	Root widget of the inspector
+	Holds all the component inspectors
+	*/
 	ObjectDetailRoot::ObjectDetailRoot() : QWidget() {
 		mainLayout = new QVBoxLayout();	
 		mainLayout->setAlignment(Qt::AlignTop);	
 		setLayout(mainLayout);
 	}
 
+	/*
+	Clears the layout
+	*/
 	void ObjectDetailRoot::ClearWidgets() {
-		// if (!mainLayout)
-		// 	return;
-		
-		// while (QLayoutItem* item = mainLayout->takeAt(0)) {
-		// 	delete item->widget();
-		// 	delete item;
-		// }
 		EmptyLayout(mainLayout);
 	}
 
+	/*
+	Constructor of the right panel
+	*/
 	ObjectDetailsPanel::ObjectDetailsPanel() : QDockWidget("Object Details")
 	{
 		setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea | Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
@@ -67,6 +33,10 @@ namespace KikooRenderer
 		setWidget(rootWidget);
 	}
 
+	/*
+	Set the inspected object
+	@param _object : Inspected object
+	*/
 	void ObjectDetailsPanel::SetObject(CoreEngine::Object3D* _object) {
 		rootWidget->ClearWidgets();
 
@@ -95,6 +65,9 @@ namespace KikooRenderer
 		currentObject->transform->transformInspector->Refresh();
 	}
 
+	/*
+	Clears all the widgets of the inspector
+	*/
 	void ObjectDetailsPanel::Clear() {
 		rootWidget->ClearWidgets();
 	}

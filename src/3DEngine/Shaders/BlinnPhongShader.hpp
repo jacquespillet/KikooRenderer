@@ -14,10 +14,10 @@ public:
 
     }
 
-    float ambientFactor = 0.1;
-    float diffuseFactor = 0.1;
-    float specularFactor = 0.1;
-    int smoothness = 2048;
+    float ambientFactor = 0.6;
+    float diffuseFactor = 0.6;
+    float specularFactor = 0.6;
+    int smoothness = 8;
 
     virtual void SetUniforms() {
         GETGL
@@ -61,7 +61,7 @@ public:
             scene->triggerRefresh = true;
         });
 
-        CustomSlider* smoothnessSlider = new CustomSlider(0, 2048, 10, "Smoothness", smoothness);
+        CustomSlider* smoothnessSlider = new CustomSlider(0, 128, 1, "Smoothness", smoothness);
         shaderParamsLayout->addLayout(smoothnessSlider);
         QObject::connect(smoothnessSlider, &CustomSlider::Modified, [this](double val) {
             smoothness = val;

@@ -16,7 +16,7 @@ Shader GetBlinnPhongShader() {
     layout(location = 1) in vec3 normal;
     layout(location = 2) in vec2 uv;
     layout(location = 3) in vec4 color;
-    layout(location = 4) in vec3 tangent;
+    layout(location = 4) in vec4 tangent;
 
     uniform mat4 modelViewProjectionMatrix;
     uniform mat4 modelMatrix;
@@ -25,7 +25,7 @@ Shader GetBlinnPhongShader() {
     out vec3 fragPos;
     out vec3 fragNormal;
     out vec2 fragUv;
-    out vec3 fragTangent;
+    out vec4 fragTangent;
     out vec3 toCamTangentSpace; 
     out vec3 toLightTangentSpace; 
 
@@ -36,11 +36,7 @@ Shader GetBlinnPhongShader() {
         fragPos = (modelMatrix * vec4(position.x, position.y, position.z, 1.0f)).xyz;
         fragNormal = normal;
         fragUv = uv;
-        fragTangent = tangent;
-
-        vec3 fragToCam = cameraPos - fragPos;
-        vec3 bitangent = cross(normal, tangent); 
-        toCamTangentSpace = vec3(dot(tangent, fragToCam), dot(bitangent, fragToCam), dot(normal, fragToCam));
+        fragTangent = -tangent;
     }
     )";
 
@@ -77,26 +73,25 @@ Shader GetBlinnPhongShader() {
     in vec3 fragPos;
     in vec3 fragNormal;
     in vec2 fragUv;
-    in vec3 fragTangent;
+    in vec4 fragTangent;
     in vec3 toCamTangentSpace; 
 
     void main()
     {
-
-
         vec3 fragToCam = cameraPos - fragPos;
-
 
         vec4 finalAlbedo = (hasAlbedoTex==1) ? albedo * texture(albedoTexture, fragUv) : albedo;
         vec3 finalNormal = (hasNormalTex==1) ? texture(normalTexture, fragUv).xyz : fragNormal;
+        vec4 specularColor = vec4(1, 1, 1, 1);
+        
+        float finalSpecularFactor = (hasSpecularTex==1) ? texture(specularTexture, fragUv).x : specularFactor;
         
         vec4 finalColor = vec4(0, 0, 0, 1);
         finalColor.rgb += ambientFactor * finalAlbedo.rgb;
 
-        for(int i=0; i<numLights; i++) {
-            vec3 fragBitangent = normalize(cross(fragNormal, fragTangent)); 
-            vec3 toLightTangentSpace = vec3(dot(fragTangent, lights[i].direction),    dot(fragBitangent, lights[i].direction), dot(fragNormal, lights[i].direction)); 
+        vec3 fragBitangent = -normalize(cross(fragNormal, fragTangent.xyz) * fragTangent.w); 
 
+        for(int i=0; i<numLights; i++) {
             float attenuation = 1;
             vec3 lightDirection = normalize(lights[i].direction);
             
@@ -116,23 +111,29 @@ Shader GetBlinnPhongShader() {
 
             //Redefinition of vectors in tangent space
             if(hasNormalTex == 1) {
-                toLight = toLightTangentSpace;
-                fragToCam = toCamTangentSpace;
+                toLight = -normalize(vec3(dot(fragTangent.xyz, lights[i].direction),    dot(fragBitangent, lights[i].direction), dot(fragNormal, lights[i].direction)));
+                fragToCam = -normalize(vec3(dot(fragTangent.xyz, fragToCam), dot(fragBitangent, fragToCam), dot(fragNormal, fragToCam)));
+                finalNormal = vec3(0, 0, 1);
             }
 
 
             vec4 diffuse = diffuseFactor * finalAlbedo * lights[i].color * max(dot(normalize(finalNormal.xyz), toLight), 0);
 
-            // Specular
             vec3 halfwayVec = normalize(toLight + fragToCam);
-            vec4 specular = specularFactor * finalAlbedo * lights[i].color * pow(max(dot(normalize(finalNormal.xyz), halfwayVec),0), smoothness);
 
+            // Specular factor * specular color * lightColor * specularity of fragment
+            vec4 specular = finalSpecularFactor * specularColor * lights[i].color * pow(max(dot(normalize(finalNormal.xyz), halfwayVec),0), smoothness);
+
+            // finalColor.rgb +=  attenuation * (diffuse).rgb;
             finalColor.rgb +=  attenuation * (diffuse + specular).rgb;
+            // finalColor = vec4(fragToCam.xyz, 1);
         }
-        // finalColor = vec4(fragTangent.xyz, 1);
+        // finalColor.xyz = tangent;
+        // finalColor.xyz = fragBitangent;
+        // finalColor.xyz = fragNormal;
+        // finalColor.xy = fragUv;
         outputColor = finalColor;
         outputColor.a = finalAlbedo.a;
-        
     }
     )";
 

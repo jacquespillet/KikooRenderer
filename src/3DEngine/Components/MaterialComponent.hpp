@@ -56,8 +56,11 @@ class MaterialComponent : public Component {
         Texture normalTex;
 
 		std::string albedoTexStr = "";
+		bool shouldLoadAlbedo = false;
 		std::string specularTexStr = "";
+		bool shouldLoadSpecular = false;
 		std::string normalTexStr = "";
+		bool shouldLoadNormal = false;
 
 		MaterialInspector* materialInspector;
 		

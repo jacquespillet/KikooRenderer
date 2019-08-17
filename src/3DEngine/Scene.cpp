@@ -35,8 +35,8 @@ namespace CoreEngine {
 		transformWidget = new TransformWidget(this);
 		transformWidget->Enable();
 
-		Object3D* dirLight = GetDirectionalLight(this, "Main light", glm::dvec3(0), glm::dvec3(40, 170, 0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
-		AddObject(dirLight);
+		// Object3D* dirLight = GetDirectionalLight(this, "Main light", glm::dvec3(0), glm::dvec3(40, 170, 0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
+		// AddObject(dirLight);
 	
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
@@ -274,7 +274,7 @@ namespace CoreEngine {
 
     void Scene::DeleteSelection() {
         for(int i=0; i<selectedObjects.size(); i++) {
-            RemoveObject(selectedObjects[i]);
+            objectDetailsPanel->sceneTree->DeleteObject(selectedObjects[i]);
         }
         ClearSelection();
     }

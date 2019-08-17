@@ -40,28 +40,28 @@ Object3D* GetCube(Scene* scene, std::string name, glm::dvec3 _position, glm::dve
     vertex.push_back(glm::dvec3(-0.5, -0.5, 0.5)); //bottom right
 
     // Right
-    vertex.push_back(glm::dvec3(0.5, -0.5, 0.5)); // Bottom left
-    vertex.push_back(glm::dvec3(0.5, 0.5, 0.5)); //Top left
-    vertex.push_back(glm::dvec3(0.5, 0.5, -0.5)); //Top right
-    vertex.push_back(glm::dvec3(0.5, -0.5, -0.5)); //Bottom right
+    vertex.push_back(glm::dvec3(0.5, -0.5, -0.5)); // Bottom left
+    vertex.push_back(glm::dvec3(0.5, 0.5, -0.5)); //Top left
+    vertex.push_back(glm::dvec3(0.5, 0.5, 0.5)); //Top right
+    vertex.push_back(glm::dvec3(0.5, -0.5, 0.5)); //Bottom right
 
     // Left
-    vertex.push_back(glm::dvec3(-0.5, -0.5, -0.5)); //Bottom Left
-    vertex.push_back(glm::dvec3(-0.5, 0.5, -0.5)); //Top left
-    vertex.push_back(glm::dvec3(-0.5, 0.5, 0.5)); //Top right
-    vertex.push_back(glm::dvec3(-0.5, -0.5, 0.5)); // Bottom right
+    vertex.push_back(glm::dvec3(-0.5, -0.5, 0.5)); //Bottom Left
+    vertex.push_back(glm::dvec3(-0.5, 0.5, 0.5)); //Top left
+    vertex.push_back(glm::dvec3(-0.5, 0.5, -0.5)); //Top right
+    vertex.push_back(glm::dvec3(-0.5, -0.5,-0.5)); // Bottom right
 
     // Top
-    vertex.push_back(glm::dvec3(-0.5, 0.5, 0.5)); //Bottom Left
-    vertex.push_back(glm::dvec3(-0.5, 0.5, -0.5)); //Top Left
-    vertex.push_back(glm::dvec3(0.5, 0.5, -0.5)); // top right
-    vertex.push_back(glm::dvec3(0.5, 0.5, 0.5)); //bottom right
+    vertex.push_back(glm::dvec3(-0.5, 0.5, -0.5)); //Bottom Left
+    vertex.push_back(glm::dvec3(-0.5, 0.5, 0.5)); //Top Left
+    vertex.push_back(glm::dvec3(0.5, 0.5, 0.5)); // top right
+    vertex.push_back(glm::dvec3(0.5, 0.5, -0.5)); //bottom right
 
     // Bottom
-    vertex.push_back(glm::dvec3( 0.5, -0.5,  0.5)); //bottom left
-    vertex.push_back(glm::dvec3( 0.5, -0.5, -0.5)); // top left
-    vertex.push_back(glm::dvec3(-0.5, -0.5, -0.5)); //Top right
-    vertex.push_back(glm::dvec3(-0.5, -0.5,  0.5)); //Bottom right
+    vertex.push_back(glm::dvec3( -0.5, -0.5,  0.5)); //bottom left
+    vertex.push_back(glm::dvec3( -0.5, -0.5, -0.5)); // top left
+    vertex.push_back(glm::dvec3(0.5, -0.5, -0.5)); //Top right
+    vertex.push_back(glm::dvec3(0.5, -0.5,  0.5)); //Bottom right
 
 
     //
@@ -69,16 +69,16 @@ Object3D* GetCube(Scene* scene, std::string name, glm::dvec3 _position, glm::dve
     //
 
     //Front
-    normals.push_back(glm::dvec3(0, 0, 1));
-    normals.push_back(glm::dvec3(0, 0, 1));
-    normals.push_back(glm::dvec3(0, 0, 1));
-    normals.push_back(glm::dvec3(0, 0, 1));
+    normals.push_back(glm::dvec3(0, 0, -1));
+    normals.push_back(glm::dvec3(0, 0, -1));
+    normals.push_back(glm::dvec3(0, 0, -1));
+    normals.push_back(glm::dvec3(0, 0, -1));
     
     //Back
-    normals.push_back(glm::dvec3(0, 0, -1));
-    normals.push_back(glm::dvec3(0, 0, -1));
-    normals.push_back(glm::dvec3(0, 0, -1));
-    normals.push_back(glm::dvec3(0, 0, -1));
+    normals.push_back(glm::dvec3(0, 0, 1));
+    normals.push_back(glm::dvec3(0, 0, 1));
+    normals.push_back(glm::dvec3(0, 0, 1));
+    normals.push_back(glm::dvec3(0, 0, 1));
     
     //Right
     normals.push_back(glm::dvec3(1, 0, 0));
@@ -110,40 +110,40 @@ Object3D* GetCube(Scene* scene, std::string name, glm::dvec3 _position, glm::dve
     //
 
     //Front
+    uv.push_back(glm::dvec2(0, 1));
     uv.push_back(glm::dvec2(0, 0));
-    uv.push_back(glm::dvec2(0, 0));
-    uv.push_back(glm::dvec2(0, 0));
-    uv.push_back(glm::dvec2(0, 0));
+    uv.push_back(glm::dvec2(1, 0));
+    uv.push_back(glm::dvec2(1, 1));
     
     //Back
+    uv.push_back(glm::dvec2(0, 1));
     uv.push_back(glm::dvec2(0, 0));
-    uv.push_back(glm::dvec2(0, 0));
-    uv.push_back(glm::dvec2(0, 0));
-    uv.push_back(glm::dvec2(0, 0));
+    uv.push_back(glm::dvec2(1, 0));
+    uv.push_back(glm::dvec2(1, 1));
     
     //Right
+    uv.push_back(glm::dvec2(0, 1));
     uv.push_back(glm::dvec2(0, 0));
-    uv.push_back(glm::dvec2(0, 0));
-    uv.push_back(glm::dvec2(0, 0));
-    uv.push_back(glm::dvec2(0, 0));
+    uv.push_back(glm::dvec2(1, 0));
+    uv.push_back(glm::dvec2(1, 1));
     
     //Left
+    uv.push_back(glm::dvec2(0, 1));
     uv.push_back(glm::dvec2(0, 0));
-    uv.push_back(glm::dvec2(0, 0));
-    uv.push_back(glm::dvec2(0, 0));
-    uv.push_back(glm::dvec2(0, 0));
+    uv.push_back(glm::dvec2(1, 0));
+    uv.push_back(glm::dvec2(1, 1));
     
     //Top
+    uv.push_back(glm::dvec2(0, 1));
     uv.push_back(glm::dvec2(0, 0));
-    uv.push_back(glm::dvec2(0, 0));
-    uv.push_back(glm::dvec2(0, 0));
-    uv.push_back(glm::dvec2(0, 0));
+    uv.push_back(glm::dvec2(1, 0));
+    uv.push_back(glm::dvec2(1, 1));
     
     //Bottom
+    uv.push_back(glm::dvec2(0, 1));
     uv.push_back(glm::dvec2(0, 0));
-    uv.push_back(glm::dvec2(0, 0));
-    uv.push_back(glm::dvec2(0, 0));
-    uv.push_back(glm::dvec2(0, 0));
+    uv.push_back(glm::dvec2(1, 0));
+    uv.push_back(glm::dvec2(1, 1));
 
 
     //
@@ -242,7 +242,7 @@ Object3D* GetCube(Scene* scene, std::string name, glm::dvec3 _position, glm::dve
 
     //Setup mesh
     MeshFilterComponent* mesh = new MeshFilterComponent(newObject);
-    mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles);
+    mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles, true);
 
     //Setup transform
     TransformComponent* transform = new TransformComponent(newObject );
@@ -478,7 +478,7 @@ Object3D* GetQuad(Scene* scene, std::string name, glm::dvec3 _position, glm::dve
 
     //Setup mesh
     MeshFilterComponent* mesh = new MeshFilterComponent(newObject);
-    mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles);
+    mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles, true);
 
     //Setup transform
     TransformComponent* transform = new TransformComponent(newObject );
@@ -540,7 +540,7 @@ Object3D* GetCircle(Scene* scene, std::string name, glm::dvec3 _position, glm::d
     triangles.push_back(0);
     //Setup mesh
     MeshFilterComponent* mesh = new MeshFilterComponent(newObject);
-    mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles);
+    mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles, true);
 
     //Setup transform
     TransformComponent* transform = new TransformComponent(newObject );
@@ -671,7 +671,7 @@ Object3D* GetSphere(Scene* scene, std::string name, glm::dvec3 _position, glm::d
 
     //Setup mesh
     MeshFilterComponent* mesh = new MeshFilterComponent(newObject);
-    mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles);
+    mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles, true);
     mesh->drawingMode = GL_TRIANGLES;
 
     //Setup transform
@@ -735,8 +735,8 @@ Object3D* GetGrid(Scene* scene, std::string name) {
             uv.push_back(glm::dvec2(0, 0));
             uv.push_back(glm::dvec2(0, 0));
 
-            colors.push_back(glm::dvec4(255, 0, 255, 255));
-            colors.push_back(glm::dvec4(255, 0, 255, 255));
+            colors.push_back(glm::dvec4(255, 255, 255, 255));
+            colors.push_back(glm::dvec4(255, 255, 255, 255));
 
             triangles.push_back(vertex.size()-1);
             triangles.push_back(vertex.size()-2);
@@ -836,7 +836,7 @@ Object3D* GetAxes(Scene* scene, std::string name) {
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
     material->albedo =glm::vec4(0.6, 0.6, 0.6, 0.6);
-    material->influence = 0;
+    material->influence = 0.0;
     material->SetShader(&scene->standardShaders.unlitMeshShader);
 
     newObject->AddComponent(material);
@@ -1018,7 +1018,7 @@ Object3D* GetTerrain(Scene* scene, std::string name,glm::dvec3 _position, glm::d
     // mesh->drawingMode = GL_TRIANGLE_FAN;
     
     // mesh->drawingMode = GL_LINES;
-    mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles);
+    mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles, true);
 
     //Setup transform
     TransformComponent* transform = new TransformComponent(newObject );

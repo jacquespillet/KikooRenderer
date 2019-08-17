@@ -173,7 +173,12 @@ void SceneTree::keyPressEvent(QKeyEvent* e) {
 }
 
 void SceneTree::DeleteObject(CoreEngine::Object3D* object) {
-	std::cout << "delete " <<std::endl;
+	for (int i = 0; i < model->rowCount(); i++) {
+		TreeItem* item = (TreeItem*) model->item(i, 0);
+		if(item->object3D == object) {
+			item->Delete();
+		}
+	}
 }
 
 }

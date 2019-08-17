@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Util/Common.h"
+#include "ObjectParams.hpp"
 #include "3DEngine/Object3D.hpp"
 #include "SceneTree/SceneTree.hpp"
 #include "3DEngine/Components/TransformComponent.hpp"
@@ -16,21 +17,10 @@ class SceneTree;
 class ObjectDetailRoot;
 class ObjectDetailsPanel;
 
-//Widget for object "general" parameters
-class ObjectDetails : public QGroupBox {
-	Q_OBJECT
-public:
-	ObjectDetails(CoreEngine::Object3D* _object, ObjectDetailRoot* _root);
 
-	CoreEngine::Object3D* object;
-	ObjectDetailRoot* root;
-
-
-signals:
-	void InspectorModified();
-};
-
-//Root widget of the dock
+/*
+Main widget for the dockWidget
+*/
 class ObjectDetailRoot : public QWidget {
 	Q_OBJECT
 public:
@@ -50,7 +40,9 @@ signals:
 	void InspectorModified();
 };
 
-//Dock widget
+/*
+DockWidget for the object inspector
+*/
 class ObjectDetailsPanel : public QDockWidget
 {
 	Q_OBJECT
