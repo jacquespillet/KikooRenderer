@@ -6,6 +6,80 @@ namespace KikooRenderer
 namespace CoreEngine
 {
 
+/*
+* Returns a layout containing all the inputs for blinn phong shading
+*/
+ QLayout* BlinnPhongParams::GetLayout() {
+    QVBoxLayout* shaderParamsLayout = new QVBoxLayout();
+
+    
+    ColorPicker* specularColorPicker = new ColorPicker("specular Color", 210, 15, 60, 255);
+    shaderParamsLayout->addWidget(specularColorPicker);
+    connect(specularColorPicker, &ColorPicker::ColorPicked, this, [this](QColor color) {
+        glm::vec4 specularColorVec = glm::dvec4(color.red(), color.green(), color.blue(), color.alpha()) * 0.00392156;
+        specularColor = specularColorVec;
+        scene->triggerRefresh = true;
+    });
+
+    // Normal Map
+    FilePicker* normalMapPicker = new FilePicker("Normal Map", normalMapStr);
+    shaderParamsLayout->addWidget(normalMapPicker);
+    connect(normalMapPicker, &FilePicker::FileModified, this, [this](QString string) {
+        normalMapStr = string.toStdString();
+        shouldLoadNormal = true;
+        scene->triggerRefresh = true;
+    });
+
+    CustomSlider* normalMapInfluenceSlider = new CustomSlider(0.0f, 3.0f, 0.01, "Normal Map Influence", normalMapInfluence);
+    shaderParamsLayout->addLayout(normalMapInfluenceSlider);
+    QObject::connect(normalMapInfluenceSlider, &CustomSlider::Modified, [this](double val) {
+        normalMapInfluence = val;
+        scene->triggerRefresh = true;
+    });
+
+    //Specular Map
+    FilePicker* specularPicker = new FilePicker("Specular Map", specularMapStr);
+    shaderParamsLayout->addWidget(specularPicker);
+    connect(specularPicker, &FilePicker::FileModified, this, [this](QString string) {
+        specularMapStr = string.toStdString();
+        shouldLoadSpecular = true;
+        scene->triggerRefresh = true;
+    });
+
+    CustomSlider* ambientSlider = new CustomSlider(0, 1, 0.01, "Ambient Factor", ambientFactor);
+    shaderParamsLayout->addLayout(ambientSlider);
+    QObject::connect( ambientSlider, &CustomSlider::Modified, [this](double val) {
+        ambientFactor = val;
+        scene->triggerRefresh = true;
+    });
+
+    CustomSlider* diffuseSlider = new CustomSlider(0, 1, 0.01, "Diffuse Factor", diffuseFactor);
+    shaderParamsLayout->addLayout(diffuseSlider);
+    QObject::connect(diffuseSlider, &CustomSlider::Modified, [this](double val) {
+        diffuseFactor = val;
+        scene->triggerRefresh = true;
+    });
+
+    CustomSlider* specularSlider = new CustomSlider(0, 1, 0.01, "Specular Factor", specularFactor);
+    shaderParamsLayout->addLayout(specularSlider);
+    QObject::connect(specularSlider, &CustomSlider::Modified, [this](double val) {
+        specularFactor = val;
+        scene->triggerRefresh = true;
+    });
+
+    CustomSlider* smoothnessSlider = new CustomSlider(0, 128, 1, "Smoothness", smoothness);
+    shaderParamsLayout->addLayout(smoothnessSlider);
+    QObject::connect(smoothnessSlider, &CustomSlider::Modified, [this](double val) {
+        smoothness = val;
+        scene->triggerRefresh = true;
+    });
+
+    return shaderParamsLayout;
+}
+
+/*
+* Returns the actual blinn phong shader
+*/
 Shader GetBlinnPhongShader() {
     Shader blinnPhongShader;
 
@@ -71,6 +145,7 @@ Shader GetBlinnPhongShader() {
     uniform float diffuseFactor;
     uniform float specularFactor;
     uniform float smoothness;
+    uniform vec4 specularColor;
 
     in vec3 fragPos;
     in vec3 fragNormal;
@@ -84,7 +159,7 @@ Shader GetBlinnPhongShader() {
 
         vec4 finalAlbedo   = (hasAlbedoTex==1) ? albedo * texture(albedoTexture, fragUv) : albedo;
         vec3 finalNormal   = (hasNormalTex==1) ? normalMapInfluence * normalize(texture(normalTexture, fragUv)).xyz : fragNormal;
-        vec4 specularColor = vec4(1, 1, 1, 1);
+        // vec4 specularColor = vec4(1, 1, 1, 1);
         
         float finalSpecularFactor = (hasSpecularTex==1) ? texture(specularTexture, fragUv).x : specularFactor;
         

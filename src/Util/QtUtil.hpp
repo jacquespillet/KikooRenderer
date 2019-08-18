@@ -51,7 +51,6 @@ public slots:
 	void OnSliderChanged(int i)
 	{
 		double val = (double)i * step;
-		std::cout << i << " " << val << std::endl;
 		spinBox->setValue(val);
 		emit Modified(val);
 	}

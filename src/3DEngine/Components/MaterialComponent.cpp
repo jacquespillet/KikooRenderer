@@ -113,7 +113,6 @@ void MaterialComponent::OnEnable(){
 	inited = true;
 }
 void MaterialComponent::OnUpdate(){
-	// std::cout << "isloaded " << albedoTex.loaded << " tex " << albedoTexStr << std::endl;
 	if (shouldLoadAlbedo ) {
 		albedoTex = KikooRenderer::CoreEngine::Texture(albedoTexStr, GL_TEXTURE0);
 		shouldLoadAlbedo = false;

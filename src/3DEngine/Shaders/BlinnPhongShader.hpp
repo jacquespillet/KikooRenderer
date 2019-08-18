@@ -10,28 +10,43 @@ namespace CoreEngine
 {
 class BlinnPhongParams : public ShaderParams {
 public:
-    BlinnPhongParams() {
 
-    }
-
+    //Factors for each light component
     float ambientFactor = 0.6;
     float diffuseFactor = 0.6;
     float specularFactor = 0.6;
     int smoothness = 8;
 
+    //Scales the normals of the normal map
     float normalMapInfluence = 1;
     
+    //Normal map variables : Texture, name, should be reloaded at next frame
     Texture normalMap;
     std::string normalMapStr;
     bool shouldLoadNormal = false;
     
+    //Specular map variables : Texture, name, should be reloaded at next frame
     Texture specularMap;
     std::string specularMapStr;
     bool shouldLoadSpecular = false;
 
+    //Color of specular reflections
+    glm::vec4 specularColor;
+
+    BlinnPhongParams() {
+        specularColor = glm::vec4(1);
+    }
+
+    /*
+    * Sets all the appropriate shader uniform variables
+    * Called at each frame before rendering the object within a valid GL context
+    */
     virtual void SetUniforms() {
         GETGL
 
+        /*
+        * When textures changed in the form, load them for the incoming frame
+        */
         if (shouldLoadNormal ) {
             normalMap = KikooRenderer::CoreEngine::Texture(normalMapStr, GL_TEXTURE2);
             shouldLoadNormal = false;
@@ -42,6 +57,12 @@ public:
             shouldLoadSpecular = false;
         }
         
+        /*
+        Set variables for normal mapping : 
+            * Texture variable
+            * bool hasNormalTex
+            * Influence of normals of the map on the actual normal
+        */
         if(normalMap.loaded) {
             normalMap.Use();
             int texLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "normalTexture"); 
@@ -57,6 +78,11 @@ public:
             ogl->glUniform1i(hasNormalTexLocation, 0);
         } 
 
+        /*
+        Set variables for Specular mapping : 
+            * Texture variable
+            * bool hasSpecularTex
+        */
         if(specularMap.loaded) {
             specularMap.Use();
             int texLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "specularTexture"); 
@@ -68,6 +94,12 @@ public:
             int hasSpecularTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasSpecularTex"); 
             ogl->glUniform1i(hasSpecularTexLocation, 0);
         }
+
+        /*
+        * Set all factors for computing blinn phong shading
+        */
+		int specularColorLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "specularColor"); 
+		ogl->glUniform4fv(specularColorLocation, 1, glm::value_ptr(specularColor));
 
         int ambientFactorLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "ambientFactor");
         ogl->glUniform1f(ambientFactorLocation, ambientFactor);
@@ -82,64 +114,7 @@ public:
         ogl->glUniform1f(smoothnessLocation, smoothness);
     }
     
-    virtual QLayout* GetLayout() {
-        QVBoxLayout* shaderParamsLayout = new QVBoxLayout();
-
-        // Normal Map
-        FilePicker* normalMapPicker = new FilePicker("Normal Map", normalMapStr);
-        shaderParamsLayout->addWidget(normalMapPicker);
-        connect(normalMapPicker, &FilePicker::FileModified, this, [this](QString string) {
-            normalMapStr = string.toStdString();
-            shouldLoadNormal = true;
-            scene->triggerRefresh = true;
-        });
-
-        CustomSlider* normalMapInfluenceSlider = new CustomSlider(0.0f, 3.0f, 0.01, "Normal Map Influence", normalMapInfluence);
-        shaderParamsLayout->addLayout(normalMapInfluenceSlider);
-        QObject::connect(normalMapInfluenceSlider, &CustomSlider::Modified, [this](double val) {
-            normalMapInfluence = val;
-            scene->triggerRefresh = true;
-        });
-
-        //Specular Map
-        FilePicker* specularPicker = new FilePicker("Specular Map", specularMapStr);
-        shaderParamsLayout->addWidget(specularPicker);
-        connect(specularPicker, &FilePicker::FileModified, this, [this](QString string) {
-            specularMapStr = string.toStdString();
-            shouldLoadSpecular = true;
-            scene->triggerRefresh = true;
-        });
-
-        CustomSlider* ambientSlider = new CustomSlider(0, 1, 0.01, "Ambient Factor", ambientFactor);
-        shaderParamsLayout->addLayout(ambientSlider);
-        QObject::connect( ambientSlider, &CustomSlider::Modified, [this](double val) {
-            ambientFactor = val;
-            scene->triggerRefresh = true;
-        });
-    
-        CustomSlider* diffuseSlider = new CustomSlider(0, 1, 0.01, "Diffuse Factor", diffuseFactor);
-        shaderParamsLayout->addLayout(diffuseSlider);
-        QObject::connect(diffuseSlider, &CustomSlider::Modified, [this](double val) {
-            diffuseFactor = val;
-            scene->triggerRefresh = true;
-        });
-
-        CustomSlider* specularSlider = new CustomSlider(0, 1, 0.01, "Specular Factor", specularFactor);
-        shaderParamsLayout->addLayout(specularSlider);
-        QObject::connect(specularSlider, &CustomSlider::Modified, [this](double val) {
-            specularFactor = val;
-            scene->triggerRefresh = true;
-        });
-
-        CustomSlider* smoothnessSlider = new CustomSlider(0, 128, 1, "Smoothness", smoothness);
-        shaderParamsLayout->addLayout(smoothnessSlider);
-        QObject::connect(smoothnessSlider, &CustomSlider::Modified, [this](double val) {
-            smoothness = val;
-            scene->triggerRefresh = true;
-        });
-
-        return shaderParamsLayout;
-    }
+    virtual QLayout* GetLayout();
 };
 
 Shader GetBlinnPhongShader();
