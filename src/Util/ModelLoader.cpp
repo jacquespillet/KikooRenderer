@@ -90,9 +90,9 @@ KikooRenderer::CoreEngine::Object3D* ObjectFromOBJ(std::string fileName, KikooRe
     KikooRenderer::CoreEngine::MaterialComponent* material = new  KikooRenderer::CoreEngine::MaterialComponent(newObject);
     material->SetShader(&scene->standardShaders.blinnPhongShader);
 
-    material->albedoTex = KikooRenderer::CoreEngine::Texture("C:/Users/Jacques/Documents/Boulot/2019/3D Models/E-45-Aircraft/textures/E-45 _col.jpg", GL_TEXTURE0);
-    // material->specularTex = KikooRenderer::CoreEngine::Texture("C:/Users/Jacques/Documents/Boulot/2019/3D Models/Cobblestones/Textures/BrickRound0105_5_SPEC.png", GL_TEXTURE1);
-    material->normalTex = KikooRenderer::CoreEngine::Texture("C:/Users/Jacques/Documents/Boulot/2019/3D Models/E-45-Aircraft/textures/E-45-nor_1.jpg", GL_TEXTURE2);
+    // material->albedoTex = KikooRenderer::CoreEngine::Texture("C:/Users/Jacques/Documents/Boulot/2019/3D Models/E-45-Aircraft/textures/E-45 _col.jpg", GL_TEXTURE0);
+    // // material->specularTex = KikooRenderer::CoreEngine::Texture("C:/Users/Jacques/Documents/Boulot/2019/3D Models/Cobblestones/Textures/BrickRound0105_5_SPEC.png", GL_TEXTURE1);
+    // material->normalTex = KikooRenderer::CoreEngine::Texture("C:/Users/Jacques/Documents/Boulot/2019/3D Models/E-45-Aircraft/textures/E-45-nor_1.jpg", GL_TEXTURE2);
 
     KikooRenderer::CoreEngine::BoundingBoxComponent* boundingBox = new  KikooRenderer::CoreEngine::BoundingBoxComponent(newObject);
 

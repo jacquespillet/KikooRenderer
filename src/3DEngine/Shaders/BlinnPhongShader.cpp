@@ -64,6 +64,8 @@ Shader GetBlinnPhongShader() {
     uniform int hasAlbedoTex;
     uniform int hasSpecularTex;
     uniform int hasNormalTex;
+    uniform float normalMapInfluence;
+
 
     uniform float ambientFactor;
     uniform float diffuseFactor;
@@ -81,7 +83,7 @@ Shader GetBlinnPhongShader() {
         vec3 fragToCam = cameraPos - fragPos;
 
         vec4 finalAlbedo   = (hasAlbedoTex==1) ? albedo * texture(albedoTexture, fragUv) : albedo;
-        vec3 finalNormal   = (hasNormalTex==1) ? texture(normalTexture, fragUv).xyz : fragNormal;
+        vec3 finalNormal   = (hasNormalTex==1) ? normalMapInfluence * normalize(texture(normalTexture, fragUv)).xyz : fragNormal;
         vec4 specularColor = vec4(1, 1, 1, 1);
         
         float finalSpecularFactor = (hasSpecularTex==1) ? texture(specularTexture, fragUv).x : specularFactor;
@@ -89,6 +91,7 @@ Shader GetBlinnPhongShader() {
         vec4 finalColor = vec4(0, 0, 0, 1);
         finalColor.rgb += ambientFactor * finalAlbedo.rgb;
 
+        //Multiply by handedness stored in w of tangent vector
         vec3 fragBitangent = normalize(cross(fragNormal, fragTangent.xyz) * fragTangent.w); 
 
         for(int i=0; i<numLights; i++) {
@@ -108,6 +111,7 @@ Shader GetBlinnPhongShader() {
             }
             
             vec3 toLight = -lightDirection;
+
             //Redefinition of vectors in tangent space
             if(hasNormalTex == 1) {
                 toLight     = normalize(vec3(dot(fragTangent.xyz, toLight),dot(fragBitangent, toLight), dot(fragNormal, toLight)));
@@ -115,12 +119,12 @@ Shader GetBlinnPhongShader() {
             }
 
 
-            vec4 diffuse = diffuseFactor * finalAlbedo * lights[i].color * max(dot(normalize(finalNormal.xyz), toLight), 0);
+            vec4 diffuse = diffuseFactor * finalAlbedo * lights[i].color * max(dot(finalNormal.xyz, toLight), 0);
 
             vec3 halfwayVec = normalize(toLight + fragToCam);
 
             // Specular factor * specular color * lightColor * specularity of fragment
-            vec4 specular = finalSpecularFactor * specularColor * lights[i].color * pow(max(dot(normalize(finalNormal.xyz), halfwayVec),0), smoothness);
+            vec4 specular = finalSpecularFactor * specularColor * lights[i].color * pow(max(dot(finalNormal.xyz, halfwayVec),0), smoothness);
 
             finalColor.rgb +=  attenuation * (diffuse + specular).rgb;  
         }

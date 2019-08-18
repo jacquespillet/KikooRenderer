@@ -19,10 +19,56 @@ public:
     float specularFactor = 0.6;
     int smoothness = 8;
 
+    float normalMapInfluence = 1;
+    
+    Texture normalMap;
+    std::string normalMapStr;
+    bool shouldLoadNormal = false;
+    
+    Texture specularMap;
+    std::string specularMapStr;
+    bool shouldLoadSpecular = false;
+
     virtual void SetUniforms() {
         GETGL
 
-        // std::cout << "INSIDE " << this->shader << "  " <<  this->shader->programShaderObject << std::endl;
+        if (shouldLoadNormal ) {
+            normalMap = KikooRenderer::CoreEngine::Texture(normalMapStr, GL_TEXTURE2);
+            shouldLoadNormal = false;
+        }
+
+        if (shouldLoadSpecular ) {
+            specularMap = KikooRenderer::CoreEngine::Texture(specularMapStr, GL_TEXTURE1);
+            shouldLoadSpecular = false;
+        }
+        
+        if(normalMap.loaded) {
+            normalMap.Use();
+            int texLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "normalTexture"); 
+            ogl->glUniform1i(texLocation, 2); 
+            
+            int hasNormalTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasNormalTex"); 
+            ogl->glUniform1i(hasNormalTexLocation, 1);
+
+            int normalMapInfluenceLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "normalMapInfluence");
+            ogl->glUniform1f(normalMapInfluenceLocation, normalMapInfluence);
+        }  else {
+            int hasNormalTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasNormalTex"); 
+            ogl->glUniform1i(hasNormalTexLocation, 0);
+        } 
+
+        if(specularMap.loaded) {
+            specularMap.Use();
+            int texLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "specularTexture"); 
+            ogl->glUniform1i(texLocation, 1); 
+
+            int hasSpecularTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasSpecularTex"); 
+            ogl->glUniform1i(hasSpecularTexLocation, 1);
+        } else {
+            int hasSpecularTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasSpecularTex"); 
+            ogl->glUniform1i(hasSpecularTexLocation, 0);
+        }
+
         int ambientFactorLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "ambientFactor");
         ogl->glUniform1f(ambientFactorLocation, ambientFactor);
 
@@ -38,7 +84,31 @@ public:
     
     virtual QLayout* GetLayout() {
         QVBoxLayout* shaderParamsLayout = new QVBoxLayout();
-        std::cout << ambientFactor << std::endl;
+
+        // Normal Map
+        FilePicker* normalMapPicker = new FilePicker("Normal Map", normalMapStr);
+        shaderParamsLayout->addWidget(normalMapPicker);
+        connect(normalMapPicker, &FilePicker::FileModified, this, [this](QString string) {
+            normalMapStr = string.toStdString();
+            shouldLoadNormal = true;
+            scene->triggerRefresh = true;
+        });
+
+        CustomSlider* normalMapInfluenceSlider = new CustomSlider(0.0f, 3.0f, 0.01, "Normal Map Influence", normalMapInfluence);
+        shaderParamsLayout->addLayout(normalMapInfluenceSlider);
+        QObject::connect(normalMapInfluenceSlider, &CustomSlider::Modified, [this](double val) {
+            normalMapInfluence = val;
+            scene->triggerRefresh = true;
+        });
+
+        //Specular Map
+        FilePicker* specularPicker = new FilePicker("Specular Map", specularMapStr);
+        shaderParamsLayout->addWidget(specularPicker);
+        connect(specularPicker, &FilePicker::FileModified, this, [this](QString string) {
+            specularMapStr = string.toStdString();
+            shouldLoadSpecular = true;
+            scene->triggerRefresh = true;
+        });
 
         CustomSlider* ambientSlider = new CustomSlider(0, 1, 0.01, "Ambient Factor", ambientFactor);
         shaderParamsLayout->addLayout(ambientSlider);
@@ -46,7 +116,7 @@ public:
             ambientFactor = val;
             scene->triggerRefresh = true;
         });
-
+    
         CustomSlider* diffuseSlider = new CustomSlider(0, 1, 0.01, "Diffuse Factor", diffuseFactor);
         shaderParamsLayout->addLayout(diffuseSlider);
         QObject::connect(diffuseSlider, &CustomSlider::Modified, [this](double val) {

@@ -16,8 +16,8 @@ public:
 
 		slider = new QSlider(Qt::Horizontal);
 		// slider->setFocusPolicy(Qt::StrongFocus);
-		slider->setTickPosition(QSlider::TicksBothSides);
-		slider->setTickInterval(10);
+		// slider->setTickPosition(QSlider::TicksBothSides);
+		// slider->setTickInterval(10);
 		slider->setMinimum(min / step);
 		slider->setMaximum(max / step);
 		slider->setSingleStep(1);
@@ -51,6 +51,7 @@ public slots:
 	void OnSliderChanged(int i)
 	{
 		double val = (double)i * step;
+		std::cout << i << " " << val << std::endl;
 		spinBox->setValue(val);
 		emit Modified(val);
 	}
@@ -102,13 +103,13 @@ class FilePicker : public QWidget {
 public:
 	std::string fileName;
 	QLineEdit* fileLineEdit;
-	FilePicker(std::string label) : QWidget() {
+	FilePicker(std::string label, std::string value = "") : QWidget() {
 		QHBoxLayout* mainLayout = new QHBoxLayout();
 
 		QLabel* fileLabel = new QLabel(QString::fromStdString(label));
 		mainLayout->addWidget(fileLabel);
 
-		fileLineEdit = new QLineEdit();
+		fileLineEdit = new QLineEdit(QString::fromStdString(value));
 		mainLayout->addWidget(fileLineEdit);
 
 		QPushButton* button = new QPushButton("Choose File");

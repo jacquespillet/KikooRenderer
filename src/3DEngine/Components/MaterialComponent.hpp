@@ -39,12 +39,6 @@ class MaterialComponent : public Component {
         void SetShader(Shader* shader);
         void SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 viewMatrix, glm::dmat4 projectionMatrix, Scene* scene);
 
-		// void SetSelectedShader();
-		// void ResetShader();
-		// ShaderParams* tmpParams;
-		// Shader* tmpShader;
-
-
         Shader* shader;
 
         float influence;
@@ -52,15 +46,9 @@ class MaterialComponent : public Component {
         glm::vec4 albedo;
 
         Texture albedoTex;
-        Texture specularTex;
-        Texture normalTex;
 
 		std::string albedoTexStr = "";
 		bool shouldLoadAlbedo = false;
-		std::string specularTexStr = "";
-		bool shouldLoadSpecular = false;
-		std::string normalTexStr = "";
-		bool shouldLoadNormal = false;
 
 		MaterialInspector* materialInspector;
 		
