@@ -5,6 +5,7 @@
 
 namespace KikooRenderer {
 namespace CoreEngine {
+enum PRIMITIVE_MESH {MODEL_MESH=0, CUBE_MESH=1, SPHERE_MESH=2, CIRCLE_MESH=3, CONE_MESH=4, QUAD_MESH=5, MESH_PRIMITIVE_ENUM_SIZE=6};
 
 class MeshFilterComponent;    
 class MeshFilterInspector : public QGroupBox {
@@ -17,6 +18,9 @@ class MeshFilterInspector : public QGroupBox {
 		QVBoxLayout* mainLayout;
 
 		void Refresh();
+
+        static std::string GetByPrimitiveMesh(PRIMITIVE_MESH type);
+
 };
 
 
@@ -59,6 +63,12 @@ class MeshFilterComponent : public Component {
         int primitiveSize;
 
         std::vector<Vertex> vertices;
+        
+        PRIMITIVE_MESH meshType;
+        std::string modelpath;
+
+        bool shoudRebuildBuffers = false;
+
 
         QJsonObject jsonObj;
         QJsonObject ToJSON() {

@@ -1,4 +1,7 @@
 #include "MeshFilterComponent.hpp"
+#include "BaseMeshes.hpp"
+#include "Util/ModelLoader.hpp"
+#include "BoundingComponent.hpp"
 
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLFunctions_3_2_Core>
@@ -8,15 +11,98 @@
 namespace KikooRenderer {
 namespace CoreEngine {
 
+std::string MeshFilterInspector::GetByPrimitiveMesh(PRIMITIVE_MESH type) {
+	switch (type)
+	{
+		case MODEL_MESH:
+			return "Model";
+			break;
+		case CUBE_MESH:
+			return "Cube";
+			break;
+		case SPHERE_MESH:
+			return "Sphere";
+			break;
+		case CIRCLE_MESH:
+			return "Circle";
+			break; 
+		case CONE_MESH:
+			return "Cone";
+			break;       
+		case QUAD_MESH:
+			return "Quad";
+			break;                                    
+		default:
+			return "";
+			break;
+	}
+}
 MeshFilterInspector::MeshFilterInspector(MeshFilterComponent* meshFilterComponent) : QGroupBox("Mesh Filter") {
 	this->meshFilterComponent = meshFilterComponent;
 	Object3D* object = meshFilterComponent->object3D;
 	scene = object->scene;
-
 	mainLayout = new QVBoxLayout();
+
+	QHBoxLayout* modelLayout = new QHBoxLayout();
+	QComboBox* modelList = new QComboBox();
+	QLabel* modelLabel = new QLabel("Model");
+	for (int i = 0; i < PRIMITIVE_MESH::MESH_PRIMITIVE_ENUM_SIZE; i++) {
+		std::string modelName = MeshFilterInspector::GetByPrimitiveMesh((PRIMITIVE_MESH)i);
+		modelList->addItem(QString::fromStdString(modelName));
+	}
+	int modelInx = meshFilterComponent->meshType;
+	modelList->setCurrentIndex(modelInx);
+	modelLayout->addWidget(modelLabel);
+	modelLayout->addWidget(modelList);
+	mainLayout->addLayout(modelLayout);
+
+	FilePicker* modelPicker = new FilePicker("Model File Name");
+	mainLayout->addWidget(modelPicker);
+	modelPicker->setVisible((meshFilterComponent->meshType == PRIMITIVE_MESH::MODEL_MESH));
+	connect(modelPicker, &FilePicker::FileModified, this, [this, meshFilterComponent, object](QString value) {
+		meshFilterComponent->modelpath = value.toStdString();
+
+		std::vector<glm::dvec3> vertex;
+		std::vector<glm::dvec3> normals;
+		std::vector<glm::dvec2> uv;
+		std::vector<glm::dvec4> colors;
+		std::vector<int> triangles;
+		Util::FileIO::GetModelBuffers(meshFilterComponent->modelpath, &vertex, &normals, &uv, &colors, &triangles);
+		
+		meshFilterComponent->LoadFromBuffers(vertex, normals, uv, colors, triangles, true);
+		meshFilterComponent->shoudRebuildBuffers = true;
+
+		BoundingBoxComponent* bb = (BoundingBoxComponent*) object->GetComponent("BoundingBox");
+		bb->shouldRefresh = true;
+	});
+
+
+	connect(modelList, static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged), this, [this,meshFilterComponent, modelPicker, object](int index) {
+		if(index != PRIMITIVE_MESH::MODEL_MESH) {
+			std::vector<glm::dvec3> vertex;
+			std::vector<glm::dvec3> normals;
+			std::vector<glm::dvec2> uv;
+			std::vector<glm::dvec4> colors;
+			std::vector<int> triangles;
+
+			meshFilterComponent->meshType =(PRIMITIVE_MESH)index;
+			if(index == PRIMITIVE_MESH::CUBE_MESH)    GetCubeBuffers(&vertex, &normals, &uv, &colors, &triangles);
+			if(index == PRIMITIVE_MESH::CIRCLE_MESH)  GetCircleBuffers(&vertex, &normals, &uv, &colors, &triangles);
+			if(index == PRIMITIVE_MESH::CONE_MESH)    GetConeBuffers(&vertex, &normals, &uv, &colors, &triangles);
+			if(index == PRIMITIVE_MESH::QUAD_MESH)    GetQuadBuffers(&vertex, &normals, &uv, &colors, &triangles);
+			if(index == PRIMITIVE_MESH::SPHERE_MESH)  GetSphereBuffers(&vertex, &normals, &uv, &colors, &triangles);
+
+			meshFilterComponent->LoadFromBuffers(vertex, normals, uv, colors, triangles, false);
+			meshFilterComponent->shoudRebuildBuffers = true;
+		} else {
+			modelPicker->setVisible(true);
+		}
+	});
+
+
+
+
 	setLayout(mainLayout);
-
-
 }
 
 void MeshFilterInspector::Refresh() {
@@ -34,7 +120,13 @@ void MeshFilterComponent::OnEnable(){
 	InitBuffers();
 	RebuildBuffers();
 }
-void MeshFilterComponent::OnUpdate(){}
+void MeshFilterComponent::OnUpdate(){
+	if(shoudRebuildBuffers) {
+		RebuildBuffers();
+		shoudRebuildBuffers = false;
+		object3D->scene->triggerRefresh = true;
+	}
+}
 void MeshFilterComponent::OnRender(){
 	GETGL
 	//bind VAO	
@@ -103,7 +195,6 @@ void MeshFilterComponent::CalculateTangents(std::vector<glm::vec4>& tangents ,st
 		tangents[i] = glm::vec4(glm::normalize((t - n * glm::dot(n, t))), 1);
 		
 		tangents[i].w = (glm::dot(glm::cross(n, t), glm::vec3(tan2[i])) < 0.0F) ? -1.0F : 1.0F;
-		// std::cout << "Normal " << glm::to_string(normals[i]) << " Tangent " << glm::to_string(tan1[i]) << " Tan 2 " << glm::to_string(tan2[i]) << " Handedness " << handedness << std::endl;
 	}
 }
 
@@ -114,11 +205,12 @@ void MeshFilterComponent::LoadFromBuffers(std::vector<glm::dvec3> _vertex,
         std::vector<glm::dvec4> _colors,
         std::vector<int> _triangles, 
         bool calculateTangents) {
-	std::vector<glm::vec4> tangents(_normals.size(), glm::vec4(0, 0, 0, 0));
-    this->triangles = _triangles;
-	
-	if(calculateTangents) CalculateTangents(tangents, _vertex, _normals, _uv, _triangles);
 
+    this->triangles = _triangles;
+
+	std::vector<glm::vec4> tangents(_normals.size(), glm::vec4(0, 0, 0, 0));
+	if(calculateTangents) CalculateTangents(tangents, _vertex, _normals, _uv, _triangles);
+	vertices.resize(0);
     for(int i=0; i<_vertex.size(); i++) {
         Vertex vertex = {
             _vertex[i],
@@ -131,6 +223,7 @@ void MeshFilterComponent::LoadFromBuffers(std::vector<glm::dvec3> _vertex,
 			tangents[i]
         };
         vertices.push_back(vertex);
+		
     }
 }
 
@@ -197,7 +290,6 @@ void MeshFilterComponent::RebuildBuffers() {
 	//copy data to buffers
 	ogl->glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), (uint8_t*)&vertices[0], GL_STATIC_DRAW);
 	ogl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, triangles.size() * sizeof(unsigned int), (uint8_t*)&triangles[0], GL_STATIC_DRAW);
-	
 	//Unbind VAO
 	ogl->glBindVertexArray(0);
 	

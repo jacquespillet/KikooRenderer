@@ -4,7 +4,12 @@
 
 namespace KikooRenderer {
 namespace CoreEngine {
-    enum PRIMITIVE_MESH {CUBE_MESH, SPHERE_MESH, CIRCLE_MESH, CONE_MESH, QUAD_MESH};
+
+    void GetCubeBuffers(std::vector<glm::dvec3>* vertex, std::vector<glm::dvec3>* normals, std::vector<glm::dvec2>* uv, std::vector<glm::dvec4>* colors, std::vector<int>* triangles);
+    void GetSphereBuffers(std::vector<glm::dvec3>* vertex, std::vector<glm::dvec3>* normals, std::vector<glm::dvec2>* uv, std::vector<glm::dvec4>* colors, std::vector<int>* triangles);
+    void GetCircleBuffers(std::vector<glm::dvec3>* vertex, std::vector<glm::dvec3>* normals, std::vector<glm::dvec2>* uv, std::vector<glm::dvec4>* colors, std::vector<int>* triangles);
+    void GetConeBuffers(std::vector<glm::dvec3>* vertex, std::vector<glm::dvec3>* normals, std::vector<glm::dvec2>* uv, std::vector<glm::dvec4>* colors, std::vector<int>* triangles);
+    void GetQuadBuffers(std::vector<glm::dvec3>* vertex, std::vector<glm::dvec3>* normals, std::vector<glm::dvec2>* uv, std::vector<glm::dvec4>* colors, std::vector<int>* triangles);
 
     MeshFilterComponent* GetCubeMesh(glm::dvec3 size, glm::dvec4 color, Object3D* object);
     MeshFilterComponent* GetSphereMesh(glm::dvec3 size, glm::dvec4 color, Object3D* object);
