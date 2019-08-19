@@ -19,5 +19,23 @@ class MainWindow : public QMainWindow
 		ObjectDetailsPanel* objectDetails;
 
         Renderer::RayTracer rayTracer;
+
+        void BuildMenuBar();
+
+
+		QMenu* fileMenu;
+		QAction* newAction;
+		QAction* saveAsAction;
+		QAction* saveAction;
+		QAction* loadAction;
+
+        QMenu* optionsMenu;
+		QAction* preferencesAction;
+        
+		QMenu* aboutMenu;
+		QAction* helpAction;
+		QAction* aboutAction;     
+
+		std::string currentFolderPath;
 };
 }

@@ -18,6 +18,8 @@ class Component  {
         virtual void Recompute()=0;
 
         bool inited;
+
+        virtual QJsonObject ToJSON() = 0;
     protected: 
 };
 

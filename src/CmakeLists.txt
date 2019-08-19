@@ -6,6 +6,7 @@ set(MainWindowSrc
 	View3D/View3DGL.cpp
 	
 	3DEngine/Components/Component.cpp
+	3DEngine/Components/BaseMeshes.cpp
 	3DEngine/Components/MeshFilterComponent.cpp
 	3DEngine/Components/TransformComponent.cpp
 	3DEngine/Components/MaterialComponent.cpp
@@ -50,6 +51,8 @@ set(MainWindowSrc
 	Util/QtUtil.cpp
 	Util/ModelLoader.cpp
 	Util/Image.cpp
+
+	FileIO/SceneToFile.cpp
 )
 
 add_executable(MainWindow ${MainWindowSrc})

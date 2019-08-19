@@ -62,17 +62,6 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 		scene->triggerRefresh = true;
 	});
 
-
-	// //Albedo Map
-	// FilePicker* specularPicker = new FilePicker("Specular Texture");
-	// mainLayout->addWidget(specularPicker);
-	// connect(specularPicker, &FilePicker::FileModified, this, [this, materialComponent](QString string) {
-	// 	materialComponent->specularTexStr = string.toStdString();
-	// 	materialComponent->shouldLoadSpecular = true;
-	// 	scene->triggerRefresh = true;
-	// });
-
-
 	shaderParametersLayout = new QVBoxLayout();
 		
 	QLayout* paramsLayout = materialComponent->params->GetLayout(); 
@@ -117,10 +106,6 @@ void MaterialComponent::OnUpdate(){
 		albedoTex = KikooRenderer::CoreEngine::Texture(albedoTexStr, GL_TEXTURE0);
 		shouldLoadAlbedo = false;
 	}
-	// if (shouldLoadSpecular ) {
-	// 	specularTex = KikooRenderer::CoreEngine::Texture(specularTexStr, GL_TEXTURE1);
-	// 	shouldLoadSpecular = false;
-	// }
 }
 void MaterialComponent::OnRender(){} 
 void MaterialComponent::OnDestroy(){} 
@@ -224,5 +209,24 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 		}
 	}
 }
+
+QJsonObject MaterialComponent::ToJSON() {
+	QJsonObject json;
+	json["type"] = "Material";
+	json["Shader"] = params->ToJSON();
+	json["influence"] = influence;
+
+	QJsonObject albedoObj;
+	albedoObj["r"] = albedo.x;
+	albedoObj["g"] = albedo.y;
+	albedoObj["b"] = albedo.z;
+	albedoObj["a"] = albedo.w;
+
+	json["albedo"] = albedoObj;
+	json["albedoTexture"] = QString::fromStdString(albedoTexStr);
+
+	return json;
+}	
+
 }
 }

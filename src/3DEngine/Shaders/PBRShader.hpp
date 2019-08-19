@@ -23,6 +23,15 @@ public:
     virtual void SetUniforms() {
 
     }
+
+    virtual QJsonObject ToJSON() {
+        QJsonObject json;
+        json["roughness"] = smoothness;
+        json["metalness"] = specularFactor;
+        return json;
+    }
+
+    
     
     virtual QLayout* GetLayout() {
         QVBoxLayout* shaderParamsLayout = new QVBoxLayout();

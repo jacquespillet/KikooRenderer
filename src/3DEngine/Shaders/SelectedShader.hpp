@@ -22,6 +22,11 @@ public:
 
     }
 
+    virtual QJsonObject ToJSON() {
+        QJsonObject json;
+        return json;
+    }
+
     virtual QLayout* GetLayout() {
         QVBoxLayout* shaderParamsLayout = new QVBoxLayout();
         return shaderParamsLayout;

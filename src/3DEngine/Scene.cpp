@@ -306,5 +306,16 @@ namespace CoreEngine {
 		}
         return closest;
     }
+
+    QJsonObject Scene::ToJSON() {
+        QJsonObject json;
+        QJsonArray objectArray;
+        for(int i=0; i<objects3D.size(); i++) {
+            QJsonObject jsonObject = objects3D[i]->ToJSON();
+            objectArray.append(jsonObject);
+        }
+        json["objects"] = objectArray;        
+        return json;
+    }
 }
 }

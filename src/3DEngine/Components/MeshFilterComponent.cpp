@@ -8,6 +8,22 @@
 namespace KikooRenderer {
 namespace CoreEngine {
 
+MeshFilterInspector::MeshFilterInspector(MeshFilterComponent* meshFilterComponent) : QGroupBox("Mesh Filter") {
+	this->meshFilterComponent = meshFilterComponent;
+	Object3D* object = meshFilterComponent->object3D;
+	scene = object->scene;
+
+	mainLayout = new QVBoxLayout();
+	setLayout(mainLayout);
+
+
+}
+
+void MeshFilterInspector::Refresh() {
+
+}
+
+
 MeshFilterComponent::MeshFilterComponent(Object3D* object) : Component("MeshFilter", object) {
     inited= false;
 	drawingMode = GL_TRIANGLES;
@@ -36,6 +52,11 @@ void MeshFilterComponent::OnDestroy() {
 	DestroyBuffers();
 }
 void MeshFilterComponent::Recompute() {}
+
+MeshFilterInspector* MeshFilterComponent::GetInspector() {
+	meshFilterInspector = new MeshFilterInspector(this);
+	return meshFilterInspector;
+}
 
 void MeshFilterComponent::CalculateTangents(std::vector<glm::vec4>& tangents ,std::vector<glm::dvec3> _vertices,  std::vector<glm::dvec3> normals, std::vector<glm::dvec2> uv,std::vector<int> triangles) {
 	std::vector<glm::vec4> tan1(_vertices.size(), glm::vec4(0));

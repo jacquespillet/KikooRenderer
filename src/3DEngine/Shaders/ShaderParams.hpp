@@ -20,6 +20,8 @@ public:
     Shader* shader;
     Scene* scene;
 
+    virtual QJsonObject ToJSON()=0;
+
 signals: 
     void Modified();
 };

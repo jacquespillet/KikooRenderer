@@ -19,6 +19,31 @@ class LightComponent : public Component {
         glm::dvec3 attenuation;
         glm::dvec4 color;
 		double fov;
+
+    
+		QJsonObject ToJSON() {
+			QJsonObject json;
+            json["type"] = "Light";
+            json["lightType"] = type;
+
+            QJsonObject attenuationJson;
+            attenuationJson["x"] = attenuation.x;
+            attenuationJson["y"] = attenuation.y;
+            attenuationJson["z"] = attenuation.z;
+            json["attenuation"] = attenuationJson;
+
+
+            QJsonObject colorJson;
+            colorJson["r"] = color.r;
+            colorJson["g"] = color.g;
+            colorJson["b"] = color.b;
+            colorJson["a"] = color.a;
+            json["color"] = colorJson;
+
+            json["fov"] = fov;
+
+			return json;
+		}
 };
 }
 }

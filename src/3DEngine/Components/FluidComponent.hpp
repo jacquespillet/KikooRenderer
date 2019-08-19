@@ -35,6 +35,15 @@ namespace CoreEngine {
         float mu = 0.01;
 
         float k1, k2, k3;
+
+    
+		QJsonObject ToJSON() {
+			QJsonObject json;
+			json["name"] = "mName";
+			json["level"] = "mLevel";
+			json["classType"] = "mClassType";
+			return json;
+		}
     };
 }
 }

@@ -37,6 +37,30 @@ public:
         specularColor = glm::vec4(1);
     }
 
+    virtual QJsonObject ToJSON() {
+        QJsonObject json;
+
+        json["ambientFactor"] =ambientFactor;
+        json["diffuseFactor"] =diffuseFactor;
+        json["specularFactor"] =specularFactor;
+        json["smoothness"] =smoothness;
+
+        json["normalMapInfluence"] =normalMapInfluence;
+        
+        json["normalMapStr"] = QString::fromStdString(normalMapStr);
+        json["specularMapStr"] = QString::fromStdString(specularMapStr);
+        
+        QJsonObject specularColorJson;
+        specularColorJson["r"] =specularColor.x; 
+        specularColorJson["g"] =specularColor.y; 
+        specularColorJson["b"] =specularColor.z; 
+        specularColorJson["q"] =specularColor.w; 
+
+        json["specularColor"] = specularColorJson;
+
+        return json;
+    }
+
     /*
     * Sets all the appropriate shader uniform variables
     * Called at each frame before rendering the object within a valid GL context

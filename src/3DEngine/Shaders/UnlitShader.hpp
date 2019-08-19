@@ -13,11 +13,6 @@ public:
     UnlitMeshParams() : ShaderParams() {
     }
 
-    float ambientFactor = 0.1;
-    float diffuseFactor = 0.1;
-    float specularFactor = 0.1;
-    int smoothness = 2048;
-
     virtual void SetUniforms() {
 
     }
@@ -25,6 +20,11 @@ public:
     virtual QLayout* GetLayout() {
         QVBoxLayout* shaderParamsLayout = new QVBoxLayout();
         return shaderParamsLayout;
+    }
+
+    virtual QJsonObject ToJSON() {
+        QJsonObject json;
+        return json;
     }
 };
 

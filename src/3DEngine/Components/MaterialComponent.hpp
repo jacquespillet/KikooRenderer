@@ -53,6 +53,9 @@ class MaterialComponent : public Component {
 		MaterialInspector* materialInspector;
 		
 		ShaderParams* params;
+
+
+		QJsonObject ToJSON();		
 };
 }
 }

@@ -1,9 +1,24 @@
 #pragma once
 #include "Util/Common.h"
 #include "Component.hpp"
+#include "3DEngine/Scene.hpp"
 
 namespace KikooRenderer {
 namespace CoreEngine {
+
+class MeshFilterComponent;    
+class MeshFilterInspector : public QGroupBox {
+	Q_OBJECT
+	public:
+		MeshFilterInspector(MeshFilterComponent* meshFilterComponent);
+		MeshFilterComponent* meshFilterComponent;
+		Scene* scene;
+
+		QVBoxLayout* mainLayout;
+
+		void Refresh();
+};
+
 
 class MeshFilterComponent : public Component {
     public:
@@ -24,7 +39,11 @@ class MeshFilterComponent : public Component {
         void OnRender();
         void OnDestroy();
 		void Recompute();
-        
+
+        MeshFilterInspector* meshFilterInspector;
+        MeshFilterInspector* GetInspector();
+
+
 
         void LoadFromBuffers(std::vector<glm::dvec3> _vertex,
         std::vector<glm::dvec3> _normals,
@@ -40,6 +59,11 @@ class MeshFilterComponent : public Component {
         int primitiveSize;
 
         std::vector<Vertex> vertices;
+
+        QJsonObject jsonObj;
+        QJsonObject ToJSON() {
+			return jsonObj;
+		}
     private: 
         void InitBuffers();
         void CalculateTangents(std::vector<glm::vec4>& tangents, std::vector<glm::dvec3> _vertices, std::vector<glm::dvec3> _normals, std::vector<glm::dvec2> _uv,std::vector<int> _triangles);

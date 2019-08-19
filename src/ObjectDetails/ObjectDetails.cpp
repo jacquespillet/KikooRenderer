@@ -57,6 +57,11 @@ namespace KikooRenderer
 			rootWidget->mainLayout->addWidget(materialInspector);
 		}
 
+		CoreEngine::MeshFilterComponent* meshFilterComponent = (CoreEngine::MeshFilterComponent*)(currentObject->GetComponent("MeshFilter"));
+		if (meshFilterComponent != nullptr) {
+			CoreEngine::MeshFilterInspector* meshFilterComponentInspector = meshFilterComponent->GetInspector();
+			rootWidget->mainLayout->addWidget(meshFilterComponentInspector);
+		}
 
 
 	}

@@ -237,5 +237,30 @@ void TransformComponent::SetWorldZ(double z) {
 		this->position.z = (z - parentPos.z) / scaleFac;
 	}
 }
+
+QJsonObject TransformComponent::ToJSON() {
+	QJsonObject json;
+	json["type"] = "Transform";
+	
+	QJsonObject positionJson;
+	positionJson["X"] = position.x;
+	positionJson["Y"] = position.y;
+	positionJson["Z"] = position.z;
+	json["position"] = positionJson;
+	
+	QJsonObject scaleJson;
+	scaleJson["X"] = scale.x;
+	scaleJson["Y"] = scale.y;
+	scaleJson["Z"] = scale.z;
+	json["scale"] = scaleJson;
+	
+	QJsonObject rotationJson;
+	rotationJson["X"] = rotation.x;
+	rotationJson["Y"] = rotation.y;
+	rotationJson["Z"] = rotation.z;
+	json["rotation"] = rotationJson;
+
+	return json;
+}
 }
 }

@@ -6,6 +6,7 @@
 #include "SceneTree/SceneTree.hpp"
 #include "3DEngine/Components/TransformComponent.hpp"
 #include "3DEngine/Components/MaterialComponent.hpp"
+#include "3DEngine/Components/MeshFilterComponent.hpp"
 
 namespace KikooRenderer {
 namespace CoreEngine {

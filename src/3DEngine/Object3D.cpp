@@ -207,5 +207,30 @@ Object3D* Object3D::Intersects(Geometry::Ray ray, double& _distance) {
 	return closest;
 }
 
+QJsonObject Object3D::ToJSON() {
+	QJsonObject json;
+	json["Name"] = QString::fromStdString(name);
+	json["visible"] = QString((int)visible);
+	json["depthTest"] = QString((int)depthTest);
+	json["isStatic"] = QString((int)isStatic);
+
+	QJsonArray componentsArray;
+	for(int i=0; i<components.size(); i++) {
+		QJsonObject jsonComponent = components[i]->ToJSON();
+		componentsArray.append(jsonComponent);
+	}
+	json["components"] = componentsArray;
+
+	if(childObjects.size() > 0) {
+		
+		QJsonArray childObjectsArray;
+		for(int i=0; i<childObjects.size(); i++) {
+			QJsonObject jsonObject = childObjects[i]->ToJSON();
+			childObjectsArray.append(jsonObject);
+		}
+		json["childObjects"] = childObjectsArray;
+	}
+	return json;
+}
 }
 }

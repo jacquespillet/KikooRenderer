@@ -40,6 +40,15 @@ public:
         int smoothnessLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "smoothness");
         ogl->glUniform1f(smoothnessLocation, smoothness);
     }
+
+    virtual QJsonObject ToJSON() {
+        QJsonObject json;
+        json["ambientFactor"] = ambientFactor;
+        json["diffuseFactor"] = diffuseFactor;
+        json["specularFactor"] = specularFactor;
+        json["smoothness"] = smoothness;
+        return json;
+    }
     
     //Qt layout for setting uniforms
     virtual QLayout* GetLayout() {

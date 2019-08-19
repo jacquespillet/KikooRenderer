@@ -73,6 +73,8 @@ class TransformComponent : public Component {
         bool isScreenSize = false;
 
 		TransformInspector* transformInspector;
+
+		QJsonObject ToJSON();
 };
 }
 }

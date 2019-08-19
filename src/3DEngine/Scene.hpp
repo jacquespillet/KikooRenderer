@@ -71,6 +71,8 @@ class Scene {
 
 		KikooRenderer::ObjectDetailsPanel* objectDetailsPanel;
 
+		QJsonObject ToJSON();
+
 	protected:
 		Object3D* GetIntersectObject(int x, int y);
 };
