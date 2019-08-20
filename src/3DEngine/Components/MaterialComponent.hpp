@@ -3,6 +3,7 @@
 #include "Component.hpp"
 #include "3DEngine/Shader.hpp"
 #include "3DEngine/Texture.hpp"
+#include "3DEngine/Cubemap.hpp"
 #include "3DEngine/Scene.hpp"
 
 namespace KikooRenderer {
@@ -47,13 +48,17 @@ class MaterialComponent : public Component {
 
         Texture albedoTex;
 
+		// void SetCubemap(std::vector<std::string> cubemapFilenames);
+		// std::vector<std::string> cubemapfilenames;
+        // Cubemap cubemap;
+		// bool shouldLoadCubemap;
+
 		std::string albedoTexStr = "";
 		bool shouldLoadAlbedo = false;
 
 		MaterialInspector* materialInspector;
 		
 		ShaderParams* params;
-
 
 		QJsonObject ToJSON();		
 };

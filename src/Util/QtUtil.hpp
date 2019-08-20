@@ -102,7 +102,8 @@ class FilePicker : public QWidget {
 public:
 	std::string fileName;
 	QLineEdit* fileLineEdit;
-	FilePicker(std::string label, std::string value = "") : QWidget() {
+	QFileDialog::FileMode fileMode;
+	FilePicker(std::string label, std::string value = "", bool isMultipleFiles = false) : QWidget() {
 		QHBoxLayout* mainLayout = new QHBoxLayout();
 
 		QLabel* fileLabel = new QLabel(QString::fromStdString(label));
@@ -114,18 +115,25 @@ public:
 		QPushButton* button = new QPushButton("Choose File");
 		mainLayout->addWidget(button);
 
+		fileMode = isMultipleFiles ? QFileDialog::FileMode::ExistingFile : QFileDialog::FileMode::ExistingFiles; 
+	
 		connect(button, &QPushButton::clicked, this, [this]() {
 			QFileDialog dialog(this);
-			dialog.setFileMode(QFileDialog::ExistingFile);
+			dialog.setFileMode(QFileDialog::FileMode::ExistingFiles);
 			dialog.setNameFilter(tr(""));
 			dialog.setViewMode(QFileDialog::Detail);
 			QStringList fileNames;
 			if (dialog.exec())
 				fileNames = dialog.selectedFiles();
 
-			if (fileNames.size() > 0) {
+			if (fileNames.size() == 1) {
 				fileLineEdit->setText(fileNames[0]);
 				emit FileModified(fileNames[0]);
+			}
+			
+			if (fileNames.size() > 1) {
+				fileLineEdit->setText(fileNames[0]);
+				emit FilesModified(fileNames);
 			}
 
 
@@ -140,6 +148,7 @@ public:
 
 signals: 
 	void FileModified(QString fileName);
+	void FilesModified(QStringList fileNames);
 };
 
 

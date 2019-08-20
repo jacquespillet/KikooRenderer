@@ -32,6 +32,10 @@ namespace CoreEngine {
         Object3D* axes = GetAxes(this, "Axes");
         AddObject(axes);
 
+        // skyboxCube = GetCube(this, "Cubemap", glm::dvec3(0), glm::vec3(0), glm::dvec3(10), glm::dvec4(1, 1, 1, 1));
+        // skyboxCube->Start();
+        // skyboxCube->Enable();
+        
 		transformWidget = new TransformWidget(this);
 		transformWidget->Enable();
 
@@ -68,6 +72,10 @@ namespace CoreEngine {
                 objects3D[i]->Render(); 
             }
         }
+
+        // if(hasSkybox) {
+        //     skyboxCube->Render();
+        // }
 
 		if (transformWidget->visible && selectedObjects.size() > 0 && selectedObjects[0]->visible) {
 			transformWidget->Render();
@@ -306,6 +314,13 @@ namespace CoreEngine {
 		}
         return closest;
     }
+
+    // Called from preferences, has no GL context
+    // void Scene::SetSkybox(std::vector<std::string> filenames) {
+    //     MaterialComponent* material = (MaterialComponent*) skyboxCube->GetComponent("Material");
+    //     std::cout<<"HER"<<std::endl;
+    //     // material->SetCubemap(filenames);
+    // }
 
     QJsonObject Scene::ToJSON() {
         QJsonObject json;

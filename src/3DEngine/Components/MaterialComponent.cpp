@@ -106,6 +106,12 @@ void MaterialComponent::OnUpdate(){
 		albedoTex = KikooRenderer::CoreEngine::Texture(albedoTexStr, GL_TEXTURE0);
 		shouldLoadAlbedo = false;
 	}
+
+	// if (shouldLoadCubemap ) {
+	// 	std::cout << "LOADING"<<std::endl;
+	// 	cubemap = Cubemap(cubemapfilenames);
+	// 	shouldLoadCubemap = false;
+	// }
 }
 void MaterialComponent::OnRender(){} 
 void MaterialComponent::OnDestroy(){} 
@@ -117,7 +123,6 @@ MaterialInspector* MaterialComponent::GetInspector() {
 }
 
 
-
 void MaterialComponent::SetShader(Shader* shader) {
     this->shader = shader;
 	params = StandardShaders::GetParamsById(shader->GetId());
@@ -126,6 +131,11 @@ void MaterialComponent::SetShader(Shader* shader) {
 
     inited = true;
 }
+
+// void MaterialComponent::SetCubemap(std::vector<std::string> cubemapFilenames) {
+// 	this->cubemapfilenames = cubemapfilenames;
+// 	shouldLoadCubemap = true;
+// }
 
 void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 viewMatrix, glm::dmat4 projectionMatrix, Scene* scene) {
 	if(inited) {
@@ -160,6 +170,8 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 			int hasAlbedoTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasAlbedoTex");
 			ogl->glUniform1i(hasAlbedoTexLocation, 0);
 		}
+
+		//Set Cubemap tex
 
 		if(this->shader->GetId() != SHADER_IDS::UNLIT) {
 			int modelMatrixLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "modelMatrix"); 

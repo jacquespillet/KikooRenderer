@@ -6,8 +6,11 @@
 #include "ObjectDetails/ObjectDetails.hpp"
 #include "Renderer/RayTracer.hpp"
 
+#include "AppManagement/PreferencesWindow.hpp"
+
 namespace KikooRenderer 
 {
+class PreferencesWindow;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -34,7 +37,9 @@ class MainWindow : public QMainWindow
         
 		QMenu* aboutMenu;
 		QAction* helpAction;
-		QAction* aboutAction;     
+		QAction* aboutAction;
+
+		PreferencesWindow* preferencesWindow;
 
 		std::string currentFolderPath;
 };

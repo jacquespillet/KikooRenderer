@@ -6,6 +6,7 @@
 #include "Object3D.hpp"
 #include "TransformWidget.hpp"
 #include "ObjectDetails/ObjectDetails.hpp"
+#include "Cubemap.hpp"
 
 namespace KikooRenderer {
 class ObjectDetailsPanel;
@@ -61,17 +62,22 @@ class Scene {
 		std::vector<Object3D*> selectedObjects;
 
 		TransformWidget* transformWidget;
-
 		bool isTransforming = false;
 
 		GLint defaultFBO;
 
 
 		bool isControlKey = false;
-
 		KikooRenderer::ObjectDetailsPanel* objectDetailsPanel;
-
 		QJsonObject ToJSON();
+
+		// Cubemap* cubemap;
+		// std::vector<std::string> cubemapFilenames;
+		// bool shouldLoadSkybox = false;
+		// bool hasSkybox = false;
+		// void SetSkybox(std::vector<std::string> filenames);
+		// Object3D* skyboxCube;
+		
 
 	protected:
 		Object3D* GetIntersectObject(int x, int y);

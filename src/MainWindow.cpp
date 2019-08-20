@@ -5,6 +5,8 @@
 namespace KikooRenderer {
     MainWindow::MainWindow() {
         setWindowTitle("KikooRenderer");
+
+        preferencesWindow = new PreferencesWindow(this);
         
 	    BuildMenuBar();
 
@@ -51,7 +53,7 @@ namespace KikooRenderer {
         loadAction = fileMenu->addAction("Load Scene");
 
         optionsMenu = menuBar()->addMenu("Options");
-        preferencesAction = fileMenu->addAction("Preferences");
+        preferencesAction = optionsMenu->addAction("Preferences");
 
         aboutMenu =  menuBar()->addMenu("About");
         helpAction = aboutMenu->addAction("Help");
@@ -74,5 +76,8 @@ namespace KikooRenderer {
         // QObject::connect(loadAction, SIGNAL(triggered()), this, SLOT(LoadProject()));
         
         //QObject::connect(view3DAction, SIGNAL(triggered()), this, SLOT(Start3DView()));
+        QObject::connect(preferencesAction, &QAction::triggered, this, [this]() {
+            preferencesWindow->show();
+        });
     }    
 }
