@@ -60,21 +60,29 @@ class Scene {
 		double deltaTime;
 
 		std::vector<Object3D*> selectedObjects;
-
+		
+		//UI Elements
+		bool rendersUI = true;
+		Object3D* axes;
+		Object3D* grid;
 		TransformWidget* transformWidget;
 		bool isTransforming = false;
 
-		GLint defaultFBO;
-
+		GLint defaultFBO; 
 
 		bool isControlKey = false;
-		KikooRenderer::ObjectDetailsPanel* objectDetailsPanel;
-		QJsonObject ToJSON();
 
+		//Right panel inspector
+		KikooRenderer::ObjectDetailsPanel* objectDetailsPanel;
+		
+		
+		//Scene skybox
 		bool hasSkybox = false;
 		void SetSkybox(std::vector<std::string> filenames);
 		Object3D* skyboxCube;
 		
+		//For saving the scene
+		QJsonObject ToJSON();
 
 	protected:
 		Object3D* GetIntersectObject(int x, int y);

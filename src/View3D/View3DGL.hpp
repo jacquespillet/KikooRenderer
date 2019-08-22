@@ -30,6 +30,8 @@ class View3DGL: public QOpenGLWidget {
         int windowWidth;
         int windowHeight;
         QTimer* timer;
+
+        bool isHDR;
         
         //Overriden functions for GL
         std::string GetGLErr(); 

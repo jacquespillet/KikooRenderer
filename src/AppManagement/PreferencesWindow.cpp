@@ -9,8 +9,6 @@ namespace KikooRenderer
         renderPreferences = new RenderPreferences(this);
         setCentralWidget(renderPreferences);
         this->mainWindow = mainWindow;
-
-        //Left side widget for option categories ? ...
     }
 
     void PreferencesWindow::showEvent(QShowEvent *ev) {}
@@ -35,6 +33,16 @@ namespace KikooRenderer
         connect(backgroundPreferences, &BackgroundPreferences::SkyboxFileNames, this, [this]( std::vector<std::string> skyboxStrings) {
             this->mainPrefWindow->mainWindow->view3D->view3DGL->scene->SetSkybox(skyboxStrings);
         });
+
+
+        ui3DPreferences = new UI3DPreferences();        
+        layout->addWidget(ui3DPreferences);
+
+        QCheckBox* hdrCheckbox = new QCheckBox("HDR");
+        layout->addWidget(hdrCheckbox);
+        
+        QCheckBox* gammaCorrectionCheckbox = new QCheckBox("Gamma Correction");
+        layout->addWidget(gammaCorrectionCheckbox);
 
 
     }    

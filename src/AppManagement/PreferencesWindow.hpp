@@ -4,6 +4,7 @@
 #include "MainWindow.hpp"
 
 #include "BackgroundPreferences.hpp"
+#include "3DUIPreferences.hpp"
 
 namespace KikooRenderer 
 {
@@ -20,6 +21,8 @@ protected:
         QVBoxLayout* layout;
 
         BackgroundPreferences* backgroundPreferences;
+        UI3DPreferences* ui3DPreferences;
+
 };
 
 class PreferencesWindow: public QMainWindow {
