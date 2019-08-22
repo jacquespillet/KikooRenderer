@@ -3,6 +3,8 @@
 #include "Util/Common.h"
 #include "MainWindow.hpp"
 
+#include "BackgroundPreferences.hpp"
+
 namespace KikooRenderer 
 {
 class MainWindow;
@@ -14,23 +16,22 @@ public:
     RenderPreferences(PreferencesWindow* mainPrefWindow);
     PreferencesWindow* mainPrefWindow;
 protected:
-	  QWidget* baseWidget; 
-      QVBoxLayout* layout;
+        QWidget* baseWidget; 
+        QVBoxLayout* layout;
 
-      std::vector<std::string> skyboxStrings;
-      bool IsAllPlanes();
+        BackgroundPreferences* backgroundPreferences;
 };
 
 class PreferencesWindow: public QMainWindow {
     Q_OBJECT
-	protected:
-      void showEvent(QShowEvent *ev);
-	  void closeEvent(QCloseEvent *event);
+    protected:
+        void showEvent(QShowEvent *ev);
+        void closeEvent(QCloseEvent *event);
 
     public:
-		PreferencesWindow(MainWindow* mainWindow);
+        PreferencesWindow(MainWindow* mainWindow);
         MainWindow* mainWindow;
         RenderPreferences* renderPreferences;
-		QSize sizeHint(void) const {return QSize(800, 600);}      
+        QSize sizeHint(void) const {return QSize(800, 600);}      
 };
 }

@@ -23,6 +23,7 @@ Shader GetUnlitShader() {
     uniform mat4 modelViewProjectionMatrix;
     uniform vec4 albedo; 
     uniform float materialInfluence;
+    uniform int hasCubemap;
 
     //outputs
     out vec4 fragmentColor;  
@@ -31,12 +32,15 @@ Shader GetUnlitShader() {
     //main
     void main()
     {
-        //compute outputs
         fragmentColor = materialInfluence * albedo + (1.0 - materialInfluence) * color;
+
         vec4 finalPosition = modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
-        gl_Position = vec4(finalPosition.x, finalPosition.y, finalPosition.z, finalPosition.w);
+
         fragmentUv = uv;
         cubeTexCoords = position.xyz;
+
+        gl_Position = vec4(finalPosition.x, finalPosition.y, finalPosition.z, finalPosition.w);
+        if(hasCubemap > 0) gl_Position = gl_Position.xyww; 
     }
     )";
 
@@ -59,7 +63,6 @@ Shader GetUnlitShader() {
     {
         if(hasCubemap > 0) {
             outputColor = texture(cubemapTexture, cubeTexCoords);
-            // outputColor = vec4(cubeTexCoords.xyz, 1);
         } else {
             outputColor = (hasAlbedoTex==1) ? texture(albedoTexture, fragmentUv) : fragmentColor;
         }

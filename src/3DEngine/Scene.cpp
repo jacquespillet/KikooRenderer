@@ -69,15 +69,18 @@ namespace CoreEngine {
                 objects3D[i]->Render(); 
             }
         }
-
+        
         if(hasSkybox) {
+            ogl->glDepthFunc(GL_LEQUAL);
             skyboxCube->Render();
-        }
+            ogl->glDepthFunc(GL_LESS);
+        }   
 
 		if (transformWidget->visible && selectedObjects.size() > 0 && selectedObjects[0]->visible) {
 			transformWidget->Render();
 		}
 
+        
         ogl->glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
         ogl->glStencilMask(0x00); 
         ogl->glDisable(GL_DEPTH_TEST);
@@ -101,6 +104,7 @@ namespace CoreEngine {
 
         ogl->glStencilMask(0xFF);
         ogl->glEnable(GL_DEPTH_TEST);
+     
     }
 
     void Scene::OnUpdate() {

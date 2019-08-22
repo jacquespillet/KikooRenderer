@@ -159,10 +159,9 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 
 		if (cubemap.loaded) {
 			cubemap.Use();
-			
-			ogl->glActiveTexture(GL_TEXTURE0);
+			ogl->glActiveTexture(GL_TEXTURE3);
 			int cubemapLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "cubemapTexture");
-			ogl->glUniform1i(cubemapLocation, 0);
+			ogl->glUniform1i(cubemapLocation, 3);
 
 			int hasCubemapLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasCubemap");
 			ogl->glUniform1i(hasCubemapLocation, 1);
