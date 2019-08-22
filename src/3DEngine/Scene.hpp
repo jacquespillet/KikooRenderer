@@ -71,12 +71,9 @@ class Scene {
 		KikooRenderer::ObjectDetailsPanel* objectDetailsPanel;
 		QJsonObject ToJSON();
 
-		// Cubemap* cubemap;
-		// std::vector<std::string> cubemapFilenames;
-		// bool shouldLoadSkybox = false;
-		// bool hasSkybox = false;
-		// void SetSkybox(std::vector<std::string> filenames);
-		// Object3D* skyboxCube;
+		bool hasSkybox = false;
+		void SetSkybox(std::vector<std::string> filenames);
+		Object3D* skyboxCube;
 		
 
 	protected:

@@ -32,15 +32,12 @@ namespace CoreEngine {
         Object3D* axes = GetAxes(this, "Axes");
         AddObject(axes);
 
-        // skyboxCube = GetCube(this, "Cubemap", glm::dvec3(0), glm::vec3(0), glm::dvec3(10), glm::dvec4(1, 1, 1, 1));
-        // skyboxCube->Start();
-        // skyboxCube->Enable();
+        skyboxCube = GetCube(this, "Cubemap", glm::dvec3(0), glm::vec3(0), glm::dvec3(100), glm::dvec4(1, 1, 1, 1));
+        skyboxCube->Start();
+        skyboxCube->Enable();
         
 		transformWidget = new TransformWidget(this);
 		transformWidget->Enable();
-
-		// Object3D* dirLight = GetDirectionalLight(this, "Main light", glm::dvec3(0), glm::dvec3(40, 170, 0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
-		// AddObject(dirLight);
 	
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
@@ -73,9 +70,9 @@ namespace CoreEngine {
             }
         }
 
-        // if(hasSkybox) {
-        //     skyboxCube->Render();
-        // }
+        if(hasSkybox) {
+            skyboxCube->Render();
+        }
 
 		if (transformWidget->visible && selectedObjects.size() > 0 && selectedObjects[0]->visible) {
 			transformWidget->Render();
@@ -112,6 +109,9 @@ namespace CoreEngine {
             if(!objects3D[i]->enabled) objects3D[i]->Enable(); 
             objects3D[i]->Update();
         }
+        if(hasSkybox) {
+            skyboxCube->Update();
+        }        
     }
 
 
@@ -316,11 +316,13 @@ namespace CoreEngine {
     }
 
     // Called from preferences, has no GL context
-    // void Scene::SetSkybox(std::vector<std::string> filenames) {
-    //     MaterialComponent* material = (MaterialComponent*) skyboxCube->GetComponent("Material");
-    //     std::cout<<"HER"<<std::endl;
-    //     // material->SetCubemap(filenames);
-    // }
+    void Scene::SetSkybox(std::vector<std::string> filenames) {
+        std::cout << "Loading from scene"<<std::endl;
+        MaterialComponent* material = (MaterialComponent*) skyboxCube->GetComponent("Material");
+        
+        material->SetCubemap(filenames);
+        hasSkybox = true;
+    }
 
     QJsonObject Scene::ToJSON() {
         QJsonObject json;

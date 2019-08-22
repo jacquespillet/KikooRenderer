@@ -27,6 +27,7 @@ Shader GetUnlitShader() {
     //outputs
     out vec4 fragmentColor;  
     out vec2 fragmentUv;
+    out vec3 cubeTexCoords;
     //main
     void main()
     {
@@ -35,6 +36,7 @@ Shader GetUnlitShader() {
         vec4 finalPosition = modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
         gl_Position = vec4(finalPosition.x, finalPosition.y, finalPosition.z, finalPosition.w);
         fragmentUv = uv;
+        cubeTexCoords = position.xyz;
     }
     )";
 
@@ -43,16 +45,24 @@ Shader GetUnlitShader() {
     #version 440
     in vec4 fragmentColor; 
     in vec2 fragmentUv;
+    in vec3 cubeTexCoords;
     //uniforms
     uniform int hasAlbedoTex;
     uniform sampler2D albedoTexture;
+    uniform samplerCube cubemapTexture;
+
+    uniform int hasCubemap;
     //output
     layout(location = 0) out vec4 outputColor; 
     //main
     void main()
     {
-        outputColor = (hasAlbedoTex==1) ? texture(albedoTexture, fragmentUv) : fragmentColor;
-
+        if(hasCubemap > 0) {
+            outputColor = texture(cubemapTexture, cubeTexCoords);
+            // outputColor = vec4(cubeTexCoords.xyz, 1);
+        } else {
+            outputColor = (hasAlbedoTex==1) ? texture(albedoTexture, fragmentUv) : fragmentColor;
+        }
     }
     )";
     return unlitMeshShader;

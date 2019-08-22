@@ -47,14 +47,14 @@ class MaterialComponent : public Component {
         glm::vec4 albedo;
 
         Texture albedoTex;
-
-		// void SetCubemap(std::vector<std::string> cubemapFilenames);
-		// std::vector<std::string> cubemapfilenames;
-        // Cubemap cubemap;
-		// bool shouldLoadCubemap;
-
 		std::string albedoTexStr = "";
 		bool shouldLoadAlbedo = false;
+
+		void SetCubemap(std::vector<std::string> cubemapFilenames);
+		std::vector<std::string> cubemapfilenames;
+        Cubemap cubemap;
+		bool shouldLoadCubemap = false;
+
 
 		MaterialInspector* materialInspector;
 		

@@ -87,7 +87,7 @@ void MaterialInspector::UpdateShaderParameters() {
 	mainLayout->addLayout(shaderParametersLayout);
 }
 
-MaterialComponent::MaterialComponent(Object3D* object) : Component("Material", object), albedoTex() {
+MaterialComponent::MaterialComponent(Object3D* object) : Component("Material", object), albedoTex(), cubemap()  {
     inited= false;
     influence = 1.0;
     albedo = glm::dvec4(0.75, 0.75, 0.75, 1.0);
@@ -106,12 +106,10 @@ void MaterialComponent::OnUpdate(){
 		albedoTex = KikooRenderer::CoreEngine::Texture(albedoTexStr, GL_TEXTURE0);
 		shouldLoadAlbedo = false;
 	}
-
-	// if (shouldLoadCubemap ) {
-	// 	std::cout << "LOADING"<<std::endl;
-	// 	cubemap = Cubemap(cubemapfilenames);
-	// 	shouldLoadCubemap = false;
-	// }
+	if (shouldLoadCubemap ) {
+		cubemap = Cubemap(cubemapfilenames);
+		shouldLoadCubemap = false;
+	}
 }
 void MaterialComponent::OnRender(){} 
 void MaterialComponent::OnDestroy(){} 
@@ -132,10 +130,10 @@ void MaterialComponent::SetShader(Shader* shader) {
     inited = true;
 }
 
-// void MaterialComponent::SetCubemap(std::vector<std::string> cubemapFilenames) {
-// 	this->cubemapfilenames = cubemapfilenames;
-// 	shouldLoadCubemap = true;
-// }
+void MaterialComponent::SetCubemap(std::vector<std::string> _cubemapFilenames) {
+	this->cubemapfilenames = _cubemapFilenames;
+	shouldLoadCubemap = true;
+}
 
 void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 viewMatrix, glm::dmat4 projectionMatrix, Scene* scene) {
 	if(inited) {
@@ -158,6 +156,20 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 		ogl->glUniform4fv(albedoLocation, 1, glm::value_ptr(albedo));
 
 		params->SetUniforms();
+
+		if (cubemap.loaded) {
+			cubemap.Use();
+			
+			ogl->glActiveTexture(GL_TEXTURE0);
+			int cubemapLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "cubemapTexture");
+			ogl->glUniform1i(cubemapLocation, 0);
+
+			int hasCubemapLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasCubemap");
+			ogl->glUniform1i(hasCubemapLocation, 1);
+		} else {
+			int hasCubemapLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasCubemap");
+			ogl->glUniform1i(hasCubemapLocation, 0);
+		}
 
 		if (albedoTex.loaded) {
 			albedoTex.Use();
@@ -211,13 +223,13 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 			ogl->glUniform1i(numLightsLocation, numLights);
 
 
-			// if(this->shader->GetId() == SHADER_IDS::PBR) {         
-			// 	GLuint loc = ogl->glGetUniformLocation(this->shader->programShaderObject, "roughness");
-			// 	ogl->glUniform1f(loc, 0.5);
+		// 	// if(this->shader->GetId() == SHADER_IDS::PBR) {         
+		// 	// 	GLuint loc = ogl->glGetUniformLocation(this->shader->programShaderObject, "roughness");
+		// 	// 	ogl->glUniform1f(loc, 0.5);
 
-			// 	loc = ogl->glGetUniformLocation(this->shader->programShaderObject, "specularFrac");
-			// 	ogl->glUniform1f(loc, 0.5);
-			// }
+		// 	// 	loc = ogl->glGetUniformLocation(this->shader->programShaderObject, "specularFrac");
+		// 	// 	ogl->glUniform1f(loc, 0.5);
+		// 	// }
 		}
 	}
 }

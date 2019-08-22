@@ -16,6 +16,9 @@ public:
 protected:
 	  QWidget* baseWidget; 
       QVBoxLayout* layout;
+
+      std::vector<std::string> skyboxStrings;
+      bool IsAllPlanes();
 };
 
 class PreferencesWindow: public QMainWindow {

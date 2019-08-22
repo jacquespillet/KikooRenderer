@@ -13,6 +13,7 @@ class Cubemap {
     bool loaded = false; 
     Cubemap(std::vector<std::string> files);  
     Cubemap() {loaded = false;}
+    void Use();
     
 };
 
