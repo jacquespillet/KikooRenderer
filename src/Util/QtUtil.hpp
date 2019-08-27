@@ -79,6 +79,7 @@ public:
 		mainLayout->addWidget(button);
 
 		QColorDialog* colorDialog = new QColorDialog();
+		colorDialog->setOptions(QColorDialog::ShowAlphaChannel);
 
 		connect(button, &QPushButton::clicked, this, [this, colorDialog]() {
 			colorDialog->exec();

@@ -14,6 +14,8 @@
 namespace KikooRenderer {
 
 namespace CoreEngine {
+	Framebuffer* alternateFBO;
+	Object3D* quad;
     Scene::Scene(){
 		camera = new CameraScene(this, 1.0, 70 * DEGTORAD, 0.1, 1000.0, 1.0);
         this->started = false;
@@ -43,7 +45,14 @@ namespace CoreEngine {
         skyboxCube = GetCube(this, "Cubemap", glm::dvec3(0), glm::vec3(0), glm::dvec3(100), glm::dvec4(1, 1, 1, 1));
         skyboxCube->Start();
         skyboxCube->Enable();
-        
+
+        //////////////
+        ogl->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &defaultFBO);
+		alternateFBO = new Framebuffer;
+    
+		quad = GetQuad(this, "plane", glm::dvec3(0), glm::dvec3(0), glm::dvec3(5), glm::dvec4(1, 1, 1, 1));
+		quad->Enable();        
+        ///////////////
 	
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
@@ -68,8 +77,8 @@ namespace CoreEngine {
         ogl->glStencilFunc(GL_ALWAYS, 1, 0xFF); 
         ogl->glStencilMask(0xFF); 
 
+        alternateFBO->RenderOnObect(objects3D, quad);
 
-		// Render each object
         for(int i=0; i<objects3D.size(); i++) {
             if(objects3D[i] && objects3D[i]->visible ) {
                 objects3D[i]->Render(); 

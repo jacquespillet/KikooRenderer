@@ -182,8 +182,6 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 			ogl->glUniform1i(hasAlbedoTexLocation, 0);
 		}
 
-		//Set Cubemap tex
-
 		if(this->shader->GetId() != SHADER_IDS::UNLIT) {
 			int modelMatrixLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "modelMatrix"); 
 			ogl->glUniformMatrix4fv(modelMatrixLocation, 1, false, glm::value_ptr(glm::mat4(modelMatrix)));

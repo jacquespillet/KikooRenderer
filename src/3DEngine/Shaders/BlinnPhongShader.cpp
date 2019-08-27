@@ -74,8 +74,102 @@ namespace CoreEngine
         scene->triggerRefresh = true;
     });
 
+    QCheckBox* ReflectSkyboxCheckbox = new QCheckBox("Reflect/Refract Skybox");
+    shaderParamsLayout->addWidget(ReflectSkyboxCheckbox);
+    connect(ReflectSkyboxCheckbox, &QCheckBox::stateChanged, this, [this](int state) {
+        reflectSkybox = (state > 0);
+        scene->triggerRefresh = true;
+    });
+
     return shaderParamsLayout;
 }
+
+void BlinnPhongParams::SetUniforms() {
+    GETGL
+
+    /*
+    * When textures changed in the form, load them for the incoming frame
+    */
+    if (shouldLoadNormal ) {
+        normalMap = KikooRenderer::CoreEngine::Texture(normalMapStr, GL_TEXTURE2);
+        shouldLoadNormal = false;
+    }
+
+    if (shouldLoadSpecular ) {
+        specularMap = KikooRenderer::CoreEngine::Texture(specularMapStr, GL_TEXTURE1);
+        shouldLoadSpecular = false;
+    }
+    
+    /*
+    Set variables for normal mapping : 
+        * Texture variable
+        * bool hasNormalTex
+        * Influence of normals of the map on the actual normal
+    */
+    if(normalMap.loaded) {
+        normalMap.Use();
+        int texLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "normalTexture"); 
+        ogl->glUniform1i(texLocation, 2); 
+        
+        int hasNormalTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasNormalTex"); 
+        ogl->glUniform1i(hasNormalTexLocation, 1);
+
+        int normalMapInfluenceLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "normalMapInfluence");
+        ogl->glUniform1f(normalMapInfluenceLocation, normalMapInfluence);
+    }  else {
+        int hasNormalTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasNormalTex"); 
+        ogl->glUniform1i(hasNormalTexLocation, 0);
+    } 
+
+    /*
+    Set variables for Specular mapping : 
+        * Texture variable
+        * bool hasSpecularTex
+    */
+    if(specularMap.loaded) {
+        specularMap.Use();
+        int texLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "specularTexture"); 
+        ogl->glUniform1i(texLocation, 1); 
+
+        int hasSpecularTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasSpecularTex"); 
+        ogl->glUniform1i(hasSpecularTexLocation, 1);
+    } else {
+        int hasSpecularTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasSpecularTex"); 
+        ogl->glUniform1i(hasSpecularTexLocation, 0);
+    }
+
+    // std::cout << "here"<<std::endl;
+    int reflectSkyboxInt = reflectSkybox ? 1 : 0;
+    int reflectSkyboxLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "reflectSkybox"); 
+    ogl->glUniform1i(reflectSkyboxLocation, reflectSkyboxInt);
+    if (reflectSkybox) {
+    	MaterialComponent* skyboxMaterial = (MaterialComponent*) scene->skyboxCube->GetComponent("Material");
+        skyboxMaterial->cubemap.Use();
+    	ogl->glActiveTexture(GL_TEXTURE3);
+    	int cubemapLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "cubemapTexture");
+    	ogl->glUniform1i(cubemapLocation, 3);
+    }
+
+    /*
+    * Set all factors for computing blinn phong shading
+    */
+    
+
+    int specularColorLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "specularColor"); 
+    ogl->glUniform4fv(specularColorLocation, 1, glm::value_ptr(specularColor));
+
+    int ambientFactorLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "ambientFactor");
+    ogl->glUniform1f(ambientFactorLocation, ambientFactor);
+
+    int diffuseFactorLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "diffuseFactor");
+    ogl->glUniform1f(diffuseFactorLocation, diffuseFactor);
+
+    int specularFactorLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "specularFactor");
+    ogl->glUniform1f(specularFactorLocation, specularFactor);
+
+    int smoothnessLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "smoothness");
+    ogl->glUniform1f(smoothnessLocation, smoothness);
+} 
 
 /*
 * Returns the actual blinn phong shader
@@ -108,7 +202,7 @@ Shader GetBlinnPhongShader() {
         vec4 finalPosition = modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
         gl_Position = vec4(finalPosition.x, finalPosition.y, finalPosition.z, finalPosition.w);
         fragPos = (modelMatrix * vec4(position.x, position.y, position.z, 1.0f)).xyz;
-        fragNormal = normal;
+        fragNormal = mat3(transpose(inverse(modelMatrix))) * normal;
         fragUv = uv;
         fragTangent = tangent;
     }
@@ -135,10 +229,12 @@ Shader GetBlinnPhongShader() {
     uniform sampler2D albedoTexture;
     uniform sampler2D specularTexture;
     uniform sampler2D normalTexture;
+    uniform samplerCube cubemapTexture;
     uniform int hasAlbedoTex;
     uniform int hasSpecularTex;
     uniform int hasNormalTex;
     uniform float normalMapInfluence;
+    uniform int reflectSkybox;
 
 
     uniform float ambientFactor;
@@ -159,10 +255,24 @@ Shader GetBlinnPhongShader() {
 
         vec4 finalAlbedo   = (hasAlbedoTex==1) ? albedo * texture(albedoTexture, fragUv) : albedo;
         vec3 finalNormal   = (hasNormalTex==1) ? normalMapInfluence * normalize(texture(normalTexture, fragUv)).xyz : fragNormal;
-        // vec4 specularColor = vec4(1, 1, 1, 1);
         
         float finalSpecularFactor = (hasSpecularTex==1) ? texture(specularTexture, fragUv).x : specularFactor;
         
+        vec4 finalSpecularColor = specularColor;
+        if(reflectSkybox == 1) {
+            vec3 I = -normalize(fragToCam);
+            
+            vec3 R = vec3(0, 0, 0);
+            if(finalAlbedo.a < 1) {
+                float ratio = 1.00 / 1.52;
+                R = refract(I, normalize(fragNormal), ratio);
+            } else {
+                R = reflect(I, normalize(fragNormal));
+            }
+
+            finalSpecularColor = vec4(texture(cubemapTexture, R).rgb, 1.0);
+        }
+
         vec4 finalColor = vec4(0, 0, 0, 1);
         finalColor.rgb += ambientFactor * finalAlbedo.rgb;
 
@@ -199,7 +309,7 @@ Shader GetBlinnPhongShader() {
             vec3 halfwayVec = normalize(toLight + fragToCam);
 
             // Specular factor * specular color * lightColor * specularity of fragment
-            vec4 specular = finalSpecularFactor * specularColor * lights[i].color * pow(max(dot(finalNormal.xyz, halfwayVec),0), smoothness);
+            vec4 specular = finalSpecularFactor * finalSpecularColor * lights[i].color * pow(max(dot(finalNormal.xyz, halfwayVec),0), smoothness);
 
             finalColor.rgb +=  attenuation * (diffuse + specular).rgb;  
         }
