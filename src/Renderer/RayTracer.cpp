@@ -5,7 +5,7 @@
 #include "Geometry/Util.h"
 
 namespace KikooRenderer {
-namespace Renderer {
+namespace OfflineRenderer {
 
     RayTracer::RayTracer() {
         

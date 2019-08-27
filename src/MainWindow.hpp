@@ -21,7 +21,7 @@ class MainWindow : public QMainWindow
         SceneTree* sceneTree;
 		ObjectDetailsPanel* objectDetails;
 
-        Renderer::RayTracer rayTracer;
+        OfflineRenderer::RayTracer rayTracer;
 
         void BuildMenuBar();
 

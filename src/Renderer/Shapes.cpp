@@ -1,7 +1,7 @@
 #include "Shapes.hpp"
 
 namespace KikooRenderer {
-namespace Renderer {
+namespace OfflineRenderer {
     Sphere::Sphere(glm::dvec3 position, double radius, Material material) : material(material){
         this->position = position;
         this->radius = radius;

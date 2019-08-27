@@ -14,27 +14,25 @@
 namespace KikooRenderer {
 
 namespace CoreEngine {
-	Framebuffer* alternateFBO;
-	Object3D* quad;
     Scene::Scene(){
 		camera = new CameraScene(this, 1.0, 70 * DEGTORAD, 0.1, 1000.0, 1.0);
         this->started = false;
-
-        // standardShaders->scene = this;
     }
 
+	Framebuffer* alternateFBO;
+	Object3D* quad;
 	void Scene::Start() {
 		GETGL
 
         this->started = true;
 
+        this->renderer = new HDRRenderer(this);
+
         grid = GetGrid(this, "Grid");
-        // AddObject(grid);
         grid->Start();
         grid->Enable();
 
         axes = GetAxes(this, "Axes");
-        // AddObject(axes);
         axes->Start();
         axes->Enable();
 
@@ -47,17 +45,17 @@ namespace CoreEngine {
         skyboxCube->Enable();
 
         //////////////
-        ogl->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &defaultFBO);
-		alternateFBO = new Framebuffer;
+        // ogl->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &defaultFBO);
+		// alternateFBO = new Framebuffer;
     
-		quad = GetQuad(this, "plane", glm::dvec3(0), glm::dvec3(0), glm::dvec3(5), glm::dvec4(1, 1, 1, 1));
-		quad->Enable();        
+		// quad = GetQuad(this, "plane", glm::dvec3(0), glm::dvec3(0), glm::dvec3(5), glm::dvec4(1, 1, 1, 1));
+		// quad->Enable();
         ///////////////
 	
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
             objects3D[i]->Start();
-        } 
+        }
     }
 
     void Scene::Enable() {
@@ -70,61 +68,9 @@ namespace CoreEngine {
 
     void Scene::Render() {
 		GETGL
+        // alternateFBO->RenderOnObect(objects3D, quad);
 
-        ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
-        ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
-        
-        ogl->glStencilFunc(GL_ALWAYS, 1, 0xFF); 
-        ogl->glStencilMask(0xFF); 
-
-        alternateFBO->RenderOnObect(objects3D, quad);
-
-        for(int i=0; i<objects3D.size(); i++) {
-            if(objects3D[i] && objects3D[i]->visible ) {
-                objects3D[i]->Render(); 
-            }
-        }
-
-        //Render skybox
-        if(hasSkybox) {
-            ogl->glDepthFunc(GL_LEQUAL);
-            skyboxCube->Render();
-            ogl->glDepthFunc(GL_LESS);
-        }   
-
-        //Render UI
-        if(rendersUI) {
-            grid->Render();
-            axes->Render();
-
-            if (transformWidget->visible && selectedObjects.size() > 0 && selectedObjects[0]->visible) {
-                transformWidget->Render();
-            }
-
-            ogl->glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-            ogl->glStencilMask(0x00); 
-            ogl->glDisable(GL_DEPTH_TEST);
-
-            //Render selected objects
-            for(int i=0; i<selectedObjects.size(); i++) {
-                if(selectedObjects[i]->visible) {
-                    MaterialComponent* material = (MaterialComponent*)(selectedObjects[i]->GetComponent("Material"));
-                    if(material) {
-                        //Save shader state to set it back after this pass
-                        Shader* tmpShader = material->shader;
-                        ShaderParams* tmpParams = material->params;
-
-                        material->SetShader(&standardShaders.selectedObjectShader);
-                        selectedObjects[i]->Render();
-                        material->SetShader(tmpShader);
-                        material->params = tmpParams;
-                    }
-                }
-            }
-
-            ogl->glStencilMask(0xFF);
-            ogl->glEnable(GL_DEPTH_TEST);
-        }
+        this->renderer->Render();
     }
 
     void Scene::OnUpdate() {

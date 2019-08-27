@@ -3,7 +3,7 @@
 #include "Geometry/Ray.hpp"
 
 namespace KikooRenderer{
-namespace Renderer {
+namespace OfflineRenderer {
 
 class Camera {
     public: 

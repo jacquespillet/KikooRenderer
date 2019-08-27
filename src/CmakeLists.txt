@@ -25,6 +25,9 @@ set(MainWindowSrc
 	3DEngine/BaseObjects.cpp
 	3DEngine/Framebuffer.cpp
 	3DEngine/TransformWidget.cpp
+	
+	3DEngine/Renderer.cpp
+
 
 	3DEngine/Shaders/ShaderParams.cpp
 	3DEngine/Shaders/BlinnPhongShader.cpp

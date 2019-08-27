@@ -4,7 +4,7 @@
 #include "Material.hpp"
 
 namespace KikooRenderer {
-namespace Renderer {
+namespace OfflineRenderer {
 
 class Material;
 

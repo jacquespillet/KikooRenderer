@@ -2,7 +2,7 @@
 #include "Geometry/Util.h"
 
 namespace KikooRenderer{
-namespace Renderer {
+namespace OfflineRenderer {
 
     Camera::Camera(glm::dvec3 lookfrom, glm::dvec3 lookat, glm::dvec3 up, double fovy, double aspectRatio, double aperture, double focusDistance, double t0, double t1) {
         time0 = t0;

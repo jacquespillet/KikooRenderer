@@ -4,7 +4,7 @@
 
 
 namespace KikooRenderer{
-namespace Renderer {
+namespace OfflineRenderer {
 
     Material::Material(glm::dvec4 albedo, bool metallic) : albedo(albedo), metallic(metallic) {}
     bool Material::Scatter(KikooRenderer::Geometry::Ray in,  Point point, glm::dvec3& attenuation, KikooRenderer::Geometry::Ray& scattered) {

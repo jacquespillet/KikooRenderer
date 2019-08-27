@@ -7,11 +7,13 @@
 #include "TransformWidget.hpp"
 #include "ObjectDetails/ObjectDetails.hpp"
 #include "Cubemap.hpp"
+#include "Renderer.hpp"
 
 namespace KikooRenderer {
 class ObjectDetailsPanel;
-namespace CoreEngine {
+class Renderer;
 
+namespace CoreEngine {
 class Scene {
     public: 
         Scene();
@@ -22,7 +24,7 @@ class Scene {
         // void Destroy();
         bool started;
 
-		std::vector<Object3D*> objects3D; 
+		std::vector<Object3D*> objects3D;
 		std::vector<Object3D*> lightObjects; 
 		StandardShaders standardShaders;
 		CameraScene* camera;
@@ -83,6 +85,8 @@ class Scene {
 		
 		//For saving the scene
 		QJsonObject ToJSON();
+
+		Renderer* renderer;
 
 	protected:
 		Object3D* GetIntersectObject(int x, int y);
