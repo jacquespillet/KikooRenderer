@@ -123,9 +123,12 @@ MaterialInspector* MaterialComponent::GetInspector() {
 
 void MaterialComponent::SetShader(Shader* shader) {
     this->shader = shader;
+
 	params = StandardShaders::GetParamsById(shader->GetId());
-	params->shader = shader;
-	params->scene = object3D->scene;
+	if(params != nullptr) {
+		params->shader = shader;
+		params->scene = object3D->scene;
+	}
 
     inited = true;
 }

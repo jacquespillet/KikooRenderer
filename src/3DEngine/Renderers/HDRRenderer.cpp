@@ -12,7 +12,7 @@ namespace KikooRenderer {
 namespace CoreEngine {
 
 HDRRenderer::HDRRenderer(Scene* scene) : Renderer(scene) {
-    alternateFBO = new Framebuffer;
+    alternateFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT);
 
     quadShader.vertSrc= R"(
     //attribs
@@ -21,53 +21,39 @@ HDRRenderer::HDRRenderer(Scene* scene) : Renderer(scene) {
     layout(location = 1) in vec3 normal;
     layout(location = 2) in vec2 uv;
     layout(location = 3) in vec4 color;
-    //transforms
-    uniform mat4 modelViewProjectionMatrix;
-    uniform vec4 albedo; 
-    uniform float materialInfluence;
-    uniform int hasCubemap;
 
     //outputs
-    out vec4 fragmentColor;  
     out vec2 fragmentUv;
-    out vec3 cubeTexCoords;
     //main
     void main()
     {
-        fragmentColor = materialInfluence * albedo + (1.0 - materialInfluence) * color;
-
-        vec4 finalPosition = modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
-
-        fragmentUv = uv;
-        cubeTexCoords = position.xyz;
-
-        gl_Position = vec4(finalPosition.x, finalPosition.y, finalPosition.z, finalPosition.w);
-        if(hasCubemap > 0) gl_Position = gl_Position.xyww; 
+        fragmentUv = vec2(uv.x, -uv.y);
+        gl_Position = vec4(position.x, position.y, position.z, 1.0);
     }
     )";
 
     quadShader.fragSrc = R"(
     //inputs
     #version 440
-    in vec4 fragmentColor; 
     in vec2 fragmentUv;
-    in vec3 cubeTexCoords;
-    //uniforms
-    uniform int hasAlbedoTex;
-    uniform sampler2D albedoTexture;
-    uniform samplerCube cubemapTexture;
 
-    uniform int hasCubemap;
     //output
     layout(location = 0) out vec4 outputColor; 
+    uniform sampler2D albedoTexture;
+
     //main
     void main()
-    {
-        if(hasCubemap > 0) {
-            outputColor = texture(cubemapTexture, cubeTexCoords);
-        } else {
-            outputColor = (hasAlbedoTex==1) ? texture(albedoTexture, fragmentUv) : fragmentColor;
-        }
+    {   
+        const float gamma = 2.2;
+        vec3 hdrColor = texture(albedoTexture, fragmentUv).rgb;
+    
+        // reinhard tone mapping
+        vec3 mapped = hdrColor / (hdrColor + vec3(1.0));
+        // gamma correction 
+        mapped = pow(mapped, vec3(1.0 / gamma));
+    
+        outputColor = vec4(mapped, 1.0);
+
     }
     )";
     quadShader.name = "quad";
@@ -76,9 +62,15 @@ HDRRenderer::HDRRenderer(Scene* scene) : Renderer(scene) {
 
     quad = GetQuad(scene, "plane", glm::dvec3(0), glm::dvec3(0), glm::dvec3(5), glm::dvec4(1, 1, 1, 1));
     MaterialComponent* material = (MaterialComponent*) quad->GetComponent("Material");
-    material
+    material->SetShader(&quadShader);
     quad->Enable();
 }
+
+void HDRRenderer::Resize(int w, int h) {
+    delete alternateFBO;
+    alternateFBO = new Framebuffer(w, h, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+}
+
 
 void HDRRenderer::Render() {
     GETGL
@@ -89,12 +81,6 @@ void HDRRenderer::Render() {
     ogl->glStencilMask(0xFF); 
 
     alternateFBO->RenderOnObect(scene->objects3D, quad);
-    
-    for(int i=0; i<scene->objects3D.size(); i++) {
-        if(scene->objects3D[i] && scene->objects3D[i]->visible ) {
-            scene->objects3D[i]->Render(); 
-        }
-    }
 
     //Render skybox
     if(scene->hasSkybox) {

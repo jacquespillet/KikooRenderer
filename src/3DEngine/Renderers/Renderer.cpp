@@ -18,6 +18,9 @@ Renderer::Renderer(Scene* scene) {
 void Renderer::Render() {
 }
 
+void Renderer::Resize(int w, int h) {
+}
+
 ForwardRenderer::ForwardRenderer(Scene* scene) : Renderer(scene) {
 
 }

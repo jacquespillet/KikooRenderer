@@ -9,6 +9,7 @@ class Renderer {
 public:
     Renderer(Scene* scene);
     virtual void Render();
+    virtual void Resize(int w, int h);
 protected:
     Scene* scene;
 };

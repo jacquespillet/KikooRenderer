@@ -41,6 +41,14 @@ namespace CoreEngine {
         skyboxCube = GetCube(this, "Cubemap", glm::dvec3(0), glm::vec3(0), glm::dvec3(100), glm::dvec4(1, 1, 1, 1));
         skyboxCube->Start();
         skyboxCube->Enable();
+
+        Object3D* light = GetDirectionalLight(this, "sun", glm::dvec3(0), glm::dvec3(0, 30, 0), glm::dvec3(1), glm::dvec4(0.2, 0, 0, 1));
+        Object3D* light2 = GetDirectionalLight(this, "sun2", glm::dvec3(0), glm::dvec3(0, -30, 0), glm::dvec3(1), glm::dvec4(0, 0.2, 0, 1));
+        Object3D* light3 = GetDirectionalLight(this, "sun3", glm::dvec3(0), glm::dvec3(0, 0, 0), glm::dvec3(1), glm::dvec4(0, 0, 100, 1));
+        AddObject(light);
+        AddObject(light2);
+        AddObject(light3);
+
 	
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
@@ -194,12 +202,14 @@ namespace CoreEngine {
     }
 
     void Scene::SetWindowSize(int w, int h) {
+
         this->windowWidth = w;
         this->windowHeight = h;
         float aspectRatio = w/h;
 
         this->camera->aspect = aspectRatio;
         this->camera->UpdateProjectionMatrix();
+        renderer->Resize(w, h);
     }
 
     void Scene::HandleSelection(int x, int y) {

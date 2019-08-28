@@ -14,7 +14,7 @@ namespace CoreEngine {
 class Object3D;
 class Framebuffer {
 public: 
-	Framebuffer(int width=800, int height = 600);
+	Framebuffer(int width=800, int height = 600, int internalColorFormat = GL_RGB, int colorFormat = GL_RGB, int colorType = GL_UNSIGNED_BYTE);
 	
 	void Enable();
 	void Disable();
@@ -23,6 +23,9 @@ public:
 	unsigned int texture;
 	unsigned int depthTexture;
 	GLint defaultFBO;
+
+	int width, height;
+	int colorFormat;
 
 	void RenderOnObect(std::vector<Object3D*>& objectsToRender, Object3D* target);
 

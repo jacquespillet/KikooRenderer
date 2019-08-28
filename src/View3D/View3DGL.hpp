@@ -26,13 +26,12 @@ class View3DGL: public QOpenGLWidget {
 		CoreEngine::Scene* scene; 
 
 		virtual void OnkeyPressEvent(QKeyEvent* e);
+        
     protected: 
         int windowWidth;
         int windowHeight;
         QTimer* timer;
 
-        bool isHDR;
-        
         //Overriden functions for GL
         std::string GetGLErr(); 
         void initializeGL();

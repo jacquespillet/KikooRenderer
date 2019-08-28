@@ -12,8 +12,10 @@ class HDRRenderer : public Renderer {
 public:
     HDRRenderer(Scene* scene);
     virtual void Render();
+    virtual void Resize(int w, int h);
     
 	Framebuffer* alternateFBO;
+    int width, height;
 	Object3D* quad;
 
     Shader quadShader;

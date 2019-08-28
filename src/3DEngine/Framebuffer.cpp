@@ -4,8 +4,11 @@
 namespace KikooRenderer {
 namespace CoreEngine {
 
-	Framebuffer::Framebuffer(int width, int height) {
+	Framebuffer::Framebuffer(int width, int height,int internalColorFormat, int colorFormat, int colorType) {
 		GETGL
+		this->width = width;
+		this->height = height;
+		this->colorFormat = colorFormat;
 		
 
 		ogl->glGenFramebuffers(1, &fbo);
@@ -14,12 +17,12 @@ namespace CoreEngine {
 		// create a color attachment texture
 		ogl->glGenTextures(1, &texture);
 		ogl->glBindTexture(GL_TEXTURE_2D, texture);
-		ogl->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		ogl->glTexImage2D(GL_TEXTURE_2D, 0, internalColorFormat, width, height, 0, colorFormat, colorType, NULL);
 		ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		ogl->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
 		ogl->glBindTexture(GL_TEXTURE_2D, 0);
-
+		
 		//Create depth texture
 		ogl->glGenTextures(1, &depthTexture);
 		ogl->glBindTexture(GL_TEXTURE_2D, depthTexture);
