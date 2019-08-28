@@ -19,8 +19,6 @@ namespace CoreEngine {
         this->started = false;
     }
 
-	Framebuffer* alternateFBO;
-	Object3D* quad;
 	void Scene::Start() {
 		GETGL
 
@@ -43,14 +41,6 @@ namespace CoreEngine {
         skyboxCube = GetCube(this, "Cubemap", glm::dvec3(0), glm::vec3(0), glm::dvec3(100), glm::dvec4(1, 1, 1, 1));
         skyboxCube->Start();
         skyboxCube->Enable();
-
-        //////////////
-        // ogl->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &defaultFBO);
-		// alternateFBO = new Framebuffer;
-    
-		// quad = GetQuad(this, "plane", glm::dvec3(0), glm::dvec3(0), glm::dvec3(5), glm::dvec4(1, 1, 1, 1));
-		// quad->Enable();
-        ///////////////
 	
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
@@ -68,8 +58,6 @@ namespace CoreEngine {
 
     void Scene::Render() {
 		GETGL
-        // alternateFBO->RenderOnObect(objects3D, quad);
-
         this->renderer->Render();
     }
 

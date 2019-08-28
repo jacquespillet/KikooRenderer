@@ -1,8 +1,9 @@
 #pragma once
-#include "Scene.hpp"
+#include "Util/Common.h"
 
 namespace KikooRenderer {
 namespace CoreEngine {
+class Scene;
 
 class Renderer {
 public:
@@ -16,15 +17,6 @@ class ForwardRenderer : public Renderer {
 public:
     ForwardRenderer(Scene* scene);
     virtual void Render();
-};
-
-class HDRRenderer : public Renderer {
-public:
-    HDRRenderer(Scene* scene);
-    virtual void Render();
-    
-	Framebuffer* alternateFBO;
-	Object3D* quad;
 };
 
 }

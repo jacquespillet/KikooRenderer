@@ -7,7 +7,7 @@
 #include "TransformWidget.hpp"
 #include "ObjectDetails/ObjectDetails.hpp"
 #include "Cubemap.hpp"
-#include "Renderer.hpp"
+#include "Renderers/HDRRenderer.hpp"
 
 namespace KikooRenderer {
 class ObjectDetailsPanel;

@@ -1,0 +1,25 @@
+#pragma once
+#include "Util/Common.h"
+#include "Renderer.hpp"
+#include "../Framebuffer.hpp"
+#include "../Object3D.hpp"
+#include "../Shader.hpp"
+
+namespace KikooRenderer {
+namespace CoreEngine {
+
+class HDRRenderer : public Renderer {
+public:
+    HDRRenderer(Scene* scene);
+    virtual void Render();
+    
+	Framebuffer* alternateFBO;
+	Object3D* quad;
+
+    Shader quadShader;
+// protected:
+    // void InitShader();
+};
+
+}
+}
