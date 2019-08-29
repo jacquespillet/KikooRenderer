@@ -24,6 +24,7 @@ namespace KikooRenderer {
 
         timer = new QTimer(this);
 	    scene = new CoreEngine::Scene; 
+        scene->glWindow = this;
         
         setMouseTracking(true);
                 

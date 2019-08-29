@@ -89,47 +89,47 @@ void HDRRenderer::Render() {
     ogl->glStencilFunc(GL_ALWAYS, 1, 0xFF); 
     ogl->glStencilMask(0xFF); 
 
-    alternateFBO->RenderOnObect(scene->objects3D, quad);
+    // alternateFBO->RenderOnObect(scene->objects3D, quad);
 
-    //Render skybox
-    if(scene->hasSkybox) {
-        ogl->glDepthFunc(GL_LEQUAL);
-        scene->skyboxCube->Render();
-        ogl->glDepthFunc(GL_LESS);
-    }   
+    // //Render skybox
+    // if(scene->hasSkybox) {
+    //     ogl->glDepthFunc(GL_LEQUAL);
+    //     alternateFBO->RenderOnObect(scene->skyboxCube, quad);
+    //     ogl->glDepthFunc(GL_LESS);
+    // }   
 
     //Render UI
     if(scene->rendersUI) {
-        scene->grid->Render();
-        scene->axes->Render();
+        alternateFBO->RenderOnObect(scene->grid, quad);
+        alternateFBO->RenderOnObect(scene->axes, quad);
 
-        if (scene->transformWidget->visible && scene->selectedObjects.size() > 0 && scene->selectedObjects[0]->visible) {
-            scene->transformWidget->Render();
-        }
+        // if (scene->transformWidget->visible && scene->selectedObjects.size() > 0 && scene->selectedObjects[0]->visible) {
+        //     scene->transformWidget->Render();
+        // }
 
-        ogl->glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-        ogl->glStencilMask(0x00); 
-        ogl->glDisable(GL_DEPTH_TEST);
+        // ogl->glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        // ogl->glStencilMask(0x00); 
+        // ogl->glDisable(GL_DEPTH_TEST);
 
-        //Render selected objects
-        for(int i=0; i<scene->selectedObjects.size(); i++) {
-            if(scene->selectedObjects[i]->visible) {
-                MaterialComponent* material = (MaterialComponent*)(scene->selectedObjects[i]->GetComponent("Material"));
-                if(material) {
-                    //Save shader state to set it back after this pass
-                    Shader* tmpShader = material->shader;
-                    ShaderParams* tmpParams = material->params;
+        // //Render selected objects
+        // for(int i=0; i<scene->selectedObjects.size(); i++) {
+        //     if(scene->selectedObjects[i]->visible) {
+        //         MaterialComponent* material = (MaterialComponent*)(scene->selectedObjects[i]->GetComponent("Material"));
+        //         if(material) {
+        //             //Save shader state to set it back after this pass
+        //             Shader* tmpShader = material->shader;
+        //             ShaderParams* tmpParams = material->params;
 
-                    material->SetShader(&scene->standardShaders.selectedObjectShader);
-                    scene->selectedObjects[i]->Render();
-                    material->SetShader(tmpShader);
-                    material->params = tmpParams;
-                }
-            }
-        }
+        //             material->SetShader(&scene->standardShaders.selectedObjectShader);
+        //             scene->selectedObjects[i]->Render();
+        //             material->SetShader(tmpShader);
+        //             material->params = tmpParams;
+        //         }
+        //     }
+        // }
 
-        ogl->glStencilMask(0xFF);
-        ogl->glEnable(GL_DEPTH_TEST);
+        // ogl->glStencilMask(0xFF);
+        // ogl->glEnable(GL_DEPTH_TEST);
     }
 }
 

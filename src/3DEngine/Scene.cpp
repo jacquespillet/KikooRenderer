@@ -24,8 +24,8 @@ namespace CoreEngine {
 
         this->started = true;
 
-        this->renderer = new HDRRenderer(this);
-        // this->renderer = new ForwardRenderer(this);
+        // this->renderer = new HDRRenderer(this);
+        this->renderer = new ForwardRenderer(this);
 
         grid = GetGrid(this, "Grid");
         grid->Start();
@@ -204,6 +204,22 @@ namespace CoreEngine {
         this->camera->aspect = aspectRatio;
         this->camera->UpdateProjectionMatrix();
         renderer->Resize(w, h);
+    }
+    void Scene::SetRenderPipeline(RENDER_PIPELINE pipeline) {
+        this->glWindow->makeCurrent();
+        switch (pipeline)
+        {
+            case RENDER_PIPELINE::FORWARD:
+                this->renderer = new ForwardRenderer(this);
+                break;
+            case RENDER_PIPELINE::HDR:
+                this->renderer = new HDRRenderer(this);
+                break;
+            default:
+                break;
+        }
+        this->glWindow->doneCurrent();
+        this->triggerRefresh = true;
     }
 
     void Scene::HandleSelection(int x, int y) {

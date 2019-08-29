@@ -279,7 +279,7 @@ Shader GetBlinnPhongShader() {
         vec3 fragBitangent = normalize(cross(fragNormal, fragTangent.xyz) * fragTangent.w); 
 
         for(int i=0; i<numLights; i++) {
-            float attenuation = 0;
+            float attenuation = 1;
             vec3 lightDirection = normalize(lights[i].direction);
             
             float lightDist = 0;

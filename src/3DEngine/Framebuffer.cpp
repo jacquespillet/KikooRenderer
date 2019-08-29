@@ -98,6 +98,28 @@ namespace CoreEngine {
 		
 		target->Render();
 	}
+	
+	void Framebuffer::RenderOnObect(Object3D* objectToRender, Object3D* target) {
+		GETGL
+		GLint previousFBO; 
+		ogl->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previousFBO);
+		this->Enable();
+
+		if(objectToRender->visible ) objectToRender->Render(); 
+
+		Disable();
+		ogl->glBindFramebuffer(GL_FRAMEBUFFER, previousFBO);
+		
+		//Wait for objects to be rendered on FBO for rendering the target
+		Texture albedoTex;
+		albedoTex.glTex = texture;
+		albedoTex.loaded = true;
+		albedoTex.texIndex = GL_TEXTURE0;
+		MaterialComponent* material = (MaterialComponent*)target->GetComponent("Material");
+		material->albedoTex = albedoTex;
+		
+		target->Render();
+	}
 
 	// Texture* Framebuffer::GetColorTexture(){}
 	// Texture* Framebuffer::GetDepthTexture(){}

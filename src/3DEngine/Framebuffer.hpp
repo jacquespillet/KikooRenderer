@@ -28,6 +28,7 @@ public:
 	int colorFormat;
 
 	void RenderOnObect(std::vector<Object3D*>& objectsToRender, Object3D* target);
+	void RenderOnObect(Object3D* objectToRender, Object3D* target);
 
 	Texture* GetColorTexture();
 	Texture* GetDepthTexture();

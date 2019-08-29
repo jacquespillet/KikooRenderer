@@ -86,7 +86,11 @@ class Scene {
 		//For saving the scene
 		QJsonObject ToJSON();
 
+
+		void SetRenderPipeline(RENDER_PIPELINE pipeline);
 		Renderer* renderer;
+
+		QOpenGLWidget* glWindow; //Useful for catching GL context
 
 	protected:
 		Object3D* GetIntersectObject(int x, int y);

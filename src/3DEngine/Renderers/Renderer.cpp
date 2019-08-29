@@ -21,12 +21,26 @@ void Renderer::Render() {
 void Renderer::Resize(int w, int h) {
 }
 
-ForwardRenderer::ForwardRenderer(Scene* scene) : Renderer(scene) {
+void Renderer::SetGammaCorrection(bool value) {
+//     std::cout << "HERE"<<std::endl;
+//     this->scene->glWindow->makeCurrent();
+//     GETGL
+//     if(value) ogl->glEnable(GL_FRAMEBUFFER_SRGB); 
+//     else ogl->glDisable(GL_FRAMEBUFFER_SRGB); 
+//     this->scene->glWindow->doneCurrent();
+//     scene->triggerRefresh = true;
 
+    isGammaCorrected = value;
+}
+
+ForwardRenderer::ForwardRenderer(Scene* scene) : Renderer(scene) {
 }
 
 void ForwardRenderer::Render() {
     GETGL
+    if(isGammaCorrected) ogl->glEnable(GL_FRAMEBUFFER_SRGB); 
+    else ogl->glDisable(GL_FRAMEBUFFER_SRGB); 
+
     ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
     ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
     
