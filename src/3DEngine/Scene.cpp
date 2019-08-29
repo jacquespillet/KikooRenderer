@@ -25,6 +25,7 @@ namespace CoreEngine {
         this->started = true;
 
         this->renderer = new HDRRenderer(this);
+        // this->renderer = new ForwardRenderer(this);
 
         grid = GetGrid(this, "Grid");
         grid->Start();
@@ -38,16 +39,9 @@ namespace CoreEngine {
         transformWidget->Start();
 		transformWidget->Enable();
 
-        skyboxCube = GetCube(this, "Cubemap", glm::dvec3(0), glm::vec3(0), glm::dvec3(100), glm::dvec4(1, 1, 1, 1));
+        skyboxCube = GetCube(this, "Cubemap", glm::dvec3(0), glm::vec3(0), glm::dvec3(100), glm::dvec4(0.1, 0.1, 0.1, 1));
         skyboxCube->Start();
         skyboxCube->Enable();
-
-        Object3D* light = GetDirectionalLight(this, "sun", glm::dvec3(0), glm::dvec3(0, 30, 0), glm::dvec3(1), glm::dvec4(0.2, 0, 0, 1));
-        Object3D* light2 = GetDirectionalLight(this, "sun2", glm::dvec3(0), glm::dvec3(0, -30, 0), glm::dvec3(1), glm::dvec4(0, 0.2, 0, 1));
-        Object3D* light3 = GetDirectionalLight(this, "sun3", glm::dvec3(0), glm::dvec3(0, 0, 0), glm::dvec3(1), glm::dvec4(0, 0, 100, 1));
-        AddObject(light);
-        AddObject(light2);
-        AddObject(light3);
 
 	
         //Start each object

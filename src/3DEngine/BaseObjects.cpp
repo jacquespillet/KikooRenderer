@@ -859,7 +859,7 @@ Object3D* GetPointLight(Scene* scene, std::string name, glm::dvec3 _position, gl
 	pointLight->transform->position = _position;
 	pointLight->transform->rotation = _rotation;
 	pointLight->transform->scale = _scale;
-	LightComponent* lightComponent = new LightComponent(pointLight, _color, glm::dvec3(0.25, 0.05, 0.001), 1);
+	LightComponent* lightComponent = new LightComponent(pointLight, _color, glm::dvec3(1, 1, 1), 1);
 	pointLight->AddComponent(lightComponent);
 	return pointLight;
 }

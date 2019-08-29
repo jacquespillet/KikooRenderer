@@ -16,6 +16,7 @@ public:
     
 	Framebuffer* alternateFBO;
     int width, height;
+    float exposure;
 	Object3D* quad;
 
     Shader quadShader;

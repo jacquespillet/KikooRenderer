@@ -254,7 +254,7 @@ Shader GetBlinnPhongShader() {
         vec3 fragToCam = cameraPos - fragPos;
 
         vec4 finalAlbedo   = (hasAlbedoTex==1) ? albedo * texture(albedoTexture, fragUv) : albedo;
-        vec3 finalNormal   = (hasNormalTex==1) ? normalMapInfluence * normalize(texture(normalTexture, fragUv)).xyz : fragNormal;
+        vec3 finalNormal   = (hasNormalTex==1) ? normalMapInfluence * normalize(texture(normalTexture, fragUv)).xyz : normalize(fragNormal);
         
         float finalSpecularFactor = (hasSpecularTex==1) ? texture(specularTexture, fragUv).x : specularFactor;
         
@@ -276,23 +276,23 @@ Shader GetBlinnPhongShader() {
         vec4 finalColor = vec4(0, 0, 0, 1);
         finalColor.rgb += ambientFactor * finalAlbedo.rgb;
 
-        //Multiply by handedness stored in w of tangent vector
         vec3 fragBitangent = normalize(cross(fragNormal, fragTangent.xyz) * fragTangent.w); 
 
         for(int i=0; i<numLights; i++) {
-            float attenuation = 1;
+            float attenuation = 0;
             vec3 lightDirection = normalize(lights[i].direction);
             
+            float lightDist = 0;
             if(lights[i].type == 1) { //Point light
-                float distance = distance(fragPos.xyz, lights[i].position);
-                attenuation    = 1 / (lights[i].attenuation.x + lights[i].attenuation.y * distance + lights[i].attenuation.z * (distance * distance));
+                lightDist = distance(fragPos.xyz, lights[i].position);
+                attenuation    = 1 / (lights[i].attenuation.x + lights[i].attenuation.y * lightDist + lights[i].attenuation.z * (lightDist * lightDist));
                 lightDirection = normalize(fragPos.xyz - lights[i].position);
             }
             if(lights[i].type == 2) { //Spot light
                 lightDirection  = normalize(fragPos.xyz - lights[i].position);
-                float distance  = distance(fragPos.xyz, lights[i].position);
+                lightDist  = distance(fragPos.xyz, lights[i].position);
                 float numerator = pow(max(dot(-normalize(lights[i].direction), -lightDirection), 0), 64);
-                attenuation     = numerator / (lights[i].attenuation.x + lights[i].attenuation.y * distance + lights[i].attenuation.z * (distance * distance));
+                attenuation     = numerator / (lights[i].attenuation.x + lights[i].attenuation.y * lightDist + lights[i].attenuation.z * (lightDist * lightDist));
             }
             
             vec3 toLight = -lightDirection;
@@ -307,7 +307,6 @@ Shader GetBlinnPhongShader() {
             vec4 diffuse = diffuseFactor * finalAlbedo * lights[i].color * max(dot(finalNormal.xyz, toLight), 0);
 
             vec3 halfwayVec = normalize(toLight + fragToCam);
-
             // Specular factor * specular color * lightColor * specularity of fragment
             vec4 specular = finalSpecularFactor * finalSpecularColor * lights[i].color * pow(max(dot(finalNormal.xyz, halfwayVec),0), smoothness);
 

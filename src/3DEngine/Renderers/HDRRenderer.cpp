@@ -12,6 +12,8 @@ namespace KikooRenderer {
 namespace CoreEngine {
 
 HDRRenderer::HDRRenderer(Scene* scene) : Renderer(scene) {
+    GETGL
+
     alternateFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT);
 
     quadShader.vertSrc= R"(
@@ -40,6 +42,7 @@ HDRRenderer::HDRRenderer(Scene* scene) : Renderer(scene) {
     //output
     layout(location = 0) out vec4 outputColor; 
     uniform sampler2D albedoTexture;
+    uniform float exposure;
 
     //main
     void main()
@@ -60,9 +63,15 @@ HDRRenderer::HDRRenderer(Scene* scene) : Renderer(scene) {
     std::cout << "StandardShaders: Compiling quadShader" << std::endl; 
     quadShader.Compile();
 
+    exposure = 1.0;
+
     quad = GetQuad(scene, "plane", glm::dvec3(0), glm::dvec3(0), glm::dvec3(5), glm::dvec4(1, 1, 1, 1));
     MaterialComponent* material = (MaterialComponent*) quad->GetComponent("Material");
     material->SetShader(&quadShader);
+    
+    // int exposureLocation = ogl->glGetUniformLocation(quadShader.programShaderObject, "exposure"); 
+    // ogl->glUniform1f(exposureLocation, exposure);
+
     quad->Enable();
 }
 
