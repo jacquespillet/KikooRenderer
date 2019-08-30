@@ -24,8 +24,8 @@ namespace CoreEngine {
 
         this->started = true;
 
-        // this->renderer = new HDRRenderer(this);
-        this->renderer = new ForwardRenderer(this);
+        this->renderer = new HDRRenderer(this);
+        // this->renderer = new ForwardRenderer(this);
 
         grid = GetGrid(this, "Grid");
         grid->Start();
@@ -238,6 +238,7 @@ namespace CoreEngine {
 	
 		intersectedObject->isSelected = !intersectedObject->isSelected;
 
+        //Check if it was in the selectedObjects array. If yes, remove it. If no, add it to selection
 		std::vector<Object3D*>::iterator it = std::find(selectedObjects.begin(), selectedObjects.end(), intersectedObject);
 		int objectInx = std::distance(selectedObjects.begin(), it);
 		if (it != selectedObjects.end()) {
@@ -295,11 +296,12 @@ namespace CoreEngine {
 
     // Called from preferences, has no GL context
     void Scene::SetSkybox(std::vector<std::string> filenames) {
-        std::cout << "Loading from scene"<<std::endl;
+        glWindow->makeCurrent();
         MaterialComponent* material = (MaterialComponent*) skyboxCube->GetComponent("Material");
-        
         material->SetCubemap(filenames);
         hasSkybox = true;
+        glWindow->doneCurrent();
+        triggerRefresh = true;
     }
 
     QJsonObject Scene::ToJSON() {

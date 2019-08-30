@@ -106,10 +106,6 @@ void MaterialComponent::OnUpdate(){
 		albedoTex = KikooRenderer::CoreEngine::Texture(albedoTexStr, GL_TEXTURE0);
 		shouldLoadAlbedo = false;
 	}
-	if (shouldLoadCubemap ) {
-		cubemap = Cubemap(cubemapfilenames);
-		shouldLoadCubemap = false;
-	}
 }
 void MaterialComponent::OnRender(){} 
 void MaterialComponent::OnDestroy(){} 
@@ -135,7 +131,7 @@ void MaterialComponent::SetShader(Shader* shader) {
 
 void MaterialComponent::SetCubemap(std::vector<std::string> _cubemapFilenames) {
 	this->cubemapfilenames = _cubemapFilenames;
-	shouldLoadCubemap = true;
+	cubemap = Cubemap(cubemapfilenames);
 }
 
 void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 viewMatrix, glm::dmat4 projectionMatrix, Scene* scene) {
@@ -161,8 +157,8 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 		params->SetUniforms();
 
 		if (cubemap.loaded) {
-			cubemap.Use();
 			ogl->glActiveTexture(GL_TEXTURE3);
+			cubemap.Use();
 			int cubemapLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "cubemapTexture");
 			ogl->glUniform1i(cubemapLocation, 3);
 

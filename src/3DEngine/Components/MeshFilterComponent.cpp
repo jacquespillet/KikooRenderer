@@ -138,6 +138,8 @@ void MeshFilterComponent::OnRender(){
 	
 	//unbind VAO
 	ogl->glBindVertexArray(0);
+	ogl->glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	ogl->glBindTexture(GL_TEXTURE_2D, 0);
 } 
 
 void MeshFilterComponent::OnDestroy() {

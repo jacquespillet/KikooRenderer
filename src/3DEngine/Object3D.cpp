@@ -17,7 +17,6 @@ namespace CoreEngine {
 Object3D::Object3D(std::string _name, Scene* _scene) {
     this->name = _name;
     this->scene = _scene;
-	//this->frameBuffer = nullptr;
 
 	transform = new TransformComponent(this);
 	this->AddComponent(transform);

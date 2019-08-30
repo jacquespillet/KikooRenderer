@@ -16,6 +16,14 @@ Cubemap::Cubemap(std::vector<std::string> files) {
     ogl->glGenTextures(1, &textureID);
     ogl->glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 
+    ogl->glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    ogl->glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    ogl->glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    ogl->glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    ogl->glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    ogl->glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0); 
+    ogl->glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 0); 
+    
     int width, height, nrChannels;
     for (unsigned int i = 0; i < files.size(); i++)
     {
@@ -31,17 +39,15 @@ Cubemap::Cubemap(std::vector<std::string> files) {
             stbi_image_free(data);
         }
     }
-    ogl->glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    ogl->glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    ogl->glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    ogl->glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    ogl->glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    
 
     loaded = true;
+    ogl->glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
 void Cubemap::Use() {
     GETGL
+    // std::cout << textureID << std::endl;    
     ogl->glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 }
 

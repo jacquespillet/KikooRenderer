@@ -30,6 +30,11 @@ public:
 	void RenderOnObect(std::vector<Object3D*>& objectsToRender, Object3D* target);
 	void RenderOnObect(Object3D* objectToRender, Object3D* target);
 
+	void RenderObjectsToFBO(std::vector<Object3D*>& objectsToRender);
+	void RenderObjectToFBO(Object3D* objectToRender);
+	void RenderFBOToObject(Object3D* target);
+
+
 	Texture* GetColorTexture();
 	Texture* GetDepthTexture();
 
