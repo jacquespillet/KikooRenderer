@@ -207,6 +207,8 @@ Shader GetBlinnPhongShader() {
         fragNormal = (flipNormals > 0) ? -mat3(transpose(inverse(modelMatrix))) * normal  : mat3(transpose(inverse(modelMatrix))) * normal;
         fragUv = uv;
         fragTangent = tangent;
+
+
     }
     )";
 
@@ -220,6 +222,8 @@ Shader GetBlinnPhongShader() {
             vec3 attenuation;
             vec3 direction;
             vec4 color;
+            sampler2D depthMap;
+            mat4 lightSpaceMatrix;
     };
 
     layout(location = 0) out vec4 outputColor; 
@@ -250,6 +254,25 @@ Shader GetBlinnPhongShader() {
     in vec2 fragUv;
     in vec4 fragTangent;
     in vec3 toCamTangentSpace; 
+
+    float ShadowCalculation(vec4 fragPosLightSpace, int inx, vec3 lightDir)
+    {
+        // perform perspective divide
+        vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+        // transform to [0,1] range
+        projCoords = projCoords * 0.5 + 0.5;
+        // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+        float closestDepth = texture(lights[inx].depthMap, projCoords.xy).r; 
+        // get depth of current fragment from light's perspective
+        float currentDepth = projCoords.z;
+        // check whether current frag pos is in shadow
+
+        // float bias = max(0.05 * (1.0 - dot(fragNormal, lightDir)), 0.005);  
+        float bias = 0.005;
+        float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
+
+        return shadow;
+    } 
 
     void main()
     {
@@ -312,7 +335,10 @@ Shader GetBlinnPhongShader() {
             // Specular factor * specular color * lightColor * specularity of fragment
             vec4 specular = finalSpecularFactor * finalSpecularColor * lights[i].color * pow(max(dot(finalNormal.xyz, halfwayVec),0), smoothness);
 
-            finalColor.rgb +=  attenuation * (diffuse + specular).rgb;  
+            vec4 fragPosLightSpace = lights[i].lightSpaceMatrix * vec4(fragPos, 1.0);
+            float shadow = ShadowCalculation(fragPosLightSpace, i, toLight);
+
+            finalColor.rgb += (1.0 - shadow) *  attenuation * (diffuse + specular).rgb;
         }
         outputColor = finalColor;
         outputColor.a = finalAlbedo.a;

@@ -50,18 +50,18 @@ namespace CoreEngine {
         AddObject(room);
 
 
-        Object3D* cube1 = GetCube(this, "Cube", glm::dvec3(2, 1, 3), glm::vec3(20, 40, 10), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
+        Object3D* cube1 = GetCube(this, "Cube", glm::dvec3(0, 1, 0), glm::vec3(0, 0, 0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
         mat = (MaterialComponent*) cube1->GetComponent("Material");
         mat->shader = standardShaders.shaders[2];
         AddObject(cube1);
 
         
-        Object3D* cube2 = GetCube(this, "Cube2", glm::dvec3(-1, 1, 2), glm::vec3(10, 50, 70), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
-        mat = (MaterialComponent*) cube2->GetComponent("Material");
-        mat->shader = standardShaders.shaders[2];
-        AddObject(cube2);
+        // Object3D* cube2 = GetCube(this, "Cube2", glm::dvec3(-1, 1, 2), glm::vec3(0, 0, 0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
+        // mat = (MaterialComponent*) cube2->GetComponent("Material");
+        // mat->shader = standardShaders.shaders[2];
+        // AddObject(cube2);
 
-        Object3D* dirLight = GetDirectionalLight(this, "light", glm::dvec3(0, 3, -5), glm::vec3(30, 20, 0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
+        Object3D* dirLight = GetDirectionalLight(this, "light", glm::dvec3(0, 3, 0), glm::vec3(90, 0, 0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
         AddObject(dirLight);
 	
         //Start each object

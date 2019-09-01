@@ -1,6 +1,7 @@
 #pragma once
 #include "Util/Common.h"
 #include "Component.hpp"
+#include "../Framebuffer.hpp"
 
 
 namespace KikooRenderer {
@@ -13,13 +14,18 @@ class LightComponent : public Component {
         void OnUpdate();
         void OnRender();
         void OnDestroy();
-        void Recompute(){}
+        void Recompute();
+
+        void RenderDepthMap();
 
         int type; //0 directional, 1 point, 2 spot
         glm::dvec3 attenuation;
         glm::dvec4 color;
 		double fov;
-
+        
+	    Framebuffer* depthFBO;
+        glm::dmat4 lightProjection;
+        glm::dmat4 lightSpaceMatrix;
     
 		QJsonObject ToJSON() {
 			QJsonObject json;

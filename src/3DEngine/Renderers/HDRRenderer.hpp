@@ -15,7 +15,6 @@ public:
     virtual void Resize(int w, int h);
     
 	Framebuffer* alternateFBO;
-	Framebuffer* depthFBO;
 
     int width, height;
     float exposure;

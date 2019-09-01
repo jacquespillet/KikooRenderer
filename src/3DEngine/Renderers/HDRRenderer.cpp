@@ -1,6 +1,7 @@
 #include "HDRRenderer.hpp"
 #include "../Scene.hpp"
 #include "../Components/MaterialComponent.hpp"
+#include "../Components/LightComponent.hpp"
 
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLFunctions_3_2_Core>
@@ -15,7 +16,7 @@ HDRRenderer::HDRRenderer(Scene* scene) : Renderer(scene) {
     GETGL
 
     alternateFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true);
-    depthFBO = new Framebuffer(1024, 1024, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, true, true);
+    
 
     quadShader.vertSrc= R"(
     //attribs
@@ -118,27 +119,22 @@ void HDRRenderer::Render() {
     }
 
     alternateFBO->Disable();
-    alternateFBO->RenderFBOToObject(quad);
 
-    depthFBO->Enable();
-     
-    ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
-    ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
-    
-    //Shadow pass
-    glm::dmat4 lightProjection = glm::orthoLH(-10.0, 10.0, -10.0, 10.0, 1.0, 10.0);
     for(int i=0; i<scene->lightObjects.size(); i++) {
-        glm::dmat4 viewMat = glm::inverse(scene->lightObjects[i]->transform->GetWorldModelMatrix());
-        for(int i=0; i<scene->objects3D.size(); i++) {
-            if(scene->objects3D[i] && scene->objects3D[i]->visible ) {
-                scene->objects3D[i]->Render(&viewMat, &lightProjection); 
-            }
-        }
+        LightComponent* light = (LightComponent*) scene->lightObjects[i]->GetComponent("Light");
+        light->RenderDepthMap();
+        light->depthFBO->RenderFBOToObject(dummyQuad, true);
     }
+
+    
+    ogl->glViewport(0, 0, alternateFBO->width, alternateFBO->height);
+    alternateFBO->RenderFBOToObject(quad);
+    
+
+    //Shadow pass
+    
     
     //Render objects on it
-    depthFBO->Disable();
-    depthFBO->RenderFBOToObject(dummyQuad, true);
 }
 
 }
