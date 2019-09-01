@@ -18,7 +18,7 @@ CameraScene::CameraScene(Scene* _scene, double _eyeDistance, double _fov, double
     UpdateProjectionMatrix();
 
     this->transform->position.x = 0;
-    this->transform->position.y = 0;
+    this->transform->position.y = 2;
     this->transform->position.z = -2;
 
 	projectionType = ProjectionType::Perspective;

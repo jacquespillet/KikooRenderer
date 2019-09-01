@@ -37,7 +37,7 @@ class Object3D {
 
         void Start();
         void Enable();
-        void Render(glm::dmat4* overridenViewMat = nullptr);
+        void Render(glm::dmat4* overridenViewMat = nullptr, glm::dmat4* overridenProjMat = nullptr);
         void Update();
         void Destroy();
         void Recompute();
