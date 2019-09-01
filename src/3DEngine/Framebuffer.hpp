@@ -14,7 +14,7 @@ namespace CoreEngine {
 class Object3D;
 class Framebuffer {
 public: 
-	Framebuffer(int width=800, int height = 600, int internalColorFormat = GL_RGB, int colorFormat = GL_RGB, int colorType = GL_UNSIGNED_BYTE);
+	Framebuffer(int width=800, int height = 600, int internalColorFormat = GL_RGB, int colorFormat = GL_RGB, int colorType = GL_UNSIGNED_BYTE, bool hasColor=true, bool hasDepth=true);
 	
 	void Enable();
 	void Disable();
@@ -27,12 +27,16 @@ public:
 	int width, height;
 	int colorFormat;
 
+	//Directly renders the object to the target object
 	void RenderOnObect(std::vector<Object3D*>& objectsToRender, Object3D* target);
 	void RenderOnObect(Object3D* objectToRender, Object3D* target);
 
+	//Render object to the current FBO
 	void RenderObjectsToFBO(std::vector<Object3D*>& objectsToRender);
 	void RenderObjectToFBO(Object3D* objectToRender);
-	void RenderFBOToObject(Object3D* target);
+
+	//Render the FBO to a target object	
+	void RenderFBOToObject(Object3D* target, bool renderDepth=false);
 
 
 	Texture* GetColorTexture();

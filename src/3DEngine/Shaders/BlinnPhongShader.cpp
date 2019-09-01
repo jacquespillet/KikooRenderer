@@ -190,6 +190,8 @@ Shader GetBlinnPhongShader() {
     uniform mat4 modelMatrix;
     uniform vec3 cameraPos;
 
+    uniform int flipNormals;
+
     out vec3 fragPos;
     out vec3 fragNormal;
     out vec2 fragUv;
@@ -202,7 +204,7 @@ Shader GetBlinnPhongShader() {
         vec4 finalPosition = modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
         gl_Position = vec4(finalPosition.x, finalPosition.y, finalPosition.z, finalPosition.w);
         fragPos = (modelMatrix * vec4(position.x, position.y, position.z, 1.0f)).xyz;
-        fragNormal = mat3(transpose(inverse(modelMatrix))) * normal;
+        fragNormal = (flipNormals > 0) ? -mat3(transpose(inverse(modelMatrix))) * normal  : mat3(transpose(inverse(modelMatrix))) * normal;
         fragUv = uv;
         fragTangent = tangent;
     }

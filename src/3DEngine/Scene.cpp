@@ -23,6 +23,7 @@ namespace CoreEngine {
 		GETGL
 
         this->started = true;
+        standardShaders.Compile();
 
         this->renderer = new HDRRenderer(this);
         // this->renderer = new ForwardRenderer(this);
@@ -43,6 +44,26 @@ namespace CoreEngine {
         skyboxCube->Start();
         skyboxCube->Enable();
 
+        Object3D* room = GetCube(this, "Room", glm::dvec3(0, 0, 0), glm::vec3(0), glm::dvec3(10), glm::dvec4(1, 1, 1, 1));
+        MaterialComponent* mat = (MaterialComponent*) room->GetComponent("Material");
+        mat->flipNormals = true;
+        mat->shader = standardShaders.shaders[2];
+        AddObject(room);
+
+
+        Object3D* cube1 = GetCube(this, "Cube", glm::dvec3(2, 1, 3), glm::vec3(20, 40, 10), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
+        mat = (MaterialComponent*) cube1->GetComponent("Material");
+        mat->shader = standardShaders.shaders[2];
+        AddObject(cube1);
+
+        
+        Object3D* cube2 = GetCube(this, "Cube2", glm::dvec3(-1, -1, 2), glm::vec3(10, 50, 70), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
+        mat = (MaterialComponent*) cube2->GetComponent("Material");
+        mat->shader = standardShaders.shaders[2];
+        AddObject(cube2);
+
+        Object3D* dirLight = GetDirectionalLight(this, "light", glm::dvec3(0, 0, -2), glm::vec3(0, 20, 0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
+        AddObject(dirLight);
 	
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
@@ -51,7 +72,6 @@ namespace CoreEngine {
     }
 
     void Scene::Enable() {
-        standardShaders.Compile();
         for(int i=0; i<objects3D.size(); i++) {
             if(!objects3D[i]->started) objects3D[i]->Start(); 
             objects3D[i]->Enable();

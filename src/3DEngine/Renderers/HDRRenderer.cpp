@@ -14,7 +14,8 @@ namespace CoreEngine {
 HDRRenderer::HDRRenderer(Scene* scene) : Renderer(scene) {
     GETGL
 
-    alternateFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+    alternateFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true);
+    depthFBO = new Framebuffer(1024, 1024, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, false, true);
 
     quadShader.vertSrc= R"(
     //attribs
@@ -63,21 +64,24 @@ HDRRenderer::HDRRenderer(Scene* scene) : Renderer(scene) {
 
     exposure = 1.0;
 
-    quad = GetQuad(scene, "plane", glm::dvec3(0), glm::dvec3(0), glm::dvec3(5), glm::dvec4(1, 1, 1, 1));
+    quad = GetQuad(scene, "plane", glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
     MaterialComponent* material = (MaterialComponent*) quad->GetComponent("Material");
     material->SetShader(&quadShader);
     
+    dummyQuad = GetMiniQuad(scene, "plane", glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
+    MaterialComponent* dummyMaterial = (MaterialComponent*) dummyQuad->GetComponent("Material");
+    dummyMaterial->SetShader(&quadShader);
+    
     // int exposureLocation = ogl->glGetUniformLocation(quadShader.programShaderObject, "exposure"); 
     // ogl->glUniform1f(exposureLocation, exposure);
-
+    dummyQuad->Enable();
     quad->Enable();
 }
 
 void HDRRenderer::Resize(int w, int h) {
     delete alternateFBO;
-    alternateFBO = new Framebuffer(w, h, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+    alternateFBO = new Framebuffer(w, h, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true);
 }
-
 
 void HDRRenderer::Render() {
     GETGL   
@@ -89,10 +93,10 @@ void HDRRenderer::Render() {
     ogl->glStencilFunc(GL_ALWAYS, 1, 0xFF); 
     ogl->glStencilMask(0xFF); 
 
-
+    //Main pass
     for(int i=0; i<scene->objects3D.size(); i++) {
         if(scene->objects3D[i] && scene->objects3D[i]->visible ) {
-            scene->objects3D[i]->Render(); 
+            scene->objects3D[i]->Render();
         }
     }
 
@@ -101,7 +105,7 @@ void HDRRenderer::Render() {
         ogl->glDepthFunc(GL_LEQUAL);
         scene->skyboxCube->Render();
         ogl->glDepthFunc(GL_LESS);
-    }   
+    }
 
     //Render UI
     if(scene->rendersUI) {
@@ -111,38 +115,35 @@ void HDRRenderer::Render() {
         if (scene->transformWidget->visible && scene->selectedObjects.size() > 0 && scene->selectedObjects[0]->visible) {
             scene->transformWidget->Render();
         }
-
-        ogl->glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-        ogl->glStencilMask(0x00); 
-        ogl->glDisable(GL_DEPTH_TEST);
-
-        //Render selected objects
-        for(int i=0; i<scene->selectedObjects.size(); i++) {
-            if(scene->selectedObjects[i]->visible) {
-                MaterialComponent* material = (MaterialComponent*)(scene->selectedObjects[i]->GetComponent("Material"));
-                if(material) {
-                    //Save shader state to set it back after this pass
-                    Shader* tmpShader = material->shader;
-                    ShaderParams* tmpParams = material->params;
-
-                    material->SetShader(&scene->standardShaders.selectedObjectShader);
-                    scene->selectedObjects[i]->Render();
-                    material->SetShader(tmpShader);
-                    material->params = tmpParams;
-                }
-            }
-        }
-
-        ogl->glStencilMask(0xFF);
-        ogl->glEnable(GL_DEPTH_TEST);
     }
-
-
-
 
     alternateFBO->Disable();
     alternateFBO->RenderFBOToObject(quad);
+
+    depthFBO->Enable();
+     
+    ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
+    ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
+    
+    //Shadow pass
+    for(int i=0; i<scene->lightObjects.size(); i++) {
+        glm::dmat4 viewMat = glm::inverse(scene->lightObjects[i]->transform->GetWorldModelMatrix());
+        // glm::dmat4 viewMat = glm::inverse(scene->camera->transform->GetWorldModelMatrix());
+
+        for(int i=0; i<scene->objects3D.size(); i++) {
+            if(scene->objects3D[i] && scene->objects3D[i]->visible ) {
+                scene->objects3D[i]->Render(&viewMat); 
+            }
+        }
+    }
+    
+    
+    //Render objects on it
+    depthFBO->Disable();
+    depthFBO->RenderFBOToObject(dummyQuad, true);
+
+
 }
 
 }
-}
+} 

@@ -55,6 +55,8 @@ class MaterialComponent : public Component {
         Cubemap cubemap;
 		bool shouldLoadCubemap = false;
 
+		bool flipNormals=false;
+
 
 		MaterialInspector* materialInspector;
 		

@@ -391,6 +391,66 @@ namespace CoreEngine {
     }
 
 
+    void GetMiniQuadBuffers(std::vector<glm::dvec3>* vertex, std::vector<glm::dvec3>* normals, std::vector<glm::dvec2>* uv, std::vector<glm::dvec4>* colors, std::vector<int>* triangles) {
+        //
+        ///Vertices
+        //
+        glm::dvec3 v1 = glm::dvec3(-1.0, 0.5, -0.5); //bottom left
+        glm::dvec3 v2 = glm::dvec3(-1.0, 1.0, -0.5); // top left
+        glm::dvec3 v3 = glm::dvec3(-0.5, 1.0, -0.5); //Top right
+        glm::dvec3 v4 = glm::dvec3(-0.5, 0.5, -0.5); //Bottom right
+        //Front
+        vertex->push_back(v1); 
+        vertex->push_back(v2); 
+        vertex->push_back(v3); 
+        vertex->push_back(v4); 
+
+        //
+        ///Normals
+        //
+
+        //Front
+        normals->push_back(glm::dvec3(0, 0, -1));
+        normals->push_back(glm::dvec3(0, 0, -1));
+        normals->push_back(glm::dvec3(0, 0, -1));
+        normals->push_back(glm::dvec3(0, 0, -1));
+
+
+        //
+        ////UV
+        //
+
+        //Front
+        uv->push_back(glm::dvec2(0, 1));
+        uv->push_back(glm::dvec2(0, 0));
+        uv->push_back(glm::dvec2(1, 0));
+        uv->push_back(glm::dvec2(1, 1));
+
+
+        //
+        ////Colors
+        //
+
+        //Front
+        colors->push_back(glm::dvec4(255, 255, 255, 255));
+        colors->push_back(glm::dvec4(255, 255, 255, 255));
+        colors->push_back(glm::dvec4(255, 255, 255, 255));
+        colors->push_back(glm::dvec4(255, 255, 255, 255));
+
+        //
+        ////Triangles
+        //
+
+        //Front
+        int index = 0;
+        triangles->push_back(index + 0);
+        triangles->push_back(index + 2);
+        triangles->push_back(index + 1);
+        triangles->push_back(index + 3);
+        triangles->push_back(index + 2);
+        triangles->push_back(index + 0);
+    }
+
     MeshFilterComponent* GetCubeMesh(glm::dvec3 size, glm::dvec4 color, Object3D* object){
         std::vector<glm::dvec3> vertex;
         std::vector<glm::dvec3> normals;
@@ -497,6 +557,29 @@ namespace CoreEngine {
         mesh->jsonObj = json;         
         return mesh;
     }
+
+    
+    MeshFilterComponent* GetMiniQuadMesh(glm::dvec3 size, glm::dvec4 color, Object3D* object){
+        std::vector<glm::dvec3> vertex;
+        std::vector<glm::dvec3> normals;
+        std::vector<glm::dvec2> uv;
+        std::vector<glm::dvec4> colors;
+        std::vector<int> triangles;
+
+        GetMiniQuadBuffers(&vertex, &normals, &uv, &colors, &triangles);
+
+        //Setup mesh
+        MeshFilterComponent* mesh = new MeshFilterComponent(object);
+        mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles, true);
+        mesh->meshType = PRIMITIVE_MESH::QUAD_MESH;
+
+        QJsonObject json;
+        json["Type"] = QString("Primitive");
+        json["Primitive"] = QString("Quad");
+        mesh->jsonObj = json;         
+        return mesh;
+    }
+
 
     MeshFilterComponent* GetById(PRIMITIVE_MESH meshId, Object3D* object){
         enum PRIMITIVE_MESH {CUBE_MESH, SPHERE_MESH, CIRCLE_MESH, CONE_MESH, QUAD_MESH};

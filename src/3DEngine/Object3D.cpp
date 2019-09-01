@@ -122,7 +122,7 @@ Component* Object3D::GetComponent(std::string name) {
 	return nullptr;
 }
 
-void Object3D::Render() {
+void Object3D::Render(glm::dmat4* overridenViewMat ) {
 	GETGL
 
 	if(!depthTest) ogl->glDisable(GL_DEPTH_TEST);
@@ -140,7 +140,8 @@ void Object3D::Render() {
 	
 
 	if(transform != nullptr) {
-		glm::mat4 vMatrix = scene->camera->GetViewMatrix();
+		glm::mat4 vMatrix = (overridenViewMat == nullptr)  ?  scene->camera->GetViewMatrix() : (*overridenViewMat);
+
 		glm::mat4 pMatrix = scene->camera->GetProjectionMatrix();
 		glm::mat4 mvpMatrix = pMatrix * vMatrix * currentModelMatrix;
 

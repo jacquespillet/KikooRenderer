@@ -15,9 +15,12 @@ public:
     virtual void Resize(int w, int h);
     
 	Framebuffer* alternateFBO;
+	Framebuffer* depthFBO;
+
     int width, height;
     float exposure;
 	Object3D* quad;
+	Object3D* dummyQuad;
 
     Shader quadShader;
 // protected:

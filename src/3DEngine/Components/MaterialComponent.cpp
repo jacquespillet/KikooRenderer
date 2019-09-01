@@ -62,6 +62,13 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 		scene->triggerRefresh = true;
 	});
 
+	QCheckBox* flipNormalsCheckbox = new QCheckBox("Flip Normals"); flipNormalsCheckbox->setChecked(materialComponent->flipNormals);
+	mainLayout->addWidget(flipNormalsCheckbox);
+	connect(flipNormalsCheckbox, &QCheckBox::stateChanged, this, [this, materialComponent](int state) {
+		materialComponent->flipNormals = state > 0;
+		scene->triggerRefresh = true;
+	});
+
 	shaderParametersLayout = new QVBoxLayout();
 		
 	QLayout* paramsLayout = materialComponent->params->GetLayout(); 
@@ -153,6 +160,9 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 
 		int albedoLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "albedo"); 
 		ogl->glUniform4fv(albedoLocation, 1, glm::value_ptr(albedo));
+
+		int flipNormalsLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "flipNormals"); 
+		ogl->glUniform1i(flipNormalsLocation, flipNormals);
 
 		params->SetUniforms();
 

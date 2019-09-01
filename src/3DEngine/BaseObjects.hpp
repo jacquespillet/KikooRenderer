@@ -12,6 +12,7 @@ namespace CoreEngine {
     Object3D* GetWireFrameBox(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color);
 
     Object3D* GetQuad(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color);
+    Object3D* GetMiniQuad(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color);
 
     Object3D* GetCircle(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color);
 
