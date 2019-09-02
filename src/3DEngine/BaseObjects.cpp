@@ -874,7 +874,7 @@ Object3D* GetBezierSurface(Scene* scene, std::string name,glm::dvec3 _position, 
 
 
 Object3D* GetDirectionalLight(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
-	Object3D* dirLight = new Object3D(name, scene);
+    Object3D* dirLight = new Object3D(name, scene);
 	dirLight->transform->position = _position;
 	dirLight->transform->rotation = _rotation;
 	dirLight->transform->scale = _scale;

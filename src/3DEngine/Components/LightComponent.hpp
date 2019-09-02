@@ -2,6 +2,7 @@
 #include "Util/Common.h"
 #include "Component.hpp"
 #include "../Framebuffer.hpp"
+#include "../Shader.hpp"
 
 
 namespace KikooRenderer {
@@ -23,6 +24,8 @@ class LightComponent : public Component {
         glm::dvec4 color;
 		double fov;
         
+        Shader depthPassShader;
+
 	    Framebuffer* depthFBO;
         glm::dmat4 lightProjection;
         glm::dmat4 lightSpaceMatrix;

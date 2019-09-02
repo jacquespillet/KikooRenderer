@@ -121,22 +121,18 @@ void HDRRenderer::Render() {
     alternateFBO->Disable();
 
     ogl->glCullFace(GL_FRONT);
+    LightComponent* light;
     for(int i=0; i<scene->lightObjects.size(); i++) {
-        LightComponent* light = (LightComponent*) scene->lightObjects[i]->GetComponent("Light");
+        light = (LightComponent*) scene->lightObjects[i]->GetComponent("Light");
         light->RenderDepthMap();
-        light->depthFBO->RenderFBOToObject(dummyQuad, true);
     }
     ogl->glCullFace(GL_BACK);
 
     
     ogl->glViewport(0, 0, alternateFBO->width, alternateFBO->height);
     alternateFBO->RenderFBOToObject(quad);
-    
+    // light->depthFBO->RenderFBOToObject(dummyQuad, true);
 
-    //Shadow pass
-    
-    
-    //Render objects on it
 }
 
 }

@@ -61,8 +61,8 @@ namespace CoreEngine {
         mat->shader = standardShaders.shaders[2];
         AddObject(cube2);
 
-        Object3D* dirLight = GetDirectionalLight(this, "light", glm::dvec3(0, 3, 0), glm::vec3(20, 30, 0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
-        AddObject(dirLight);
+        // Object3D* dirLight = GetDirectionalLight(this, "light", glm::dvec3(0, 3, 0), glm::vec3(20, 30, 0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
+        // AddObject(dirLight);
 	
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
@@ -124,7 +124,6 @@ namespace CoreEngine {
 		if (light != nullptr) {
 			lightObjects.push_back(object);
 		}
-
         return currentName;
     }
 
