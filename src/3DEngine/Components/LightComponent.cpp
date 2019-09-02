@@ -17,7 +17,7 @@ LightComponent::LightComponent(Object3D* object, glm::dvec4 color, glm::dvec3 at
     this->color = color;   
 
     depthFBO = new Framebuffer(1024, 1024, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, true, true);
-    lightProjection  = glm::orthoLH(-10.0, 10.0, -10.0, 10.0, 1.0, 100.0);
+    lightProjection  = glm::orthoLH(-10.0, 10.0, -10.0, 10.0, 1.0, 10.0);
 }
 
 void LightComponent::RenderDepthMap() {

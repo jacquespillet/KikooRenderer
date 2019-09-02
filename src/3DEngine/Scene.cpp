@@ -56,12 +56,12 @@ namespace CoreEngine {
         AddObject(cube1);
 
         
-        // Object3D* cube2 = GetCube(this, "Cube2", glm::dvec3(-1, 1, 2), glm::vec3(0, 0, 0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
-        // mat = (MaterialComponent*) cube2->GetComponent("Material");
-        // mat->shader = standardShaders.shaders[2];
-        // AddObject(cube2);
+        Object3D* cube2 = GetCube(this, "Cube2", glm::dvec3(-1, 1, 2), glm::vec3(0, 0, 0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
+        mat = (MaterialComponent*) cube2->GetComponent("Material");
+        mat->shader = standardShaders.shaders[2];
+        AddObject(cube2);
 
-        Object3D* dirLight = GetDirectionalLight(this, "light", glm::dvec3(0, 3, 0), glm::vec3(90, 0, 0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
+        Object3D* dirLight = GetDirectionalLight(this, "light", glm::dvec3(0, 3, 0), glm::vec3(20, 30, 0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
         AddObject(dirLight);
 	
         //Start each object

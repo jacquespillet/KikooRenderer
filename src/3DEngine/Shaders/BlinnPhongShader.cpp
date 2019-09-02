@@ -255,21 +255,33 @@ Shader GetBlinnPhongShader() {
     in vec4 fragTangent;
     in vec3 toCamTangentSpace; 
 
-    float ShadowCalculation(vec4 fragPosLightSpace, int inx, vec3 lightDir)
+    float ShadowCalculation(vec4 fragPosLightSpace, int inx)
     {
         // perform perspective divide
         vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
         // transform to [0,1] range
         projCoords = projCoords * 0.5 + 0.5;
         // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
-        float closestDepth = texture(lights[inx].depthMap, projCoords.xy).r; 
         // get depth of current fragment from light's perspective
         float currentDepth = projCoords.z;
         // check whether current frag pos is in shadow
 
-        // float bias = max(0.05 * (1.0 - dot(fragNormal, lightDir)), 0.005);  
-        float bias = 0.005;
-        float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
+        float bias = max(0.05 * (dot(fragNormal, normalize(lights[inx].direction))), 0.005);  
+        float shadow = 0.0;
+        vec2 texelSize = 1.0 / textureSize(lights[inx].depthMap, 0);
+        for(int x = -1; x <= 1; ++x)
+        {
+            for(int y = -1; y <= 1; ++y)
+            {
+                float pcfDepth = texture(lights[inx].depthMap, projCoords.xy + vec2(x, y) * texelSize).r; 
+                shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
+            }    
+        }
+        shadow /= 9.0;
+
+
+        if(projCoords.z > 1.0)
+            shadow = 0.0;
 
         return shadow;
     } 
@@ -336,7 +348,7 @@ Shader GetBlinnPhongShader() {
             vec4 specular = finalSpecularFactor * finalSpecularColor * lights[i].color * pow(max(dot(finalNormal.xyz, halfwayVec),0), smoothness);
 
             vec4 fragPosLightSpace = lights[i].lightSpaceMatrix * vec4(fragPos, 1.0);
-            float shadow = ShadowCalculation(fragPosLightSpace, i, toLight);
+            float shadow = ShadowCalculation(fragPosLightSpace, i);
 
             finalColor.rgb += (1.0 - shadow) *  attenuation * (diffuse + specular).rgb;
         }
