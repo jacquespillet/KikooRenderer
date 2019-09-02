@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
-project(RenderingTests)
-set(PROJECT_BRIEF "RenderingTests")
+project(KikooRenderer)
+set(PROJECT_BRIEF "KikooRenderer")
 
 set(CMAKE_AUTOMOC ON)
 
@@ -13,9 +13,12 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_LINK_FLAGS}")
 #qt
 find_package(Qt5 COMPONENTS Core Widgets Gui OpenGL 3DCore 3DExtras 3DRender 3DInput)
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
-set(QT_BIN_DIR "C:/Qt/5.11.2/msvc2017_64/bin")
-set(QT_LIB_DIR "C:/Qt/5.11.2/msvc2017_64/lib")
-set(QT_BUILD_DIR  "C:/Qt/5.11.2/msvc2017_64")
+# set(QT_BIN_DIR "C:/Qt/5.11.2/msvc2017_64/bin")
+# set(QT_LIB_DIR "C:/Qt/5.11.2/msvc2017_64/lib")
+# set(QT_BUILD_DIR  "C:/Qt/5.11.2/msvc2017_64")
+set(QT_BIN_DIR "C:/Qt/5.10.1/msvc2017_64/bin")
+set(QT_LIB_DIR "C:/Qt/5.10.1/msvc2017_64/lib")
+set(QT_BUILD_DIR  "C:/Qt/5.10.1/msvc2017_64")
 link_directories(${QT_LIB_DIR})
 
 #link_directories(lib dir)
