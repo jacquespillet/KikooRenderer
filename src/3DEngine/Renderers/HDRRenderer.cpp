@@ -131,7 +131,11 @@ void HDRRenderer::Render() {
     
     ogl->glViewport(0, 0, alternateFBO->width, alternateFBO->height);
     alternateFBO->RenderFBOToObject(quad);
-    // light->depthFBO->RenderFBOToObject(dummyQuad, true);
+    
+    for(int i=0; i<scene->lightObjects.size(); i++) {
+        light = (LightComponent*) scene->lightObjects[i]->GetComponent("Light");
+        light->depthFBO->RenderFBOToObject(dummyQuad, true);
+    }
 
 }
 

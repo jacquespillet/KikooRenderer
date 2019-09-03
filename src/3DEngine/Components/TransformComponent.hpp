@@ -63,6 +63,7 @@ class TransformComponent : public Component {
         
         glm::mat4 GetWorldModelMatrix();
         glm::dmat4 GetWorldTransRotMatrix(); 
+        glm::dmat4 GetWorldRotationMatrix(); 
 		glm::dvec3 GetWorldPosition();
 		glm::dvec3 GetWorldScale();
 
