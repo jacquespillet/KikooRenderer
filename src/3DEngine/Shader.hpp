@@ -22,11 +22,16 @@ class Shader
 		//shader source	
 		std::string vertSrc;
 		std::string fragSrc;
+		std::string geometrySrc;
 	
 		//shader programs
 		int programShaderObject;
 		int vertexShaderObject;
+		int geometryShaderObject;
 		int fragmentShaderObject;
+
+		bool isLit = true;
+		bool isDepthPass=false;
 		
 
 		Shader();

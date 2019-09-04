@@ -17,59 +17,104 @@ LightComponent::LightComponent(Object3D* object, glm::dvec4 color, glm::dvec3 at
 
     object3D->scene->glWindow->makeCurrent();
     
-    //Avant dernier arg TRUE pour debug, doit etre FALSE
-    depthFBO = new Framebuffer(1024, 1024, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, false, true);
-    depthCubeFBO = new CubeFramebuffer(1024, 1024, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, true, true);
-    
-    
-    lightProjection  = glm::orthoLH(-20.0, 20.0, -20.0, 20.0, 1.0, 100.0);
+    if(type==0) {
+        //Avant dernier arg TRUE pour debug, doit etre FALSE
+        depthFBO = new Framebuffer(1024, 1024, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, false, true);
+        lightProjection  = glm::orthoLH(-20.0, 20.0, -20.0, 20.0, 1.0, 100.0);
 
-    depthPassShader.vertSrc= R"(
-    #version 440
-    layout(location = 0) in vec3 position;
+        depthPassShader.vertSrc= R"(
+        #version 440
+        layout(location = 0) in vec3 position;
 
-    uniform mat4 modelViewProjectionMatrix;
-    void main()
-    {
-        gl_Position = modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
+        uniform mat4 modelViewProjectionMatrix;
+        void main()
+        {
+            gl_Position = modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
+        }
+        )";
+
+        depthPassShader.fragSrc = R"(
+        #version 440
+        layout(location = 0) out vec4 outputColor; 
+        void main()
+        {   
+            outputColor = vec4(0);
+        }
+        )";
+        depthPassShader.name = "quad";
+        depthPassShader.isLit = false;
+        depthPassShader.isDepthPass = true;
+        std::cout << "StandardShaders: Compiling depthPassShader" << std::endl; 
+        depthPassShader.Compile();
+
+        
+        cubeDepthPassShader.vertSrc= R"(
+        #version 440
+        layout(location = 0) in vec3 position;
+
+        uniform mat4 modelViewProjectionMatrix;
+        void main()
+        {
+            gl_Position = modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
+        }
+        )";
+    } else if(type == 1) {
+        depthCubeFBO = new CubeFramebuffer(1024, 1024, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, true, true);
+        
+        depthPassShader.vertSrc= R"(
+        #version 440
+        layout(location = 0) in vec3 position;
+
+        uniform mat4 modelViewProjectionMatrix;
+        void main()
+        {
+            gl_Position = modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
+        }
+        )";
+
+        cubeDepthPassShader.geometrySrc= R"(
+        #version 330 core
+        layout (triangles) in;
+        layout (triangle_strip, max_vertices=18) out;
+
+        uniform mat4 shadowMatrices[6];
+
+        out vec4 FragPos; // FragPos from GS (output per emitvertex)
+
+        void main()
+        {
+            for(int face = 0; face < 6; ++face)
+            {
+                gl_Layer = face; // built-in variable that specifies to which face we render.
+                for(int i = 0; i < 3; ++i) // for each triangle's vertices
+                {
+                    FragPos = gl_in[i].gl_Position;
+                    gl_Position = shadowMatrices[face] * FragPos;
+                    EmitVertex();
+                }    
+                EndPrimitive();
+            }
+        }  
+        )";
+
+
+        cubeDepthPassShader.fragSrc = R"(
+        #version 440
+        in vec4 FragPos;
+
+        layout(location = 0) out vec4 outputColor; 
+        
+        void main()
+        {   
+            outputColor = vec4(0);
+        }
+        )";
+        cubeDepthPassShader.name = "quad";
+        cubeDepthPassShader.isLit = false;
+        cubeDepthPassShader.isDepthPass = true;
+        std::cout << "StandardShaders: Compiling cubeDepthPassShader" << std::endl; 
+        cubeDepthPassShader.Compile();
     }
-    )";
-
-    depthPassShader.fragSrc = R"(
-    #version 440
-    layout(location = 0) out vec4 outputColor; 
-    void main()
-    {   
-        outputColor = vec4(0);
-    }
-    )";
-    depthPassShader.name = "quad";
-    std::cout << "StandardShaders: Compiling depthPassShader" << std::endl; 
-    depthPassShader.Compile();
-
-    
-    cubeDepthPassShader.vertSrc= R"(
-    #version 440
-    layout(location = 0) in vec3 position;
-
-    uniform mat4 modelViewProjectionMatrix;
-    void main()
-    {
-        gl_Position = modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
-    }
-    )";
-
-    cubeDepthPassShader.fragSrc = R"(
-    #version 440
-    layout(location = 0) out vec4 outputColor; 
-    void main()
-    {   
-        outputColor = vec4(0);
-    }
-    )";
-    cubeDepthPassShader.name = "quad";
-    std::cout << "StandardShaders: Compiling cubeDepthPassShader" << std::endl; 
-    cubeDepthPassShader.Compile();
 
 
     object3D->scene->glWindow->doneCurrent();
@@ -96,7 +141,7 @@ void LightComponent::RenderDepthMap() {
                     Shader* tmpShader = material->shader;
                     ShaderParams* tmpParams = material->params;
                     material->SetShader(&depthPassShader);
-                    object3D->scene->objects3D[i]->Render(&viewMat, &lightProjection); 
+                    object3D->scene->objects3D[i]->DepthRenderPass(&viewMat, &lightProjection); 
                     material->SetShader(tmpShader);
                     material->params = tmpParams;
                 }
@@ -125,9 +170,19 @@ void LightComponent::RenderDepthMap() {
         lightSpaceMatrices.push_back(shadowProj * 
                         glm::lookAt(lightPos, lightPos + glm::vec3( 0.0, 0.0,-1.0), glm::vec3(0.0,-1.0, 0.0)));
 
+        //Set all these matrix in the shader for the next rendering pass
+
         
     }
 
+}
+
+void LightComponent::SetShaderUniforms() {
+    if(type==0) {
+        
+    } else {
+
+    }
 }
 
 void LightComponent::OnStart(){}

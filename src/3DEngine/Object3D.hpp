@@ -7,6 +7,7 @@ namespace KikooRenderer {
 namespace CoreEngine {
 class Component;
 class TransformComponent;
+class LightComponent;
 class Scene;
 class Object3D {
     public: 
@@ -37,7 +38,8 @@ class Object3D {
 
         void Start();
         void Enable();
-        void Render(glm::dmat4* overridenViewMat = nullptr, glm::dmat4* overridenProjMat = nullptr);
+        void Render();
+        void DepthRenderPass(glm::dmat4* overridenViewMat, glm::dmat4* overridenProjMat, LightComponent* light=nullptr);
         void Update();
         void Destroy();
         void Recompute();

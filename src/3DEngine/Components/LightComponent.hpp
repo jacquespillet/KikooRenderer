@@ -41,6 +41,8 @@ class LightComponent : public Component {
 	    CubeFramebuffer* depthCubeFBO;
         std::vector<glm::dmat4> lightSpaceMatrices;
 
+        void SetShaderUniforms();
+
 		QJsonObject ToJSON() {
 			QJsonObject json;
             json["type"] = "Light";

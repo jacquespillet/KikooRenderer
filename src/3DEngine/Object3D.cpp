@@ -2,6 +2,7 @@
 #include "Components/MaterialComponent.hpp"
 #include "Components/BoundingComponent.hpp"
 #include "Components/TransformComponent.hpp"
+#include "Components/LightComponent.hpp"
 #include "Util.hpp"
 
 #include <QtGui/QOpenGLFunctions>
@@ -122,7 +123,7 @@ Component* Object3D::GetComponent(std::string name) {
 	return nullptr;
 }
 
-void Object3D::Render(glm::dmat4* overridenViewMat,glm::dmat4* overridenProjMat ) {
+void Object3D::Render() {
 	GETGL
 
 	if(!depthTest) ogl->glDisable(GL_DEPTH_TEST);
@@ -140,8 +141,8 @@ void Object3D::Render(glm::dmat4* overridenViewMat,glm::dmat4* overridenProjMat 
 	
 
 	if(transform != nullptr) {
-		glm::mat4 vMatrix = (overridenViewMat == nullptr) ? scene->camera->GetViewMatrix() : (*overridenViewMat);
-		glm::mat4 pMatrix = (overridenProjMat == nullptr) ? scene->camera->GetProjectionMatrix() : (*overridenProjMat);
+		glm::mat4 vMatrix = scene->camera->GetViewMatrix();
+		glm::mat4 pMatrix = scene->camera->GetProjectionMatrix();
 		glm::mat4 mvpMatrix = pMatrix * vMatrix * currentModelMatrix;
 
 		
@@ -164,6 +165,51 @@ void Object3D::Render(glm::dmat4* overridenViewMat,glm::dmat4* overridenProjMat 
 	ogl->glUseProgram(0);
 	ogl->glEnable(GL_DEPTH_TEST);
 }
+
+
+void Object3D::DepthRenderPass(glm::dmat4* overridenViewMat,glm::dmat4* overridenProjMat, LightComponent* light) {
+	GETGL
+
+	if(!depthTest) ogl->glDisable(GL_DEPTH_TEST);
+
+	//TransformComponent* transform = (TransformComponent*)(this->transform); 
+	
+	glm::mat4 currentModelMatrix = transform->GetWorldModelMatrix();
+
+	//Render child objects
+	for(int i=0; i<childObjects.size(); i++) {
+		if (!childObjects[i]->started) childObjects[i]->Start();
+		if (!childObjects[i]->enabled) childObjects[i]->Enable();
+		childObjects[i]->Render();
+	}
+	
+
+	if(transform != nullptr) {
+		glm::mat4 vMatrix = (*overridenViewMat);
+		glm::mat4 pMatrix = (*overridenProjMat);
+		glm::mat4 mvpMatrix = pMatrix * vMatrix * currentModelMatrix;
+
+		
+		//bind shader
+		MaterialComponent* material = (MaterialComponent*)(this->GetComponent("Material"));
+		if(material != nullptr) {
+			material->SetupShaderUniforms(currentModelMatrix, vMatrix, pMatrix, this->scene);
+			//Draw
+			for(int i=0; i<components.size(); i++) {
+				components[i]->OnRender();
+			}    
+		}
+	}
+	
+	//
+	//unbind shader
+	//
+	
+	//unbind shader program
+	ogl->glUseProgram(0);
+	ogl->glEnable(GL_DEPTH_TEST);
+}
+
 
 Object3D* Object3D::Intersects(Geometry::Ray ray, double& _distance) {
 	//get closest collision for childs and itself

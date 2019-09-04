@@ -23,12 +23,15 @@ Shader::Shader()
 void Shader::Compile()
 {
 	GETGL
-	
+	bool hasGeometry=geometrySrc.size()>0;
+
 	//make array to pointer for source code (needed for opengl )
 	const char* vsrc[1];
 	const char* fsrc[1];
+	const char* gsrc[1];
 	vsrc[0] = vertSrc.c_str();
 	fsrc[0] = fragSrc.c_str();
+	if(hasGeometry)gsrc[0] = geometrySrc.c_str();
 	
 	//compile vertex and fragment shaders from source
 	vertexShaderObject = ogl->glCreateShader(GL_VERTEX_SHADER);
@@ -37,12 +40,18 @@ void Shader::Compile()
 	fragmentShaderObject = ogl->glCreateShader(GL_FRAGMENT_SHADER);
 	ogl->glShaderSource(fragmentShaderObject, 1, fsrc, NULL);
 	ogl->glCompileShader(fragmentShaderObject);
+	if(hasGeometry) {
+		geometryShaderObject = ogl->glCreateShader(GL_GEOMETRY_SHADER);
+		ogl->glShaderSource(geometryShaderObject, 1, gsrc, NULL);
+		ogl->glCompileShader(geometryShaderObject); 
+	}
 	std::cout << "Shader:Linking shader:" << std::endl;
 	
 	//link vertex and fragment shader to create shader program object
 	programShaderObject = ogl->glCreateProgram();
 	ogl->glAttachShader(programShaderObject, vertexShaderObject);
 	ogl->glAttachShader(programShaderObject, fragmentShaderObject);
+	if(hasGeometry) ogl->glAttachShader(programShaderObject, geometryShaderObject);
 	ogl->glLinkProgram(programShaderObject);
 	std::cout << "Shader:checking shader status:" << std::endl;
 	
