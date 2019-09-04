@@ -220,18 +220,29 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 					varName = "lights[" + std::to_string(i) + "].color";
 					loc = ogl->glGetUniformLocation(this->shader->programShaderObject, varName.c_str());
 					ogl->glUniform4fv(loc, 1, glm::value_ptr(glm::vec4(lightComponent->color)));
-
 					
-					varName = "lights[" + std::to_string(i) + "].lightSpaceMatrix";
-					loc = ogl->glGetUniformLocation(this->shader->programShaderObject, varName.c_str());
-					ogl->glUniformMatrix4fv(loc, 1, false,  glm::value_ptr(glm::mat4(lightComponent->lightSpaceMatrix)));
 
 					if(lightComponent->type == 0) {			
+						varName = "lights[" + std::to_string(i) + "].lightSpaceMatrix";
+						loc = ogl->glGetUniformLocation(this->shader->programShaderObject, varName.c_str());
+						ogl->glUniformMatrix4fv(loc, 1, false,  glm::value_ptr(glm::mat4(lightComponent->lightSpaceMatrix)));
+
 						ogl->glActiveTexture(GL_TEXTURE4);
 						ogl->glBindTexture(GL_TEXTURE_2D, lightComponent->depthFBO->depthTexture);
 						varName = "lights[" + std::to_string(i) + "].depthMap";
 						loc = ogl->glGetUniformLocation(this->shader->programShaderObject, varName.c_str());
 						ogl->glUniform1i(loc, 4);
+					} if(lightComponent->type == 1) {
+						//Set all worldToLight matrices			
+						// varName = "lights[" + std::to_string(i) + "].lightSpaceMatrix";
+						// loc = ogl->glGetUniformLocation(this->shader->programShaderObject, varName.c_str());
+						// ogl->glUniformMatrix4fv(loc, 1, false,  glm::value_ptr(glm::mat4(lightComponent->lightSpaceMatrix)));
+
+						// ogl->glActiveTexture(GL_TEXTURE4);
+						// ogl->glBindTexture(GL_TEXTURE_2D, lightComponent->depthFBO->depthTexture);
+						// varName = "lights[" + std::to_string(i) + "].depthMap";
+						// loc = ogl->glGetUniformLocation(this->shader->programShaderObject, varName.c_str());
+						// ogl->glUniform1i(loc, 4);
 					}
 
 					numLights++;

@@ -72,7 +72,6 @@ namespace CoreEngine {
 			std::cout << "Succeffuly created FBO"<<std::endl;
 		}
 
-
 		ogl->glBindRenderbuffer(GL_RENDERBUFFER, 0);
 		ogl->glBindFramebuffer(GL_FRAMEBUFFER, defaultFBO);
 	}

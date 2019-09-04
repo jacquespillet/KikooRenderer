@@ -2,6 +2,7 @@
 #include "Util/Common.h"
 #include "Component.hpp"
 #include "../Framebuffer.hpp"
+#include "../CubeFramebuffer.hpp"
 #include "../Shader.hpp"
 
 
@@ -10,39 +11,6 @@ namespace CoreEngine {
 
 class LightComponent;
 
-//Might use later ? ...
-// class LightViewBuilder {
-//     public:
-//     glm::dvec4 UP;
-//     glm::dvec4 FORWARD;
-//     double MAX_DISTANCE;
-//     double OFFSET;
-
-//     double farHeight;
-//     double farWidth;
-//     double nearHeight;
-//     double nearWidth;
-
-//     glm::dvec3 min;
-//     glm::dvec3 max;
-
-//     glm::dmat4 lightViewMatrix;
-
-//     LightComponent* light;
-
-//     LightViewBuilder(LightComponent* light);
-//     void Update();
-
-//     //Helper funcs
-//     void calculateWidthsAndHeights(); 
-//     glm::dmat4 calculateCameraRotationMatrix();
-//     glm::dvec4 calculateLightSpaceFrustumCorner(glm::dvec3 startPoint, glm::dvec3 direction,float width);
-//     std::vector<glm::dvec4> calculateFrustumVertices(glm::dmat4 rotation, glm::dvec3 forwardVector, glm::dvec3 centerNear, glm::dvec3 centerFar);
-
-//     glm::dmat4 GetProjection();
-//     glm::dmat4 GetView();
-
-// };
 
 class LightComponent : public Component {
     public:
@@ -56,19 +24,23 @@ class LightComponent : public Component {
 
         void RenderDepthMap();
 
-        // LightViewBuilder lightViewBuilder;
-
         int type; //0 directional, 1 point, 2 spot
         glm::dvec3 attenuation;
         glm::dvec4 color;
 		double fov;
         
-        Shader depthPassShader;
 
+        //Directional Shadow Map
+        Shader depthPassShader;
 	    Framebuffer* depthFBO;
         glm::dmat4 lightProjection;
         glm::dmat4 lightSpaceMatrix;
-    
+
+        //Cubemap shadow map
+        Shader cubeDepthPassShader;
+	    CubeFramebuffer* depthCubeFBO;
+        std::vector<glm::dmat4> lightSpaceMatrices;
+
 		QJsonObject ToJSON() {
 			QJsonObject json;
             json["type"] = "Light";
