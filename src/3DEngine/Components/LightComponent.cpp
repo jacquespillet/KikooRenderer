@@ -16,7 +16,7 @@ LightComponent::LightComponent(Object3D* object, glm::dvec4 color, glm::dvec3 at
     this->color = color;   
 
     object3D->scene->glWindow->makeCurrent();
-    
+    //TODO : Mettre les shaders static et compilés au start 
     if(type==0) {
         //Avant dernier arg TRUE pour debug, doit etre FALSE
         depthFBO = new Framebuffer(1024, 1024, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, false, true);
@@ -47,33 +47,24 @@ LightComponent::LightComponent(Object3D* object, glm::dvec4 color, glm::dvec3 at
         std::cout << "StandardShaders: Compiling depthPassShader" << std::endl; 
         depthPassShader.Compile();
 
-        
+
+    } else if(type == 1) {
+        depthCubeFBO = new CubeFramebuffer(1024, 1024, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, true, true);
+        lightSpaceMatrices.resize(6);
+
         cubeDepthPassShader.vertSrc= R"(
         #version 440
         layout(location = 0) in vec3 position;
 
-        uniform mat4 modelViewProjectionMatrix;
+        uniform mat4 modelMatrix;
         void main()
         {
-            gl_Position = modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
-        }
-        )";
-    } else if(type == 1) {
-        depthCubeFBO = new CubeFramebuffer(1024, 1024, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, true, true);
-        
-        depthPassShader.vertSrc= R"(
-        #version 440
-        layout(location = 0) in vec3 position;
-
-        uniform mat4 modelViewProjectionMatrix;
-        void main()
-        {
-            gl_Position = modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
+            gl_Position = modelMatrix * vec4(position.x, position.y, position.z, 1.0f);
         }
         )";
 
         cubeDepthPassShader.geometrySrc= R"(
-        #version 330 core
+        #version 440
         layout (triangles) in;
         layout (triangle_strip, max_vertices=18) out;
 
@@ -92,8 +83,8 @@ LightComponent::LightComponent(Object3D* object, glm::dvec4 color, glm::dvec3 at
                     gl_Position = shadowMatrices[face] * FragPos;
                     EmitVertex();
                 }    
-                EndPrimitive();
             }
+            EndPrimitive();
         }  
         )";
 
@@ -102,12 +93,20 @@ LightComponent::LightComponent(Object3D* object, glm::dvec4 color, glm::dvec3 at
         #version 440
         in vec4 FragPos;
 
-        layout(location = 0) out vec4 outputColor; 
-        
+        uniform vec3 lightPos;
+        uniform float farPlane;
+
         void main()
-        {   
-            outputColor = vec4(0);
-        }
+        {
+            // get distance between fragment and light source
+            float lightDistance = length(FragPos.xyz - lightPos);
+            
+            // map to [0;1] range by dividing by farPlane
+            lightDistance = lightDistance / farPlane;
+            
+            // write this as modified depth
+            gl_FragDepth = lightDistance;
+        }  
         )";
         cubeDepthPassShader.name = "quad";
         cubeDepthPassShader.isLit = false;
@@ -123,7 +122,7 @@ LightComponent::LightComponent(Object3D* object, glm::dvec4 color, glm::dvec3 at
 void LightComponent::RenderDepthMap() {
     GETGL;
 
-    ogl->glViewport(0, 0, 1024, 1024);
+    ogl->glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
     if(type==0) {
         depthFBO->Enable(); 
         ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
@@ -132,7 +131,8 @@ void LightComponent::RenderDepthMap() {
         glm::dmat4 model = object3D->transform->GetWorldRotationMatrix();
         glm::dvec3 lightPos = -20.0 * glm::dvec4(glm::column(model, 2));
         model = glm::translate(model, lightPos);
-        glm::dmat4 viewMat = glm::inverse(model);
+        viewMat = glm::inverse(model);
+        lightSpaceMatrix = lightProjection * viewMat;
 
         for(int i=0; i<object3D->scene->objects3D.size(); i++) {
             if(object3D->scene->objects3D[i] && object3D->scene->objects3D[i]->visible ) {
@@ -141,40 +141,54 @@ void LightComponent::RenderDepthMap() {
                     Shader* tmpShader = material->shader;
                     ShaderParams* tmpParams = material->params;
                     material->SetShader(&depthPassShader);
-                    object3D->scene->objects3D[i]->DepthRenderPass(&viewMat, &lightProjection); 
+                    object3D->scene->objects3D[i]->DepthRenderPass(this); 
                     material->SetShader(tmpShader);
                     material->params = tmpParams;
                 }
             }
         }
 
-        lightSpaceMatrix = lightProjection * viewMat;
         depthFBO->Disable();
     } else if(type == 1) {
-        float aspect = (float)1024/(float)1024;
-        float nearPlane = 1.0f;
-        float farPlane = 25.0f;
-        glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect, nearPlane, farPlane);    
 
+        //TODO : 
+        // * set the size of lightSpaceMatrices to 6 before and no push back (direcgt access)
         glm::vec3 lightPos = glm::vec3(object3D->transform->position);
-        lightSpaceMatrices.push_back(shadowProj * 
-                        glm::lookAt(lightPos, lightPos + glm::vec3( 1.0, 0.0, 0.0), glm::vec3(0.0,-1.0, 0.0)));
-        lightSpaceMatrices.push_back(shadowProj * 
-                        glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0,-1.0, 0.0)));
-        lightSpaceMatrices.push_back(shadowProj * 
-                        glm::lookAt(lightPos, lightPos + glm::vec3( 0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
-        lightSpaceMatrices.push_back(shadowProj * 
-                        glm::lookAt(lightPos, lightPos + glm::vec3( 0.0,-1.0, 0.0), glm::vec3(0.0, 0.0,-1.0)));
-        lightSpaceMatrices.push_back(shadowProj * 
-                        glm::lookAt(lightPos, lightPos + glm::vec3( 0.0, 0.0, 1.0), glm::vec3(0.0,-1.0, 0.0)));
-        lightSpaceMatrices.push_back(shadowProj * 
-                        glm::lookAt(lightPos, lightPos + glm::vec3( 0.0, 0.0,-1.0), glm::vec3(0.0,-1.0, 0.0)));
+        float nearPlane = 1.0f;
+        float farPlane  = 25.0f;
 
-        //Set all these matrix in the shader for the next rendering pass
+        glm::mat4 shadowProj = glm::perspectiveLH(glm::radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, nearPlane, farPlane);
+        
+        lightSpaceMatrices[0] = shadowProj * glm::lookAtLH(lightPos, lightPos + glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f));
+        lightSpaceMatrices[1] = shadowProj * glm::lookAtLH(lightPos, lightPos + glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f));
+        lightSpaceMatrices[2] = shadowProj * glm::lookAtLH(lightPos, lightPos + glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f));
+        lightSpaceMatrices[3] = shadowProj * glm::lookAtLH(lightPos, lightPos + glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f));
+        lightSpaceMatrices[4] = shadowProj * glm::lookAtLH(lightPos, lightPos + glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f));
+        lightSpaceMatrices[5] = shadowProj * glm::lookAtLH(lightPos, lightPos + glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f));
+
+
+        depthCubeFBO->Enable();
+        ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
+        ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
 
         
+        for(int i=0; i<object3D->scene->objects3D.size(); i++) {
+            if(object3D->scene->objects3D[i] && object3D->scene->objects3D[i]->visible ) {
+                MaterialComponent* material = (MaterialComponent*) object3D->scene->objects3D[i]->GetComponent("Material");
+                if(material != nullptr) {
+                    Shader* tmpShader = material->shader;
+                    ShaderParams* tmpParams = material->params;
+                    material->SetShader(&cubeDepthPassShader);
+                    
+                    object3D->scene->objects3D[i]->DepthRenderPass(this); 
+                    
+                    material->SetShader(tmpShader);
+                    material->params = tmpParams;
+                }
+            }
+        }
+        depthCubeFBO->Disable();
     }
-
 }
 
 void LightComponent::SetShaderUniforms() {

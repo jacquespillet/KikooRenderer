@@ -167,7 +167,7 @@ void Object3D::Render() {
 }
 
 
-void Object3D::DepthRenderPass(glm::dmat4* overridenViewMat,glm::dmat4* overridenProjMat, LightComponent* light) {
+void Object3D::DepthRenderPass(LightComponent* light) {
 	GETGL
 
 	if(!depthTest) ogl->glDisable(GL_DEPTH_TEST);
@@ -185,15 +185,39 @@ void Object3D::DepthRenderPass(glm::dmat4* overridenViewMat,glm::dmat4* override
 	
 
 	if(transform != nullptr) {
-		glm::mat4 vMatrix = (*overridenViewMat);
-		glm::mat4 pMatrix = (*overridenProjMat);
-		glm::mat4 mvpMatrix = pMatrix * vMatrix * currentModelMatrix;
-
-		
-		//bind shader
 		MaterialComponent* material = (MaterialComponent*)(this->GetComponent("Material"));
+		
+		ogl->glUseProgram(material->shader->programShaderObject);
+
+		if(light->type == 0) { //Directional light
+			//Set MVP matrix from the light POV
+			glm::mat4 vMatrix = light->viewMat;
+			glm::mat4 pMatrix = light->lightProjection;
+
+			glm::mat4 mvpMatrix = pMatrix * vMatrix * currentModelMatrix;
+			int modelViewProjectionMatrixLocation = ogl->glGetUniformLocation(material->shader->programShaderObject, "modelViewProjectionMatrix"); 
+			ogl->glUniformMatrix4fv(modelViewProjectionMatrixLocation, 1, false, glm::value_ptr(mvpMatrix));
+		}
+		if(light->type == 1) { //Point light, Set the 6 MVP matrices
+			int modelMatrixLocation = ogl->glGetUniformLocation(material->shader->programShaderObject, "modelMatrix"); 
+			ogl->glUniformMatrix4fv(modelMatrixLocation, 1, false, glm::value_ptr(currentModelMatrix));
+		
+            for (unsigned int i = 0; i < 6; ++i) {
+				std::string uniformName = "shadowMatrices[" + std::to_string(i) + "]";
+				int modelViewProjectionMatrixLocation = ogl->glGetUniformLocation(material->shader->programShaderObject, uniformName.c_str()); 
+				ogl->glUniformMatrix4fv(modelViewProjectionMatrixLocation, 1, false, glm::value_ptr(light->lightSpaceMatrices[i]));
+			}
+			int farPlaneLocation = ogl->glGetUniformLocation(material->shader->programShaderObject,"farPlane"); 
+			ogl->glUniform1f(farPlaneLocation, 25.0f);
+
+			int lightPosLocation = ogl->glGetUniformLocation(material->shader->programShaderObject, "lightPos"); 
+			ogl->glUniform3fv(lightPosLocation, 1, glm::value_ptr(glm::vec3(light->object3D->transform->position)));
+		}
+		
 		if(material != nullptr) {
-			material->SetupShaderUniforms(currentModelMatrix, vMatrix, pMatrix, this->scene);
+			//Won't use the MVP matrices of the current object but those of the light. 
+			//The needed MVP matrices are already binded before
+			material->SetupShaderUniforms(glm::dmat4(1), glm::dmat4(1), glm::dmat4(1), this->scene);
 			//Draw
 			for(int i=0; i<components.size(); i++) {
 				components[i]->OnRender();

@@ -34,12 +34,19 @@ class LightComponent : public Component {
         Shader depthPassShader;
 	    Framebuffer* depthFBO;
         glm::dmat4 lightProjection;
+        glm::dmat4 viewMat;
         glm::dmat4 lightSpaceMatrix;
 
         //Cubemap shadow map
         Shader cubeDepthPassShader;
 	    CubeFramebuffer* depthCubeFBO;
-        std::vector<glm::dmat4> lightSpaceMatrices;
+        std::vector<glm::mat4> lightSpaceMatrices;
+
+        //tmp
+        const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+        unsigned int depthMapFBO;
+        unsigned int depthCubemap;
+    
 
         void SetShaderUniforms();
 

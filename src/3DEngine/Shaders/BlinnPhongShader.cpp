@@ -171,8 +171,8 @@ void BlinnPhongParams::SetUniforms() {
     ogl->glUniform1f(smoothnessLocation, smoothness);
 }
 
-std::string shadowCalculationFunction = R"(
-    float ShadowCalculation(vec4 fragPosLightSpace, int inx)
+std::string DirectionalShadowCalculation = R"(
+    float DirectionalShadowCalculation(vec4 fragPosLightSpace, int inx)
     {
         vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
         projCoords = projCoords * 0.5 + 0.5;
@@ -227,6 +227,23 @@ std::string shadowCalculationFunction = R"(
 
         return max(0, shadow);
     } 
+
+)";
+
+std::string PointShadowCalculation = R"(
+float PointShadowCalculation(vec3 fragPos, int inx){
+    vec3 fragToLight = fragPos - lights[inx].position; 
+    float closestDepth = texture(lights[inx].depthCubeMap, fragToLight).r;
+    closestDepth *= 25.0;
+    
+    float currentDepth = length(fragToLight);  
+    
+    float bias = 0.05; 
+    float shadow = currentDepth -  bias > closestDepth ? 1.0 : 0.0; 
+
+    return shadow;
+}
+
 )";
 
 /*
@@ -265,8 +282,6 @@ Shader GetBlinnPhongShader() {
         fragNormal = (flipNormals > 0) ? -mat3(transpose(inverse(modelMatrix))) * normal  : mat3(transpose(inverse(modelMatrix))) * normal;
         fragUv = uv;
         fragTangent = tangent;
-
-
     }
     )";
 
@@ -275,13 +290,14 @@ Shader GetBlinnPhongShader() {
 
     struct LightSource
     {
-            int type;
-            vec3 position;
-            vec3 attenuation;
-            vec3 direction;
-            vec4 color;
-            sampler2D depthMap;
-            mat4 lightSpaceMatrix;
+        int type;
+        vec3 position;
+        vec3 attenuation;
+        vec3 direction;
+        vec4 color;
+        sampler2D depthMap;
+        mat4 lightSpaceMatrix;
+        samplerCube depthCubeMap;
     };
 
     layout(location = 0) out vec4 outputColor; 
@@ -317,9 +333,13 @@ Shader GetBlinnPhongShader() {
         float dot_product = dot(seed, vec4(12.9898,78.233,45.164,94.673));
         return fract(sin(dot_product) * 43758.5453);
     }
-    )" +  
-    shadowCalculationFunction
-    + R"(
+    )" 
+    +  
+    DirectionalShadowCalculation
+    + 
+    PointShadowCalculation
+    +
+    R"(
     void main()
     {
         vec3 fragToCam = cameraPos - fragPos;
@@ -378,10 +398,21 @@ Shader GetBlinnPhongShader() {
             // Specular factor * specular color * lightColor * specularity of fragment
             vec4 specular = finalSpecularFactor * finalSpecularColor * lights[i].color * pow(max(dot(finalNormal.xyz, halfwayVec),0), smoothness);
 
-            vec4 fragPosLightSpace = lights[i].lightSpaceMatrix * vec4(fragPos, 1.0);
-            float shadow = ShadowCalculation(fragPosLightSpace, i);
+            float shadow = 0;
+            if(lights[i].type == 0) {
+                vec4 fragPosLightSpace = lights[i].lightSpaceMatrix * vec4(fragPos, 1.0);
+                shadow = DirectionalShadowCalculation(fragPosLightSpace, i);
+            } else if(lights[i].type == 1) {
+                shadow = PointShadowCalculation(fragPos, i);
+            }
+            // finalColor.rgb += (1.0 - shadow) *  attenuation * (diffuse + specular).rgb;
 
-            finalColor.rgb += (1.0 - shadow) *  attenuation * (diffuse + specular).rgb;
+            vec3 fragToLight = fragPos - lights[i].position;
+            vec3 sampleDir = fragPos;
+            sampleDir.y -= 1;
+            finalColor.rgb += texture(lights[i].depthCubeMap, sampleDir).r;
+            // finalColor.rgb += fragToLight;
+            
         }
         outputColor = finalColor;
         outputColor.a = finalAlbedo.a;

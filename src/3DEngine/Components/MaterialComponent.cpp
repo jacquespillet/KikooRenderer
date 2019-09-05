@@ -144,14 +144,15 @@ void MaterialComponent::SetCubemap(std::vector<std::string> _cubemapFilenames) {
 void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 viewMatrix, glm::dmat4 projectionMatrix, Scene* scene) {
 	if(inited) {
 		GETGL
-		glm::mat4 mvpMatrix = projectionMatrix * viewMatrix * modelMatrix;
-		ogl->glUseProgram(shader->programShaderObject);
-
-		int modelViewProjectionMatrixLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "modelViewProjectionMatrix"); 
-		ogl->glUniformMatrix4fv(modelViewProjectionMatrixLocation, 1, false, glm::value_ptr(mvpMatrix));
 		if(shader->isDepthPass) {
-
+			
 		} else {
+			glm::mat4 mvpMatrix = projectionMatrix * viewMatrix * modelMatrix;
+			ogl->glUseProgram(shader->programShaderObject);
+
+			int modelViewProjectionMatrixLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "modelViewProjectionMatrix"); 
+			ogl->glUniformMatrix4fv(modelViewProjectionMatrixLocation, 1, false, glm::value_ptr(mvpMatrix));
+			
 			glm::vec3 camPos = scene->camera->transform->position;
 			int cameraPosLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "cameraPos"); 
 			ogl->glUniform3fv(cameraPosLocation,1, glm::value_ptr(camPos));
@@ -238,17 +239,12 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 								loc = ogl->glGetUniformLocation(this->shader->programShaderObject, varName.c_str());
 								ogl->glUniform1i(loc, 4);
 							} if(lightComponent->type == 1) {
-								//Set all worldToLight matrices			
-								//Set depth cubemap
-								// varName = "lights[" + std::to_string(i) + "].lightSpaceMatrix";
-								// loc = ogl->glGetUniformLocation(this->shader->programShaderObject, varName.c_str());
-								// ogl->glUniformMatrix4fv(loc, 1, false,  glm::value_ptr(glm::mat4(lightComponent->lightSpaceMatrix)));
-
-								// ogl->glActiveTexture(GL_TEXTURE4);
-								// ogl->glBindTexture(GL_TEXTURE_2D, lightComponent->depthFBO->depthTexture);
-								// varName = "lights[" + std::to_string(i) + "].depthMap";
-								// loc = ogl->glGetUniformLocation(this->shader->programShaderObject, varName.c_str());
-								// ogl->glUniform1i(loc, 4);
+								
+								ogl->glActiveTexture(GL_TEXTURE5);
+								ogl->glBindTexture(GL_TEXTURE_CUBE_MAP, lightComponent->depthCubeFBO->depthCubemap);								
+								varName = "lights[" + std::to_string(i) + "].depthCubeMap";
+								loc = ogl->glGetUniformLocation(this->shader->programShaderObject, varName.c_str());								
+								ogl->glUniform1i(loc, 5);	
 							}
 
 							numLights++;

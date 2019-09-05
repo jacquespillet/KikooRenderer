@@ -39,7 +39,7 @@ class Object3D {
         void Start();
         void Enable();
         void Render();
-        void DepthRenderPass(glm::dmat4* overridenViewMat, glm::dmat4* overridenProjMat, LightComponent* light=nullptr);
+        void DepthRenderPass(LightComponent* light);
         void Update();
         void Destroy();
         void Recompute();
