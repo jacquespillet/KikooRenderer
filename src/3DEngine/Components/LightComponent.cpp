@@ -53,7 +53,7 @@ LightComponent::LightComponent(Object3D* object, glm::dvec4 color, glm::dvec3 at
         lightSpaceMatrices.resize(6);
 
         cubeDepthPassShader.vertSrc= R"(
-        #version 440
+        #version 330 core
         layout(location = 0) in vec3 position;
 
         uniform mat4 modelMatrix;
@@ -64,7 +64,7 @@ LightComponent::LightComponent(Object3D* object, glm::dvec4 color, glm::dvec3 at
         )";
 
         cubeDepthPassShader.geometrySrc= R"(
-        #version 440
+        #version 330 core
         layout (triangles) in;
         layout (triangle_strip, max_vertices=18) out;
 
@@ -90,7 +90,7 @@ LightComponent::LightComponent(Object3D* object, glm::dvec4 color, glm::dvec3 at
 
 
         cubeDepthPassShader.fragSrc = R"(
-        #version 440
+        #version 330 core
         in vec4 FragPos;
 
         uniform vec3 lightPos;
@@ -106,7 +106,7 @@ LightComponent::LightComponent(Object3D* object, glm::dvec4 color, glm::dvec3 at
             
             // write this as modified depth
             gl_FragDepth = lightDistance;
-        }  
+        }
         )";
         cubeDepthPassShader.name = "quad";
         cubeDepthPassShader.isLit = false;
@@ -151,20 +151,18 @@ void LightComponent::RenderDepthMap() {
         depthFBO->Disable();
     } else if(type == 1) {
 
-        //TODO : 
-        // * set the size of lightSpaceMatrices to 6 before and no push back (direcgt access)
         glm::vec3 lightPos = glm::vec3(object3D->transform->position);
-        float nearPlane = 1.0f;
-        float farPlane  = 25.0f;
+        nearPlane = 1;
+        farPlane  = 25;
 
-        glm::mat4 shadowProj = glm::perspectiveLH(glm::radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, nearPlane, farPlane);
+        glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, nearPlane, farPlane);
         
-        lightSpaceMatrices[0] = shadowProj * glm::lookAtLH(lightPos, lightPos + glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f));
-        lightSpaceMatrices[1] = shadowProj * glm::lookAtLH(lightPos, lightPos + glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f));
-        lightSpaceMatrices[2] = shadowProj * glm::lookAtLH(lightPos, lightPos + glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f));
-        lightSpaceMatrices[3] = shadowProj * glm::lookAtLH(lightPos, lightPos + glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f));
-        lightSpaceMatrices[4] = shadowProj * glm::lookAtLH(lightPos, lightPos + glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f));
-        lightSpaceMatrices[5] = shadowProj * glm::lookAtLH(lightPos, lightPos + glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f));
+        lightSpaceMatrices[0] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f));
+        lightSpaceMatrices[1] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f));
+        lightSpaceMatrices[2] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f));
+        lightSpaceMatrices[3] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f));
+        lightSpaceMatrices[4] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f));
+        lightSpaceMatrices[5] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f));
 
 
         depthCubeFBO->Enable();

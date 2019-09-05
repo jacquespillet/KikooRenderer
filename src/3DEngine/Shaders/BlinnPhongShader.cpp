@@ -234,7 +234,7 @@ std::string PointShadowCalculation = R"(
 float PointShadowCalculation(vec3 fragPos, int inx){
     vec3 fragToLight = fragPos - lights[inx].position; 
     float closestDepth = texture(lights[inx].depthCubeMap, fragToLight).r;
-    closestDepth *= 25.0;
+    closestDepth *= lights[inx].farPlane;
     
     float currentDepth = length(fragToLight);  
     
@@ -298,6 +298,7 @@ Shader GetBlinnPhongShader() {
         sampler2D depthMap;
         mat4 lightSpaceMatrix;
         samplerCube depthCubeMap;
+        float farPlane;
     };
 
     layout(location = 0) out vec4 outputColor; 
@@ -405,13 +406,12 @@ Shader GetBlinnPhongShader() {
             } else if(lights[i].type == 1) {
                 shadow = PointShadowCalculation(fragPos, i);
             }
-            // finalColor.rgb += (1.0 - shadow) *  attenuation * (diffuse + specular).rgb;
+            finalColor.rgb += (1.0 - shadow) *  attenuation * (diffuse + specular).rgb;
 
-            vec3 fragToLight = fragPos - lights[i].position;
-            vec3 sampleDir = fragPos;
-            sampleDir.y -= 1;
-            finalColor.rgb += texture(lights[i].depthCubeMap, sampleDir).r;
-            // finalColor.rgb += fragToLight;
+            // vec3 fragToLight = fragPos - lights[i].position;
+            // vec3 sampleDir = fragPos;
+            // sampleDir.y -= 1;
+            // finalColor.rgb += texture(lights[i].depthCubeMap, sampleDir).r;
             
         }
         outputColor = finalColor;

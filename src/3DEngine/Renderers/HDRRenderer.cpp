@@ -120,13 +120,13 @@ void HDRRenderer::Render() {
 
     alternateFBO->Disable();
 
-    ogl->glCullFace(GL_FRONT);
+    // ogl->glCullFace(GL_FRONT);
     LightComponent* light;
     for(int i=0; i<scene->lightObjects.size(); i++) {
         light = (LightComponent*) scene->lightObjects[i]->GetComponent("Light");
         light->RenderDepthMap();
     }
-    ogl->glCullFace(GL_BACK);
+    // ogl->glCullFace(GL_BACK);
 
     
     ogl->glViewport(0, 0, alternateFBO->width, alternateFBO->height);

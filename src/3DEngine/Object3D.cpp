@@ -208,7 +208,7 @@ void Object3D::DepthRenderPass(LightComponent* light) {
 				ogl->glUniformMatrix4fv(modelViewProjectionMatrixLocation, 1, false, glm::value_ptr(light->lightSpaceMatrices[i]));
 			}
 			int farPlaneLocation = ogl->glGetUniformLocation(material->shader->programShaderObject,"farPlane"); 
-			ogl->glUniform1f(farPlaneLocation, 25.0f);
+			ogl->glUniform1f(farPlaneLocation, light->farPlane);
 
 			int lightPosLocation = ogl->glGetUniformLocation(material->shader->programShaderObject, "lightPos"); 
 			ogl->glUniform3fv(lightPosLocation, 1, glm::value_ptr(glm::vec3(light->object3D->transform->position)));

@@ -29,6 +29,7 @@ class LightComponent : public Component {
         glm::dvec4 color;
 		double fov;
         
+        const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 
         //Directional Shadow Map
         Shader depthPassShader;
@@ -41,11 +42,8 @@ class LightComponent : public Component {
         Shader cubeDepthPassShader;
 	    CubeFramebuffer* depthCubeFBO;
         std::vector<glm::mat4> lightSpaceMatrices;
-
-        //tmp
-        const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
-        unsigned int depthMapFBO;
-        unsigned int depthCubemap;
+        float nearPlane;
+        float farPlane;
     
 
         void SetShaderUniforms();
