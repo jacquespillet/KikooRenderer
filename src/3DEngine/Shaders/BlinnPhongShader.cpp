@@ -233,13 +233,31 @@ std::string DirectionalShadowCalculation = R"(
 std::string PointShadowCalculation = R"(
 float PointShadowCalculation(vec3 fragPos, int inx){
     vec3 fragToLight = fragPos - lights[inx].position; 
-    float closestDepth = texture(lights[inx].depthCubeMap, fragToLight).r;
-    closestDepth *= lights[inx].farPlane;
-    
     float currentDepth = length(fragToLight);  
-    
-    float bias = 0.05; 
-    float shadow = currentDepth -  bias > closestDepth ? 1.0 : 0.0; 
+
+    float shadow  = 0.0;
+    float bias    = 0.05; 
+    float samples = 4.0;
+    float offset  = 0.1;
+    for(float x = -offset; x < offset; x += offset / (samples * 0.5))
+    {
+        for(float y = -offset; y < offset; y += offset / (samples * 0.5))
+        {
+            for(float z = -offset; z < offset; z += offset / (samples * 0.5))
+            {
+                float closestDepth = texture(lights[inx].depthCubeMap, fragToLight + vec3(x, y, z)).r; 
+                closestDepth *= lights[inx].farPlane;   // Undo mapping [0;1]
+                if(currentDepth - bias > closestDepth)
+                    shadow += 1.0;
+            }
+        }
+    }
+    shadow /= (samples * samples * samples);    
+
+    //NO PCF
+    // float closestDepth = texture(lights[inx].depthCubeMap, fragToLight).r;
+    // closestDepth *= lights[inx].farPlane;
+    // shadow = currentDepth -  bias > closestDepth ? 1.0 : 0.0; 
 
     return shadow;
 }
@@ -323,6 +341,7 @@ Shader GetBlinnPhongShader() {
     uniform float specularFactor;
     uniform float smoothness;
     uniform vec4 specularColor;
+    uniform mat4 modelMatrix;
 
     in vec3 fragPos;
     in vec3 fragNormal;
@@ -406,13 +425,7 @@ Shader GetBlinnPhongShader() {
             } else if(lights[i].type == 1) {
                 shadow = PointShadowCalculation(fragPos, i);
             }
-            finalColor.rgb += (1.0 - shadow) *  attenuation * (diffuse + specular).rgb;
-
-            // vec3 fragToLight = fragPos - lights[i].position;
-            // vec3 sampleDir = fragPos;
-            // sampleDir.y -= 1;
-            // finalColor.rgb += texture(lights[i].depthCubeMap, sampleDir).r;
-            
+            finalColor.rgb += (1.0 - shadow) *  attenuation * (diffuse + specular).rgb;            
         }
         outputColor = finalColor;
         outputColor.a = finalAlbedo.a;

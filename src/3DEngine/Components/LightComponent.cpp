@@ -83,8 +83,8 @@ LightComponent::LightComponent(Object3D* object, glm::dvec4 color, glm::dvec3 at
                     gl_Position = shadowMatrices[face] * FragPos;
                     EmitVertex();
                 }    
+                EndPrimitive();
             }
-            EndPrimitive();
         }  
         )";
 
@@ -152,24 +152,21 @@ void LightComponent::RenderDepthMap() {
     } else if(type == 1) {
 
         glm::vec3 lightPos = glm::vec3(object3D->transform->position);
-        nearPlane = 1;
-        farPlane  = 25;
+        nearPlane = 0.001;
+        farPlane  = 100.0;
 
-        glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, nearPlane, farPlane);
-        
-        lightSpaceMatrices[0] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f));
-        lightSpaceMatrices[1] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f));
-        lightSpaceMatrices[2] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f));
-        lightSpaceMatrices[3] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f));
-        lightSpaceMatrices[4] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f));
-        lightSpaceMatrices[5] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f));
+        glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)1.0, nearPlane, farPlane);
 
+        lightSpaceMatrices[0] = (shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)));
+        lightSpaceMatrices[1] = (shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)));
+        lightSpaceMatrices[2] = (shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)));
+        lightSpaceMatrices[3] = (shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)));
+        lightSpaceMatrices[4] = (shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)));
+        lightSpaceMatrices[5] = (shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f)));
 
         depthCubeFBO->Enable();
-        ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
-        ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
+        ogl->glClear(GL_DEPTH_BUFFER_BIT);
 
-        
         for(int i=0; i<object3D->scene->objects3D.size(); i++) {
             if(object3D->scene->objects3D[i] && object3D->scene->objects3D[i]->visible ) {
                 MaterialComponent* material = (MaterialComponent*) object3D->scene->objects3D[i]->GetComponent("Material");
