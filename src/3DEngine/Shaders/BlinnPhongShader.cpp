@@ -424,6 +424,9 @@ Shader GetBlinnPhongShader() {
                 shadow = DirectionalShadowCalculation(fragPosLightSpace, i);
             } else if(lights[i].type == 1) {
                 shadow = PointShadowCalculation(fragPos, i);
+            }else if(lights[i].type == 2) {
+                vec4 fragPosLightSpace = lights[i].lightSpaceMatrix * vec4(fragPos, 1.0);
+                shadow = DirectionalShadowCalculation(fragPosLightSpace, i);
             }
             finalColor.rgb += (1.0 - shadow) *  attenuation * (diffuse + specular).rgb;            
         }

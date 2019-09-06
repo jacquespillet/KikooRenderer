@@ -113,6 +113,38 @@ LightComponent::LightComponent(Object3D* object, glm::dvec4 color, glm::dvec3 at
         cubeDepthPassShader.isDepthPass = true;
         std::cout << "StandardShaders: Compiling cubeDepthPassShader" << std::endl; 
         cubeDepthPassShader.Compile();
+    } else if(type==2) {
+        //Avant dernier arg TRUE pour debug, doit etre FALSE
+        depthFBO = new Framebuffer(1024, 1024, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, false, true);
+        lightProjection  = glm::perspectiveLH(80.0f, 1.0f, 0.01f, 100.0f);
+        // lightProjection  = glm::perspectiveLH((float)(DEGTORAD * fov), 1.0f, 0.01f, 100.0f);
+
+        depthPassShader.vertSrc= R"(
+        #version 440
+        layout(location = 0) in vec3 position;
+
+        uniform mat4 modelViewProjectionMatrix;
+        void main()
+        {
+            gl_Position = modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
+        }
+        )";
+
+        depthPassShader.fragSrc = R"(
+        #version 440
+        layout(location = 0) out vec4 outputColor; 
+        void main()
+        {   
+            outputColor = vec4(0);
+        }
+        )";
+        depthPassShader.name = "quad";
+        depthPassShader.isLit = false;
+        depthPassShader.isDepthPass = true;
+        std::cout << "StandardShaders: Compiling depthPassShader" << std::endl; 
+        depthPassShader.Compile();
+
+
     }
 
 
@@ -134,6 +166,7 @@ void LightComponent::RenderDepthMap() {
         viewMat = glm::inverse(model);
         lightSpaceMatrix = lightProjection * viewMat;
 
+        ogl->glCullFace(GL_FRONT);
         for(int i=0; i<object3D->scene->objects3D.size(); i++) {
             if(object3D->scene->objects3D[i] && object3D->scene->objects3D[i]->visible ) {
                 MaterialComponent* material = (MaterialComponent*) object3D->scene->objects3D[i]->GetComponent("Material");
@@ -147,7 +180,7 @@ void LightComponent::RenderDepthMap() {
                 }
             }
         }
-
+        ogl->glCullFace(GL_BACK);
         depthFBO->Disable();
     } else if(type == 1) {
 
@@ -183,6 +216,30 @@ void LightComponent::RenderDepthMap() {
             }
         }
         depthCubeFBO->Disable();
+    } else  if(type==2) {
+        depthFBO->Enable(); 
+        ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
+        ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
+
+        glm::dmat4 model = object3D->transform->GetWorldModelMatrix();
+        viewMat = glm::inverse(model);
+        lightSpaceMatrix = lightProjection * viewMat;
+
+        for(int i=0; i<object3D->scene->objects3D.size(); i++) {
+            if(object3D->scene->objects3D[i] && object3D->scene->objects3D[i]->visible ) {
+                MaterialComponent* material = (MaterialComponent*) object3D->scene->objects3D[i]->GetComponent("Material");
+                if(material != nullptr) {
+                    Shader* tmpShader = material->shader;
+                    ShaderParams* tmpParams = material->params;
+                    material->SetShader(&depthPassShader);
+                    object3D->scene->objects3D[i]->DepthRenderPass(this); 
+                    material->SetShader(tmpShader);
+                    material->params = tmpParams;
+                }
+            }
+        }
+
+        depthFBO->Disable();
     }
 }
 

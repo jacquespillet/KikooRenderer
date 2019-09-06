@@ -189,7 +189,7 @@ void Object3D::DepthRenderPass(LightComponent* light) {
 		
 		ogl->glUseProgram(material->shader->programShaderObject);
 
-		if(light->type == 0) { //Directional light
+		if(light->type == 0 || light->type == 2) { //Directional light
 			//Set MVP matrix from the light POV
 			glm::mat4 vMatrix = light->viewMat;
 			glm::mat4 pMatrix = light->lightProjection;

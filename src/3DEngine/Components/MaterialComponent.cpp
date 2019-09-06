@@ -228,7 +228,7 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 							ogl->glUniform4fv(loc, 1, glm::value_ptr(glm::vec4(lightComponent->color)));
 							
 
-							if(lightComponent->type == 0) {			
+							if(lightComponent->type == 0 || lightComponent->type == 2) {			
 								varName = "lights[" + std::to_string(i) + "].lightSpaceMatrix";
 								loc = ogl->glGetUniformLocation(this->shader->programShaderObject, varName.c_str());
 								ogl->glUniformMatrix4fv(loc, 1, false,  glm::value_ptr(glm::mat4(lightComponent->lightSpaceMatrix)));
