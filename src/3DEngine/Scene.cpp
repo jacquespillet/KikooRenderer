@@ -44,22 +44,22 @@ namespace CoreEngine {
         skyboxCube->Start();
         skyboxCube->Enable();
 
-        Object3D* room = GetQuad(this, "Room", glm::dvec3(0, 0, 0), glm::vec3(90, 0, 0), glm::dvec3(20), glm::dvec4(1, 1, 1, 1));
-        MaterialComponent* mat = (MaterialComponent*) room->GetComponent("Material");
-        mat->shader = standardShaders.shaders[2];
-        AddObject(room);
+        // Object3D* room = GetQuad(this, "Room", glm::dvec3(0, 0, 0), glm::vec3(90, 0, 0), glm::dvec3(20), glm::dvec4(1, 1, 1, 1));
+        // MaterialComponent* mat = (MaterialComponent*) room->GetComponent("Material");
+        // mat->shader = standardShaders.shaders[2];
+        // AddObject(room);
 
 
-        Object3D* cube1 = GetCube(this, "Cube", glm::dvec3(0, 0.5, 0), glm::vec3(0, 0, 0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
-        mat = (MaterialComponent*) cube1->GetComponent("Material");
-        mat->shader = standardShaders.shaders[2];
-        AddObject(cube1);
+        // Object3D* cube1 = GetCube(this, "Cube", glm::dvec3(0, 0.5, 0), glm::vec3(0, 0, 0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
+        // mat = (MaterialComponent*) cube1->GetComponent("Material");
+        // mat->shader = standardShaders.shaders[2];
+        // AddObject(cube1);
 
         
-        Object3D* cube2 = GetCube(this, "Cube2", glm::dvec3(-1, 0.5, 2), glm::vec3(0, 0, 0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
-        mat = (MaterialComponent*) cube2->GetComponent("Material");
-        mat->shader = standardShaders.shaders[2];
-        AddObject(cube2);
+        // Object3D* cube2 = GetCube(this, "Cube2", glm::dvec3(-1, 0.5, 2), glm::vec3(0, 0, 0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
+        // mat = (MaterialComponent*) cube2->GetComponent("Material");
+        // mat->shader = standardShaders.shaders[2];
+        // AddObject(cube2);
 	
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
@@ -126,6 +126,16 @@ namespace CoreEngine {
 
     //RemoveObject
     void Scene::RemoveObject(Object3D* object) {
+        LightComponent* light = (LightComponent*)object->GetComponent("Light");
+		if (light != nullptr) {
+			for (int i = 0; i < lightObjects.size(); i++) {
+				if (lightObjects[i] == object) {
+					lightObjects.erase(lightObjects.begin() + i);
+					break;
+				}
+			}
+		}
+
         for(int i=0; i<objects3D.size(); i++) {
             if(objects3D[i] == object) {
 				for (int j = 0; j < object->childObjects.size(); j++) {
@@ -136,17 +146,6 @@ namespace CoreEngine {
                 break;
             }
         }
-
-		LightComponent* light = (LightComponent*)object->GetComponent("Light");
-		if (light != nullptr) {
-			for (int i = 0; i < lightObjects.size(); i++) {
-				if (objects3D[i] == object) {
-					delete lightObjects[i];
-					objects3D.erase(objects3D.begin() + i);
-					break;
-				}
-			}
-		}
     }
 
 

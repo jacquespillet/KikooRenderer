@@ -31,6 +31,8 @@ class Object3D {
         bool isSelected = false;
 
         Object3D(std::string name, Scene* scene);
+        ~Object3D();
+
         void AddComponent(Component* component);
         std::string AddObject(Object3D* object);
 		void ClearObjects();

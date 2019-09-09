@@ -23,6 +23,16 @@ Object3D::Object3D(std::string _name, Scene* _scene) {
 	this->AddComponent(transform);
 }
 
+Object3D::~Object3D() {
+	for(int i=0; i<components.size(); i++) { 
+		delete components[i];
+	}
+
+	for(int i=0; i<childObjects.size(); i++) {
+		delete childObjects[i];
+	}
+}
+
 void Object3D::AddComponent(Component* component) {
 	if(component != nullptr) {
 		for(int i=0; i<components.size(); i++) { 

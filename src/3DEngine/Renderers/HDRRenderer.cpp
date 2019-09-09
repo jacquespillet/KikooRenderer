@@ -126,7 +126,6 @@ void HDRRenderer::Render() {
         light->RenderDepthMap();
     }
 
-    
     ogl->glViewport(0, 0, alternateFBO->width, alternateFBO->height);
     alternateFBO->RenderFBOToObject(quad);
 
