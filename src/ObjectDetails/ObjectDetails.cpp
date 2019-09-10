@@ -62,7 +62,12 @@ namespace KikooRenderer
 			CoreEngine::MeshFilterInspector* meshFilterComponentInspector = meshFilterComponent->GetInspector();
 			rootWidget->mainLayout->addWidget(meshFilterComponentInspector);
 		}
-
+		
+		CoreEngine::LightComponent* lightComponent = (CoreEngine::LightComponent*)(currentObject->GetComponent("Light"));
+		if (lightComponent != nullptr) {
+			CoreEngine::LightInspector* lightInspector = lightComponent->GetInspector();
+			rootWidget->mainLayout->addWidget(lightInspector);
+		}
 
 	}
 

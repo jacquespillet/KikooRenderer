@@ -7,6 +7,7 @@
 #include "3DEngine/Components/TransformComponent.hpp"
 #include "3DEngine/Components/MaterialComponent.hpp"
 #include "3DEngine/Components/MeshFilterComponent.hpp"
+#include "3DEngine/Components/LightComponent.hpp"
 
 namespace KikooRenderer {
 namespace CoreEngine {

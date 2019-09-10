@@ -10,6 +10,17 @@ namespace KikooRenderer {
 namespace CoreEngine {
 
 class LightComponent;
+class LightInspector : public QGroupBox {
+	Q_OBJECT
+	public:
+		LightInspector(LightComponent* lightComponent);
+		LightComponent* lightComponent;
+		Scene* scene;
+
+		QVBoxLayout* mainLayout;
+
+		void Refresh();
+};
 
 
 class LightComponent : public Component {
@@ -24,12 +35,21 @@ class LightComponent : public Component {
 
         void RenderDepthMap();
 
+        
+        LightInspector* lightInspector;
+        LightInspector* GetInspector();
+
         int type; //0 directional, 1 point, 2 spot
         glm::dvec3 attenuation;
         glm::dvec4 color;
+        double intensity=1;
 		double fov;
+
+        bool castShadow;
         
         const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+        float farClip = 100;
+        float bias;
 
         //Directional Shadow Map
         Shader depthPassShader;
@@ -43,10 +63,11 @@ class LightComponent : public Component {
 	    CubeFramebuffer* depthCubeFBO;
         std::vector<glm::mat4> lightSpaceMatrices;
         float nearPlane;
-        float farPlane;
     
 
         void SetShaderUniforms();
+
+        void SetType(int type);
 
 		QJsonObject ToJSON() {
 			QJsonObject json;

@@ -225,7 +225,7 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 
 							varName = "lights[" + std::to_string(i) + "].color";
 							loc = ogl->glGetUniformLocation(this->shader->programShaderObject, varName.c_str());
-							ogl->glUniform4fv(loc, 1, glm::value_ptr(glm::vec4(lightComponent->color)));
+							ogl->glUniform4fv(loc, 1, glm::value_ptr(glm::vec4(lightComponent->color) * (float)lightComponent->intensity));
 							
 
 							if(lightComponent->type == 0 || lightComponent->type == 2) {			
@@ -248,7 +248,7 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 
 								varName = "lights[" + std::to_string(i) + "].farPlane";
 								loc = ogl->glGetUniformLocation(this->shader->programShaderObject, varName.c_str());
-								ogl->glUniform1f(loc, lightComponent->farPlane);								
+								ogl->glUniform1f(loc, lightComponent->farClip);								
 							}
 
 							numLights++;

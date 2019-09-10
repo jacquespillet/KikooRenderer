@@ -179,7 +179,7 @@ std::string DirectionalShadowCalculation = R"(
         float currentDepth = projCoords.z;
 
         float bias = max(0.05 * (dot(fragNormal, normalize(lights[inx].direction))), 0.005);  
-        
+        bias = 0.00005;
         float shadow = 0;
 
         ///////MANUAL PCF
@@ -394,14 +394,14 @@ Shader GetBlinnPhongShader() {
             float lightDist = 0;
             if(lights[i].type == 1) { //Point light
                 lightDist = distance(fragPos.xyz, lights[i].position);
-                attenuation    = 1 / (lights[i].attenuation.x + lights[i].attenuation.y * lightDist + lights[i].attenuation.z * (lightDist * lightDist));
+                attenuation    = 1 / (lights[i].attenuation.x * (lightDist * lightDist));
                 lightDirection = normalize(fragPos.xyz - lights[i].position);
             }
             if(lights[i].type == 2) { //Spot light
                 lightDirection  = normalize(fragPos.xyz - lights[i].position);
                 lightDist  = distance(fragPos.xyz, lights[i].position);
                 float numerator = pow(max(dot(-normalize(lights[i].direction), -lightDirection), 0), 64);
-                attenuation     = numerator / (lights[i].attenuation.x + lights[i].attenuation.y * lightDist + lights[i].attenuation.z * (lightDist * lightDist));
+                attenuation     = numerator / (lights[i].attenuation.x * (lightDist * lightDist));
             }
             
             vec3 toLight = -lightDirection;

@@ -121,6 +121,13 @@ void CubeFramebuffer::RenderFBOToObject(Object3D* target, bool renderDepth) {
 
 }
 
+void CubeFramebuffer::Clear() {
+    GETGL
+    Enable();
+    ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
+    ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    Disable();
+}
 
 
 Cubemap* CubeFramebuffer::GetColorTexture() {
