@@ -293,7 +293,7 @@ namespace CoreEngine {
 
     void GetConeBuffers(std::vector<glm::dvec3>* vertex, std::vector<glm::dvec3>* normals, std::vector<glm::dvec2>* uv, std::vector<glm::dvec4>* colors, std::vector<int>* triangles) {
 
-        uint32_t numSlices = 16;
+        uint32_t numSlices = 32;
 
         //Circle center
         vertex->push_back(glm::dvec3(0, 0, 0));
@@ -320,7 +320,7 @@ namespace CoreEngine {
             colors->push_back(glm::dvec4(255, 255, 255, 255));
             
             triangles->push_back(i);
-            triangles->push_back(i-1);
+            triangles->push_back(i+1);
             triangles->push_back(0);
             
             triangles->push_back(i);
@@ -331,6 +331,10 @@ namespace CoreEngine {
         triangles->push_back(numSlices);
         triangles->push_back(2);
         triangles->push_back(0);
+        
+        triangles->push_back(numSlices);
+        triangles->push_back(1);
+        triangles->push_back(2);
     }
 
     void GetQuadBuffers(std::vector<glm::dvec3>* vertex, std::vector<glm::dvec3>* normals, std::vector<glm::dvec2>* uv, std::vector<glm::dvec4>* colors, std::vector<int>* triangles) {
