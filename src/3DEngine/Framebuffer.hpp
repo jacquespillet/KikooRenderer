@@ -14,7 +14,7 @@ namespace CoreEngine {
 class Object3D;
 class Framebuffer {
 public: 
-	Framebuffer(int width=800, int height = 600, int internalColorFormat = GL_RGB, int colorFormat = GL_RGB, int colorType = GL_UNSIGNED_BYTE, bool hasColor=true, bool hasDepth=true);
+	Framebuffer(int width=800, int height = 600, int internalColorFormat = GL_RGB, int colorFormat = GL_RGB, int colorType = GL_UNSIGNED_BYTE, bool hasColor=true, bool hasDepth=true, bool multisampled=false);
 	
 	void Enable();
 	void Disable();

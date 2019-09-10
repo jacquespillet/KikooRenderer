@@ -15,7 +15,7 @@ namespace CoreEngine {
 HDRRenderer::HDRRenderer(Scene* scene) : Renderer(scene) {
     GETGL
 
-    alternateFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true);
+    alternateFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, false);
     
 
     quadShader.vertSrc= R"(
@@ -81,53 +81,53 @@ HDRRenderer::HDRRenderer(Scene* scene) : Renderer(scene) {
 
 void HDRRenderer::Resize(int w, int h) {
     delete alternateFBO;
-    alternateFBO = new Framebuffer(w, h, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true);
+    alternateFBO = new Framebuffer(w, h, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, true);
 }
 
 void HDRRenderer::Render() {
     GETGL   
     alternateFBO->Enable();
     
-    ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
-    ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
+    // ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
+    // ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
     
-    ogl->glStencilFunc(GL_ALWAYS, 1, 0xFF); 
-    ogl->glStencilMask(0xFF); 
+    // ogl->glStencilFunc(GL_ALWAYS, 1, 0xFF); 
+    // ogl->glStencilMask(0xFF); 
 
-    //Main pass
-    for(int i=0; i<scene->objects3D.size(); i++) {
-        if(scene->objects3D[i] && scene->objects3D[i]->visible ) {
-            scene->objects3D[i]->Render();
-        }
-    }
+    // //Main pass
+    // for(int i=0; i<scene->objects3D.size(); i++) {
+    //     if(scene->objects3D[i] && scene->objects3D[i]->visible ) {
+    //         scene->objects3D[i]->Render();
+    //     }
+    // }
 
-    //Render skybox
-    if(scene->hasSkybox) {
-        ogl->glDepthFunc(GL_LEQUAL);
-        scene->skyboxCube->Render();
-        ogl->glDepthFunc(GL_LESS);
-    }
+    // //Render skybox
+    // if(scene->hasSkybox) {
+    //     ogl->glDepthFunc(GL_LEQUAL);
+    //     scene->skyboxCube->Render();
+    //     ogl->glDepthFunc(GL_LESS);
+    // }
 
-    //Render UI
-    if(scene->rendersUI) {
-        scene->grid->Render();
-        scene->axes->Render();
+    // //Render UI
+    // if(scene->rendersUI) {
+    //     scene->grid->Render();
+    //     scene->axes->Render();
 
-        if (scene->transformWidget->visible && scene->selectedObjects.size() > 0 && scene->selectedObjects[0]->visible) {
-            scene->transformWidget->Render();
-        }
-    }
+    //     if (scene->transformWidget->visible && scene->selectedObjects.size() > 0 && scene->selectedObjects[0]->visible) {
+    //         scene->transformWidget->Render();
+    //     }
+    // }
 
     alternateFBO->Disable();
 
-    LightComponent* light;
-    for(int i=0; i<scene->lightObjects.size(); i++) {
-        light = (LightComponent*) scene->lightObjects[i]->GetComponent("Light");
-        light->RenderDepthMap();
-    }
+    // LightComponent* light;
+    // for(int i=0; i<scene->lightObjects.size(); i++) {
+    //     light = (LightComponent*) scene->lightObjects[i]->GetComponent("Light");
+    //     light->RenderDepthMap();
+    // }
 
-    ogl->glViewport(0, 0, alternateFBO->width, alternateFBO->height);
-    alternateFBO->RenderFBOToObject(quad);
+    // ogl->glViewport(0, 0, alternateFBO->width, alternateFBO->height);
+    // alternateFBO->RenderFBOToObject(quad);
 
     //USE IT FOR DEBUGGING LIGHT DEPTH FRAMES    
     // for(int i=0; i<scene->lightObjects.size(); i++) {

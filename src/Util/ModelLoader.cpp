@@ -75,6 +75,7 @@ KikooRenderer::CoreEngine::Object3D* ObjectFromOBJ(std::string fileName, KikooRe
     outUv.resize(vertexIndices.size(), glm::dvec2(0, 0));
     outColors.resize(vertexIndices.size(), glm::dvec4(1, 1, 1, 1));
 
+    //Use Max of tmp arrays in case they are empty
     for(int i=0; i<vertexIndices.size(); i++) {
         outNormals[vertexIndices[i]] = tmpNormals[normalIndices[i]];
         outUv[vertexIndices[i]] = tmpUv[uvIndices[i]];
