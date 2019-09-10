@@ -27,6 +27,11 @@ public:
 	int width, height;
 	int colorFormat;
 
+	bool multisampled = false;
+	unsigned int intermediateFBO;
+	unsigned int intermediateRBO;
+	unsigned int screenTexture;
+
 	//Directly renders the object to the target object
 	void RenderOnObect(std::vector<Object3D*>& objectsToRender, Object3D* target);
 	void RenderOnObect(Object3D* objectToRender, Object3D* target);

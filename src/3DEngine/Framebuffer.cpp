@@ -9,16 +9,17 @@ namespace CoreEngine {
 		this->width = width;
 		this->height = height;
 		this->colorFormat = colorFormat;
+		this->multisampled = multisampled;
 		
 		ogl->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &defaultFBO);
+		if(!multisampled) {
 
-		ogl->glGenFramebuffers(1, &fbo);
-		ogl->glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-		
-		if(hasColor) {
-			// create a color attachment texture
-			ogl->glGenTextures(1, &texture);
-			if(!multisampled) {
+			ogl->glGenFramebuffers(1, &fbo);
+			ogl->glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+			
+			if(hasColor) {
+				// create a color attachment texture
+				ogl->glGenTextures(1, &texture);
 				ogl->glBindTexture(GL_TEXTURE_2D, texture);
 				ogl->glTexImage2D(GL_TEXTURE_2D, 0, internalColorFormat, width, height, 0, colorFormat, colorType, NULL);
 				ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -26,86 +27,128 @@ namespace CoreEngine {
 				ogl->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
 				ogl->glBindTexture(GL_TEXTURE_2D, 0);
 			} else {
-				ogl->glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texture);
-				ogl->glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGB, width, height, GL_TRUE);
-				ogl->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, texture, 0);				
-				ogl->glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+				ogl->glDrawBuffer(GL_NONE);
+				ogl->glReadBuffer(GL_NONE);	
 			}
-		}else {
-			ogl->glDrawBuffer(GL_NONE);
-			ogl->glReadBuffer(GL_NONE);	
-		}
-		
-		if(hasDepth) {
-			if(!multisampled) {
-				//Create depth texture
-				ogl->glGenTextures(1, &depthTexture);
-				ogl->glBindTexture(GL_TEXTURE_2D, depthTexture);
-				ogl->glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-				ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-				ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-				ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER); 
-				ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-				float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-				ogl->glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor); 
+			
+			if(hasDepth) {
+					//Create depth texture
+					ogl->glGenTextures(1, &depthTexture);
+					ogl->glBindTexture(GL_TEXTURE_2D, depthTexture);
+					ogl->glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+					ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+					ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+					ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER); 
+					ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+					float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+					ogl->glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor); 
 
-				ogl->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
-				ogl->glBindTexture(GL_TEXTURE_2D, 0);
-			} 
-			else {
-				ogl->glGenTextures(1, &depthTexture);
-				ogl->glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, depthTexture);
-				ogl->glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_DEPTH_COMPONENT32, width, height, GL_TRUE);
-				// ogl->glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-				// ogl->glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-				// ogl->glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER); 
-				// ogl->glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-				// float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-				// ogl->glTexParameterfv(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_BORDER_COLOR, borderColor); 
-
-				ogl->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D_MULTISAMPLE, depthTexture, 0);
-				ogl->glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
-			}
-
-		} else {
-			if(!multisampled) {
+					ogl->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
+					ogl->glBindTexture(GL_TEXTURE_2D, 0);
+			} else {
 				// create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
 				ogl->glGenRenderbuffers(1, &rbo);
 				ogl->glBindRenderbuffer(GL_RENDERBUFFER, rbo);
 				ogl->glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height); // use a single renderbuffer object for both a depth AND stencil buffer.
 				ogl->glBindRenderbuffer(GL_RENDERBUFFER, 0);
 				ogl->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
-			} else {
-				ogl->glGenRenderbuffers(1, &rbo);
-				ogl->glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-				ogl->glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, width, height);
-				ogl->glBindRenderbuffer(GL_RENDERBUFFER, 0);
-				ogl->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);				
 			}
-		}
 
-		ogl->glEnable(GL_CULL_FACE); 
-		ogl->glCullFace(GL_BACK);
+			ogl->glEnable(GL_CULL_FACE); 
+			ogl->glCullFace(GL_BACK);
 
-		ogl->glEnable(GL_BLEND);
-		ogl->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		
-		ogl->glEnable(GL_STENCIL_TEST);    
-		ogl->glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);  
-		
-		// ogl->glEnable(GL_MULTISAMPLE);  
+			ogl->glEnable(GL_BLEND);
+			ogl->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			
+			ogl->glEnable(GL_STENCIL_TEST);    
+			ogl->glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);  
+			
+			// ogl->glEnable(GL_MULTISAMPLE);  
 
-		//disable writting to depth buffer
-		ogl->glEnable(GL_DEPTH_TEST);
+			//disable writting to depth buffer
+			ogl->glEnable(GL_DEPTH_TEST);
 
-		// now that we actually created the fbo and added all attachments we want to check if it is actually complete now
-		if (ogl->glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
-			std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << width << "  " << height << std::endl;
+			// now that we actually created the fbo and added all attachments we want to check if it is actually complete now
+			if (ogl->glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
+				std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << width << "  " << height << std::endl;
+			} else {
+				std::cout << "Succeffuly created FBO"<<std::endl;
+			}
 		} else {
-			std::cout << "Succeffuly created FBO"<<std::endl;
-		}
+			ogl->glGenFramebuffers(1, &fbo);
+			ogl->glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+			// create a multisampled color attachment texture
+			ogl->glGenTextures(1, &texture);
+			ogl->glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texture);
+			ogl->glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGB, width, height, GL_TRUE);
+			ogl->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, texture, 0);
+			// create a (also multisampled) renderbuffer object for depth and stencil attachments
+			ogl->glGenRenderbuffers(1, &rbo);
+			ogl->glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+			ogl->glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, width, height);
+			ogl->glBindRenderbuffer(GL_RENDERBUFFER, 0);
+			ogl->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
-		ogl->glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+			if (ogl->glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+				std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+			} else {
+				std::cout << "ERROR::FRAMEBUFFER:: Framebuffer OK!" << std::endl;
+			}
+
+			// configure second post-processing framebuffer
+			ogl->glGenFramebuffers(1, &intermediateFBO);
+			ogl->glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
+			// create a color attachment texture
+			ogl->glGenTextures(1, &screenTexture);
+			ogl->glBindTexture(GL_TEXTURE_2D, screenTexture);
+			ogl->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+			ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			ogl->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);	// we only need a color buffer
+
+			if (ogl->glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+				std::cout << "ERROR::FRAMEBUFFER:: Intermediate framebuffer is not complete!" << std::endl;
+			} else {
+				std::cout << "ERROR::FRAMEBUFFER:: Intermediate framebuffer OK!" << std::endl;
+			}
+
+			//  else {
+			// 		std::cout << "COLOR" << std::endl;
+			// 		ogl->glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texture);
+			// 		ogl->glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGB, width, height, GL_TRUE);
+			// 		ogl->glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+			// 		ogl->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, texture, 0);				
+			// 	}
+
+
+				// 			else {
+				// 	ogl->glGenTextures(1, &depthTexture);
+				// 	ogl->glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, depthTexture);
+				// 	ogl->glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_DEPTH_COMPONENT, width, height, GL_TRUE);
+				// 	// ogl->glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+				// 	// ogl->glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+				// 	// ogl->glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER); 
+				// 	// ogl->glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+				// 	// float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+				// 	// ogl->glTexParameterfv(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_BORDER_COLOR, borderColor); 
+
+				// 	ogl->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D_MULTISAMPLE, depthTexture, 0);
+				// 	ogl->glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+				// }
+
+				// else {
+				// 	std::cout << "DEPTH" << std::endl;
+				// 	ogl->glGenRenderbuffers(1, &rbo);
+				// 	ogl->glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+				// 	ogl->glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, width, height);
+				// 	ogl->glBindRenderbuffer(GL_RENDERBUFFER, 0);
+				// 	ogl->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);				
+				// }
+
+		}
+		ogl->glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);		
+		ogl->glBindTexture(GL_TEXTURE_2D, 0);
 		ogl->glBindFramebuffer(GL_FRAMEBUFFER, defaultFBO);
 	}
 
@@ -165,13 +208,40 @@ namespace CoreEngine {
 	}
 
 	void Framebuffer::RenderFBOToObject(Object3D* target, bool renderDepth) {
-		Texture albedoTex;
-		albedoTex.glTex = renderDepth ? depthTexture : texture;
-		albedoTex.loaded = true;
-		albedoTex.texIndex = GL_TEXTURE0;
-		MaterialComponent* material = (MaterialComponent*)target->GetComponent("Material");
-		material->albedoTex = albedoTex;
-		target->Render();	
+		GETGL
+		if(!multisampled) {
+			Texture albedoTex;
+			albedoTex.glTex = renderDepth ? depthTexture : texture;
+			albedoTex.loaded = true;
+			albedoTex.texIndex = GL_TEXTURE0;
+			MaterialComponent* material = (MaterialComponent*)target->GetComponent("Material");
+			material->albedoTex = albedoTex;
+			target->Render();	
+		} else {
+			ogl->glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
+			ogl->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
+
+			// if (ogl->glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+			// 	std::cout << "ERROR::FRAMEBUFFER:: Intermediate framebuffer is not complete!" << std::endl;
+			// } else {
+			// 	std::cout << "ERROR::FRAMEBUFFER:: Intermediate framebuffer OK!" << std::endl;
+			// }
+			ogl->glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+			// ogl->glBindFramebuffer(GL_FRAMEBUFFER, defaultFBO);
+			// ogl->glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+			// ogl->glClear(GL_COLOR_BUFFER_BIT);
+			// ogl->glDisable(GL_DEPTH_TEST);
+			ogl->glBindFramebuffer(GL_FRAMEBUFFER, defaultFBO);
+
+			Texture albedoTex;
+			albedoTex.glTex = screenTexture;
+			albedoTex.loaded = true;
+			albedoTex.texIndex = GL_TEXTURE0;
+			MaterialComponent* material = (MaterialComponent*)target->GetComponent("Material");
+			material->albedoTex = albedoTex;
+			target->Render();	
+		}
 	}
 
 
