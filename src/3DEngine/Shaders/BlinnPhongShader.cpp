@@ -99,7 +99,7 @@ void BlinnPhongParams::SetUniforms() {
         specularMap = KikooRenderer::CoreEngine::Texture(specularMapStr, GL_TEXTURE1);
         shouldLoadSpecular = false;
     }
-    
+
     /*
     Set variables for normal mapping : 
         * Texture variable
@@ -138,7 +138,6 @@ void BlinnPhongParams::SetUniforms() {
         ogl->glUniform1i(hasSpecularTexLocation, 0);
     }
 
-    // std::cout << "here"<<std::endl;
     int reflectSkyboxInt = reflectSkybox ? 1 : 0;
     int reflectSkyboxLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "reflectSkybox"); 
     ogl->glUniform1i(reflectSkyboxLocation, reflectSkyboxInt);
@@ -154,7 +153,6 @@ void BlinnPhongParams::SetUniforms() {
     * Set all factors for computing blinn phong shading
     */
     
-
     int specularColorLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "specularColor"); 
     ogl->glUniform4fv(specularColorLocation, 1, glm::value_ptr(specularColor));
 
@@ -334,6 +332,7 @@ Shader GetBlinnPhongShader() {
     uniform int hasNormalTex;
     uniform float normalMapInfluence;
     uniform int reflectSkybox;
+    uniform int receiveShadow;
 
 
     uniform float ambientFactor;
@@ -419,14 +418,16 @@ Shader GetBlinnPhongShader() {
             vec4 specular = finalSpecularFactor * finalSpecularColor * lights[i].color * pow(max(dot(finalNormal.xyz, halfwayVec),0), smoothness);
 
             float shadow = 0;
-            if(lights[i].type == 0) {
-                vec4 fragPosLightSpace = lights[i].lightSpaceMatrix * vec4(fragPos, 1.0);
-                shadow = DirectionalShadowCalculation(fragPosLightSpace, i);
-            } else if(lights[i].type == 1) {
-                shadow = PointShadowCalculation(fragPos, i);
-            }else if(lights[i].type == 2) {
-                vec4 fragPosLightSpace = lights[i].lightSpaceMatrix * vec4(fragPos, 1.0);
-                shadow = DirectionalShadowCalculation(fragPosLightSpace, i);
+            if(receiveShadow > 0) {
+                if(lights[i].type == 0) {
+                    vec4 fragPosLightSpace = lights[i].lightSpaceMatrix * vec4(fragPos, 1.0);
+                    shadow = DirectionalShadowCalculation(fragPosLightSpace, i);
+                } else if(lights[i].type == 1) {
+                    shadow = PointShadowCalculation(fragPos, i);
+                }else if(lights[i].type == 2) {
+                    vec4 fragPosLightSpace = lights[i].lightSpaceMatrix * vec4(fragPos, 1.0);
+                    shadow = DirectionalShadowCalculation(fragPosLightSpace, i);
+                }
             }
             finalColor.rgb += (1.0 - shadow) *  attenuation * (diffuse + specular).rgb;            
         }

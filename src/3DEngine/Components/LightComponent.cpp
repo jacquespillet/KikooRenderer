@@ -66,6 +66,7 @@ LightInspector::LightInspector(LightComponent* lightComponent) : QGroupBox("Ligh
     });    
 
     QCheckBox* castShadowCheckbox = new QCheckBox("Cast Shadow");
+    castShadowCheckbox->setChecked(lightComponent->castShadow);
     mainLayout->addWidget(castShadowCheckbox);
     QObject::connect(castShadowCheckbox, &QCheckBox::stateChanged, [this,lightComponent](int state) {
         lightComponent->castShadow = state > 0;
@@ -259,7 +260,7 @@ void LightComponent::RenderDepthMap() {
 
             ogl->glCullFace(GL_FRONT);
             for(int i=0; i<object3D->scene->objects3D.size(); i++) {
-                if(object3D->scene->objects3D[i] && object3D->scene->objects3D[i]->visible ) {
+                if(object3D->scene->objects3D[i] && object3D->scene->objects3D[i]->visible && object3D->scene->objects3D[i]->castShadow) {
                     MaterialComponent* material = (MaterialComponent*) object3D->scene->objects3D[i]->GetComponent("Material");
                     if(material != nullptr) {
                         Shader* tmpShader = material->shader;
@@ -289,7 +290,7 @@ void LightComponent::RenderDepthMap() {
             ogl->glClear(GL_DEPTH_BUFFER_BIT);
 
             for(int i=0; i<object3D->scene->objects3D.size(); i++) {
-                if(object3D->scene->objects3D[i] && object3D->scene->objects3D[i]->visible ) {
+                if(object3D->scene->objects3D[i] && object3D->scene->objects3D[i]->visible && object3D->scene->objects3D[i]->castShadow) {
                     MaterialComponent* material = (MaterialComponent*) object3D->scene->objects3D[i]->GetComponent("Material");
                     if(material != nullptr) {
                         Shader* tmpShader = material->shader;
@@ -314,7 +315,7 @@ void LightComponent::RenderDepthMap() {
             lightSpaceMatrix = lightProjection * viewMat;
 
             for(int i=0; i<object3D->scene->objects3D.size(); i++) {
-                if(object3D->scene->objects3D[i] && object3D->scene->objects3D[i]->visible ) {
+                if(object3D->scene->objects3D[i] && object3D->scene->objects3D[i]->visible && object3D->scene->objects3D[i]->castShadow) {
                     MaterialComponent* material = (MaterialComponent*) object3D->scene->objects3D[i]->GetComponent("Material");
                     if(material != nullptr) {
                         Shader* tmpShader = material->shader;

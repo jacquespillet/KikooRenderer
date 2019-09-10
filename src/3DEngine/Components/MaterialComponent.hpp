@@ -57,6 +57,8 @@ class MaterialComponent : public Component {
 
 		bool flipNormals=false;
 
+		bool receiveShadow = true;
+
 
 		MaterialInspector* materialInspector;
 		

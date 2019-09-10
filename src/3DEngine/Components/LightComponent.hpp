@@ -45,7 +45,7 @@ class LightComponent : public Component {
         double intensity=1;
 		double fov;
 
-        bool castShadow;
+        bool castShadow=true;
         
         const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
         float farClip = 100;

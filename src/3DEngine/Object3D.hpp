@@ -30,6 +30,8 @@ class Object3D {
 
         bool isSelected = false;
 
+        bool castShadow = true;
+
         Object3D(std::string name, Scene* scene);
         ~Object3D();
 

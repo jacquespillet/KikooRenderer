@@ -69,6 +69,13 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 		scene->triggerRefresh = true;
 	});
 
+	QCheckBox* receiveShadowCheckbox = new QCheckBox("Receive Shadow"); receiveShadowCheckbox->setChecked(materialComponent->receiveShadow);
+	mainLayout->addWidget(receiveShadowCheckbox);
+	connect(receiveShadowCheckbox, &QCheckBox::stateChanged, this, [this, materialComponent](int state) {
+		materialComponent->receiveShadow = state > 0;
+		scene->triggerRefresh = true;
+	});
+
 	shaderParametersLayout = new QVBoxLayout();
 		
 	QLayout* paramsLayout = materialComponent->params->GetLayout(); 
@@ -165,7 +172,6 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 				int influenceLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "materialInfluence"); 
 				ogl->glUniform1f(influenceLocation, influence);
 				
-
 				int albedoLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "albedo"); 
 				ogl->glUniform4fv(albedoLocation, 1, glm::value_ptr(albedo));
 				params->SetUniforms();
@@ -200,6 +206,8 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 				}
 
 				if(this->shader->GetId() != SHADER_IDS::UNLIT) {
+					int receiveShadowLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "receiveShadow"); 
+					ogl->glUniform1i(receiveShadowLocation, (int)receiveShadow);
 
 					int numLights = 0;
 					for(int i=0; i<scene->lightObjects.size(); i++) {

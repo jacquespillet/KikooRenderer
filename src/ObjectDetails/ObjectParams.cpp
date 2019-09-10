@@ -40,6 +40,14 @@ namespace KikooRenderer {
 			emit root->InspectorModified();
 		});
 
+		QCheckBox* castShadowCheckBox = new QCheckBox("Cast Shadow");
+		castShadowCheckBox->setChecked(object->castShadow);
+		mainLayout->addWidget(castShadowCheckBox);
+		connect(castShadowCheckBox, &QCheckBox::stateChanged, [this](int state) {
+			object->castShadow = state > 0;
+			emit root->InspectorModified();
+		});
+
 		setLayout(mainLayout);
 	}
 }
