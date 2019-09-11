@@ -28,9 +28,6 @@ public:
 	int colorFormat;
 
 	bool multisampled = false;
-	unsigned int intermediateFBO;
-	unsigned int intermediateRBO;
-	unsigned int screenTexture;
 
 	//Directly renders the object to the target object
 	void RenderOnObect(std::vector<Object3D*>& objectsToRender, Object3D* target);
@@ -47,9 +44,13 @@ public:
 	Texture* GetColorTexture();
 	Texture* GetDepthTexture();
 
-private:
+	void CopyToFramebuffer(Framebuffer* otherFB);
+
 	unsigned int fbo;
 	unsigned int rbo;
+
+
+
 };
 }
 }

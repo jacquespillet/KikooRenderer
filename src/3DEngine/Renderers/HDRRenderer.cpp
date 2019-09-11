@@ -15,7 +15,8 @@ namespace CoreEngine {
 HDRRenderer::HDRRenderer(Scene* scene) : Renderer(scene) {
     GETGL
 
-    alternateFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGB, GL_RGB, GL_FLOAT, true, false, true);
+    quadFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, useMSAA);
+    if(useMSAA){alternateFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, false);}
     
 
     quadShader.vertSrc= R"(
@@ -80,14 +81,15 @@ HDRRenderer::HDRRenderer(Scene* scene) : Renderer(scene) {
 }
 
 void HDRRenderer::Resize(int w, int h) {
-    delete alternateFBO;
+    delete quadFBO;
 
-    alternateFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, true);
+    quadFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, useMSAA);
+    if(useMSAA){alternateFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, false);}
 }
 
 void HDRRenderer::Render() {
     GETGL   
-    alternateFBO->Enable();
+    quadFBO->Enable();
     
     ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
     ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
@@ -119,16 +121,22 @@ void HDRRenderer::Render() {
         }
     }
 
-    alternateFBO->Disable();
+    quadFBO->Disable();
 
+    //Render all shadow maps
     LightComponent* light;
     for(int i=0; i<scene->lightObjects.size(); i++) {
         light = (LightComponent*) scene->lightObjects[i]->GetComponent("Light");
         light->RenderDepthMap();
     }
 
-    ogl->glViewport(0, 0, alternateFBO->width, alternateFBO->height);
-    alternateFBO->RenderFBOToObject(quad);
+    ogl->glViewport(0, 0, quadFBO->width, quadFBO->height);
+    if(useMSAA){
+        quadFBO->CopyToFramebuffer(alternateFBO);
+        alternateFBO->RenderFBOToObject(quad);
+    } else {
+        quadFBO->RenderFBOToObject(quad);
+    }
 
     //USE IT FOR DEBUGGING LIGHT DEPTH FRAMES    
     // for(int i=0; i<scene->lightObjects.size(); i++) {

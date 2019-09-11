@@ -14,6 +14,7 @@ public:
     virtual void Render();
     virtual void Resize(int w, int h);
     
+	Framebuffer* quadFBO;
 	Framebuffer* alternateFBO;
 
     int width, height;
@@ -22,6 +23,8 @@ public:
 	Object3D* dummyQuad;
 
     Shader quadShader;
+
+    bool useMSAA = true;
 // protected:
     // void InitShader();
 };
