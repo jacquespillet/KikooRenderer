@@ -13,6 +13,7 @@ public:
     HDRRenderer(Scene* scene);
     virtual void Render();
     virtual void Resize(int w, int h);
+    virtual void SetMSAA(bool value);
     
 	Framebuffer* quadFBO;
 	Framebuffer* alternateFBO;

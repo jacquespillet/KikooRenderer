@@ -63,8 +63,6 @@ namespace CoreEngine {
 			ogl->glEnable(GL_STENCIL_TEST);    
 			ogl->glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);  
 			
-			// ogl->glEnable(GL_MULTISAMPLE);  
-
 			//disable writting to depth buffer
 			ogl->glEnable(GL_DEPTH_TEST);
 
@@ -128,6 +126,10 @@ namespace CoreEngine {
 	void Framebuffer::Disable() {
 		GETGL
 		ogl->glBindFramebuffer(GL_FRAMEBUFFER, defaultFBO);
+	}
+
+	Framebuffer::~Framebuffer() {
+		Destroy();
 	}
 
 	void Framebuffer::Destroy() {

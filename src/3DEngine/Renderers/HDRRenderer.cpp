@@ -87,6 +87,17 @@ void HDRRenderer::Resize(int w, int h) {
     if(useMSAA){alternateFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, false);}
 }
 
+void HDRRenderer::SetMSAA(bool value) {
+    useMSAA = value;
+    if(!useMSAA) {
+        delete alternateFBO;
+    } else {
+        alternateFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, false);
+    }
+    quadFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, useMSAA);
+    scene->triggerRefresh = true;
+}
+
 void HDRRenderer::Render() {
     GETGL   
     quadFBO->Enable();

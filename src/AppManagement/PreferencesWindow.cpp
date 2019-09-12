@@ -40,18 +40,31 @@ namespace KikooRenderer
         layout->addWidget(ui3DPreferences);
 
         QCheckBox* hdrCheckbox = new QCheckBox("HDR");
+        hdrCheckbox->setChecked(true);
         connect(hdrCheckbox, &QCheckBox::stateChanged, this, [this, mainPrefWindow](int state) {
             
             if(state > 0) mainPrefWindow->mainWindow->view3D->view3DGL->scene->SetRenderPipeline(CoreEngine::RENDER_PIPELINE::HDR);
             else mainPrefWindow->mainWindow->view3D->view3DGL->scene->SetRenderPipeline(CoreEngine::RENDER_PIPELINE::FORWARD);
         });
         layout->addWidget(hdrCheckbox);
-        
-        QCheckBox* gammaCorrectionCheckbox = new QCheckBox("Gamma Correction");
-        connect(gammaCorrectionCheckbox, &QCheckBox::stateChanged, this, [this, mainPrefWindow](int state) {
-            mainPrefWindow->mainWindow->view3D->view3DGL->scene->renderer->SetGammaCorrection(state > 0);
+
+        QCheckBox* msaaCheckbox = new QCheckBox("Multi Sampling Anti Aliasing");
+        msaaCheckbox->setChecked(true);
+        connect(msaaCheckbox, &QCheckBox::stateChanged, this, [this, mainPrefWindow](int state) {
+            mainPrefWindow->mainWindow->view3D->view3DGL->scene->glWindow->makeCurrent();
+            mainPrefWindow->mainWindow->view3D->view3DGL->scene->renderer->SetMSAA(state > 0);
+            mainPrefWindow->mainWindow->view3D->view3DGL->scene->glWindow->doneCurrent();
         });
-        layout->addWidget(gammaCorrectionCheckbox);
+        layout->addWidget(msaaCheckbox);
+
+        
+        // QCheckBox* gammaCorrectionCheckbox = new QCheckBox("Gamma Correction");
+        // connect(gammaCorrectionCheckbox, &QCheckBox::stateChanged, this, [this, mainPrefWindow](int state) {
+        //     mainPrefWindow->mainWindow->view3D->view3DGL->scene->renderer->SetGammaCorrection(state > 0);
+        // });
+        // layout->addWidget(gammaCorrectionCheckbox);
+
+
 
 
     }    

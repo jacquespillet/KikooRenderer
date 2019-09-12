@@ -15,11 +15,9 @@ Renderer::Renderer(Scene* scene) {
     this->scene = scene;
 }
 
-void Renderer::Render() {
-}
-
-void Renderer::Resize(int w, int h) {
-}
+void Renderer::Render() {}
+void Renderer::Resize(int w, int h) {}
+void Renderer::SetMSAA(bool value) {}
 
 void Renderer::SetGammaCorrection(bool value) {
 //     std::cout << "HERE"<<std::endl;
@@ -33,7 +31,18 @@ void Renderer::SetGammaCorrection(bool value) {
     isGammaCorrected = value;
 }
 
+
 ForwardRenderer::ForwardRenderer(Scene* scene) : Renderer(scene) {
+}
+
+void ForwardRenderer::SetMSAA(bool value) {
+    GETGL
+    if(value) {
+        ogl->glEnable(GL_MULTISAMPLE);  
+    } else {
+        ogl->glDisable(GL_MULTISAMPLE);  
+    }
+    scene->triggerRefresh = true;
 }
 
 void ForwardRenderer::Render() {

@@ -13,6 +13,7 @@ public:
     virtual void Render();
     virtual void Resize(int w, int h);
     virtual void SetGammaCorrection(bool value);
+    virtual void SetMSAA(bool value);
 protected:
     bool isGammaCorrected = false;
     Scene* scene;
@@ -22,6 +23,7 @@ class ForwardRenderer : public Renderer {
 public:
     ForwardRenderer(Scene* scene);
     virtual void Render();
+    virtual void SetMSAA(bool value);
 };
 
 }

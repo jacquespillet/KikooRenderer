@@ -64,18 +64,20 @@ namespace KikooRenderer {
             ogl->glEnable(GL_CULL_FACE);  
             ogl->glCullFace(GL_BACK);
             
-            ogl->glEnable(GL_BLEND);
             ogl->glEnable(GL_STENCIL_TEST);    
             ogl->glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);  
             ogl->glStencilFunc(GL_ALWAYS, 1, 0xFF); // all fragments should update the stencil buffer
             ogl->glStencilMask(0xFF); // enable writing to the stencil buffer
             
-            ogl->glEnable(GL_MULTISAMPLE);  
+            
+            ogl->glEnable(GL_BLEND);
             ogl->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-            //disable writting to depth buffer
             ogl->glEnable(GL_DEPTH_TEST);
-            //glDepthMask(GL_FALSE);
+            
+            ogl->glEnable(GL_MULTISAMPLE);
+            
+            //For drawing in wireframe
             // ogl->glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 			
 
