@@ -62,7 +62,7 @@ Shader GetUnlitShader() {
     void main()
     {
         if(hasCubemap > 0) {
-            outputColor = texture(cubemapTexture, cubeTexCoords);
+            outputColor = vec4(texture(cubemapTexture, cubeTexCoords).xyz, 1);
         } else {
             outputColor = (hasAlbedoTex==1) ? texture(albedoTexture, fragmentUv) : fragmentColor;
         }

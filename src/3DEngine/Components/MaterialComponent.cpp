@@ -79,6 +79,7 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 	shaderParametersLayout = new QVBoxLayout();
 		
 	QLayout* paramsLayout = materialComponent->params->GetLayout(); 
+	materialComponent->params->scene = scene;
 	shaderParametersLayout->addLayout(paramsLayout);
 
 	mainLayout->addLayout(shaderParametersLayout);
@@ -155,6 +156,7 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 		if(shader->isDepthPass) {
 			
 		} else {
+
 			glm::mat4 mvpMatrix = projectionMatrix * viewMatrix * modelMatrix;
 			ogl->glUseProgram(shader->programShaderObject);
 
@@ -167,6 +169,21 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 
 			int modelMatrixLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "modelMatrix"); 
 			ogl->glUniformMatrix4fv(modelMatrixLocation, 1, false, glm::value_ptr(glm::mat4(modelMatrix)));
+
+			if (cubemap.loaded) {
+				ogl->glCullFace(GL_FRONT);
+				ogl->glActiveTexture(GL_TEXTURE3);
+				cubemap.Use();
+				int cubemapLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "cubemapTexture");
+				ogl->glUniform1i(cubemapLocation, 3);
+
+				int hasCubemapLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasCubemap");
+				ogl->glUniform1i(hasCubemapLocation, 1);
+			} else {
+				int hasCubemapLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasCubemap");
+				ogl->glUniform1i(hasCubemapLocation, 0);
+			}
+			
 			
 			if(this->shader->isLit) {
 
@@ -179,20 +196,6 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 
 				int flipNormalsLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "flipNormals"); 
 				ogl->glUniform1i(flipNormalsLocation, flipNormals);
-				if (cubemap.loaded) {
-					ogl->glActiveTexture(GL_TEXTURE3);
-
-
-					cubemap.Use();
-					int cubemapLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "cubemapTexture");
-					ogl->glUniform1i(cubemapLocation, 3);
-
-					int hasCubemapLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasCubemap");
-					ogl->glUniform1i(hasCubemapLocation, 1);
-				} else {
-					int hasCubemapLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasCubemap");
-					ogl->glUniform1i(hasCubemapLocation, 0);
-				}
 
 				if (albedoTex.loaded) {
 					albedoTex.Use();

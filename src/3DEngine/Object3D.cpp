@@ -62,7 +62,6 @@ std::string Object3D::AddObject(Object3D* object) {
 	}
 	object->name = currentName;
 	childObjects.push_back(object);
-
 	
 	return currentName;
 }
@@ -174,6 +173,7 @@ void Object3D::Render() {
 	//unbind shader program
 	ogl->glUseProgram(0);
 	ogl->glEnable(GL_DEPTH_TEST);
+	ogl->glCullFace(GL_BACK);
 }
 
 

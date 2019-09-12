@@ -28,7 +28,7 @@ namespace KikooRenderer {
 
         setDockOptions(QMainWindow::AnimatedDocks);
 
-	    showNormal();
+	    showMaximized();
         ExpandToFitScreen();
     }
 
