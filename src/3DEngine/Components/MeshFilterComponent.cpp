@@ -207,7 +207,6 @@ void MeshFilterComponent::LoadFromBuffers(std::vector<glm::dvec3> _vertex,
         std::vector<glm::dvec4> _colors,
         std::vector<int> _triangles, 
         bool calculateTangents) {
-
     this->triangles = _triangles;
 
 	std::vector<glm::vec4> tangents(_normals.size(), glm::vec4(0, 0, 0, 0));

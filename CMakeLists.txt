@@ -13,12 +13,12 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_LINK_FLAGS}")
 #qt
 find_package(Qt5 COMPONENTS Core Widgets Gui OpenGL 3DCore 3DExtras 3DRender 3DInput)
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
-set(QT_BIN_DIR "C:/Qt/5.11.2/msvc2017_64/bin")
-set(QT_LIB_DIR "C:/Qt/5.11.2/msvc2017_64/lib")
-set(QT_BUILD_DIR  "C:/Qt/5.11.2/msvc2017_64")
-# set(QT_BIN_DIR "C:/Qt/5.10.1/msvc2017_64/bin")
-# set(QT_LIB_DIR "C:/Qt/5.10.1/msvc2017_64/lib")
-# set(QT_BUILD_DIR  "C:/Qt/5.10.1/msvc2017_64")
+# set(QT_BIN_DIR "C:/Qt/5.11.2/msvc2017_64/bin")
+# set(QT_LIB_DIR "C:/Qt/5.11.2/msvc2017_64/lib")
+# set(QT_BUILD_DIR  "C:/Qt/5.11.2/msvc2017_64")
+set(QT_BIN_DIR "C:/Qt/5.10.1/msvc2017_64/bin")
+set(QT_LIB_DIR "C:/Qt/5.10.1/msvc2017_64/lib")
+set(QT_BUILD_DIR  "C:/Qt/5.10.1/msvc2017_64")
 link_directories(${QT_LIB_DIR})
 
 #link_directories(lib dir)
@@ -27,13 +27,16 @@ link_directories(${QT_LIB_DIR})
 set(GLM_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/glm)
 include_directories(${GLM_INC_DIR})
 
-#glm
+#stbi
 set(STBI_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/STB_image)
 include_directories(${STBI_INC_DIR})
 
-# #eigen
-# set(EIGEN_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/eigen)
-# include_directories(${EIGEN_INC_DIR})
+#assimp
+set(ASSIMP_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/assimp-4.1.0/build/install/include)
+set(ASSIMP_LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/assimp-4.1.0/build/install/lib)
+set(ASSIMP_BIN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/assimp-4.1.0/build/install/bin)
+include_directories(${ASSIMP_INC_DIR})
+link_directories(${ASSIMP_LIB_DIR})
 
 include_directories(src)
 add_subdirectory(src)
@@ -75,3 +78,7 @@ install(DIRECTORY ${QT_BUILD_DIR}/plugins/platforms
 		COMPONENT MainWindowDist
 )
 
+install(FILES ${ASSIMP_BIN_DIR}/assimp-vc140-mt.dll
+		DESTINATION bin
+		COMPONENT MainWindowDist
+)

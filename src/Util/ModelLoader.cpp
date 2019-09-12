@@ -5,6 +5,10 @@
 #include "3DEngine/Components/TransformComponent.hpp"
 #include "3DEngine/Texture.hpp"
 
+#include <assimp/Importer.hpp>      // C++ importer interface
+#include <assimp/scene.h>           // Output data structure
+#include <assimp/postprocess.h>     // Post processing flags
+
 namespace KikooRenderer {
 namespace Util {
 namespace FileIO {
@@ -70,6 +74,99 @@ void GetModelBuffers(std::string filename, std::vector<glm::dvec3>* vertex, std:
         (*normals)[(*triangles)[i]] = tmpNormals[normalIndices[i]];
         (*uv)[(*triangles)[i]] = tmpUv[uvIndices[i]];
     }  
+}
+
+void processNode(aiNode *node, const aiScene *scene, std::vector<glm::dvec3>* vertex, std::vector<glm::dvec3>* normals, std::vector<glm::dvec2>* uv, std::vector<glm::dvec4>* colors, std::vector<int>* triangles) {
+    // process all the node's meshes (if any)
+    std::cout << "Processing node " <<node->mNumMeshes <<  std::endl;
+    for(unsigned int i = 0; i < node->mNumMeshes; i++)
+    {
+        aiMesh *mesh = scene->mMeshes[node->mMeshes[i]]; 
+        
+        for(unsigned int i = 0; i < mesh->mNumVertices; i++)
+        {
+            glm::vec3 pos; 
+            pos.x = mesh->mVertices[i].x;
+            pos.y = mesh->mVertices[i].y;
+            pos.z = mesh->mVertices[i].z; 
+            vertex->push_back(pos);
+
+            glm::vec3 normal;
+            normal.x = mesh->mNormals[i].x;
+            normal.y = mesh->mNormals[i].y;
+            normal.z = mesh->mNormals[i].z;
+            normals->push_back(normal);
+
+            if(mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
+            {
+                glm::vec2 vec;
+                vec.x = mesh->mTextureCoords[0][i].x; 
+                vec.y = mesh->mTextureCoords[0][i].y;
+                uv->push_back(vec);
+            }
+            else
+                uv->push_back(glm::vec2(0.0f, 0.0f));
+        }
+
+        for(unsigned int i = 0; i < mesh->mNumFaces; i++)
+        {
+            aiFace face = mesh->mFaces[i];
+            for(unsigned int j = 0; j < face.mNumIndices; j++)
+                triangles->push_back(face.mIndices[j]);
+        } 
+    }
+    // then do the same for each of its children
+    for(unsigned int i = 0; i < node->mNumChildren; i++)
+    {
+        processNode(node->mChildren[i], scene, vertex, normals, uv, colors, triangles);
+    }
+}
+
+void LoadModel(std::string filename, std::vector<glm::dvec3>* vertex, std::vector<glm::dvec3>* normals, std::vector<glm::dvec2>* uv, std::vector<glm::dvec4>* colors, std::vector<int>* triangles) {
+    Assimp::Importer import;
+    const aiScene *scene = import.ReadFile(filename, aiProcess_Triangulate | aiProcess_FlipUVs); 
+
+    if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) 
+    {
+        std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
+        return;
+    }
+    std::string directory = filename.substr(0, filename.find_last_of('/'));
+
+    aiMesh *mesh = scene->mMeshes[0]; 
+    for(unsigned int i = 0; i < mesh->mNumVertices; i++)
+    {
+        glm::vec3 pos; 
+        pos.x = mesh->mVertices[i].x;
+        pos.y = mesh->mVertices[i].y;
+        pos.z = mesh->mVertices[i].z; 
+        vertex->push_back(pos);
+
+        glm::vec3 normal;
+        normal.x = mesh->mNormals[i].x;
+        normal.y = mesh->mNormals[i].y;
+        normal.z = mesh->mNormals[i].z;
+        normals->push_back(normal);
+
+        if(mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
+        {
+            glm::vec2 vec;
+            vec.x = mesh->mTextureCoords[0][i].x; 
+            vec.y = mesh->mTextureCoords[0][i].y;
+            uv->push_back(vec);
+        }
+        else
+            uv->push_back(glm::vec2(0.0f, 0.0f));
+    }
+
+    for(unsigned int i = 0; i < mesh->mNumFaces; i++)
+    {
+        aiFace face = mesh->mFaces[i];
+        for(unsigned int j = 0; j < face.mNumIndices; j++)
+            triangles->push_back(face.mIndices[j]);
+    }
+    processNode(scene->mRootNode, scene, vertex, normals, uv, colors, triangles);
+    colors->resize(vertex->size());
 }
 
 }
