@@ -51,5 +51,7 @@ namespace CoreEngine {
 
 	Object3D* GetSpotLight(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color, double FOV);
 
+    //Object From Files
+    CoreEngine::Object3D* ObjectFromOBJ(std::string filename, KikooRenderer::CoreEngine::Scene* scene);
 }
 }

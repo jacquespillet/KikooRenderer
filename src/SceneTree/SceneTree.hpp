@@ -2,10 +2,11 @@
 
 #include "Util/Common.h"
 #include "View3D/View3D.hpp"
-#include "3DEngine/BaseObjects.hpp"
 
 namespace KikooRenderer {
-
+namespace CoreEngine{
+	class Object3D;
+}
 class View3D;
 class SceneTreeView;
 

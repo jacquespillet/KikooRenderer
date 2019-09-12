@@ -43,12 +43,6 @@ namespace CoreEngine {
         skyboxCube = GetCube(this, "Cubemap", glm::dvec3(0), glm::vec3(0), glm::dvec3(100), glm::dvec4(0.1, 0.1, 0.1, 1));
         skyboxCube->Start();
         skyboxCube->Enable();
-
-        Object3D* cube1 = GetCube(this, "Cube", glm::dvec3(0, 0, 0), glm::vec3(0, 0, 10), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
-        MaterialComponent*  mat = (MaterialComponent*) cube1->GetComponent("Material");
-        mat->shader = standardShaders.shaders[2]; //Blinn phong
-        AddObject(cube1);
-
 	
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {

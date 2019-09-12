@@ -2,6 +2,7 @@
 #include "../Scene.hpp"
 #include "../Components/MaterialComponent.hpp"
 #include "../Components/LightComponent.hpp"
+#include "../BaseObjects.hpp"
 
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLFunctions_3_2_Core>

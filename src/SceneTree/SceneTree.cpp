@@ -1,6 +1,6 @@
 #include "SceneTree.hpp"
 
-// #include "3DEngine/BaseObjects.hpp"
+#include "3DEngine/BaseObjects.hpp"
 
 namespace KikooRenderer 
 {
@@ -80,9 +80,15 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
     QString circleStr = "Circle";
     QString quadStr = "Quad";
 	QString emptyStr = "Empty";
+
 	QString dirLightStr = "Directional Light";
 	QString pointLightStr = "Point Light";
 	QString spotLightStr = "Spot Light";
+
+	QString rabbitStr = "Rabbit";
+	QString buddhaStr = "Buddha";
+	QString dragonStr = "Dragon";
+	QString teapotStr = "Teapot";
 
 	QPoint menuPos;
 	if(!fromMainWindow) menuPos = tree->mapToGlobal(pos);
@@ -103,6 +109,12 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
     addObjectMenu->addAction(pointLightStr);
     addObjectMenu->addAction(spotLightStr);
 
+	QMenu* addMeshesMenu = new QMenu("Meshes");
+    addMeshesMenu->addAction(rabbitStr);
+    addMeshesMenu->addAction(buddhaStr);
+    addMeshesMenu->addAction(dragonStr);
+    addMeshesMenu->addAction(teapotStr);
+    addObjectMenu->addMenu(addMeshesMenu);
 
     myMenu.addMenu(addObjectMenu);
     QAction* selectedItem = myMenu.exec(menuPos);
@@ -119,10 +131,16 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
 		if (selectedItem->text() == circleStr) objectToAdd = CoreEngine::GetCircle(view3D->view3DGL->scene, name.toStdString(), glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.5, 0.5, 0.5, 1));
 		if (selectedItem->text() == quadStr) objectToAdd = CoreEngine::GetQuad(view3D->view3DGL->scene, name.toStdString(), glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(0.5, 0.5, 0.5, 1));
 		if (selectedItem->text() == emptyStr) objectToAdd = new CoreEngine::Object3D(name.toStdString(), view3D->view3DGL->scene);
+		
 		if (selectedItem->text() == dirLightStr) objectToAdd = CoreEngine::GetDirectionalLight(view3D->view3DGL->scene, name.toStdString(), glm::dvec3(0), glm::dvec3(30, 20, 0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
 		if (selectedItem->text() == pointLightStr) objectToAdd = CoreEngine::GetPointLight(view3D->view3DGL->scene, name.toStdString(), glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
 		if (selectedItem->text() == spotLightStr) objectToAdd = CoreEngine::GetSpotLight(view3D->view3DGL->scene, name.toStdString(), glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1), 90);
 		
+		if (selectedItem->text() == rabbitStr) objectToAdd = CoreEngine::ObjectFromOBJ("C:/Users/Jacques/Documents/Boulot/2019/Qt BP/resources/OBJ/bunny/bunny.obj", view3D->view3DGL->scene);
+		if (selectedItem->text() == buddhaStr) objectToAdd = CoreEngine::ObjectFromOBJ("C:/Users/Jacques/Documents/Boulot/2019/Qt BP/resources/OBJ/buddha/untitled.obj", view3D->view3DGL->scene);
+		if (selectedItem->text() == dragonStr) objectToAdd = CoreEngine::ObjectFromOBJ("C:/Users/Jacques/Documents/Boulot/2019/Qt BP/resources/OBJ/dragon/dragon.obj", view3D->view3DGL->scene);
+		if (selectedItem->text() == teapotStr) objectToAdd = CoreEngine::ObjectFromOBJ("C:/Users/Jacques/Documents/Boulot/2019/Qt BP/resources/OBJ/teapot/teapot.obj", view3D->view3DGL->scene);
+
 		if (selectedIndexes.size() > 0) {
 			TreeItem* parentItem = (TreeItem*)model->itemFromIndex(selectedIndexes[0]);
 			parentItem->object3D->AddObject(objectToAdd);
