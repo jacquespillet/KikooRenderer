@@ -915,7 +915,7 @@ Object3D* ObjectFromOBJ(std::string fileName, KikooRenderer::CoreEngine::Scene* 
     std::vector<glm::dvec4> colors;
     std::vector<int> triangles;
 
-    Util::FileIO::LoadModel("C:/Users/GYFLYM/Documents/bunny.obj", &vertex, &normals, &uv, &colors, &triangles);
+    Util::FileIO::LoadModel(fileName, &vertex, &normals, &uv, &colors, &triangles);
 
     MeshFilterComponent* mesh = new MeshFilterComponent(newObject);
     mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles, false);
@@ -925,10 +925,6 @@ Object3D* ObjectFromOBJ(std::string fileName, KikooRenderer::CoreEngine::Scene* 
     //Setup material
     MaterialComponent* material = new  MaterialComponent(newObject);
     material->SetShader(&scene->standardShaders.blinnPhongShader);
-
-    // material->albedoTex = Texture("C:/Users/Jacques/Documents/Boulot/2019/3D Models/E-45-Aircraft/textures/E-45 _col.jpg", GL_TEXTURE0);
-    // // material->specularTex = Texture("C:/Users/Jacques/Documents/Boulot/2019/3D Models/Cobblestones/Textures/BrickRound0105_5_SPEC.png", GL_TEXTURE1);
-    // material->normalTex = Texture("C:/Users/Jacques/Documents/Boulot/2019/3D Models/E-45-Aircraft/textures/E-45-nor_1.jpg", GL_TEXTURE2);
 
     BoundingBoxComponent* boundingBox = new  BoundingBoxComponent(newObject);
 

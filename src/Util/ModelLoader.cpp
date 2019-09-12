@@ -124,7 +124,7 @@ void processNode(aiNode *node, const aiScene *scene, std::vector<glm::dvec3>* ve
 
 void LoadModel(std::string filename, std::vector<glm::dvec3>* vertex, std::vector<glm::dvec3>* normals, std::vector<glm::dvec2>* uv, std::vector<glm::dvec4>* colors, std::vector<int>* triangles) {
     Assimp::Importer import;
-    const aiScene *scene = import.ReadFile(filename, aiProcess_Triangulate | aiProcess_FlipUVs); 
+    const aiScene *scene = import.ReadFile(filename, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_FlipWindingOrder); 
 
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) 
     {
@@ -133,39 +133,42 @@ void LoadModel(std::string filename, std::vector<glm::dvec3>* vertex, std::vecto
     }
     std::string directory = filename.substr(0, filename.find_last_of('/'));
 
-    aiMesh *mesh = scene->mMeshes[0]; 
-    for(unsigned int i = 0; i < mesh->mNumVertices; i++)
-    {
-        glm::vec3 pos; 
-        pos.x = mesh->mVertices[i].x;
-        pos.y = mesh->mVertices[i].y;
-        pos.z = mesh->mVertices[i].z; 
-        vertex->push_back(pos);
+    for(unsigned int j = 0; j < scene->mNumMeshes; j++) {
+        aiMesh *mesh = scene->mMeshes[j]; 
 
-        glm::vec3 normal;
-        normal.x = mesh->mNormals[i].x;
-        normal.y = mesh->mNormals[i].y;
-        normal.z = mesh->mNormals[i].z;
-        normals->push_back(normal);
-
-        if(mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
+        for(unsigned int i = 0; i < mesh->mNumVertices; i++)
         {
-            glm::vec2 vec;
-            vec.x = mesh->mTextureCoords[0][i].x; 
-            vec.y = mesh->mTextureCoords[0][i].y;
-            uv->push_back(vec);
-        }
-        else
-            uv->push_back(glm::vec2(0.0f, 0.0f));
-    }
+            glm::vec3 pos; 
+            pos.x = mesh->mVertices[i].x;
+            pos.y = mesh->mVertices[i].y;
+            pos.z = mesh->mVertices[i].z; 
+            vertex->push_back(pos);
 
-    for(unsigned int i = 0; i < mesh->mNumFaces; i++)
-    {
-        aiFace face = mesh->mFaces[i];
-        for(unsigned int j = 0; j < face.mNumIndices; j++)
-            triangles->push_back(face.mIndices[j]);
+            glm::vec3 normal;
+            normal.x = mesh->mNormals[i].x;
+            normal.y = mesh->mNormals[i].y;
+            normal.z = mesh->mNormals[i].z;
+            normals->push_back(normal);
+
+            if(mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
+            {
+                glm::vec2 vec;
+                vec.x = mesh->mTextureCoords[0][i].x; 
+                vec.y = mesh->mTextureCoords[0][i].y;
+                uv->push_back(vec);
+            }
+            else
+                uv->push_back(glm::vec2(0.0f, 0.0f));
+        }
+
+        for(unsigned int i = 0; i < mesh->mNumFaces; i++)
+        {
+            aiFace face = mesh->mFaces[i];
+            for(unsigned int j = 0; j < face.mNumIndices; j++)
+                triangles->push_back(face.mIndices[j]);
+        }
     }
-    processNode(scene->mRootNode, scene, vertex, normals, uv, colors, triangles);
+    // processNode(scene->mRootNode, scene, vertex, normals, uv, colors, triangles);
     colors->resize(vertex->size());
 }
 

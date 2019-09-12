@@ -86,6 +86,7 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 
 void MaterialInspector::Refresh() {}
 
+//Refreshes the layout of shader parameters
 void MaterialInspector::UpdateShaderParameters() {
 	EmptyLayout(shaderParametersLayout);
 	shaderParametersLayout = new QVBoxLayout();
