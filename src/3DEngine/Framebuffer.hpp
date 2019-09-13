@@ -26,6 +26,8 @@ public:
 
 	int width, height;
 	int colorFormat;
+	int internalColorFormat;
+	int colorType;
 
 	bool multisampled = false;
 

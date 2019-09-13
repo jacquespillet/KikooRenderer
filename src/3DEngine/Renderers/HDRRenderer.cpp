@@ -17,11 +17,7 @@ namespace CoreEngine {
 
 HDRRenderer::HDRRenderer(Scene* scene) : Renderer(scene) {
     GETGL
-
-    quadFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, useMSAA);
-    if(useMSAA){alternateFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, false);}
-    finalFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, false);
-    
+    SetFramebuffers();
 
     quadShader.vertSrc= R"(
     //attribs
@@ -77,25 +73,41 @@ HDRRenderer::HDRRenderer(Scene* scene) : Renderer(scene) {
     // int exposureLocation = ogl->glGetUniformLocation(quadShader.programShaderObject, "exposure"); 
     // ogl->glUniform1f(exposureLocation, exposure);
     quad->Enable();
-    postProcessor.AddProcess(new PostProcess); 
+    
+    // postProcessor.AddProcess(new PostProcess); 
 }
 
 void HDRRenderer::Resize(int w, int h) {
     delete quadFBO;
+    delete alternateFBO;
+    delete finalFBO;
 
-    quadFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, useMSAA);
-    if(useMSAA){alternateFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, false);}
-    finalFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, false);
+    SetFramebuffers();
 }
+
+void HDRRenderer::SetFramebuffers() {
+    //FBO that will be rendered on the quad : Should not be multisampled
+    quadFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, false);
+    
+    //Alternate FBO used for rendering multisampled when using MSAA
+    if(useMSAA){alternateFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, true);}
+    
+    //Final FBO if post processing
+    finalFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, false);
+    
+}
+
+
 
 void HDRRenderer::SetMSAA(bool value) {
     useMSAA = value;
+
     if(!useMSAA) {
         delete alternateFBO;
     } else {
-        alternateFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, false);
+        alternateFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, true);
     }
-    quadFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, useMSAA);
+    quadFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, false);
     scene->triggerRefresh = true;
 }
 
@@ -107,7 +119,9 @@ void HDRRenderer::Destroy() {
 
 void HDRRenderer::Render() {
     GETGL   
-    quadFBO->Enable();
+    if(useMSAA) alternateFBO->Enable();
+    else quadFBO->Enable();
+    
     
     ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
     ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
@@ -139,7 +153,8 @@ void HDRRenderer::Render() {
         }
     }
 
-    quadFBO->Disable();
+    if(useMSAA) alternateFBO->Disable();
+    else quadFBO->Disable();
 
     //Render all shadow maps
     LightComponent* light;
@@ -149,16 +164,17 @@ void HDRRenderer::Render() {
     }
 
     ogl->glViewport(0, 0, quadFBO->width, quadFBO->height);
+
     if(useMSAA){
-        quadFBO->CopyToFramebuffer(alternateFBO);
-        alternateFBO->RenderFBOToObject(quad);
+        alternateFBO->CopyToFramebuffer(quadFBO);
+    }
+    
+    if(postProcessor.numProcesses >0) {
+        postProcessor.Run(quadFBO, finalFBO);
+        finalFBO->RenderFBOToObject(quad);
     } else {
         quadFBO->RenderFBOToObject(quad);
     }
-
-
-    //Here, we have the final FBO.
-    postProcessor.Run(alternateFBO, finalFBO);
 
 
     //USE IT FOR DEBUGGING LIGHT DEPTH FRAMES    

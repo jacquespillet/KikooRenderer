@@ -18,6 +18,8 @@ public:
     virtual void SetMSAA(bool value);
     virtual void Destroy();
 
+    void SetFramebuffers();
+
 	Framebuffer* quadFBO;
 	Framebuffer* alternateFBO;
 	Framebuffer* finalFBO;

@@ -17,8 +17,12 @@ public:
 
     void Destroy();
 
+    int numProcesses=0;
+
 private:
     std::vector<PostProcess*> processes;
+    Framebuffer* internalFBO0;
+    Framebuffer* internalFBO1;
 };
 
 }

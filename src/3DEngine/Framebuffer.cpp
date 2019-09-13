@@ -9,6 +9,9 @@ namespace CoreEngine {
 		this->width = width;
 		this->height = height;
 		this->colorFormat = colorFormat;
+		this->internalColorFormat = internalColorFormat;
+		this->internalColorFormat = internalColorFormat;
+		this->colorType = colorType;
 		this->multisampled = multisampled;
 		
 		ogl->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &defaultFBO);
