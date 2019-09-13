@@ -14,6 +14,7 @@ public:
     virtual void Resize(int w, int h);
     virtual void SetGammaCorrection(bool value);
     virtual void SetMSAA(bool value);
+    virtual void Destroy();
 protected:
     bool isGammaCorrected = false;
     Scene* scene;
@@ -24,6 +25,7 @@ public:
     ForwardRenderer(Scene* scene);
     virtual void Render();
     virtual void SetMSAA(bool value);
+    virtual void Destroy();
 };
 
 }

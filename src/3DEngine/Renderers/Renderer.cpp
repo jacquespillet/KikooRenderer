@@ -18,6 +18,7 @@ Renderer::Renderer(Scene* scene) {
 void Renderer::Render() {}
 void Renderer::Resize(int w, int h) {}
 void Renderer::SetMSAA(bool value) {}
+void Renderer::Destroy() {}
 
 void Renderer::SetGammaCorrection(bool value) {
 //     std::cout << "HERE"<<std::endl;
@@ -31,6 +32,7 @@ void Renderer::SetGammaCorrection(bool value) {
     isGammaCorrected = value;
 }
 
+void ForwardRenderer::Destroy() {}
 
 ForwardRenderer::ForwardRenderer(Scene* scene) : Renderer(scene) {
 }

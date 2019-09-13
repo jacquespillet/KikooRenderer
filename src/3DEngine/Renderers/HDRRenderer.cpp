@@ -4,6 +4,8 @@
 #include "../Components/LightComponent.hpp"
 #include "../BaseObjects.hpp"
 
+#include "../PostProcessing/PostProcess.hpp"
+
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLFunctions_3_2_Core>
 #define GLV QOpenGLFunctions_3_2_Core
@@ -18,6 +20,7 @@ HDRRenderer::HDRRenderer(Scene* scene) : Renderer(scene) {
 
     quadFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, useMSAA);
     if(useMSAA){alternateFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, false);}
+    finalFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, false);
     
 
     quadShader.vertSrc= R"(
@@ -71,14 +74,10 @@ HDRRenderer::HDRRenderer(Scene* scene) : Renderer(scene) {
     MaterialComponent* material = (MaterialComponent*) quad->GetComponent("Material");
     material->SetShader(&quadShader);
     
-    dummyQuad = GetMiniQuad(scene, "plane", glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
-    MaterialComponent* dummyMaterial = (MaterialComponent*) dummyQuad->GetComponent("Material");
-    dummyMaterial->SetShader(&quadShader);
-    
     // int exposureLocation = ogl->glGetUniformLocation(quadShader.programShaderObject, "exposure"); 
     // ogl->glUniform1f(exposureLocation, exposure);
-    dummyQuad->Enable();
     quad->Enable();
+    postProcessor.AddProcess(new PostProcess); 
 }
 
 void HDRRenderer::Resize(int w, int h) {
@@ -86,6 +85,7 @@ void HDRRenderer::Resize(int w, int h) {
 
     quadFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, useMSAA);
     if(useMSAA){alternateFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, false);}
+    finalFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, false);
 }
 
 void HDRRenderer::SetMSAA(bool value) {
@@ -97,6 +97,12 @@ void HDRRenderer::SetMSAA(bool value) {
     }
     quadFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, useMSAA);
     scene->triggerRefresh = true;
+}
+
+void HDRRenderer::Destroy() {
+    delete alternateFBO;
+    delete quadFBO;
+    delete finalFBO;
 }
 
 void HDRRenderer::Render() {
@@ -149,6 +155,11 @@ void HDRRenderer::Render() {
     } else {
         quadFBO->RenderFBOToObject(quad);
     }
+
+
+    //Here, we have the final FBO.
+    postProcessor.Run(alternateFBO, finalFBO);
+
 
     //USE IT FOR DEBUGGING LIGHT DEPTH FRAMES    
     // for(int i=0; i<scene->lightObjects.size(); i++) {

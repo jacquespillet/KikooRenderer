@@ -140,6 +140,7 @@ namespace CoreEngine {
             objects3D[i]->Destroy();
             delete objects3D[i];
         }
+        renderer->Destroy();
     }
 
 

@@ -5,6 +5,8 @@
 #include "../Object3D.hpp"
 #include "../Shader.hpp"
 
+#include "../PostProcessing/PostProcessor.hpp"
+
 namespace KikooRenderer {
 namespace CoreEngine {
 
@@ -14,9 +16,11 @@ public:
     virtual void Render();
     virtual void Resize(int w, int h);
     virtual void SetMSAA(bool value);
-    
+    virtual void Destroy();
+
 	Framebuffer* quadFBO;
 	Framebuffer* alternateFBO;
+	Framebuffer* finalFBO;
 
     int width, height;
     float exposure;
@@ -26,6 +30,8 @@ public:
     Shader quadShader;
 
     bool useMSAA = true;
+
+    PostProcessor postProcessor;
 // protected:
     // void InitShader();
 };

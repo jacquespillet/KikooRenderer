@@ -906,8 +906,8 @@ Object3D* GetSpotLight(Scene* scene, std::string name, glm::dvec3 _position, glm
 }
 
 
-Object3D* ObjectFromOBJ(std::string fileName, KikooRenderer::CoreEngine::Scene* scene) {
-    Object3D* newObject = new Object3D("test", scene);
+Object3D* ObjectFromOBJ(std::string name, std::string fileName, KikooRenderer::CoreEngine::Scene* scene) {
+    Object3D* newObject = new Object3D(name, scene);
 
     std::vector<glm::dvec3> vertex;
     std::vector<glm::dvec3> normals;
