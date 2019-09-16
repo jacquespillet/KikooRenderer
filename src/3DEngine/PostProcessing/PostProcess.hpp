@@ -8,7 +8,7 @@ namespace CoreEngine {
 class MaterialComponent;
 class PostProcess {
 public:
-    PostProcess();
+    PostProcess(Scene* scene);
     virtual void Run(Framebuffer* famebufferIn, Framebuffer* famebufferOut);
 
     Shader shader;

@@ -70,30 +70,37 @@ Object3D* GetWireFrameBox(Scene* scene, std::string name, glm::dvec3 _position, 
 }
 
 Object3D* GetQuad(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
-     //Start each Object3D in scene
+    std::cout << "0" << std::endl;
+    //Start each Object3D in scene
     Object3D* newObject = new Object3D(name, scene);
+    std::cout << "1" << std::endl;
  
     MeshFilterComponent* mesh = GetQuadMesh(glm::dvec3(1), _color, newObject);
+    std::cout << "2" << std::endl;
 
     //Setup transform
     TransformComponent* transform = new TransformComponent(newObject );
     transform->position = _position;
     transform->rotation = _rotation;
     transform->scale = _scale;
+    std::cout << "3" << std::endl;
     
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
     material->albedo = _color;
     material->SetShader(&scene->standardShaders.unlitMeshShader);
 
+    std::cout << "4" << std::endl;
 
     BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
+    std::cout << "5" << std::endl;
 
     newObject->AddComponent(material);
     newObject->AddComponent(mesh);
 	newObject->transform = transform;
     newObject->AddComponent(boundingBox);
 
+    std::cout << "6" << std::endl;
 
     return newObject;
 }

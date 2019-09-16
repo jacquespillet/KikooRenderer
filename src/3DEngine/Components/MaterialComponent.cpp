@@ -28,7 +28,6 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 	QComboBox* shaderList = new QComboBox();
 	QLabel* shaderLabel = new QLabel("Shader");
 	for (int i = 0; i < scene->standardShaders.shaders.size(); i++) {
-		
 		shaderList->addItem(QString::fromStdString(scene->standardShaders.shaders[i]->name));
 	}
 	int shaderInx = materialComponent->shader->GetId();

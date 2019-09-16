@@ -5,7 +5,7 @@
 
 namespace KikooRenderer {
 namespace CoreEngine {
-    PostProcess::PostProcess() {
+    PostProcess::PostProcess(Scene* scene) {
         shader.vertSrc= R"(
         //attribs
         #version 440
@@ -41,24 +41,24 @@ namespace CoreEngine {
         }
         )";
         shader.name = "nullPostProcess";
-        std::cout << "StandardShaders: Compiling shader" << std::endl; 
+        std::cout << "nullPostProcess: Compiling shader" << std::endl; 
         shader.Compile();
         
-        quad = GetQuad(nullptr, "plane", glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
+        quad = GetQuad(scene, "plane", glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
         material = (MaterialComponent*) quad->GetComponent("Material");
         material->SetShader(&shader);
         
-        // int exposureLocation = ogl->glGetUniformLocation(quadShader.programShaderObject, "exposure"); 
-        // ogl->glUniform1f(exposureLocation, exposure);
         quad->Enable();        
     }
-    void PostProcess::Run(Framebuffer* famebufferIn, Framebuffer* famebufferOut) {
-        famebufferOut->Enable();
+    void PostProcess::Run(Framebuffer* framebufferIn, Framebuffer* framebufferOut) {
+        GETGL
+        // std::cout << "Writing " << framebufferOut << std::endl;
+        framebufferOut->Enable();
+        ogl->glClearColor(1.0, 0, 0, 1.0);
+        ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);        
         //Attach framebufferInTexture as a albedo texture
-        quad->Render();
-        famebufferOut->Disable();
-
-
+        // quad->Render();
+        framebufferOut->Disable();
     }
 }
 }
