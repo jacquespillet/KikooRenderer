@@ -47,7 +47,6 @@ Cubemap::Cubemap(std::vector<std::string> files) {
 
 void Cubemap::Use() {
     GETGL
-    // std::cout << textureID << std::endl;    
     ogl->glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 }
 

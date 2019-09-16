@@ -73,8 +73,6 @@ HDRRenderer::HDRRenderer(Scene* scene) : Renderer(scene) {
     // int exposureLocation = ogl->glGetUniformLocation(quadShader.programShaderObject, "exposure"); 
     // ogl->glUniform1f(exposureLocation, exposure);
     quad->Enable();
-
-    postProcessor.AddProcess(new PostProcess(scene));
 }
 
 void HDRRenderer::Resize(int w, int h) {
@@ -84,6 +82,16 @@ void HDRRenderer::Resize(int w, int h) {
 
     SetFramebuffers();
 }
+
+void HDRRenderer::AddPostEffect(PostProcess* postProcess) {
+    postProcessor.AddProcess(postProcess);
+    scene->triggerRefresh = true;
+}
+void HDRRenderer::RemovePostEffect(PostProcess* postProcess) {
+    postProcessor.RemoveProcess(postProcess);
+    scene->triggerRefresh = true;
+}
+
 
 void HDRRenderer::SetFramebuffers() {
     //FBO that will be rendered on the quad : Should not be multisampled
@@ -170,11 +178,8 @@ void HDRRenderer::Render() {
     }
     
     if(postProcessor.numProcesses >0) {
-        Framebuffer* test = nullptr;
-        std::cout << test << std::endl;
-        postProcessor.Run(quadFBO, test);
-        test->RenderFBOToObject(quad);
-        std::cout << "Rendering " << test << std::endl;
+        postProcessor.Run(quadFBO, finalFBO);
+        finalFBO->RenderFBOToObject(quad);
     } else {
         quadFBO->RenderFBOToObject(quad);
     }

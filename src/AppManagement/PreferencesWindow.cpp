@@ -1,14 +1,20 @@
 #include "PreferencesWindow.hpp"
 #include "3DEngine/Renderers/Renderer.hpp"
+#include "PostProcessingPreferences.hpp"
 
 namespace KikooRenderer 
 {
 
     //////////////Window class
     PreferencesWindow::PreferencesWindow(MainWindow* mainWindow) {
-        setWindowTitle("Preferences");    
-        renderPreferences = new RenderPreferences(this);
-        setCentralWidget(renderPreferences);
+        setWindowTitle("Preferences");
+
+        tabWidget = new QTabWidget;
+        tabWidget->addTab(new RenderPreferences(this), tr("General"));
+        tabWidget->addTab(new PostProcessingPreferences(this), tr("Post Processing"));
+        
+        setCentralWidget(tabWidget);
+
         this->mainWindow = mainWindow;
     }
 
@@ -57,15 +63,10 @@ namespace KikooRenderer
         });
         layout->addWidget(msaaCheckbox);
 
-        
         // QCheckBox* gammaCorrectionCheckbox = new QCheckBox("Gamma Correction");
         // connect(gammaCorrectionCheckbox, &QCheckBox::stateChanged, this, [this, mainPrefWindow](int state) {
         //     mainPrefWindow->mainWindow->view3D->view3DGL->scene->renderer->SetGammaCorrection(state > 0);
         // });
         // layout->addWidget(gammaCorrectionCheckbox);
-
-
-
-
     }    
 }

@@ -17,6 +17,8 @@ public:
     virtual void Resize(int w, int h);
     virtual void SetMSAA(bool value);
     virtual void Destroy();
+    virtual void AddPostEffect(PostProcess* postProcess);
+    virtual void RemovePostEffect(PostProcess* postProcess);
 
     void SetFramebuffers();
 

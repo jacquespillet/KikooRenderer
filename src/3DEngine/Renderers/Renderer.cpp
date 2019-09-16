@@ -19,6 +19,8 @@ void Renderer::Render() {}
 void Renderer::Resize(int w, int h) {}
 void Renderer::SetMSAA(bool value) {}
 void Renderer::Destroy() {}
+void Renderer::AddPostEffect(PostProcess* postProcess) {}
+void Renderer::RemovePostEffect(PostProcess* postProcess) {}
 
 void Renderer::SetGammaCorrection(bool value) {
 //     std::cout << "HERE"<<std::endl;
@@ -46,6 +48,9 @@ void ForwardRenderer::SetMSAA(bool value) {
     }
     scene->triggerRefresh = true;
 }
+
+void ForwardRenderer::AddPostEffect(PostProcess* postProcess) {}
+void ForwardRenderer::RemovePostEffect(PostProcess* postProcess) {}
 
 void ForwardRenderer::Render() {
     GETGL

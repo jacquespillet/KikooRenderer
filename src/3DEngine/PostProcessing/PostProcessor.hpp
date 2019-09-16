@@ -13,7 +13,7 @@ public:
     
     void RemoveProcess(PostProcess* process);
 
-     Framebuffer* Run(Framebuffer*& framebufferIn, Framebuffer*& framebufferOut);
+     void Run(Framebuffer*& framebufferIn, Framebuffer*& framebufferOut);
 
     void Destroy();
 

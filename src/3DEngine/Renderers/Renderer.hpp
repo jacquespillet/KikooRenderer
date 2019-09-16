@@ -3,6 +3,7 @@
 
 namespace KikooRenderer {
 namespace CoreEngine {
+class PostProcess;
 class Scene;
 
 enum RENDER_PIPELINE {FORWARD, HDR};
@@ -15,6 +16,9 @@ public:
     virtual void SetGammaCorrection(bool value);
     virtual void SetMSAA(bool value);
     virtual void Destroy();
+    virtual void AddPostEffect(PostProcess* postProcess);
+    virtual void RemovePostEffect(PostProcess* postProcess);
+
 protected:
     bool isGammaCorrected = false;
     Scene* scene;
@@ -26,6 +30,8 @@ public:
     virtual void Render();
     virtual void SetMSAA(bool value);
     virtual void Destroy();
+    virtual void AddPostEffect(PostProcess* postProcess);
+    virtual void RemovePostEffect(PostProcess* postProcess);
 };
 
 }

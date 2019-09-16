@@ -14,6 +14,7 @@ public:
     Shader shader;
 	Object3D* quad;
     MaterialComponent* material;
+    Texture albedoTex;
 };
 }
 }

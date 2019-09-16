@@ -36,12 +36,12 @@ namespace CoreEngine {
         //main
         void main()
         {   
-            // vec3 hdrColor = texture(albedoTexture, fragmentUv).rgb;
-            outputColor = vec4(1,0,0,1);
+            vec3 color = texture(albedoTexture, fragmentUv).rgb;
+            float grayScale = (color.r + color.g + color.b) * 0.3333333;
+            outputColor = vec4(grayScale, grayScale, grayScale, 1);
         }
         )";
         shader.name = "nullPostProcess";
-        std::cout << "nullPostProcess: Compiling shader" << std::endl; 
         shader.Compile();
         
         quad = GetQuad(scene, "plane", glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
@@ -55,9 +55,15 @@ namespace CoreEngine {
         // std::cout << "Writing " << framebufferOut << std::endl;
         framebufferOut->Enable();
         ogl->glClearColor(1.0, 0, 0, 1.0);
-        ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);        
+        ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
+
+
+		material->albedoTex.glTex =  framebufferIn->texture;
+		material->albedoTex.loaded = true;
+		material->albedoTex.texIndex = GL_TEXTURE0;
+
         //Attach framebufferInTexture as a albedo texture
-        // quad->Render();
+        quad->Render();
         framebufferOut->Disable();
     }
 }

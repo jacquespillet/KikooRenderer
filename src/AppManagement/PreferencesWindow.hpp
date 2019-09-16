@@ -30,6 +30,7 @@ class PreferencesWindow: public QMainWindow {
     protected:
         void showEvent(QShowEvent *ev);
         void closeEvent(QCloseEvent *event);
+        QTabWidget *tabWidget;
 
     public:
         PreferencesWindow(MainWindow* mainWindow);

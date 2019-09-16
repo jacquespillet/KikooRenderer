@@ -66,6 +66,7 @@ set(MainWindowSrc
 	AppManagement/PreferencesWindow.cpp
 	AppManagement/BackgroundPreferences.cpp
 	AppManagement/3DUIPreferences.cpp
+	AppManagement/PostProcessingPreferences.cpp
 )
 
 add_executable(MainWindow ${MainWindowSrc})
