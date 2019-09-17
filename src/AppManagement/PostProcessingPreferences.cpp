@@ -1,6 +1,7 @@
 #include "PostProcessingPreferences.hpp"
 #include "PreferencesWindow.hpp"
 #include "3DEngine/PostProcessing/PostProcess.hpp"
+#include "3DEngine/PostProcessing/FXAAPostProcess.hpp"
 
 namespace KikooRenderer 
 {
@@ -23,7 +24,8 @@ PostProcessingPreferences::PostProcessingPreferences(PreferencesWindow* mainPref
         scene = mainPrefWindow->mainWindow->view3D->view3DGL->scene;
         scene->glWindow->makeCurrent();
         if(state > 0) {
-            grayScalePost = new CoreEngine::PostProcess(scene);
+            // grayScalePost = new CoreEngine::PostProcess(scene);
+            grayScalePost = new CoreEngine::FXAAPostProcess(scene);
             scene->renderer->AddPostEffect(grayScalePost);
         } else {
             //Remove the live effect from the scene
