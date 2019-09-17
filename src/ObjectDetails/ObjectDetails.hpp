@@ -34,7 +34,7 @@ public:
 	void ClearWidgets();
 
 	QSize sizeHint() const {
-		return QSize(350, 0);
+		return QSize(width(), 0);
 	}
 
 

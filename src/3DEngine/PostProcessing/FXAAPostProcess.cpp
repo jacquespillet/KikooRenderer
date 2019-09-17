@@ -23,8 +23,7 @@ namespace CoreEngine {
             gl_Position = vec4(position.x, position.y, position.z, 1.0);
         }
         )";
-
-        shader.fragSrc = R"(
+        std::string simpleFxaa = R"(
         //inputs
         #version 440
         in vec2 fragmentUv;
@@ -59,7 +58,7 @@ namespace CoreEngine {
             float dirReduce = max((lumaTL + lumaTR + lumaBL + lumaBR) * (0.25 * reduceMultiplier), minValue);
             float invDirAdjustment = 1.0 / (min(abs(dir.x), abs(dir.y)) + dirReduce);
 
-            dir = clamp(dir * invDirAdjustment, vec2(-maxSpan, -maxSpan), vec2(maxSpan, maxSpan)) * inverseTextureSize.xy; //Does that work ??
+            dir = clamp(dir * invDirAdjustment, vec2(-maxSpan, -maxSpan), vec2(maxSpan, maxSpan)) * inverseTextureSize.xy;
 
             vec3 result1 = 0.5 * (texture(albedoTexture, fragmentUv + (dir * vec2(1.0/3.0 - 0.5))).rgb + 
                                            texture(albedoTexture, fragmentUv + (dir * vec2(2.0/3.0 - 0.5))).rgb);          
@@ -78,6 +77,160 @@ namespace CoreEngine {
             }
         }
         )";
+
+        std::string complexFxaa = R"(
+        //inputs
+        #version 440
+        in vec2 fragmentUv;
+
+        //output
+        layout(location = 0) out vec4 outputColor; 
+        uniform sampler2D albedoTexture;
+        uniform vec3 inverseTextureSize;
+
+    	float contrastThreshold = 0.0312f;
+        float relativeThreshold = 0.063f;
+
+		struct EdgeData {
+			bool isHorizontal;
+            float pixelStep;
+			float oppositeLuminance; 
+            float gradient;
+		};
+
+        struct LuminanceData {
+            float m;
+            float e;
+            float w;
+            float s;
+            float n;
+
+			float ne;
+            float nw;
+            float se;
+            float sw;
+
+            float highest;
+            float lowest;
+            float contrast;
+        };
+
+        LuminanceData GetLuminanceNeighborhood(vec2 uv) {
+            vec3 luma = vec3(0.2126729f,  0.7151522f, 0.0721750f);
+    
+            LuminanceData l;
+
+			l.m = dot(luma, texture(albedoTexture, uv).rgb);
+			l.n = dot(luma, texture(albedoTexture, uv + vec2( 0, -1) * inverseTextureSize.xy).rgb);
+			l.e = dot(luma, texture(albedoTexture, uv + vec2( 1,  0) * inverseTextureSize.xy).rgb);
+			l.s = dot(luma, texture(albedoTexture, uv + vec2( 0,  1) * inverseTextureSize.xy).rgb);
+			l.w = dot(luma, texture(albedoTexture, uv + vec2(-1,  0) * inverseTextureSize.xy).rgb);
+
+			l.ne = dot(luma, texture(albedoTexture, uv + vec2( -1,  1) * inverseTextureSize.xy).rgb);
+			l.nw = dot(luma, texture(albedoTexture, uv + vec2( -1, -1) * inverseTextureSize.xy).rgb);
+			l.se = dot(luma, texture(albedoTexture, uv + vec2(  1,  1) * inverseTextureSize.xy).rgb);
+			l.sw = dot(luma, texture(albedoTexture, uv + vec2(  1, -1) * inverseTextureSize.xy).rgb);
+
+			l.highest = max(max(max(max(l.n, l.e), l.s), l.w), l.m);
+			l.lowest = min(min(min(min(l.n, l.e), l.s), l.w), l.m);
+			l.contrast = l.highest - l.lowest;            
+			return l;
+        }
+
+        float GetBlendFactor(LuminanceData l) {
+			float f = 2 * (l.n + l.e + l.s + l.w);
+			f += l.ne + l.nw + l.se + l.sw;
+			f *= 1.0 / 12;
+            f = abs(f - l.m);
+            
+			f = clamp(f / l.contrast, 0, 1);
+
+			float blendFactor = smoothstep(0, 1, f);
+			return blendFactor * blendFactor;
+        }
+
+		EdgeData DetermineEdge (LuminanceData l) {
+			EdgeData e;
+			float horizontal =
+				abs(l.n + l.s - 2 * l.m) * 2 +
+				abs(l.ne + l.se - 2 * l.e) +
+				abs(l.nw + l.sw - 2 * l.w);
+			
+            float vertical =
+				abs(l.e + l.w - 2 * l.m) * 2 +
+				abs(l.ne + l.nw - 2 * l.n) +
+				abs(l.se + l.sw - 2 * l.s);
+
+			e.isHorizontal = horizontal >= vertical;
+
+			float positiveLuminance = e.isHorizontal ? l.s : l.e;
+			float negativeLuminance = e.isHorizontal ? l.n : l.w;
+			
+            float positiveGradient = abs(positiveLuminance - l.m);
+			float negativeGradient = abs(negativeLuminance - l.m);
+
+			e.pixelStep = e.isHorizontal ? inverseTextureSize.y : inverseTextureSize.x;            
+   
+            if (positiveGradient < negativeGradient) {
+				e.pixelStep = -e.pixelStep;
+				e.oppositeLuminance = negativeLuminance;
+				e.gradient = negativeGradient;                
+			} else {
+				e.oppositeLuminance = positiveLuminance;
+				e.gradient = positiveGradient;                
+            }
+
+            return e;
+		}        
+
+		float DetermineEdgeBlendFactor (LuminanceData l, EdgeData e, vec2 uv) {
+			vec2 uvEdge = uv;
+			vec2 edgeStep;
+			if (e.isHorizontal) {
+				uvEdge.y += e.pixelStep * 0.5;
+				edgeStep = vec2(inverseTextureSize.x, 0);
+			}
+			else {
+				uvEdge.x += e.pixelStep * 0.5;
+				edgeStep = vec2(inverseTextureSize.y, 0);
+			}			
+            
+            return e.gradient;
+		}
+
+
+        vec4 GetFinalColor() {
+            LuminanceData l = GetLuminanceNeighborhood(fragmentUv);
+			float actualThreshold = max(contrastThreshold, relativeThreshold * l.highest);
+            if (l.contrast < actualThreshold) {
+				return vec4(texture(albedoTexture, fragmentUv).rgb, 1);
+			}
+
+            float blendFactor = GetBlendFactor(l);
+            EdgeData edge = DetermineEdge(l);
+
+			float edgeBlendFactor = DetermineEdgeBlendFactor(l, edge, fragmentUv);
+            return vec4(edgeBlendFactor, edgeBlendFactor, edgeBlendFactor, 1);
+
+            vec2 blendUv = fragmentUv;
+			if (edge.isHorizontal) {
+				blendUv.y += edge.pixelStep * blendFactor;
+			}
+			else {
+				blendUv.x += edge.pixelStep * blendFactor;
+			}
+			return vec4(texture(albedoTexture, blendUv).rgb, 1);
+        }
+        
+
+        //main
+        void main()
+        {   
+            outputColor = GetFinalColor();
+        }
+        )";
+
+        shader.fragSrc = complexFxaa;
         shader.name = "nullFXAAPostProcess";
         shader.Compile();
         
@@ -91,7 +244,7 @@ namespace CoreEngine {
         GETGL
         // std::cout << "Writing " << framebufferOut << std::endl;
         framebufferOut->Enable();
-        ogl->glClearColor(1.0, 0, 0, 1.0);
+        ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
         ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
 
 
@@ -113,7 +266,6 @@ namespace CoreEngine {
         loc = ogl->glGetUniformLocation(shader.programShaderObject, "reduceMultiplier"); 
         ogl->glUniform1f(loc, reduceMultiplier);
 
-        std::cout << " min " << minValue << " max " << maxSpan << " mult " << reduceMultiplier << std::endl;
 
         //Attach framebufferInTexture as a albedo texture
         quad->Render();

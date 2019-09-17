@@ -70,12 +70,12 @@ PostProcessingPreferences::PostProcessingPreferences(PreferencesWindow* mainPref
         // }
         if(state > 0) {
             // grayScalePost = new CoreEngine::PostProcess(scene);
-            grayScalePost = new CoreEngine::FXAAPostProcess(scene);
-            scene->renderer->AddPostEffect(grayScalePost);
+            fxaaPost = new CoreEngine::FXAAPostProcess(scene);
+            scene->renderer->AddPostEffect(fxaaPost);
         } else {
             //Remove the live effect from the scene
-            scene->renderer->RemovePostEffect(grayScalePost);
-            delete grayScalePost;
+            scene->renderer->RemovePostEffect(fxaaPost);
+            delete fxaaPost;
         }
         scene->glWindow->doneCurrent();
     });
