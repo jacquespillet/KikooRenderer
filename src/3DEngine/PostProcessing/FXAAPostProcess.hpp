@@ -16,6 +16,10 @@ public:
 	Object3D* quad;
     MaterialComponent* material;
     Texture albedoTex;
+
+    float minValue = 1.0 / 128.0;
+    float maxSpan = 8.0;
+    float reduceMultiplier = 1.0 / 8.0;
 };
 }
 }

@@ -33,7 +33,7 @@ public:
 		spinBox->setSingleStep(step);
 		spinBox->setValue(initialValue);
 
-		connect(spinBox, SIGNAL(valueChanged(double)), this, SLOT(OnSpinBoxChanged(double)));
+		// connect(spinBox, SIGNAL(valueChanged(double)), this, SLOT(OnSpinBoxChanged(double)));
 		addWidget(spinBox);
 	}
 

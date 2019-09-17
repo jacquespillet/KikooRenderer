@@ -34,6 +34,12 @@ namespace CoreEngine {
         uniform sampler2D albedoTexture;
         uniform vec3 inverseTextureSize;
 
+        
+        uniform float minValue;
+        uniform float maxSpan;
+        uniform float reduceMultiplier;
+
+
         //main
         void main()
         {   
@@ -50,19 +56,15 @@ namespace CoreEngine {
             dir.x = -((lumaTL + lumaTR) - (lumaBL + lumaBR));
             dir.y = ((lumaTL + lumaBL) - (lumaTR + lumaBR));
 
-            float minValue = 1.0 / 128.0;
-            float maxSpan = 8.0;
-            float reduceMultiplier = 1.0 / 8.0;
-
             float dirReduce = max((lumaTL + lumaTR + lumaBL + lumaBR) * (0.25 * reduceMultiplier), minValue);
             float invDirAdjustment = 1.0 / (min(abs(dir.x), abs(dir.y)) + dirReduce);
 
             dir = clamp(dir * invDirAdjustment, vec2(-maxSpan, -maxSpan), vec2(maxSpan, maxSpan)) * inverseTextureSize.xy; //Does that work ??
 
-            vec3 result1 = (1.0 / 2.0) * (texture(albedoTexture, fragmentUv + (dir * vec2(1.0/3.0 - 0.5))).rgb + 
+            vec3 result1 = 0.5 * (texture(albedoTexture, fragmentUv + (dir * vec2(1.0/3.0 - 0.5))).rgb + 
                                            texture(albedoTexture, fragmentUv + (dir * vec2(2.0/3.0 - 0.5))).rgb);          
 
-            vec3 result2 = result1 *  (1.0 / 2.0) + (1.0 / 2.0) * (texture(albedoTexture, fragmentUv + (dir * vec2(0.0/3.0 - 0.5))).rgb + 
+            vec3 result2 = result1 *  0.5 + 0.5 * (texture(albedoTexture, fragmentUv + (dir * vec2(0.0/3.0 - 0.5))).rgb + 
                                            texture(albedoTexture, fragmentUv + (dir * vec2(3.0/3.0 - 0.5))).rgb); 
 
             float lumaMin = min(lumaM, min(min(lumaTL, lumaTR), min(lumaBL, lumaBR)));
@@ -74,13 +76,6 @@ namespace CoreEngine {
             } else {
                 outputColor = vec4(result2, 1);
             }
-
-
-            // vec3 color = texture(albedoTexture, fragmentUv).rgb;
-            // float grayScale = (color.r + color.g + color.b) * 0.3333333;
-            // outputColor = vec4(grayScale, grayScale, grayScale, 1);
-            // outputColor = vec4(tempVal, tempVal, tempVal, 1);
-            // outputColor = vec4(inverseTextureSize.x, inverseTextureSize.x, inverseTextureSize.x, 1);
         }
         )";
         shader.name = "nullFXAAPostProcess";
@@ -107,8 +102,18 @@ namespace CoreEngine {
         ogl->glUseProgram(shader.programShaderObject);
 
         GLuint loc = ogl->glGetUniformLocation(shader.programShaderObject, "inverseTextureSize");
-        // ogl->glUniform3fv(loc, 1, glm::value_ptr(glm::vec3(1.0 / (float)framebufferIn->width, 1.0 / (float)framebufferIn->height, 0)));
-        ogl->glUniform3fv(loc, 1, glm::value_ptr(glm::vec3(0)));
+        ogl->glUniform3fv(loc, 1, glm::value_ptr(glm::vec3(1.0 / (float)framebufferIn->width, 1.0 / (float)framebufferIn->height, 0)));
+
+        loc = ogl->glGetUniformLocation(shader.programShaderObject, "minValue"); 
+        ogl->glUniform1f(loc, minValue);
+
+        loc = ogl->glGetUniformLocation(shader.programShaderObject, "maxSpan"); 
+        ogl->glUniform1f(loc, maxSpan);
+
+        loc = ogl->glGetUniformLocation(shader.programShaderObject, "reduceMultiplier"); 
+        ogl->glUniform1f(loc, reduceMultiplier);
+
+        std::cout << " min " << minValue << " max " << maxSpan << " mult " << reduceMultiplier << std::endl;
 
         //Attach framebufferInTexture as a albedo texture
         quad->Render();
