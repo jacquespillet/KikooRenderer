@@ -1,0 +1,75 @@
+#include "DepthOfFieldPostProcess.hpp"
+#include "../BaseObjects.hpp"
+#include "../Components/MaterialComponent.hpp"
+
+
+namespace KikooRenderer {
+namespace CoreEngine {
+    DepthOfFieldPostProcess::DepthOfFieldPostProcess(Scene* scene): PostProcess(scene)  {
+        shader.vertSrc= R"(
+        //attribs
+        #version 440
+        layout(location = 0) in vec3 position;
+        layout(location = 1) in vec3 normal;
+        layout(location = 2) in vec2 uv;
+        layout(location = 3) in vec4 color;
+
+        //outputs
+        out vec2 fragmentUv;
+        //main
+        void main()
+        {
+            fragmentUv = vec2(uv.x, -uv.y);
+            gl_Position = vec4(position.x, position.y, position.z, 1.0);
+        }
+        )";
+
+        shader.fragSrc = R"(
+        //inputs
+        #version 440
+        in vec2 fragmentUv;
+
+        //output
+        layout(location = 0) out vec4 outputColor; 
+        uniform sampler2D albedoTexture;
+
+        //main
+        void main()
+        {   
+            float near = 0.1;
+            float far  = 1000.0;
+
+            float depth = texture(albedoTexture, fragmentUv).r;
+            float z = depth * 2.0 - 1.0; // back to NDC 
+            z = (2.0 * near * far) / (far + near - z * (far - near));
+
+            outputColor = vec4(z, z, z, 1);
+        }
+        )";
+        shader.name = "nullDepthOfFieldPostProcess";
+        shader.Compile();
+        
+        quad = GetQuad(scene, "plane", glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
+        material = (MaterialComponent*) quad->GetComponent("Material");
+        material->SetShader(&shader);
+        
+        quad->Enable();        
+    }
+    void DepthOfFieldPostProcess::Run(Framebuffer* framebufferIn, Framebuffer* framebufferOut) {
+        GETGL
+        // std::cout << "Writing " << framebufferOut << std::endl;
+        framebufferOut->Enable();
+        ogl->glClearColor(1.0, 0, 0, 1.0);
+        ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
+
+
+		material->albedoTex.glTex =  framebufferIn->depthTexture;
+		material->albedoTex.loaded = true;
+		material->albedoTex.texIndex = GL_TEXTURE0;
+
+        //Attach framebufferInTexture as a albedo texture
+        quad->Render();
+        framebufferOut->Disable();
+    }
+}
+}

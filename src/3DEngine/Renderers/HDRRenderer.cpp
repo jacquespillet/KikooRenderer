@@ -95,13 +95,13 @@ void HDRRenderer::RemovePostEffect(PostProcess* postProcess) {
 
 void HDRRenderer::SetFramebuffers() {
     //FBO that will be rendered on the quad : Should not be multisampled
-    quadFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, false);
+    quadFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, false);
     
     //Alternate FBO used for rendering multisampled when using MSAA
-    if(useMSAA){alternateFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, true);}
+    if(useMSAA){alternateFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, true);}
     
     //Final FBO if post processing
-    finalFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, false);
+    finalFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, false);
     
 }
 
@@ -113,9 +113,9 @@ void HDRRenderer::SetMSAA(bool value) {
     if(!useMSAA) {
         delete alternateFBO;
     } else {
-        alternateFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, true);
+        alternateFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, true);
     }
-    quadFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, false, false);
+    quadFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, false);
     scene->triggerRefresh = true;
 }
 
@@ -181,15 +181,13 @@ void HDRRenderer::Render() {
         postProcessor.Run(quadFBO, finalFBO);
         finalFBO->RenderFBOToObject(quad);
     } else {
-        quadFBO->RenderFBOToObject(quad);
+        quadFBO->RenderFBOToObject(quad, true);
     }
-
 
     //USE IT FOR DEBUGGING LIGHT DEPTH FRAMES    
     // for(int i=0; i<scene->lightObjects.size(); i++) {
     //     light = (LightComponent*) scene->lightObjects[i]->GetComponent("Light");
-    //     light->depthFBO->RenderFBOToObject(dummyQuad, true);
-    // }
+    // } 
 
 }
 

@@ -2,13 +2,15 @@
 #include "PreferencesWindow.hpp"
 #include "3DEngine/PostProcessing/PostProcess.hpp"
 #include "3DEngine/PostProcessing/FXAAPostProcess.hpp"
+#include "3DEngine/PostProcessing/DepthOfFieldPostProcess.hpp"
 
 namespace KikooRenderer 
 {
 PostProcessingPreferences::PostProcessingPreferences(PreferencesWindow* mainPrefWindow) {
     this->mainPrefWindow = mainPrefWindow;
 
-
+    //0. FXAA Post
+    // -------------------------------------------------------------------
     QVBoxLayout* mainLayout = new QVBoxLayout();
     mainLayout->setAlignment(Qt::AlignTop);
     setLayout(mainLayout);
@@ -93,6 +95,33 @@ PostProcessingPreferences::PostProcessingPreferences(PreferencesWindow* mainPref
     });
 
     mainLayout->addWidget(fxaaGroupbox);
+    // -------------------------------------------------------------------
+
+    
+    //1. Depth of Field Post
+    // -------------------------------------------------------------------
+    QGroupBox* dofGroupbox = new QGroupBox("Depth of Field");
+    QVBoxLayout* dofLayout = new QVBoxLayout();
+    dofGroupbox->setLayout(dofLayout);
+
+    QCheckBox* enableDofCheckbox = new QCheckBox("enable Depth of Field");
+    dofLayout->addWidget(enableDofCheckbox);
+
+    connect(enableDofCheckbox, &QCheckBox::stateChanged, this, [this, mainPrefWindow](int state){
+        scene = mainPrefWindow->mainWindow->view3D->view3DGL->scene;
+        scene->glWindow->makeCurrent();
+        if(state > 0) {
+            dofPost = new CoreEngine::DepthOfFieldPostProcess(scene);
+            scene->renderer->AddPostEffect(dofPost);
+        } else {
+            scene->renderer->RemovePostEffect(dofPost);
+            delete dofPost;
+        }
+        scene->glWindow->doneCurrent();
+    });    
+    
+    mainLayout->addWidget(dofGroupbox);
+    // -------------------------------------------------------------------
 }
 
 }

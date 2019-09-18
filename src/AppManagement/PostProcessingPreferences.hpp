@@ -7,6 +7,7 @@ namespace KikooRenderer
 namespace CoreEngine {
 class PostProcess;
 class FXAAPostProcess;
+class DepthOfFieldPostProcess;
 class Scene;
 } 
 class PreferencesWindow;
@@ -21,6 +22,7 @@ private:
     PreferencesWindow* mainPrefWindow;
     CoreEngine::PostProcess* grayScalePost;
     CoreEngine::FXAAPostProcess* fxaaPost;
+    CoreEngine::DepthOfFieldPostProcess* dofPost;
     CoreEngine::Scene* scene;
 
 };

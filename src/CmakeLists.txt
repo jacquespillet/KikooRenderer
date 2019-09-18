@@ -17,6 +17,7 @@ set(MainWindowSrc
 	3DEngine/PostProcessing/PostProcessor.cpp
 	3DEngine/PostProcessing/PostProcess.cpp
 	3DEngine/PostProcessing/FXAAPostProcess.cpp
+	3DEngine/PostProcessing/DepthOfFieldPostProcess.cpp
 	
 	3DEngine/Object3D.cpp
 	3DEngine/Scene.cpp
