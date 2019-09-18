@@ -42,6 +42,11 @@ public:
 		return 0;
 	}
 
+	void SetVisible(bool visible) {
+		slider->setVisible(visible);
+		spinBox->setVisible(visible);
+	}
+
 public slots:
 	void OnSpinBoxChanged(double i)
 	{

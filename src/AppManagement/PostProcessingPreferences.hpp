@@ -16,6 +16,8 @@ public:
     PostProcessingPreferences(PreferencesWindow* mainPrefWindow);
 
 private:
+    bool isFxaa = false;
+    
     PreferencesWindow* mainPrefWindow;
     CoreEngine::PostProcess* grayScalePost;
     CoreEngine::FXAAPostProcess* fxaaPost;

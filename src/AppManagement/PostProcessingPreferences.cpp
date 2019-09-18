@@ -13,74 +13,86 @@ PostProcessingPreferences::PostProcessingPreferences(PreferencesWindow* mainPref
     mainLayout->setAlignment(Qt::AlignTop);
     setLayout(mainLayout);
 
-    QGroupBox* grayScaleGroupbox = new QGroupBox("Gray Scale Post FX");
-    QVBoxLayout* grayScaleLayout = new QVBoxLayout();
-    grayScaleGroupbox->setLayout(grayScaleLayout);
+    QGroupBox* fxaaGroupbox = new QGroupBox("FXAA");
+    QVBoxLayout* fxaaLayout = new QVBoxLayout();
+    fxaaGroupbox->setLayout(fxaaLayout);
 
-    QCheckBox* enableGrayScaleCheckbox = new QCheckBox("Enable Grayscale post FX");
-    grayScaleLayout->addWidget(enableGrayScaleCheckbox);
+    QCheckBox* enableFxaaCheckbox = new QCheckBox("enable FXAA");
+    fxaaLayout->addWidget(enableFxaaCheckbox);
 
-    // minValue
-    CustomSlider* minValueSlider = new CustomSlider(0.0f, 0.5, 0.0001, "minValue", (1.0 / 128.0));
-    grayScaleLayout->addLayout(minValueSlider);
-    QObject::connect(minValueSlider, &CustomSlider::Modified, [this, mainPrefWindow](double val) {
-        
-        scene = mainPrefWindow->mainWindow->view3D->view3DGL->scene;
-        scene->glWindow->makeCurrent();
-        
-        if(fxaaPost != nullptr) {
-            fxaaPost->minValue = val;
-        }
-        scene->triggerRefresh = true;
-    });
-
-    // maxSpan
-    CustomSlider* maxSpanSlider = new CustomSlider(0.0f, 20.0, 0.1, "maxSpan", 8.0f);
-    grayScaleLayout->addLayout(maxSpanSlider);
-    QObject::connect(maxSpanSlider, &CustomSlider::Modified, [this, mainPrefWindow](double val) {
-        
-        scene = mainPrefWindow->mainWindow->view3D->view3DGL->scene;
-        scene->glWindow->makeCurrent();
-        
-        if(fxaaPost != nullptr) {
-            fxaaPost->maxSpan = val;
-        }
-        scene->triggerRefresh = true;
-    });    
-
-    // reduceMultiplier
-    CustomSlider* reduceMultiplierSlider = new CustomSlider(0.0f, 1, 0.001, "reduceMultiplier", (1.0 / 8.0));
-    grayScaleLayout->addLayout(reduceMultiplierSlider);
-    QObject::connect(reduceMultiplierSlider, &CustomSlider::Modified, [this, mainPrefWindow](double val) {
-        
-        scene = mainPrefWindow->mainWindow->view3D->view3DGL->scene;
-        scene->glWindow->makeCurrent();
-        
-        if(fxaaPost != nullptr) {
-            fxaaPost->reduceMultiplier = val;
-        }
-        scene->triggerRefresh = true;
-    });    
-
-
-    connect(enableGrayScaleCheckbox, &QCheckBox::stateChanged, this, [this, mainPrefWindow](int state){
-        // if(scene != nullptr) {
+    connect(enableFxaaCheckbox, &QCheckBox::stateChanged, this, [this, mainPrefWindow](int state){
             scene = mainPrefWindow->mainWindow->view3D->view3DGL->scene;
             scene->glWindow->makeCurrent();
-        // }
         if(state > 0) {
-            // grayScalePost = new CoreEngine::PostProcess(scene);
             fxaaPost = new CoreEngine::FXAAPostProcess(scene);
             scene->renderer->AddPostEffect(fxaaPost);
         } else {
-            //Remove the live effect from the scene
             scene->renderer->RemovePostEffect(fxaaPost);
             delete fxaaPost;
         }
         scene->glWindow->doneCurrent();
     });
 
-    mainLayout->addWidget(grayScaleGroupbox);
+    // // minValue
+    // CustomSlider* minValueSlider = new CustomSlider(0.0f, 0.5, 0.0001, "minValue", (1.0 / 128.0));
+    // fxaaLayout->addLayout(minValueSlider);
+    // QObject::connect(minValueSlider, &CustomSlider::Modified, [this, mainPrefWindow](double val) {
+        
+    //     scene = mainPrefWindow->mainWindow->view3D->view3DGL->scene;
+    //     scene->glWindow->makeCurrent();
+        
+    //     if(fxaaPost != nullptr) {
+    //         fxaaPost->minValue = val;
+    //     }
+    //     scene->triggerRefresh = true;
+    //     scene->glWindow->doneCurrent();
+    // });
+
+    // // maxSpan
+    // CustomSlider* maxSpanSlider = new CustomSlider(0.0f, 20.0, 0.1, "maxSpan", 8.0f);
+    // fxaaLayout->addLayout(maxSpanSlider);
+    // QObject::connect(maxSpanSlider, &CustomSlider::Modified, [this, mainPrefWindow](double val) {
+        
+    //     scene = mainPrefWindow->mainWindow->view3D->view3DGL->scene;
+    //     scene->glWindow->makeCurrent();
+        
+    //     if(fxaaPost != nullptr) {
+    //         fxaaPost->maxSpan = val;
+    //     }
+    //     scene->triggerRefresh = true;
+    //     scene->glWindow->doneCurrent();
+    // });    
+
+    // reduceMultiplier
+    // CustomSlider* reduceMultiplierSlider = new CustomSlider(0.0f, 1, 0.001, "reduceMultiplier", (1.0 / 8.0));
+    // fxaaLayout->addLayout(reduceMultiplierSlider);
+    // QObject::connect(reduceMultiplierSlider, &CustomSlider::Modified, [this, mainPrefWindow](double val) {
+        
+    //     scene = mainPrefWindow->mainWindow->view3D->view3DGL->scene;
+    //     scene->glWindow->makeCurrent();
+        
+    //     if(fxaaPost != nullptr) {
+    //         fxaaPost->reduceMultiplier = val;
+    //     }
+    //     scene->triggerRefresh = true;
+    //     scene->glWindow->doneCurrent();
+    // });    
+
+    // reduceMultiplier
+    CustomSlider* blendFactorMultiplierSlider = new CustomSlider(0.0f, 2.0f, 0.01, "blend factor", 1.0);
+    fxaaLayout->addLayout(blendFactorMultiplierSlider);
+    QObject::connect(blendFactorMultiplierSlider, &CustomSlider::Modified, [this, mainPrefWindow](double val) {
+        scene = mainPrefWindow->mainWindow->view3D->view3DGL->scene;
+        scene->glWindow->makeCurrent();
+        
+        if(fxaaPost != nullptr) {
+            fxaaPost->blendFactorMultiplier = val;
+        }
+        scene->triggerRefresh = true;
+        scene->glWindow->doneCurrent();
+    });
+
+    mainLayout->addWidget(fxaaGroupbox);
 }
 
 }

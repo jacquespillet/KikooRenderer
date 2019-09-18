@@ -20,6 +20,8 @@ public:
     float minValue = 1.0 / 128.0;
     float maxSpan = 8.0;
     float reduceMultiplier = 1.0 / 8.0;
+
+    float blendFactorMultiplier = 1.0;
 };
 }
 }
