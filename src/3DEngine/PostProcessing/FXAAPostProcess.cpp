@@ -317,7 +317,6 @@ namespace CoreEngine {
 
         ogl->glUseProgram(shader.programShaderObject);
 
-
         GLuint loc = ogl->glGetUniformLocation(shader.programShaderObject, "inverseTextureSize");
         ogl->glUniform3fv(loc, 1, glm::value_ptr(glm::vec3(1.0 / (float)framebufferIn->width, 1.0 / (float)framebufferIn->height, 0)));
 

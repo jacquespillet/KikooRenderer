@@ -41,10 +41,11 @@ namespace CoreEngine {
 					ogl->glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 					ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 					ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-					ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER); 
-					ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-					float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-					ogl->glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor); 
+					
+					// ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER); 
+					// ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+					// float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+					// ogl->glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor); 
 
 					ogl->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
 					ogl->glBindTexture(GL_TEXTURE_2D, 0);
@@ -83,12 +84,24 @@ namespace CoreEngine {
 			ogl->glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texture);
 			ogl->glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, internalColorFormat, width, height, GL_TRUE);
 			ogl->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, texture, 0);
-			// create a (also multisampled) renderbuffer object for depth and stencil attachments
-			ogl->glGenRenderbuffers(1, &rbo);
-			ogl->glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-			ogl->glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, width, height);
-			ogl->glBindRenderbuffer(GL_RENDERBUFFER, 0);
-			ogl->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+			
+			if(hasDepth) {
+				//Create depth texture
+				ogl->glGenTextures(1, &depthTexture);
+				ogl->glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, depthTexture);
+				ogl->glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_DEPTH_COMPONENT, width, height, GL_TRUE);
+				ogl->glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+				ogl->glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+				
+				ogl->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D_MULTISAMPLE, depthTexture, 0);
+			} else {
+				// create a (also multisampled) renderbuffer object for depth and stencil attachments
+				ogl->glGenRenderbuffers(1, &rbo);
+				ogl->glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+				ogl->glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, width, height);
+				ogl->glBindRenderbuffer(GL_RENDERBUFFER, 0);
+				ogl->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+			}
 
 
 			if (ogl->glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
@@ -116,6 +129,7 @@ namespace CoreEngine {
 		ogl->glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
 		ogl->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, otherFB->fbo);
 		ogl->glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+		ogl->glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 		ogl->glBindFramebuffer(GL_FRAMEBUFFER, currentFBO);
 	}
 
@@ -138,6 +152,8 @@ namespace CoreEngine {
 	void Framebuffer::Destroy() {
 		GETGL
 		ogl->glDeleteFramebuffers(1, &fbo);
+		ogl->glDeleteTextures(1, &depthTexture);
+		ogl->glDeleteTextures(1, &texture);
 	}
 
 	void Framebuffer::RenderOnObect(std::vector<Object3D*>& objectsToRender, Object3D* target) {

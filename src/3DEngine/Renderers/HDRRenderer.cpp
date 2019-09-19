@@ -130,7 +130,6 @@ void HDRRenderer::Render() {
     if(useMSAA) alternateFBO->Enable();
     else quadFBO->Enable();
     
-    
     ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
     ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
     
@@ -181,7 +180,7 @@ void HDRRenderer::Render() {
         postProcessor.Run(quadFBO, finalFBO);
         finalFBO->RenderFBOToObject(quad);
     } else {
-        quadFBO->RenderFBOToObject(quad, true);
+        quadFBO->RenderFBOToObject(quad, false);
     }
 
     //USE IT FOR DEBUGGING LIGHT DEPTH FRAMES    

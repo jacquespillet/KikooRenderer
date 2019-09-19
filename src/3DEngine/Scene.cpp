@@ -44,11 +44,25 @@ namespace CoreEngine {
         skyboxCube->Start();
         skyboxCube->Enable();
 
-        Object3D* cube1 = GetCube(this, "Cube", glm::dvec3(0, 0, 0), glm::vec3(0, 0, 10), glm::dvec3(0.05, 10, 0.05), glm::dvec4(1, 1, 1, 1));
-        MaterialComponent*  mat = (MaterialComponent*) cube1->GetComponent("Material");
-        mat->shader = standardShaders.shaders[2]; //Blinn phong
-        AddObject(cube1);        
-	
+        Object3D* room = GetQuad(this, "Room", glm::dvec3(0, 0, 0), glm::vec3(90, 0, 0), glm::dvec3(20), glm::dvec4(1, 1, 1, 1));
+        MaterialComponent* mat = (MaterialComponent*) room->GetComponent("Material");
+        mat->shader = standardShaders.shaders[2];
+        AddObject(room);
+
+        Object3D* cube1 = GetCube(this, "Cube", glm::dvec3(0, 0.5, 0), glm::vec3(0, 0, 0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
+        mat = (MaterialComponent*) cube1->GetComponent("Material");
+        mat->shader = standardShaders.shaders[2];
+        AddObject(cube1);   
+
+        Object3D* cube2 = GetCube(this, "Cube2", glm::dvec3(-1, 0.5, 2), glm::vec3(0, 0, 0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
+        mat = (MaterialComponent*) cube2->GetComponent("Material");
+        mat->shader = standardShaders.shaders[2];
+        AddObject(cube2);	
+
+        // Object3D* light = GetDirectionalLight(this, "light", glm::dvec3(0), glm::dvec3(30, 20, 0), glm::dvec3(1), glm::dvec4(4, 4, 4, 1));
+        // AddObject(light);	
+
+
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
             objects3D[i]->Start();

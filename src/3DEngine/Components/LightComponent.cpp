@@ -103,7 +103,7 @@ LightComponent::LightComponent(Object3D* object, glm::dvec4 color, glm::dvec3 at
 
 void LightComponent::SetType(int type) {
     this->type = type;
-    object3D->scene->glWindow->makeCurrent();
+    // object3D->scene->glWindow->makeCurrent();
     //TODO : Mettre les shaders static et compilés au start 
     if(type==0) {
         //Avant dernier arg TRUE pour debug, doit etre FALSE
@@ -232,7 +232,7 @@ void LightComponent::SetType(int type) {
         std::cout << "StandardShaders: Compiling depthPassShader" << std::endl; 
         depthPassShader.Compile();
     }
-    object3D->scene->glWindow->doneCurrent();
+    // object3D->scene->glWindow->doneCurrent();
     object3D->scene->triggerRefresh = true;
     
 }
@@ -244,7 +244,7 @@ LightInspector* LightComponent::GetInspector() {
 }
 
 void LightComponent::RenderDepthMap() {
-    GETGL;
+    GETGL
     if(castShadow) {
         ogl->glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
         if(type==0) {

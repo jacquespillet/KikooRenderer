@@ -32,18 +32,40 @@ namespace CoreEngine {
         //output
         layout(location = 0) out vec4 outputColor; 
         uniform sampler2D albedoTexture;
+        uniform vec3 texelSize;
+
+        float focusDistance = 10;
+        float focusRange = 3;
+
 
         //main
         void main()
         {   
-            float near = 0.1;
-            float far  = 1000.0;
+            // float near = 0.1;
+            // float far  = 1000.0;
 
-            float depth = texture(albedoTexture, fragmentUv).r;
-            float z = depth * 2.0 - 1.0; // back to NDC 
-            z = (2.0 * near * far) / (far + near - z * (far - near));
+            // float depth = texture(albedoTexture, fragmentUv).r;
+            // float z = depth * 2.0 - 1.0; // back to NDC 
+            // z = (2.0 * near * far) / (far + near - z * (far - near));
 
-            outputColor = vec4(z, z, z, 1);
+            // float coc = (z - focusDistance) / focusRange;
+            // coc = clamp(coc, -1, 1);
+            // if (coc < 0) {
+            //     outputColor = coc * -vec4(1, 0, 0, 1);
+            // } else {
+            //     outputColor = vec4(coc, coc, coc, 1);
+            // }
+
+            vec3 color = 0;
+            for (int u = -4; u <= 4; u++) {
+                for (int v = -4; v <= 4; v++) {
+                    vec2 o = vec2(u, v)  * texelSize.xy;
+                    color += texture(albedoTexture, fragmentUv + o).rgb;
+                }
+            }
+            color *= 1.0 / 81;
+            outputColor = vec4(color.rgb, 1);
+
         }
         )";
         shader.name = "nullDepthOfFieldPostProcess";
@@ -57,16 +79,21 @@ namespace CoreEngine {
     }
     void DepthOfFieldPostProcess::Run(Framebuffer* framebufferIn, Framebuffer* framebufferOut) {
         GETGL
-        // std::cout << "Writing " << framebufferOut << std::endl;
         framebufferOut->Enable();
+        
         ogl->glClearColor(1.0, 0, 0, 1.0);
         ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
+		
+        
+        ogl->glUseProgram(shader.programShaderObject);
 
+        GLuint loc = ogl->glGetUniformLocation(shader.programShaderObject, "inverseTextureSize");
+        ogl->glUniform3fv(loc, 1, glm::value_ptr(glm::vec3(1.0 / (float)framebufferIn->width, 1.0 / (float)framebufferIn->height, 0)));
 
-		material->albedoTex.glTex =  framebufferIn->depthTexture;
+        material->albedoTex.glTex =  framebufferIn->texture;
 		material->albedoTex.loaded = true;
 		material->albedoTex.texIndex = GL_TEXTURE0;
-
+        
         //Attach framebufferInTexture as a albedo texture
         quad->Render();
         framebufferOut->Disable();
