@@ -13,6 +13,7 @@ public:
 
     Shader shader;
 	Object3D* quad;
+	Scene* scene;
     MaterialComponent* material;
     Texture albedoTex;
 };

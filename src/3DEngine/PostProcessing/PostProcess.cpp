@@ -6,6 +6,8 @@
 namespace KikooRenderer {
 namespace CoreEngine {
     PostProcess::PostProcess(Scene* scene) {
+        this->scene = scene;
+        
         shader.vertSrc= R"(
         //attribs
         #version 440

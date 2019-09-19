@@ -16,6 +16,10 @@ public:
 	Object3D* quad;
     MaterialComponent* material;
     Texture albedoTex;
+
+    float bokehRadius = 8.0;
+    float focusDistance = 10.0;
+    float focusRange = 3.0;
 };
 }
 }

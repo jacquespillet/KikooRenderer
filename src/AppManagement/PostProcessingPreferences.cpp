@@ -119,7 +119,50 @@ PostProcessingPreferences::PostProcessingPreferences(PreferencesWindow* mainPref
         }
         scene->glWindow->doneCurrent();
     });    
+
+
+    CustomSlider* bokehRadiusSlider = new CustomSlider(1.0f, 64.0f, 1.0, "Bokeh Radius", 8.0);
+    dofLayout->addLayout(bokehRadiusSlider);
+    QObject::connect(bokehRadiusSlider, &CustomSlider::Modified, [this, mainPrefWindow](double val) {
+        scene = mainPrefWindow->mainWindow->view3D->view3DGL->scene;
+        scene->glWindow->makeCurrent();
+        
+        if(dofPost != nullptr) {
+            dofPost->bokehRadius = val;
+        }
+        scene->triggerRefresh = true;
+        scene->glWindow->doneCurrent();
+    });
     
+
+    CustomSlider* focusDistanceSlider = new CustomSlider(1.0f, 64.0f, 1.0, "Focus Distance", 10.0);
+    dofLayout->addLayout(focusDistanceSlider);
+    QObject::connect(focusDistanceSlider, &CustomSlider::Modified, [this, mainPrefWindow](double val) {
+        scene = mainPrefWindow->mainWindow->view3D->view3DGL->scene;
+        scene->glWindow->makeCurrent();
+        
+        if(dofPost != nullptr) {
+            dofPost->focusDistance = val;
+        }
+        scene->triggerRefresh = true;
+        scene->glWindow->doneCurrent();
+    });
+    
+    
+    CustomSlider* focusRangeSlider = new CustomSlider(1.0f, 10.0f, 0.5, "Focus Range", 3.0);
+    dofLayout->addLayout(focusRangeSlider);
+    QObject::connect(focusRangeSlider, &CustomSlider::Modified, [this, mainPrefWindow](double val) {
+        scene = mainPrefWindow->mainWindow->view3D->view3DGL->scene;
+        scene->glWindow->makeCurrent();
+        
+        if(dofPost != nullptr) {
+            dofPost->focusRange = val;
+        }
+        scene->triggerRefresh = true;
+        scene->glWindow->doneCurrent();
+    });
+    
+
     mainLayout->addWidget(dofGroupbox);
     // -------------------------------------------------------------------
 }

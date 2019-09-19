@@ -44,20 +44,29 @@ namespace CoreEngine {
         skyboxCube->Start();
         skyboxCube->Enable();
 
-        Object3D* room = GetQuad(this, "Room", glm::dvec3(0, 0, 0), glm::vec3(90, 0, 0), glm::dvec3(20), glm::dvec4(1, 1, 1, 1));
+        Object3D* room = GetQuad(this, "Room", glm::dvec3(0, 0, 0), glm::vec3(90, 0, 0), glm::dvec3(20), glm::dvec4(0.1, 0.8, 0.1, 1));
         MaterialComponent* mat = (MaterialComponent*) room->GetComponent("Material");
         mat->shader = standardShaders.shaders[2];
         AddObject(room);
 
-        Object3D* cube1 = GetCube(this, "Cube", glm::dvec3(0, 0.5, 0), glm::vec3(0, 0, 0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
-        mat = (MaterialComponent*) cube1->GetComponent("Material");
-        mat->shader = standardShaders.shaders[2];
-        AddObject(cube1);   
+        for(int i=0; i<15; i++) {
+            std::srand(i * 1000);
+            glm::dvec3 position = glm::dvec3(((double)std::rand() / (double)RAND_MAX) -0.5, ((double)std::rand() / (double)RAND_MAX) * 2.0 + 0.5, ((double)std::rand() / (double)RAND_MAX) -0.5);
+            glm::dvec3 size = glm::dvec3((double)std::rand() / (double)RAND_MAX, (double)std::rand() / (double)RAND_MAX, (double)std::rand() / (double)RAND_MAX);
+            glm::vec4 color = glm::vec4((double)std::rand() / (double)RAND_MAX, (double)std::rand() / (double)RAND_MAX, (double)std::rand() / (double)RAND_MAX, 1.0);
+            std::cout << glm::to_string(position) << std::endl;
+            Object3D* cube1 = GetCube(this, "Cube", position, glm::vec3(0, 0, 0), size, color);
+            mat = (MaterialComponent*) cube1->GetComponent("Material");
+            mat->shader = standardShaders.shaders[2];
+            AddObject(cube1);  
+        }
 
-        Object3D* cube2 = GetCube(this, "Cube2", glm::dvec3(-1, 0.5, 2), glm::vec3(0, 0, 0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
-        mat = (MaterialComponent*) cube2->GetComponent("Material");
-        mat->shader = standardShaders.shaders[2];
-        AddObject(cube2);	
+
+        // Object3D* cube2 = GetCube(this, "Cube2", glm::dvec3(-1, 0.5, 2), glm::vec3(0, 0, 0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
+        // mat = (MaterialComponent*) cube2->GetComponent("Material");
+        // mat->albedo = glm::vec4(0.1, 0.2, 0.9, 1);
+        // mat->shader = standardShaders.shaders[2];
+        // AddObject(cube2);	
 
         // Object3D* light = GetDirectionalLight(this, "light", glm::dvec3(0), glm::dvec3(30, 20, 0), glm::dvec3(1), glm::dvec4(4, 4, 4, 1));
         // AddObject(light);	
