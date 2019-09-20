@@ -8,6 +8,7 @@ namespace CoreEngine {
 class PostProcess;
 class FXAAPostProcess;
 class DepthOfFieldPostProcess;
+class BloomPostProcess;
 class Scene;
 } 
 class PreferencesWindow;
@@ -23,6 +24,7 @@ private:
     CoreEngine::PostProcess* grayScalePost;
     CoreEngine::FXAAPostProcess* fxaaPost;
     CoreEngine::DepthOfFieldPostProcess* dofPost;
+    CoreEngine::BloomPostProcess* bloomPost;
     CoreEngine::Scene* scene;
 
 };

@@ -19,7 +19,7 @@ namespace CoreEngine {
         //main
         void main()
         {
-            fragmentUv = vec2(uv.x, -uv.y);
+            fragmentUv = vec2(uv.x, uv.y);
             gl_Position = vec4(position.x, position.y, position.z, 1.0);
         }
         )";

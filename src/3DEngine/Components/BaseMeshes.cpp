@@ -364,10 +364,10 @@ namespace CoreEngine {
         //
 
         //Front
-        uv->push_back(glm::dvec2(0, 1));
         uv->push_back(glm::dvec2(0, 0));
-        uv->push_back(glm::dvec2(1, 0));
+        uv->push_back(glm::dvec2(0, 1));
         uv->push_back(glm::dvec2(1, 1));
+        uv->push_back(glm::dvec2(1, 0));
 
 
         //

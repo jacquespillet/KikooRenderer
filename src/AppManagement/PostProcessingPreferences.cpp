@@ -3,6 +3,7 @@
 #include "3DEngine/PostProcessing/PostProcess.hpp"
 #include "3DEngine/PostProcessing/FXAAPostProcess.hpp"
 #include "3DEngine/PostProcessing/DepthOfFieldPostProcess.hpp"
+#include "3DEngine/PostProcessing/bloomPostProcess.hpp"
 
 namespace KikooRenderer 
 {
@@ -161,10 +162,35 @@ PostProcessingPreferences::PostProcessingPreferences(PreferencesWindow* mainPref
         scene->triggerRefresh = true;
         scene->glWindow->doneCurrent();
     });
-    
-
     mainLayout->addWidget(dofGroupbox);
     // -------------------------------------------------------------------
+
+
+    //2. Bloom Post
+    // -------------------------------------------------------------------    
+    QGroupBox* bloomGroupbox = new QGroupBox("Bloom");
+    QVBoxLayout* bloomLayout = new QVBoxLayout();
+    bloomGroupbox->setLayout(bloomLayout);
+
+    QCheckBox* enablebloomCheckbox = new QCheckBox("enable Bloom");
+    bloomLayout->addWidget(enablebloomCheckbox);
+
+    connect(enablebloomCheckbox, &QCheckBox::stateChanged, this, [this, mainPrefWindow](int state){
+        scene = mainPrefWindow->mainWindow->view3D->view3DGL->scene;
+        scene->glWindow->makeCurrent();
+        if(state > 0) {
+            bloomPost = new CoreEngine::BloomPostProcess(scene);
+            scene->renderer->AddPostEffect(bloomPost);
+        } else {
+            scene->renderer->RemovePostEffect(bloomPost);
+            delete bloomPost;
+        }
+        scene->glWindow->doneCurrent();
+    });    
+
+    mainLayout->addWidget(bloomGroupbox);
+    // -------------------------------------------------------------------    
+
 }
 
 }

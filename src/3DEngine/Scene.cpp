@@ -44,7 +44,7 @@ namespace CoreEngine {
         skyboxCube->Start();
         skyboxCube->Enable();
 
-        Object3D* room = GetQuad(this, "Room", glm::dvec3(0, 0, 0), glm::vec3(90, 0, 0), glm::dvec3(20), glm::dvec4(0.1, 0.8, 0.1, 1));
+        Object3D* room = GetQuad(this, "Room", glm::dvec3(0, 0, 0), glm::vec3(90, 0, 0), glm::dvec3(20), glm::dvec4(0.2, 0.2, 0.2, 1));
         MaterialComponent* mat = (MaterialComponent*) room->GetComponent("Material");
         mat->shader = standardShaders.shaders[2];
         AddObject(room);
@@ -60,7 +60,7 @@ namespace CoreEngine {
         //     mat->shader = standardShaders.shaders[2];
         //     AddObject(cube1);  
         // }
-        Object3D* cube1 = GetCube(this, "Cube", glm::vec3(0, 0.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), glm::vec4(0, 0, 1, 1));
+        Object3D* cube1 = GetCube(this, "Cube", glm::vec3(0, 0.5, 0), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), glm::vec4(0, 1, 0, 1));
         mat = (MaterialComponent*) cube1->GetComponent("Material");
         mat->shader = standardShaders.shaders[2];
         AddObject(cube1);
