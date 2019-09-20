@@ -22,7 +22,7 @@ CameraScene::CameraScene(Scene* _scene, double _eyeDistance, double _fov, double
     this->transform->position.z = -2;
 
 	projectionType = ProjectionType::Perspective;
-
+    viewMatrix = glm::inverse(this->transform->GetModelMatrix()); 
 }
 
 glm::dvec3 CameraScene::GetPosition() {
@@ -34,7 +34,7 @@ glm::dmat4 CameraScene::GetProjectionMatrix() {
 }
 
 glm::dmat4 CameraScene::GetViewMatrix() {
-    return glm::inverse(this->transform->GetModelMatrix());  
+    return viewMatrix;  
 }
 
 glm::dmat4 CameraScene::GetModelTransform() {
@@ -71,7 +71,8 @@ void CameraScene::OnKeyPressEvent(QKeyEvent *e){
             this->transform->position.z += glm::column(transform, 0).z * speedFactor;
         }
 
-
+        previousViewMatrix = glm::mat4(viewMatrix);
+        viewMatrix = glm::inverse(this->transform->GetModelMatrix());
     }  
 
 	if (e->key() == Qt::Key_5) {
@@ -141,6 +142,8 @@ void CameraScene::OnMouseMoveEvent(QMouseEvent *e) {
         previousX = newX;
         previousY = newY;        
     }
+    previousViewMatrix = glm::mat4(viewMatrix);
+    viewMatrix = glm::inverse(this->transform->GetModelMatrix());
 }
 void CameraScene::OnWheelEvent(QWheelEvent *event) {
     QPoint point = event->angleDelta();
@@ -155,6 +158,8 @@ void CameraScene::OnWheelEvent(QWheelEvent *event) {
         this->transform->position.y -= glm::column(transform, 2).y * speedFactor;
         this->transform->position.z -= glm::column(transform, 2).z * speedFactor;
     }
+    previousViewMatrix = glm::mat4(viewMatrix);
+    viewMatrix = glm::inverse(this->transform->GetModelMatrix());
 }
 
 Geometry::Ray CameraScene::GetRay(int x, int y) {

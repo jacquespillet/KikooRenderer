@@ -47,6 +47,9 @@ class CameraScene{
         Geometry::Ray GetRay(double x, double y);
 		Geometry::Planes GetPlanes();
 
+        glm::mat4 viewMatrix;
+        glm::mat4 previousViewMatrix;
+
     private: 
         bool isRightClicked = false;
         bool isLeftClicked = false;

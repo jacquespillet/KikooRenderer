@@ -3,7 +3,8 @@
 #include "3DEngine/PostProcessing/PostProcess.hpp"
 #include "3DEngine/PostProcessing/FXAAPostProcess.hpp"
 #include "3DEngine/PostProcessing/DepthOfFieldPostProcess.hpp"
-#include "3DEngine/PostProcessing/bloomPostProcess.hpp"
+#include "3DEngine/PostProcessing/BloomPostProcess.hpp"
+#include "3DEngine/PostProcessing/MotionBlurPostProcess.hpp"
 
 namespace KikooRenderer 
 {
@@ -230,6 +231,59 @@ PostProcessingPreferences::PostProcessingPreferences(PreferencesWindow* mainPref
     mainLayout->addWidget(bloomGroupbox);
     // -------------------------------------------------------------------    
 
+
+    //2. Bloom Post
+    // -------------------------------------------------------------------       
+    QGroupBox* motionBlurGroupbox = new QGroupBox("Motion Blur");
+    QVBoxLayout* motionBlurLayout = new QVBoxLayout();
+    motionBlurGroupbox->setLayout(motionBlurLayout);
+
+    QCheckBox* enablemotionBlurCheckbox = new QCheckBox("enable Motion Blur");
+    motionBlurLayout->addWidget(enablemotionBlurCheckbox);
+
+    connect(enablemotionBlurCheckbox, &QCheckBox::stateChanged, this, [this, mainPrefWindow](int state){
+        scene = mainPrefWindow->mainWindow->view3D->view3DGL->scene;
+        scene->glWindow->makeCurrent();
+        if(state > 0) {
+            motionBlurPost = new CoreEngine::MotionBlurPostProcess(scene);
+            scene->renderer->AddPostEffect(motionBlurPost);
+        } else {
+            scene->renderer->RemovePostEffect(motionBlurPost);
+            delete motionBlurPost;
+        }
+        scene->glWindow->doneCurrent();
+    });    
+
+
+    CustomSlider* velocityMultiplierSlider = new CustomSlider(0.001f, 1.0f, 0.001f, "Velocity Multiplier", 0.125);
+    motionBlurLayout->addLayout(velocityMultiplierSlider);
+    QObject::connect(velocityMultiplierSlider, &CustomSlider::Modified, [this, mainPrefWindow](double val) {
+        scene = mainPrefWindow->mainWindow->view3D->view3DGL->scene;
+        scene->glWindow->makeCurrent();
+        
+        if(motionBlurPost != nullptr) {
+            motionBlurPost->velocityMultiplier = val;
+        }
+        scene->triggerRefresh = true;
+        scene->glWindow->doneCurrent();
+    });
+
+    CustomSlider* numSamplesSlider = new CustomSlider(1, 16, 2, "Samples Number", 4);
+    motionBlurLayout->addLayout(numSamplesSlider);
+    QObject::connect(numSamplesSlider, &CustomSlider::Modified, [this, mainPrefWindow](double val) {
+        scene = mainPrefWindow->mainWindow->view3D->view3DGL->scene;
+        scene->glWindow->makeCurrent();
+        
+        if(motionBlurPost != nullptr) {
+            motionBlurPost->numSamples = val;
+        }
+        scene->triggerRefresh = true;
+        scene->glWindow->doneCurrent();
+    });
+
+    mainLayout->addWidget(motionBlurGroupbox);
+
+    // -------------------------------------------------------------------       
 }
 
 }

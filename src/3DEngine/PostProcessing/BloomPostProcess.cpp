@@ -81,37 +81,27 @@ namespace CoreEngine {
         uniform sampler2D albedoTexture;
         // uniform sampler2D depthTexture;
         uniform vec3 texelSize;
-        uniform float weight4[4]  = float[](0.214607,	0.189879,	0.131514,	0.071303);
-        uniform float weight5[5]  = float[](0.227027, 0.1945946,  0.1216216,  0.054054,   0.016216);
-        uniform float weight6[6]  = float[](0.198596,	0.175713,	0.121703,	0.065984,	0.028002,	0.0093);
-        uniform float weight7[7]  = float[](0.197641,	0.174868,	0.121117,	0.065666,	0.027867,	0.009255,	0.002406);
-        uniform float weight8[8]  = float[](0.197448,	0.174697,	0.120999,	0.065602,	0.02784,	0.009246,	0.002403,	0.000489);
-        uniform float weight9[9]  = float[](0.197417,	0.17467,	0.12098,	0.065592,	0.027835,	0.009245,	0.002403,	0.000489,	0.000078);
-        uniform float weight10[10] = float[](0.197413,	0.174667,	0.120978,	0.065591,	0.027835,	0.009245,	0.002403,	0.000489,	0.000078,	0.00001);
+        uniform float weight7[4]   = float[](0.214607,	0.189879,	0.131514,	0.071303);
+        uniform float weight9[5]   = float[](0.227027,  0.1945946,  0.1216216,  0.054054,   0.016216);
+        uniform float weight11[6]  = float[](0.198596,	0.175713,	0.121703,	0.065984,	0.028002,	0.0093);
+        uniform float weight13[7]  = float[](0.197641,	0.174868,	0.121117,	0.065666,	0.027867,	0.009255,	0.002406);
+        uniform float weight15[8]  = float[](0.197448,	0.174697,	0.120999,	0.065602,	0.02784,	0.009246,	0.002403,	0.000489);
+        uniform float weight17[9]  = float[](0.197417,	0.17467,	0.12098,	0.065592,	0.027835,	0.009245,	0.002403,	0.000489,	0.000078);
+        uniform float weight19[10] = float[](0.197413,	0.174667,	0.120978,	0.065591,	0.027835,	0.009245,	0.002403,	0.000489,	0.000078,	0.00001);
 
         uniform float kernelRadius;
-        
+        uniform float kernelSize;
         uniform int horizontal;
 
         //main
         void main()
-        {   
-            vec3 result = texture(albedoTexture, fragmentUv).rgb * weight[0];
-            if(horizontal > 0)
+        {
+            vec2 texOffset = (horizontal > 0) ? vec2(texelSize.x, 0) : vec2(0.0, texelSize.y);
+            vec3 result = texture(albedoTexture, fragmentUv).rgb * weight7[0];
+            for(int i = 1; i <= 3; ++i)
             {
-                for(int i = 1; i < 5; ++i)
-                {
-                    result += texture(albedoTexture, fragmentUv + vec2(texelSize.x * i, 0.0) * kernelRadius).rgb * weight[i];
-                    result += texture(albedoTexture, fragmentUv - vec2(texelSize.x * i, 0.0) * kernelRadius).rgb * weight[i];
-                }
-            }
-            else
-            {
-                for(int i = 1; i < 5; ++i)
-                {
-                    result += texture(albedoTexture, fragmentUv + vec2(0.0, texelSize.y * i) * kernelRadius).rgb * weight[i];
-                    result += texture(albedoTexture, fragmentUv - vec2(0.0, texelSize.y * i) * kernelRadius).rgb * weight[i];
-                }
+                result += texture(albedoTexture, fragmentUv + texOffset * i * kernelRadius).rgb * weight7[i];
+                result += texture(albedoTexture, fragmentUv - texOffset * i * kernelRadius).rgb * weight7[i];
             }
             outputColor = vec4(result.rgb, 1.0);
         }

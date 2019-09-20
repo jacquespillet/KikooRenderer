@@ -9,6 +9,7 @@ class PostProcess;
 class FXAAPostProcess;
 class DepthOfFieldPostProcess;
 class BloomPostProcess;
+class MotionBlurPostProcess;
 class Scene;
 } 
 class PreferencesWindow;
@@ -25,6 +26,7 @@ private:
     CoreEngine::FXAAPostProcess* fxaaPost;
     CoreEngine::DepthOfFieldPostProcess* dofPost;
     CoreEngine::BloomPostProcess* bloomPost;
+    CoreEngine::MotionBlurPostProcess* motionBlurPost;
     CoreEngine::Scene* scene;
 
 };
