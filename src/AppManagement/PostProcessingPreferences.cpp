@@ -188,6 +188,45 @@ PostProcessingPreferences::PostProcessingPreferences(PreferencesWindow* mainPref
         scene->glWindow->doneCurrent();
     });    
 
+    CustomSlider* brightnessThresholdSlider = new CustomSlider(0.0f, 2.0f, 0.01, "Brightness Threshold", 0.3);
+    bloomLayout->addLayout(brightnessThresholdSlider);
+    QObject::connect(brightnessThresholdSlider, &CustomSlider::Modified, [this, mainPrefWindow](double val) {
+        scene = mainPrefWindow->mainWindow->view3D->view3DGL->scene;
+        scene->glWindow->makeCurrent();
+        
+        if(bloomPost != nullptr) {
+            bloomPost->brightnessThreshold = val;
+        }
+        scene->triggerRefresh = true;
+        scene->glWindow->doneCurrent();
+    });
+
+    CustomSlider* kernelSizeSlider = new CustomSlider(3.0f, 21.0f, 2.0, "Kernel Size", 5.0f);
+    bloomLayout->addLayout(kernelSizeSlider);
+    QObject::connect(kernelSizeSlider, &CustomSlider::Modified, [this, mainPrefWindow](double val) {
+        scene = mainPrefWindow->mainWindow->view3D->view3DGL->scene;
+        scene->glWindow->makeCurrent();
+        
+        if(bloomPost != nullptr) {
+            bloomPost->kernelSize = val;
+        }
+        scene->triggerRefresh = true;
+        scene->glWindow->doneCurrent();
+    });
+
+    CustomSlider* kernelRadiusSlider = new CustomSlider(1.0f, 16.0f, 0.5, "Kernel Radius", 1.0f);
+    bloomLayout->addLayout(kernelRadiusSlider);
+    QObject::connect(kernelRadiusSlider, &CustomSlider::Modified, [this, mainPrefWindow](double val) {
+        scene = mainPrefWindow->mainWindow->view3D->view3DGL->scene;
+        scene->glWindow->makeCurrent();
+        
+        if(bloomPost != nullptr) {
+            bloomPost->kernelRadius = val;
+        }
+        scene->triggerRefresh = true;
+        scene->glWindow->doneCurrent();
+    });
+
     mainLayout->addWidget(bloomGroupbox);
     // -------------------------------------------------------------------    
 

@@ -19,6 +19,10 @@ public:
     Shader blurShader;
     Shader blendShader;
 
+    float brightnessThreshold = 0.3;
+    int kernelSize = 5;
+    float kernelRadius = 1.0;
+
 	Object3D* quad;
     MaterialComponent* material;
     Texture albedoTex;
