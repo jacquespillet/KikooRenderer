@@ -10,6 +10,7 @@ namespace KikooRenderer {
 namespace CoreEngine {
 class Scene;
 class MaterialComponent;
+class MeshFilterComponent;
 
 class ParticleSystem : public Object3D {
 public: 
@@ -24,18 +25,18 @@ public:
     void Recompute() override;
 
     void GenerateParticles();
-    void EmitSimpleParticle();
-    void EmitAdvancedParticle();
+    void EmitParticle();
 
 private:
     std::vector<Particle> particles;
     Object3D* quad;
     MaterialComponent* quadMaterial;
+    MeshFilterComponent* quadMeshFilter;
     Shader particleShader;
 
     //_________________________
     // Main parameters
-    float pps = 50;
+    float pps = 200;
     float speed = 2;
     float scale = 0.5;
     float lifeLength = 4;
@@ -59,10 +60,10 @@ private:
     //  * 0 : additive
     //  * 1 : One minus src alpha
     int blendingMode = 0;
-
-
     
     float toSpawn = 0;
+
+    int numRows = 1;
 };
 
 }

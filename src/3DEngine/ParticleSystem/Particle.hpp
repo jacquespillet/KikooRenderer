@@ -8,7 +8,7 @@ class Scene;
 class Particle {
 public: 
     Particle(){}
-    Particle(Scene* scene, glm::vec3 position, glm::vec3 velocity, float gravityEffect, float lifeLength, float rotation, float scale);
+    Particle(Scene* scene, int numRows, glm::vec3 position, glm::vec3 velocity, float gravityEffect, float lifeLength, float rotation, float scale);
 
     bool Update(glm::vec3 camPos);
     
@@ -19,8 +19,8 @@ public:
     float distance;
 
 
-    //Tmp 
-    int numRows=4;
+    //Texture atlas parameters
+    int numRows=1;
     glm::vec2 offset1;
     glm::vec2 offset2;
     float blendValue;

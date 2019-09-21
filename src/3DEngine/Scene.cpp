@@ -9,8 +9,8 @@
 #include "ParticleSystem/ParticleSystem.hpp"
 
 #include <QtGui/QOpenGLFunctions>
-#include <QOpenGLFunctions_3_2_Core>
-#define GLV QOpenGLFunctions_3_2_Core
+#include <QOpenGLFunctions_3_3_Core>
+#define GLV QOpenGLFunctions_3_3_Core
 #define GETGL GLV* ogl = QOpenGLContext::currentContext()->versionFunctions<GLV>(); if(ogl==NULL){std::cout << "could not get opengl context";}
 
 namespace KikooRenderer {
@@ -20,7 +20,6 @@ namespace CoreEngine {
 		camera = new CameraScene(this, 1.0, 70 * DEGTORAD, 0.1, 1000.0, 1.0);
         this->started = false;
     }
-
 	void Scene::Start() {
 		GETGL
 
@@ -48,8 +47,6 @@ namespace CoreEngine {
 
         ParticleSystem* ps = new ParticleSystem("ps", this);
         AddObject(ps);
-
-
 
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {

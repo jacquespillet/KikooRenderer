@@ -1,8 +1,8 @@
 #include "Shader.hpp"
 
 #include <QtGui/QOpenGLFunctions>
-#include <QOpenGLFunctions_3_2_Core>
-#define GLV QOpenGLFunctions_3_2_Core
+#include <QOpenGLFunctions_3_3_Core>
+#define GLV QOpenGLFunctions_3_3_Core
 #define GETGL GLV* ogl = QOpenGLContext::currentContext()->versionFunctions<GLV>(); if(ogl==NULL){std::cout << "could not get opengl context";}
 
 

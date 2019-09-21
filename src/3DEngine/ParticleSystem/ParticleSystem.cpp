@@ -2,6 +2,7 @@
 #include "../Scene.hpp"
 #include "../BaseObjects.hpp"
 #include "../Texture.hpp"
+#include "Util/RandomUtil.hpp"
 
 #include "ParticleShader.hpp"
 namespace KikooRenderer {
@@ -26,45 +27,6 @@ void InsertionSort(std::vector<Particle>& arr)
     }  
 } 
 
-float GetRand() {
-    return ((float)std::rand() / (float)RAND_MAX);
-}
-
-float GenerateValue(float average, float errorMargin) {
-    float offset = (GetRand() - 0.5f) * 2.0f * errorMargin;
-    return average + offset;
-}
-
-glm::vec3 GenerateRandomUnitVector() {
-    float theta = (float) (GetRand() * 2.0f * PI);
-    float z = (GetRand() * 2) - 1;
-    float rootOneMinusZSquared = (float) std::sqrt(1 - z * z);
-    float x = (float) (rootOneMinusZSquared * std::cos(theta));
-    float y = (float) (rootOneMinusZSquared * std::sin(theta));
-    return  glm::vec3(x, y, z);
-}
-
-glm::vec3 GenerateRandomUnitVectorWithinCone(glm::vec3 coneDirection, float angle) {
-    float cosAngle = (float) std::cos(angle);
-    float theta = (float) (GetRand() * 2.0f * PI);
-    float z = cosAngle + (GetRand() * (1 - cosAngle));
-    float rootOneMinusZSquared = (float) std::sqrt(1 - z * z);
-    float x = (float) (rootOneMinusZSquared * std::cos(theta));
-    float y = (float) (rootOneMinusZSquared * std::sin(theta));
-
-    glm::vec4 direction(x, y, z, 1);
-    if (coneDirection.x != 0 || coneDirection.y != 0 || (coneDirection.z != 1 && coneDirection.z != -1)) {
-        glm::vec3 rotateAxis = glm::cross(coneDirection, glm::vec3(0, 0, 1));
-        glm::normalize(rotateAxis);
-        float rotateAngle = (float) std::acos(glm::dot(coneDirection, glm::vec3(0, 0, 1)));
-        
-        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0), -rotateAngle, rotateAxis);
-        direction = rotationMatrix * direction;
-    } else if (coneDirection.z == -1) {
-        direction.z *= -1;
-    }
-    return glm::vec3(direction);
-}
 
 ParticleSystem::ParticleSystem(std::string name, Scene* scene) : Object3D(name, scene) {
     particleShader = GetParticleShader();
@@ -77,10 +39,12 @@ ParticleSystem::ParticleSystem(std::string name, Scene* scene) : Object3D(name, 
     quadMaterial = (MaterialComponent*) quad->GetComponent("Material");
     quadMaterial->SetShader(&particleShader);
 
-    // Texture albedoTex = Texture("C:/Users/Jacques/Pictures/Textures/Particles/particleStar.png", GL_TEXTURE0);
     Texture albedoTex = Texture("C:/Users/Jacques/Pictures/Textures/Particles/particleAtlas.png", GL_TEXTURE0);
     quadMaterial->albedoTex = albedoTex;
+    numRows = 4;
 
+    quadMeshFilter = (MeshFilterComponent*) quad->GetComponent("MeshFilter");
+    quadMeshFilter->renderInstanced = true;
 
     direction = glm::vec3(0, 1, 0);
 }
@@ -99,19 +63,34 @@ void ParticleSystem::Render() {
     ogl->glDepthMask(false);
     ogl->glBlendFunc(GL_SRC_ALPHA, GL_ONE);    
 
+    ogl->glUseProgram(particleShader.programShaderObject);
+    ogl->glUniform1i(ogl->glGetUniformLocation(particleShader.programShaderObject, "rowNum"), numRows);
+    
+    quadMeshFilter->numInstances = particles.size();
+    std::vector<MeshFilterComponent::InstanceAttribute> instanceAttributes = std::vector<MeshFilterComponent::InstanceAttribute>(particles.size());
     for(int i=0; i<particles.size(); i++) {
         quad->transform->position = particles[i].position;
         quad->transform->scale = glm::vec3(particles[i].scale);
         quad->transform->rotation = glm::vec3(0, 0, particles[i].rotation);
 
-        ogl->glUseProgram(particleShader.programShaderObject);
+		glm::mat4 vMatrix = scene->camera->GetViewMatrix();
+		glm::mat4 pMatrix = scene->camera->GetProjectionMatrix();
+        glm::mat4 mMatrix = glm::translate(glm::mat4(1.0), glm::vec3(quad->transform->position));
+        mMatrix[0][0] = vMatrix[0][0]; mMatrix[1][0] = vMatrix[0][1]; mMatrix[2][0] = vMatrix[0][2];
+        mMatrix[0][1] = vMatrix[1][0]; mMatrix[1][1] = vMatrix[1][1]; mMatrix[2][1] = vMatrix[1][2];
+        mMatrix[0][2] = vMatrix[2][0]; mMatrix[1][2] = vMatrix[2][1]; mMatrix[2][2] = vMatrix[2][2];
+        mMatrix = glm::rotate(mMatrix, (float)quad->transform->rotation.z * (float)DEGTORAD, glm::vec3(0.0f, 0.0f, 1.0f));
+        mMatrix = glm::scale(mMatrix, glm::vec3(quad->transform->scale));
 
-        ogl->glUniform2fv(ogl->glGetUniformLocation(particleShader.programShaderObject, "texOffset1"),1, glm::value_ptr(particles[i].offset1));
-        ogl->glUniform2fv(ogl->glGetUniformLocation(particleShader.programShaderObject, "texOffset2"),1, glm::value_ptr(particles[i].offset2));
-        ogl->glUniform2fv(ogl->glGetUniformLocation(particleShader.programShaderObject, "texCoordInfo"),1, glm::value_ptr(glm::vec2(particles[i].numRows, particles[i].blendValue)));
-
-        quad->Render();
+        glm::mat4 mvp = pMatrix * vMatrix *  mMatrix;
+        
+        instanceAttributes[i].modelMatrix = mvp;
+        instanceAttributes[i].additionalData1 = glm::vec4(particles[i].offset1.x, particles[i].offset1.y, particles[i].offset2.x, particles[i].offset2.y);
+        instanceAttributes[i].additionalData2 = glm::vec4(particles[i].blendValue, 0, 0, 0);
     }
+
+    quadMeshFilter->SetInstanceAttributes(instanceAttributes);
+    quad->Render();
 
     ogl->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);    
     ogl->glDepthMask(true);
@@ -152,7 +131,7 @@ void ParticleSystem::GenerateParticles() {
 
     int spawnCount = (int) toSpawn;
     for(int i=0; i<spawnCount; i++) {
-        EmitAdvancedParticle();
+        EmitParticle();
     }
 
     if (delta * pps < 1.0 && toSpawn >= 1.0)
@@ -161,29 +140,22 @@ void ParticleSystem::GenerateParticles() {
     }    
 }
 
-void ParticleSystem::EmitSimpleParticle() {
-    glm::vec3 velocity = glm::vec3(GetRand() * 2.0 - 1.0, GetRand() * 2.0 - 1.0, GetRand() * 2.0 - 1.0);
-    glm::normalize(velocity);
-    velocity *= speed;
-    Particle particle(scene, this->transform->position, velocity, gravityFactor, lifeLength, 0, 1);
-    particles.push_back(particle);
-}
 
-void ParticleSystem::EmitAdvancedParticle() {
+void ParticleSystem::EmitParticle() {
     glm::vec3 velocity(0);
     if(useDirection){
-        velocity = GenerateRandomUnitVectorWithinCone(direction, directionDeviation);
+        velocity = Util::GenerateRandomUnitVectorWithinCone(direction, directionDeviation);
     }else{
-        velocity = GenerateRandomUnitVector();
+        velocity = Util::GenerateRandomUnitVector();
     }
     glm::normalize(velocity);
-    velocity *= GenerateValue(speed, speedError);
+    velocity *= Util::GenerateValue(speed, speedError);
 
-    float finalScale = GenerateValue(scale, scaleError);
-    float finalLifeLength = GenerateValue(lifeLength, lifeError);
-    float finalRotation = isRandomRotation ? GetRand() * 360.0f : 0;
+    float finalScale = Util::GenerateValue(scale, scaleError);
+    float finalLifeLength = Util::GenerateValue(lifeLength, lifeError);
+    float finalRotation = isRandomRotation ? Util::GetRand() * 360.0f : 0;
 
-    Particle particle(scene, this->transform->position, velocity, gravityFactor, finalLifeLength, finalRotation, finalScale);   
+    Particle particle(scene, numRows, this->transform->position, velocity, gravityFactor, finalLifeLength, finalRotation, finalScale);   
     particles.push_back(particle); 
 }
 

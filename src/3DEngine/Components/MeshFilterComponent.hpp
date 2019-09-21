@@ -36,6 +36,12 @@ class MeshFilterComponent : public Component {
 			glm::vec4 tan;
 		};    
 
+        struct InstanceAttribute {
+            glm::mat4 modelMatrix;
+            glm::vec4 additionalData1;
+            glm::vec4 additionalData2;
+        };
+
         MeshFilterComponent(Object3D* object);
         void OnStart();
         void OnEnable();
@@ -69,6 +75,11 @@ class MeshFilterComponent : public Component {
 
         bool shoudRebuildBuffers = false;
 
+        void SetInstanceAttributes(std::vector<InstanceAttribute> modelMatrices);
+        bool renderInstanced = false;
+        int numInstances = 100;
+        std::vector<InstanceAttribute> instanceAttributes;
+
 
         QJsonObject jsonObj;
         QJsonObject ToJSON() {
@@ -83,6 +94,10 @@ class MeshFilterComponent : public Component {
         unsigned int vertexBuffer;
         unsigned int elementBuffer;
         unsigned int vertexArrayObject;
+
+        //For instanced rendering
+        unsigned int matricesBuffer;
+
 
 };
 }

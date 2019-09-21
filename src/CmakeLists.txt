@@ -49,7 +49,6 @@ set(MainWindowSrc
 	3DEngine/ParticleSystem/ParticleSystem.cpp
 	3DEngine/ParticleSystem/Particle.cpp
 	3DEngine/ParticleSystem/ParticleShader.cpp
-	3DEngine/ParticleSystem/ParticleTexture.cpp
 
 	
 	SceneTree/SceneTree.cpp
@@ -64,6 +63,7 @@ set(MainWindowSrc
 	Util/QtUtil.cpp
 	Util/ModelLoader.cpp
 	Util/Image.cpp
+	Util/RandomUtil.cpp
 	
 	FileIO/SceneToFile.cpp
 	

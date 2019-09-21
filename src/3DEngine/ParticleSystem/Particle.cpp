@@ -4,7 +4,7 @@
 namespace KikooRenderer {
 
 namespace CoreEngine {
-Particle::Particle(Scene* scene, glm::vec3 position, glm::vec3 velocity, float gravityEffect, float lifeLength, float rotation, float scale) {
+Particle::Particle(Scene* scene, int numRows, glm::vec3 position, glm::vec3 velocity, float gravityEffect, float lifeLength, float rotation, float scale) {
     this->scene =scene;
     this->position =position;
     this->velocity =velocity;
@@ -12,6 +12,7 @@ Particle::Particle(Scene* scene, glm::vec3 position, glm::vec3 velocity, float g
     this->lifeLength =lifeLength;
     this->rotation =rotation;
     this->scale =scale;
+    this->numRows =numRows;
 }
 
 bool Particle::Update(glm::vec3 camPos) {

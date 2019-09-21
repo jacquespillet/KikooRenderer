@@ -19,6 +19,9 @@ Shader GetUnlitShader() {
     layout(location = 1) in vec3 normal;
     layout(location = 2) in vec2 uv;
     layout(location = 3) in vec4 color;
+    layout(location = 5) in mat4 modelMatrix;
+    layout(location = 9) in vec4 additionalData;
+
     //transforms
     uniform mat4 modelViewProjectionMatrix;
     uniform vec4 albedo; 
