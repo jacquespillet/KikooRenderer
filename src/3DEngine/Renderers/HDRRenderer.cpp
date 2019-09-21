@@ -145,10 +145,12 @@ void HDRRenderer::Render() {
 
     //Render skybox
     if(scene->hasSkybox) {
-        ogl->glDepthFunc(GL_LEQUAL);
+        ogl->glDepthFunc(GL_LEQUAL);        
         scene->skyboxCube->Render();
         ogl->glDepthFunc(GL_LESS);
     }
+
+    // scene->ps->Render();
 
     //Render UI
     if(scene->rendersUI) {

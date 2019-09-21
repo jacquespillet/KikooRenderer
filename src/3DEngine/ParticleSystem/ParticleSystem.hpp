@@ -44,16 +44,16 @@ private:
     
     //_________________________
     // Randomization parameters
-    float speedError = 0;
+    float speedError = 0.3;
     float lifeError = 0.5;
-    float scaleError = 0.2;
-    bool isRandomRotation = false;
+    float scaleError = 0.5;
+    bool isRandomRotation = true;
 
     //_________________________
     // System direction parameters
     glm::vec3 direction;
     bool useDirection = true;
-    float directionDeviation = 0.2;
+    float directionDeviation = 0.4;
 
     //_________________________
     // Blend mode : 

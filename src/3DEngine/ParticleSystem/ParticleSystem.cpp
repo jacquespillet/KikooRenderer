@@ -18,7 +18,7 @@ void InsertionSort(std::vector<Particle>& arr)
         key = arr[i];  
         j = i - 1;  
   
-        while (j >= 0 && arr[j].distance > key.distance) 
+        while (j >= 0 && arr[j].distance < key.distance) 
         {  
             arr[j + 1] = arr[j];  
             j = j - 1;  
@@ -61,7 +61,7 @@ void ParticleSystem::Enable() {
 void ParticleSystem::Render() {
     GETGL
     ogl->glDepthMask(false);
-    ogl->glBlendFunc(GL_SRC_ALPHA, GL_ONE);    
+    ogl->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);    
 
     ogl->glUseProgram(particleShader.programShaderObject);
     ogl->glUniform1i(ogl->glGetUniformLocation(particleShader.programShaderObject, "rowNum"), numRows);
@@ -101,7 +101,6 @@ void ParticleSystem::DepthRenderPass(LightComponent* light) {
 
 void ParticleSystem::Update() {
     GenerateParticles();
-    InsertionSort(particles);
 
     std::vector<Particle>::iterator it;
     for(it = particles.begin(); it != particles.end();)
@@ -111,6 +110,7 @@ void ParticleSystem::Update() {
             it=particles.erase(it);
         } else ++it;
     }    
+    InsertionSort(particles);
     scene->triggerRefresh = true;
 }
 

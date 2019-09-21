@@ -46,6 +46,8 @@ namespace CoreEngine {
         skyboxCube->Enable();
 
         ParticleSystem* ps = new ParticleSystem("ps", this);
+        ps->Start();
+        ps->Enable();
         AddObject(ps);
 
         //Start each object
@@ -75,6 +77,7 @@ namespace CoreEngine {
         if(hasSkybox) {
             skyboxCube->Update();
         }        
+        // ps->Update();
     }
 
 

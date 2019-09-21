@@ -6,6 +6,7 @@
 #include "../Shader.hpp"
 
 #include "../PostProcessing/PostProcessor.hpp"
+#include "../ParticleSystem/ParticleSystem.hpp"
 
 namespace KikooRenderer {
 namespace CoreEngine {
