@@ -37,41 +37,46 @@ set(MainWindowSrc
 	3DEngine/Renderers/Renderer.cpp
 	3DEngine/Renderers/HDRRenderer.cpp
 
-
 	3DEngine/Shaders/ShaderParams.cpp
 	3DEngine/Shaders/BlinnPhongShader.cpp
 	3DEngine/Shaders/GouraudShader.cpp
 	3DEngine/Shaders/PBRShader.cpp
 	3DEngine/Shaders/UnlitShader.cpp
 	3DEngine/Shaders/SelectedShader.cpp
-
+	
 	3DEngine/SpatialPartitioning/Octree.cpp
 	
-	Renderer/RayTracer.cpp
-	Renderer/Camera.cpp
-	Renderer/Material.cpp
-	Renderer/Shapes.cpp	
+	3DEngine/ParticleSystem/ParticleSystem.cpp
+	3DEngine/ParticleSystem/Particle.cpp
+	3DEngine/ParticleSystem/ParticleShader.cpp
+	3DEngine/ParticleSystem/ParticleTexture.cpp
+
 	
 	SceneTree/SceneTree.cpp
 	
 	ObjectDetails/ObjectDetails.cpp
 	ObjectDetails/ObjectParams.cpp
-
+	
 	Geometry/Util.cpp	
 	Geometry/Ray.cpp	
 	Geometry/Box.cpp	
-
+	
 	Util/QtUtil.cpp
 	Util/ModelLoader.cpp
 	Util/Image.cpp
-
+	
 	FileIO/SceneToFile.cpp
-
+	
 	AppManagement/PreferencesWindow.cpp
 	AppManagement/BackgroundPreferences.cpp
 	AppManagement/3DUIPreferences.cpp
 	AppManagement/PostProcessingPreferences.cpp
-)
+
+	Renderer/RayTracer.cpp
+	Renderer/Camera.cpp
+	Renderer/Material.cpp
+	Renderer/Shapes.cpp	
+	)
 
 add_executable(MainWindow ${MainWindowSrc})
 #target_link_libraries(MainWindow lib file name)

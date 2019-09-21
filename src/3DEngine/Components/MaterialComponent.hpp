@@ -59,7 +59,6 @@ class MaterialComponent : public Component {
 
 		bool receiveShadow = true;
 
-
 		MaterialInspector* materialInspector;
 		
 		ShaderParams* params;

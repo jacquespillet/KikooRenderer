@@ -214,6 +214,25 @@ glm::dmat4 TransformComponent::GetWorldTransRotMatrix() {
 }
 
 
+glm::dmat4 TransformComponent::GetWorldTransScaleMatrix() {
+	glm::dvec3 worldPos = position;
+	glm::dvec3 worldScale = scale;
+
+	Object3D* currentObject = object3D;
+	while (currentObject->parent != nullptr) {
+		glm::dvec3 parentScale = currentObject->parent->transform->scale;
+		glm::dvec3 parentPos = currentObject->parent->transform->position;
+		worldScale *= parentScale ;
+		worldPos += parentPos;
+		currentObject = currentObject->parent;
+	}
+
+	glm::dmat4 translateM = glm::translate(glm::dmat4(1.0f), worldPos);
+	glm::dmat4 scaleM = glm::scale(glm::dmat4(1.0f), worldScale);
+	return translateM * scaleM;
+}
+
+
 void TransformComponent::SetWorldX(double x) {
 	if (object3D->parent == nullptr) {
 		this->position.x = x;

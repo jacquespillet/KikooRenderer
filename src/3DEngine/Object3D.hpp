@@ -32,6 +32,8 @@ class Object3D {
 
         bool castShadow = true;
 
+        bool faceCamera = false;
+
         Object3D(std::string name, Scene* scene);
         ~Object3D();
 
@@ -40,13 +42,13 @@ class Object3D {
 		void ClearObjects();
         Component*  GetComponent(std::string name);
 
-        void Start();
-        void Enable();
-        void Render();
-        void DepthRenderPass(LightComponent* light);
-        void Update();
-        void Destroy();
-        void Recompute();
+        virtual void Start();
+        virtual void Enable();
+        virtual void Render();
+        virtual void DepthRenderPass(LightComponent* light);
+        virtual void Update();
+        virtual void Destroy();
+        virtual void Recompute();
 
         Object3D* Intersects(Geometry::Ray ray, double& distance);
 

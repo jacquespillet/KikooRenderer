@@ -136,10 +136,8 @@ void Object3D::Render() {
 	GETGL
 
 	if(!depthTest) ogl->glDisable(GL_DEPTH_TEST);
-
-	//TransformComponent* transform = (TransformComponent*)(this->transform); 
 	
-	glm::mat4 currentModelMatrix = transform->GetWorldModelMatrix();
+	glm::mat4 mMatrix = transform->GetWorldModelMatrix();
 
 	//Render child objects
 	for(int i=0; i<childObjects.size(); i++) {
@@ -152,23 +150,25 @@ void Object3D::Render() {
 	if(transform != nullptr) {
 		glm::mat4 vMatrix = scene->camera->GetViewMatrix();
 		glm::mat4 pMatrix = scene->camera->GetProjectionMatrix();
-		glm::mat4 mvpMatrix = pMatrix * vMatrix * currentModelMatrix;
-
 		
-		//bind shader
+		if(faceCamera) {	
+			mMatrix[0][0] = vMatrix[0][0]; mMatrix[1][0] = vMatrix[0][1]; mMatrix[2][0] = vMatrix[0][2];
+			mMatrix[0][1] = vMatrix[1][0]; mMatrix[1][1] = vMatrix[1][1]; mMatrix[2][1] = vMatrix[1][2];
+			mMatrix[0][2] = vMatrix[2][0]; mMatrix[1][2] = vMatrix[2][1]; mMatrix[2][2] = vMatrix[2][2];
+			mMatrix = glm::rotate(mMatrix, (float)transform->rotation.z * (float)DEGTORAD, glm::vec3(0.0f, 0.0f, 1.0f));
+			mMatrix = glm::scale(mMatrix, glm::vec3(transform->scale));
+		
+		}
+		
 		MaterialComponent* material = (MaterialComponent*)(this->GetComponent("Material"));
 		if(material != nullptr) {
-			material->SetupShaderUniforms(currentModelMatrix, vMatrix, pMatrix, this->scene);
+			material->SetupShaderUniforms(mMatrix, vMatrix, pMatrix, this->scene);
 			//Draw
 			for(int i=0; i<components.size(); i++) {
 				components[i]->OnRender();
 			}    
 		}
 	}
-	
-	//
-	//unbind shader
-	//
 	
 	//unbind shader program
 	ogl->glUseProgram(0);
@@ -184,7 +184,7 @@ void Object3D::DepthRenderPass(LightComponent* light) {
 
 	//TransformComponent* transform = (TransformComponent*)(this->transform); 
 	
-	glm::mat4 currentModelMatrix = transform->GetWorldModelMatrix();
+	glm::mat4 mMatrix = transform->GetWorldModelMatrix();
 
 	//Render child objects
 	for(int i=0; i<childObjects.size(); i++) {
@@ -204,13 +204,13 @@ void Object3D::DepthRenderPass(LightComponent* light) {
 			glm::mat4 vMatrix = light->viewMat;
 			glm::mat4 pMatrix = light->lightProjection;
 
-			glm::mat4 mvpMatrix = pMatrix * vMatrix * currentModelMatrix;
+			glm::mat4 mvpMatrix = pMatrix * vMatrix * mMatrix;
 			int modelViewProjectionMatrixLocation = ogl->glGetUniformLocation(material->shader->programShaderObject, "modelViewProjectionMatrix"); 
 			ogl->glUniformMatrix4fv(modelViewProjectionMatrixLocation, 1, false, glm::value_ptr(mvpMatrix));
 		}
 		if(light->type == 1) { //Point light, Set the 6 MVP matrices
 			int modelMatrixLocation = ogl->glGetUniformLocation(material->shader->programShaderObject, "modelMatrix"); 
-			ogl->glUniformMatrix4fv(modelMatrixLocation, 1, false, glm::value_ptr(currentModelMatrix));
+			ogl->glUniformMatrix4fv(modelMatrixLocation, 1, false, glm::value_ptr(mMatrix));
 		
             for (unsigned int i = 0; i < 6; ++i) {
 				std::string uniformName = "shadowMatrices[" + std::to_string(i) + "]";

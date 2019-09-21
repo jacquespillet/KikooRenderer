@@ -155,7 +155,6 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 		if(shader->isDepthPass) {
 			
 		} else {
-
 			glm::mat4 mvpMatrix = projectionMatrix * viewMatrix * modelMatrix;
 			ogl->glUseProgram(shader->programShaderObject);
 
@@ -183,7 +182,18 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 				ogl->glUniform1i(hasCubemapLocation, 0);
 			}
 			
-			
+			if (albedoTex.loaded) {
+				albedoTex.Use();
+				int texLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "albedoTexture");
+				ogl->glUniform1i(texLocation, 0);
+
+				int hasAlbedoTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasAlbedoTex");
+				ogl->glUniform1i(hasAlbedoTexLocation, 1);
+			} else {
+				int hasAlbedoTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasAlbedoTex");
+				ogl->glUniform1i(hasAlbedoTexLocation, 0);
+			}
+
 			if(this->shader->isLit) {
 
 				int influenceLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "materialInfluence"); 
@@ -196,17 +206,6 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 				int flipNormalsLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "flipNormals"); 
 				ogl->glUniform1i(flipNormalsLocation, flipNormals);
 
-				if (albedoTex.loaded) {
-					albedoTex.Use();
-					int texLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "albedoTexture");
-					ogl->glUniform1i(texLocation, 0);
-
-					int hasAlbedoTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasAlbedoTex");
-					ogl->glUniform1i(hasAlbedoTexLocation, 1);
-				} else {
-					int hasAlbedoTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasAlbedoTex");
-					ogl->glUniform1i(hasAlbedoTexLocation, 0);
-				}
 
 				if(this->shader->GetId() != SHADER_IDS::UNLIT) {
 					int receiveShadowLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "receiveShadow"); 
