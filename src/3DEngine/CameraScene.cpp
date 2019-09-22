@@ -17,9 +17,9 @@ CameraScene::CameraScene(Scene* _scene, double _eyeDistance, double _fov, double
 
     UpdateProjectionMatrix();
 
-    this->transform->position.x = 5;
-    this->transform->position.y = 10;
-    this->transform->position.z = -20;
+    this->transform->position.x = 0;
+    this->transform->position.y = 5;
+    this->transform->position.z = -5;
 
 	projectionType = ProjectionType::Perspective;
     viewMatrix = glm::inverse(this->transform->GetModelMatrix()); 

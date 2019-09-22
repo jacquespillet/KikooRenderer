@@ -66,6 +66,7 @@ set(MainWindowSrc
 	Util/ModelLoader.cpp
 	Util/Image.cpp
 	Util/RandomUtil.cpp
+	Util/NoiseUtil.cpp
 	
 	FileIO/SceneToFile.cpp
 	

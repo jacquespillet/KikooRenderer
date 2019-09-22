@@ -19,6 +19,29 @@ namespace CoreEngine
 		LoadFromFile(path);
 	}
 
+	Texture::Texture(GLuint _texIndex, std::vector<uint8_t> data, int width, int height, int bpp) { 
+		GETGL
+		texIndex = _texIndex;		
+		ogl->glActiveTexture(texIndex);
+		ogl->glGenTextures(1, &glTex);  
+		ogl->glBindTexture(GL_TEXTURE_2D, glTex);
+
+		ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+		ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+		
+		ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		GLint texType = (bpp == 3) ? GL_RGB : GL_RGBA;
+		
+		ogl->glTexImage2D(GL_TEXTURE_2D, 0, texType, width, height, 0, texType, GL_UNSIGNED_BYTE, (unsigned char *)data.data());
+		ogl->glGenerateMipmap(GL_TEXTURE_2D);
+		
+		ogl->glBindTexture(GL_TEXTURE_2D, 0);
+		loaded = true;  
+	}
+	
+
 	void Texture::Use() {
 		GETGL;
 		ogl->glActiveTexture(texIndex);
@@ -42,7 +65,6 @@ namespace CoreEngine
 		GLint texType = (nrChannels == 3) ? GL_RGB : GL_RGBA;
 		if (data)
 		{
-			std::cout << width << " " << height << "  " << nrChannels << std::endl;
 			ogl->glTexImage2D(GL_TEXTURE_2D, 0, texType, width, height, 0, texType, GL_UNSIGNED_BYTE, data);
 			ogl->glGenerateMipmap(GL_TEXTURE_2D);
 		}

@@ -5,10 +5,7 @@
 #include "Framebuffer.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/LightComponent.hpp"
-
-#include "ParticleSystem/ParticleSystem.hpp"
-
-#include "WaterTiles/WaterTile_1.hpp"
+#include "Util/NoiseUtil.hpp"
 
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLFunctions_3_3_Core>
@@ -22,6 +19,8 @@ namespace CoreEngine {
 		camera = new CameraScene(this, 1.0, 70 * DEGTORAD, 0.1, 1000.0, 1.0);
         this->started = false;
     }
+    Object3D* quad;
+    MaterialComponent* mat;
 	void Scene::Start() {
 		GETGL
 
@@ -46,57 +45,12 @@ namespace CoreEngine {
         skyboxCube = GetCube(this, "Cubemap", glm::dvec3(0), glm::vec3(0), glm::dvec3(100), glm::dvec4(0.1, 0.1, 0.1, 1));
         skyboxCube->Start();
         skyboxCube->Enable();
-
-        WaterTile_1* wt1 = new WaterTile_1("wt1", this);
-        wt1->Start();
-        wt1->Enable();
-        AddObject(wt1);
-
-        Object3D* cube0 = GetCube(this, "cube0", glm::dvec3(0), glm::vec3(0), glm::dvec3(30), glm::dvec4(1));
-        MaterialComponent* mat = (MaterialComponent*) cube0->GetComponent("Material");
-        mat->flipNormals = true;
-        mat->albedoTex = Texture("C:/Users/Jacques/Pictures/Textures/Grid/Glass_Pattern_002_basecolor.jpg", GL_TEXTURE0); 
-        cube0->Start();
-        cube0->Enable();
-        AddObject(cube0);
-
-        Object3D* cube1 = GetCube(this, "cube1", glm::dvec3(-8, 1, 1), glm::vec3(0), glm::dvec3(2, 2, 2), glm::dvec4(1, 0.2, 0.1, 1));
-        cube1->Start();
-        cube1->Enable();
-        AddObject(cube1);
-
         
-        Object3D* cube2 = GetCube(this, "cube2", glm::dvec3(8, 1, -1), glm::vec3(0), glm::dvec3(3, 2, 2), glm::dvec4(1, 0.2, 0.1, 1));
-        cube2->Start();
-        cube2->Enable();
-        AddObject(cube2);
-
-        
-        Object3D* cube3 = GetCube(this, "cube3", glm::dvec3(0, 1, 8), glm::vec3(0), glm::dvec3(2, 1, 4), glm::dvec4(1, 0.2, 0.1, 1));
-        cube3->Start();
-        cube3->Enable();
-        AddObject(cube3);
-
-        
-        Object3D* cube4 = GetCube(this, "cube4", glm::dvec3(-3, -2, 3), glm::vec3(0), glm::dvec3(4, 1, 2), glm::dvec4(0.2, 0.8, 0.1, 1));
-        cube4->Start();
-        cube4->Enable();
-        AddObject(cube4);
-
-        
-        Object3D* cube5 = GetCube(this, "cube5", glm::dvec3(5, -4, -4), glm::vec3(0), glm::dvec3(2, 4, 2), glm::dvec4(0.2, 0.8, 0.1, 1));
-        cube5->Start();
-        cube5->Enable();
-        AddObject(cube5);
-
-        
-        Object3D* cube6 = GetCube(this, "cube6", glm::dvec3(0, -2, 8), glm::vec3(0), glm::dvec3(4, 1, 3), glm::dvec4(0.2, 0.8, 0.1, 1));
-        cube6->Start();
-        cube6->Enable();
-        AddObject(cube6);
-
-
-
+        quad = GetQuad(this, "quad", glm::dvec3(0), glm::vec3(0), glm::dvec3(2), glm::dvec4(1, 0.2, 0.1, 1));
+        mat = (MaterialComponent*) quad->GetComponent("Material");        
+        quad->Start();
+        quad->Enable();
+        AddObject(quad);
 
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
@@ -117,6 +71,43 @@ namespace CoreEngine {
     }
 
     void Scene::OnUpdate() {
+
+        //Get The Noise 
+        //________________________________________________________________________
+        int resolution = 1024;
+        float step = 1 / (float)resolution;
+        int bpp = 4;
+        std::vector<uint8_t>colors(resolution * resolution * bpp);
+        for(int y=0; y<resolution; y++) {
+            float yPos = (float) y * step;
+            for(int x=0; x<resolution; x++) {
+                int inx = y * resolution * bpp + x * bpp;
+                float xPos = (float) x * step;
+
+                // float color = KikooRenderer::Util::GetValueNoise1D(xPos, 8);
+                // float color = KikooRenderer::Util::GetValueNoise2D(xPos,yPos, 256);
+                // float color = KikooRenderer::Util::GetValueNoise3D(xPos,yPos, elapsedTime, 8);
+                
+                // float color = KikooRenderer::Util::GetPerlinNoise1D(xPos, 256);
+                // float color = KikooRenderer::Util::GetPerlinNoise2D(xPos, yPos,8);
+                // float color = KikooRenderer::Util::GetPerlinNoise3D(xPos, yPos,elapsedTime, 8);
+
+                // float color = KikooRenderer::Util::GetFracNoise1D(xPos,yPos, 4, 4, 2.0, 0.5);
+                // float color = KikooRenderer::Util::GetFracNoise2D(xPos,yPos, 4, 4, 2.0, 0.5);
+                // float color = KikooRenderer::Util::GetFracNoise3D(xPos,yPos, elapsedTime, 4, 4, 2.0, 0.5);
+                color = color * 0.5 + 0.5;
+
+                uint8_t byteColor = (uint8_t)(color * 255.0f);
+                colors[inx + 0] = byteColor;
+                colors[inx + 1] = byteColor;
+                colors[inx + 2] = byteColor;
+                colors[inx + 3] = 255;
+            }
+        }
+        mat->albedoTex = Texture(GL_TEXTURE0, colors, resolution, resolution, bpp);
+        triggerRefresh = true;
+
+        //________________________________________________________________________
         for(int i=0; i<objects3D.size(); i++) {
             if(!objects3D[i]->started) objects3D[i]->Start(); 
             if(!objects3D[i]->enabled) objects3D[i]->Enable();
@@ -125,6 +116,7 @@ namespace CoreEngine {
         if(hasSkybox) {
             skyboxCube->Update();
         }        
+        elapsedTime += deltaTime;
     }
 
 

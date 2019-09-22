@@ -64,6 +64,7 @@ class Scene {
 
 		clock_t previousTime=0;
 		double deltaTime;
+		double elapsedTime = 0.0;
 
 		std::vector<Object3D*> selectedObjects;
 		
