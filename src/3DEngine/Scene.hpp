@@ -12,7 +12,7 @@
 namespace KikooRenderer {
 class ObjectDetailsPanel;
 class Renderer;
-// class ParticleSystem;
+class ParticleSystem;
 
 namespace CoreEngine {
 class Scene {
@@ -28,7 +28,7 @@ class Scene {
 		std::vector<Object3D*> objects3D;
 		std::vector<Object3D*> lightObjects;
 		// std::vector<ParticleSystem*> particleSystems;
-		// ParticleSystem* ps;
+		ParticleSystem* ps;
 
 		StandardShaders standardShaders;
 		CameraScene* camera;

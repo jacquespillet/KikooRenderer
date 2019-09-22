@@ -4,6 +4,7 @@
 #include "../Texture.hpp"
 #include "Util/RandomUtil.hpp"
 
+
 #include "ParticleShader.hpp"
 namespace KikooRenderer {
 
@@ -155,7 +156,7 @@ void ParticleSystem::EmitParticle() {
     float finalLifeLength = Util::GenerateValue(lifeLength, lifeError);
     float finalRotation = isRandomRotation ? Util::GetRand() * 360.0f : 0;
 
-    Particle particle(scene, numRows, this->transform->position, velocity, gravityFactor, finalLifeLength, finalRotation, finalScale);   
+    Particle particle(scene, numRows, this->transform->position, velocity, gravityFactor, finalLifeLength, finalRotation, finalScale, useCurlNoise);   
     particles.push_back(particle); 
 }
 

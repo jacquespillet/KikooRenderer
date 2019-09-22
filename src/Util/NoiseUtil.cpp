@@ -52,10 +52,11 @@ int hash[512] = {
 };
 int hashMask = 255;
 
-NoiseSample GetValueNoise1D(float x, int frequency) {
+NoiseSample GetValueNoise1D(float x, float frequency) {
     x *= frequency;
 
     int i0 = (int)std::floor(x);
+
     float t = x - i0;
 
     i0 &= hashMask;
@@ -79,7 +80,7 @@ NoiseSample GetValueNoise1D(float x, int frequency) {
 }
 
 
-NoiseSample GetValueNoise2D(float x, float y, int frequency) {
+NoiseSample GetValueNoise2D(float x, float y, float frequency) {
     x *= frequency;
     y *= frequency;
 
@@ -126,7 +127,7 @@ NoiseSample GetValueNoise2D(float x, float y, int frequency) {
     return sample; 
 }
 
-NoiseSample GetValueNoise3D(float x, float y, float t, int frequency) {
+NoiseSample GetValueNoise3D(float x, float y, float t, float frequency) {
     x *= frequency;
     y *= frequency;
     t *= frequency;
@@ -193,7 +194,7 @@ float gradients1D[2] = {
 };
 int gradientMask1D = 1;
 
-NoiseSample GetPerlinNoise1D(float x, int frequency) {
+NoiseSample GetPerlinNoise1D(float x, float frequency) {
     x *= frequency;
     int i0 = (int)std::floor(x);
     float t0 = x - i0;
@@ -239,7 +240,7 @@ glm::vec2 gradients2D[8] = {
 int gradientMask2D = 7;
 float sqr2 = 1.414213562373095;
 
-NoiseSample GetPerlinNoise2D(float x, float y, int frequency) {
+NoiseSample GetPerlinNoise2D(float x, float y, float frequency) {
     x *= frequency;
     y *= frequency;
 
@@ -315,7 +316,7 @@ glm::vec3 gradients3D[16] = {
 int gradientsMask3D = 15;
 
 
-NoiseSample GetPerlinNoise3D(float x, float y, float z, int frequency) {
+NoiseSample GetPerlinNoise3D(float x, float y, float z, float frequency) {
     x *= frequency;
     y *= frequency;
     z *= frequency;
@@ -397,7 +398,7 @@ NoiseSample GetPerlinNoise3D(float x, float y, float z, int frequency) {
 }
 
 //Perlin Noise  
-NoiseSample GetFracNoise1D(float x, int frequency, int octaves, float lacunarity, float persistence ) {
+NoiseSample GetFracNoise1D(float x, float frequency, int octaves, float lacunarity, float persistence ) {
     NoiseSample sum = GetPerlinNoise1D(x, frequency);
     float amplitude = 1.0f;
     float range = 1.0f;
@@ -415,7 +416,7 @@ NoiseSample GetFracNoise1D(float x, int frequency, int octaves, float lacunarity
     return sum;
 }
 
-NoiseSample GetFracNoise2D(float x, float y,int frequency, int octaves, float lacunarity, float persistence) {
+NoiseSample GetFracNoise2D(float x, float y, float frequency, int octaves, float lacunarity, float persistence) {
     NoiseSample sum  = GetPerlinNoise2D(x, y, frequency);
     float amplitude = 1.0f;
     float range = 1.0f;
@@ -433,7 +434,7 @@ NoiseSample GetFracNoise2D(float x, float y,int frequency, int octaves, float la
     return sum;
 }
 
-NoiseSample GetFracNoise3D(float x, float y, float t,int frequency, int octaves, float lacunarity, float persistence ) {
+NoiseSample GetFracNoise3D(float x, float y, float t,float frequency, int octaves, float lacunarity, float persistence ) {
     NoiseSample sum = GetPerlinNoise3D(x, y, t,  frequency);
     float amplitude = 1.0f;
     float range = 1.0f;

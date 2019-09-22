@@ -38,8 +38,8 @@ private:
     // Main parameters
     float pps = 200;
     float speed = 2;
-    float scale = 0.5;
-    float lifeLength = 4;
+    float scale = 2;
+    float lifeLength = 10;
     float gravityFactor = 0.01;
     
     //_________________________
@@ -64,6 +64,8 @@ private:
     float toSpawn = 0;
 
     int numRows = 1;
+
+    bool useCurlNoise = true;
 };
 
 }
