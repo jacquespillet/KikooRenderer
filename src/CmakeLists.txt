@@ -8,6 +8,7 @@ set(MainWindowSrc
 	3DEngine/Components/Component.cpp
 	3DEngine/Components/BaseMeshes.cpp
 	3DEngine/Components/MeshFilterComponent.cpp
+	3DEngine/Components/TerrainComponent.cpp
 	3DEngine/Components/TransformComponent.cpp
 	3DEngine/Components/MaterialComponent.cpp
 	3DEngine/Components/BoundingComponent.cpp

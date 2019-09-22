@@ -48,7 +48,7 @@ int hash[512] = {
 };
 int hashMask = 255;
 
-float GetValueNoise1D(float x, int frequency) {
+NoiseSample GetValueNoise1D(float x, int frequency) {
     x *= frequency;
 
     int i0 = (int)std::floor(x);
@@ -62,11 +62,15 @@ float GetValueNoise1D(float x, int frequency) {
     
     t = Smooth(t);
     // return hash[i0] / (float)hashMask;
-    return Lerp(h0, h1, t) / (float)hashMask;
+    NoiseSample sample;
+    sample.value = Lerp(h0, h1, t) / (float)hashMask;
+    sample.derivative = glm::vec3(0, 0, 0);
+    sample.derivative *= frequency;
+    return sample; 
 }
 
 
-float GetValueNoise2D(float x, float y, int frequency) {
+NoiseSample GetValueNoise2D(float x, float y, int frequency) {
     x *= frequency;
     y *= frequency;
 
@@ -98,10 +102,14 @@ float GetValueNoise2D(float x, float y, int frequency) {
     int h00 = hash[h0 + iy0];
     int h11 = hash[h1 + iy1];
 
-    return  Lerp( Lerp(h00, h10, tx), Lerp(h01, h11, tx), ty) / (float)hashMask;
+    NoiseSample sample;
+    sample.value = Lerp( Lerp(h00, h10, tx), Lerp(h01, h11, tx), ty) / (float)hashMask;
+    sample.derivative = glm::vec3(0, 0, 0);
+    sample.derivative *= frequency;
+    return sample; 
 }
 
-float GetValueNoise3D(float x, float y, float t, int frequency) {
+NoiseSample GetValueNoise3D(float x, float y, float t, int frequency) {
     x *= frequency;
     y *= frequency;
     t *= frequency;
@@ -140,11 +148,14 @@ float GetValueNoise3D(float x, float y, float t, int frequency) {
     int h011 = hash[h01 + it1];
     int h111 = hash[h11 + it1];  
     
-
-    return Lerp(
+    NoiseSample sample;
+    sample.value = Lerp(
         Lerp(Lerp(h000, h100, tx), Lerp(h010, h110, tx), ty),
         Lerp(Lerp(h001, h101, tx), Lerp(h011, h111, tx), ty),
         tt) * (1.0f / hashMask);
+    sample.derivative = glm::vec3(0, 0, 0);
+    sample.derivative *= frequency;
+    return sample; 
 }
 
 
@@ -153,7 +164,7 @@ float gradients1D[2] = {
 };
 int gradientMask1D = 1;
 
-float GetPerlinNoise1D(float x, int frequency) {
+NoiseSample GetPerlinNoise1D(float x, int frequency) {
     x *= frequency;
     int i0 = (int)std::floor(x);
     float t0 = x - i0;
@@ -169,7 +180,13 @@ float GetPerlinNoise1D(float x, int frequency) {
     float v1 = g1 * t1;
 
     float t = Smooth(t0);
-    return Lerp(v0, v1, t) * 2;
+
+    NoiseSample sample;
+    sample.value = Lerp(v0, v1, t) * 2;
+    sample.derivative = glm::vec3(0, 0, 0);
+    sample.derivative *= frequency;
+    return sample; 
+
 }
 
 
@@ -186,7 +203,7 @@ glm::vec2 gradients2D[8] = {
 int gradientMask2D = 7;
 float sqr2 = 1.414213562373095;
 
-float GetPerlinNoise2D(float x, float y, int frequency) {
+NoiseSample GetPerlinNoise2D(float x, float y, int frequency) {
     x *= frequency;
     y *= frequency;
 
@@ -215,10 +232,17 @@ float GetPerlinNoise2D(float x, float y, int frequency) {
     
     float tx = Smooth(tx0);
     float ty = Smooth(ty0);
-    return Lerp(
+
+
+    NoiseSample sample;
+    sample.value = Lerp(
         Lerp(v00, v10, tx),
         Lerp(v01, v11, tx),
         ty) * sqr2;
+    sample.derivative = glm::vec3(0, 0, 0);
+    sample.derivative *= frequency;
+    return sample; 
+
 }
 glm::vec3 gradients3D[16] = {
     glm::vec3( 1.0f, 1.0f, 0.0f),
@@ -243,7 +267,7 @@ glm::vec3 gradients3D[16] = {
 int gradientsMask3D = 15;
 
 
-float GetPerlinNoise3D(float x, float y, float z, int frequency) {
+NoiseSample GetPerlinNoise3D(float x, float y, float z, int frequency) {
     x *= frequency;
     y *= frequency;
     z *= frequency;
@@ -291,15 +315,21 @@ float GetPerlinNoise3D(float x, float y, float z, int frequency) {
     float tx = Smooth(tx0);
     float ty = Smooth(ty0);
     float tz = Smooth(tz0);
-    return Lerp(
+
+
+    NoiseSample sample;
+    sample.value =Lerp(
         Lerp(Lerp(v000, v100, tx), Lerp(v010, v110, tx), ty),
         Lerp(Lerp(v001, v101, tx), Lerp(v011, v111, tx), ty),
         tz);
+    sample.derivative = glm::vec3(0, 0, 0);
+    sample.derivative *= frequency;
+    return sample; 
 }
 
 //Perlin Noise  
-float GetFracNoise1D(float x, int frequency, int octaves, float lacunarity, float persistence ) {
-    float sum = GetPerlinNoise1D(x, frequency);
+NoiseSample GetFracNoise1D(float x, int frequency, int octaves, float lacunarity, float persistence ) {
+    NoiseSample sum = GetPerlinNoise1D(x, frequency);
     float amplitude = 1.0f;
     float range = 1.0f;
 
@@ -307,13 +337,17 @@ float GetFracNoise1D(float x, int frequency, int octaves, float lacunarity, floa
         frequency *= lacunarity;
         amplitude *= persistence;
         range += amplitude;
-        sum += GetPerlinNoise1D(x, frequency) * amplitude;
+        NoiseSample sample = GetPerlinNoise1D(x, frequency);
+        sum.value += sample.value * amplitude;
+        sum.derivative += sample.derivative * amplitude;
     }
-    return sum / range;
+    sum.value /= range;
+    sum.derivative /= range;
+    return sum;
 }
 
-float GetFracNoise2D(float x, float y,int frequency, int octaves, float lacunarity, float persistence) {
-    float sum = GetPerlinNoise2D(x, y, frequency);
+NoiseSample GetFracNoise2D(float x, float y,int frequency, int octaves, float lacunarity, float persistence) {
+    NoiseSample sum  = GetPerlinNoise2D(x, y, frequency);
     float amplitude = 1.0f;
     float range = 1.0f;
 
@@ -321,13 +355,17 @@ float GetFracNoise2D(float x, float y,int frequency, int octaves, float lacunari
         frequency *= lacunarity;
         amplitude *= persistence;
         range += amplitude;
-        sum += GetPerlinNoise2D(x , y, frequency) * amplitude;
+        NoiseSample sample = GetPerlinNoise2D(x , y, frequency);
+        sum.value += sample.value * amplitude;
+        sum.derivative += sample.derivative * amplitude;
     }
-    return sum / range;
+    sum.value /= range;
+    sum.derivative /= range;
+    return sum;
 }
 
-float GetFracNoise3D(float x, float y, float t,int frequency, int octaves, float lacunarity, float persistence ) {
-    float sum = GetPerlinNoise3D(x, y, t,  frequency);
+NoiseSample GetFracNoise3D(float x, float y, float t,int frequency, int octaves, float lacunarity, float persistence ) {
+    NoiseSample sum = GetPerlinNoise3D(x, y, t,  frequency);
     float amplitude = 1.0f;
     float range = 1.0f;
 
@@ -335,9 +373,13 @@ float GetFracNoise3D(float x, float y, float t,int frequency, int octaves, float
         frequency *= lacunarity;
         amplitude *= persistence;
         range += amplitude;
-        sum += GetPerlinNoise3D(x, y, t,  frequency) * amplitude;
+        NoiseSample sample = GetPerlinNoise3D(x, y, t,  frequency);
+        sum.value += sample.value * amplitude;
+        sum.derivative += sample.derivative * amplitude;
     }
-    return sum / range;    
+    sum.value /= range;
+    sum.derivative /= range;
+    return sum;    
 }
 }
 }

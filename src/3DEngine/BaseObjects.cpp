@@ -453,8 +453,8 @@ Object3D* GetTerrain(Scene* scene, std::string name,glm::dvec3 _position, glm::d
     std::vector<glm::dvec4> colors;
     std::vector<int> triangles;
 
-    float xOffset = width / subdivisionsX;
-    float yOffset = height / subdivisionsY;
+    float xOffset = width / (float)subdivisionsX;
+    float yOffset = height / (float)subdivisionsY;
 
     //
     ///Vertices
@@ -469,8 +469,8 @@ Object3D* GetTerrain(Scene* scene, std::string name,glm::dvec3 _position, glm::d
 
             if(xInx < subdivisionsX-1 && yInx < subdivisionsY-1) {
                 triangles.push_back(numAdded);
-                triangles.push_back(numAdded + subdivisionsX);
                 triangles.push_back(numAdded + subdivisionsX + 1);
+                triangles.push_back(numAdded + subdivisionsX);
                 
                 triangles.push_back(numAdded);
                 triangles.push_back(numAdded + 1);
@@ -501,9 +501,7 @@ Object3D* GetTerrain(Scene* scene, std::string name,glm::dvec3 _position, glm::d
 
     BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
 
-    FluidComponent* fluid = new FluidComponent(newObject);
 
-    newObject->AddComponent(fluid);
     newObject->AddComponent(material);
 	newObject->transform = transform;
     newObject->AddComponent(boundingBox);
