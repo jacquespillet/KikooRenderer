@@ -155,6 +155,8 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 		if(shader->isDepthPass) {
 			
 		} else {
+			if(flipNormals) ogl->glCullFace(GL_FRONT);
+
 			glm::mat4 mvpMatrix = projectionMatrix * viewMatrix * modelMatrix;
 			ogl->glUseProgram(shader->programShaderObject);
 

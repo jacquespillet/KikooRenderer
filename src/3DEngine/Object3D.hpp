@@ -44,11 +44,13 @@ class Object3D {
 
         virtual void Start();
         virtual void Enable();
-        virtual void Render();
+        virtual void Render(glm::mat4* overrideViewMatrix = nullptr);
         virtual void DepthRenderPass(LightComponent* light);
         virtual void Update();
         virtual void Destroy();
         virtual void Recompute();
+        virtual void WindowResize(int w, int h);
+
 
         Object3D* Intersects(Geometry::Ray ray, double& distance);
 

@@ -8,6 +8,8 @@
 
 #include "ParticleSystem/ParticleSystem.hpp"
 
+#include "WaterTiles/WaterTile_1.hpp"
+
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLFunctions_3_3_Core>
 #define GLV QOpenGLFunctions_3_3_Core
@@ -45,10 +47,56 @@ namespace CoreEngine {
         skyboxCube->Start();
         skyboxCube->Enable();
 
-        ParticleSystem* ps = new ParticleSystem("ps", this);
-        ps->Start();
-        ps->Enable();
-        AddObject(ps);
+        WaterTile_1* wt1 = new WaterTile_1("wt1", this);
+        wt1->Start();
+        wt1->Enable();
+        AddObject(wt1);
+
+        Object3D* cube0 = GetCube(this, "cube0", glm::dvec3(0), glm::vec3(0), glm::dvec3(30), glm::dvec4(1));
+        MaterialComponent* mat = (MaterialComponent*) cube0->GetComponent("Material");
+        mat->flipNormals = true;
+        mat->albedoTex = Texture("C:/Users/Jacques/Pictures/Textures/Grid/Glass_Pattern_002_basecolor.jpg", GL_TEXTURE0); 
+        cube0->Start();
+        cube0->Enable();
+        AddObject(cube0);
+
+        Object3D* cube1 = GetCube(this, "cube1", glm::dvec3(-8, 1, 1), glm::vec3(0), glm::dvec3(2, 2, 2), glm::dvec4(1, 0.2, 0.1, 1));
+        cube1->Start();
+        cube1->Enable();
+        AddObject(cube1);
+
+        
+        Object3D* cube2 = GetCube(this, "cube2", glm::dvec3(8, 1, -1), glm::vec3(0), glm::dvec3(3, 2, 2), glm::dvec4(1, 0.2, 0.1, 1));
+        cube2->Start();
+        cube2->Enable();
+        AddObject(cube2);
+
+        
+        Object3D* cube3 = GetCube(this, "cube3", glm::dvec3(0, 1, 8), glm::vec3(0), glm::dvec3(2, 1, 4), glm::dvec4(1, 0.2, 0.1, 1));
+        cube3->Start();
+        cube3->Enable();
+        AddObject(cube3);
+
+        
+        Object3D* cube4 = GetCube(this, "cube4", glm::dvec3(-3, -2, 3), glm::vec3(0), glm::dvec3(4, 1, 2), glm::dvec4(0.2, 0.8, 0.1, 1));
+        cube4->Start();
+        cube4->Enable();
+        AddObject(cube4);
+
+        
+        Object3D* cube5 = GetCube(this, "cube5", glm::dvec3(5, -4, -4), glm::vec3(0), glm::dvec3(2, 4, 2), glm::dvec4(0.2, 0.8, 0.1, 1));
+        cube5->Start();
+        cube5->Enable();
+        AddObject(cube5);
+
+        
+        Object3D* cube6 = GetCube(this, "cube6", glm::dvec3(0, -2, 8), glm::vec3(0), glm::dvec3(4, 1, 3), glm::dvec4(0.2, 0.8, 0.1, 1));
+        cube6->Start();
+        cube6->Enable();
+        AddObject(cube6);
+
+
+
 
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
@@ -77,7 +125,6 @@ namespace CoreEngine {
         if(hasSkybox) {
             skyboxCube->Update();
         }        
-        // ps->Update();
     }
 
 
@@ -209,6 +256,9 @@ namespace CoreEngine {
         this->camera->aspect = aspectRatio;
         this->camera->UpdateProjectionMatrix();
         renderer->Resize(w, h);
+        for(int i=0; i<objects3D.size(); i++) {
+            objects3D[i]->WindowResize(w, h);
+        }
     }
     void Scene::SetRenderPipeline(RENDER_PIPELINE pipeline) {
         this->glWindow->makeCurrent();

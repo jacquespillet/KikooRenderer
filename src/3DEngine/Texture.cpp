@@ -42,6 +42,7 @@ namespace CoreEngine
 		GLint texType = (nrChannels == 3) ? GL_RGB : GL_RGBA;
 		if (data)
 		{
+			std::cout << width << " " << height << "  " << nrChannels << std::endl;
 			ogl->glTexImage2D(GL_TEXTURE_2D, 0, texType, width, height, 0, texType, GL_UNSIGNED_BYTE, data);
 			ogl->glGenerateMipmap(GL_TEXTURE_2D);
 		}

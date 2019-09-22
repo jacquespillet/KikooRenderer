@@ -18,7 +18,7 @@ public:
 
     void Start() override;
     void Enable() override;
-    void Render() override;
+    void Render(glm::mat4* overrideViewMatrix = nullptr) override;
     void DepthRenderPass(LightComponent* light) override;
     void Update() override;
     void Destroy() override;

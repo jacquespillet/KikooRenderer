@@ -131,8 +131,9 @@ Component* Object3D::GetComponent(std::string name) {
 	}
 	return nullptr;
 }
+void Object3D::WindowResize(int w, int h) {}
 
-void Object3D::Render() {
+void Object3D::Render(glm::mat4* overrideViewMatrix) {
 	GETGL
 
 	if(!depthTest) ogl->glDisable(GL_DEPTH_TEST);
@@ -148,7 +149,7 @@ void Object3D::Render() {
 	
 
 	if(transform != nullptr) {
-		glm::mat4 vMatrix = scene->camera->GetViewMatrix();
+		glm::mat4 vMatrix = (overrideViewMatrix == nullptr) ? scene->camera->GetViewMatrix() : (*overrideViewMatrix);
 		glm::mat4 pMatrix = scene->camera->GetProjectionMatrix();
 		
 		if(faceCamera) {	
