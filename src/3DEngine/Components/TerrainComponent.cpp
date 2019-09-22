@@ -58,19 +58,12 @@ TerrainComponent::TerrainComponent(Object3D* object, float width,float height,in
     for(int i=0; i<mesh->vertices.size(); i++) {
         float xPos = mesh->vertices[i].position.x / width;
         float yPos = mesh->vertices[i].position.z / height;
-        KikooRenderer::Util::NoiseSample sample = KikooRenderer::Util::GetFracNoise2D(xPos,yPos, 6, 1, 2.0, 0.5);
+        KikooRenderer::Util::NoiseSample sample = KikooRenderer::Util::GetFracNoise2D(xPos,yPos, 2, 6, 2.0, 0.5);
         float color = sample.value;
         color = color * 0.5 + 0.5;
-        color *= 2.0;
+        color *= 4.0;
         mesh->vertices[i].position.y = color;
-    }
-
-    for(int v=0; v<mesh->vertices.size(); v++) {
-        int x = v % resolution;
-        int z = v / resolution;
-        glm::vec3 tangent = glm::vec3(1, GetXDerivative(x, z, v), 0);
-        glm::vec3 bitangent = glm::vec3(0, GetZDerivative(x, z, v), 1);
-        mesh->vertices[v].normal = glm::normalize(glm::cross(bitangent, tangent));
+        mesh->vertices[i].normal = glm::normalize(glm::vec3(-sample.derivative.x, 1.0f, -sample.derivative.y));        
     }
 
     mesh->RebuildBuffers();
@@ -79,7 +72,19 @@ TerrainComponent::TerrainComponent(Object3D* object, float width,float height,in
 void TerrainComponent::OnStart(){}
 void TerrainComponent::OnEnable(){}
 void TerrainComponent::OnUpdate(){
+    for(int i=0; i<mesh->vertices.size(); i++) {
+        float xPos = mesh->vertices[i].position.x / width;
+        float yPos = mesh->vertices[i].position.z / height;
+        KikooRenderer::Util::NoiseSample sample = KikooRenderer::Util::GetFracNoise3D(xPos,yPos, object3D->scene->elapsedTime, 2, 6, 2.0, 0.5);
+        float color = sample.value;
+        color = color * 0.5 + 0.5;
+        color *= 4.0;
+        mesh->vertices[i].position.y = color;
+        mesh->vertices[i].normal = glm::normalize(glm::vec3(-sample.derivative.x, 1.0f, -sample.derivative.y));        
+    }
     
+    mesh->RebuildBuffers();
+    object3D->scene->triggerRefresh = true;    
 }
 void TerrainComponent::OnRender(){} 
 void TerrainComponent::OnDestroy(){} 

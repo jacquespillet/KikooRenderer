@@ -54,45 +54,6 @@ namespace CoreEngine {
         quad->AddComponent(terrain);
         AddObject(quad);
 
-        // quad = GetQuad(this, "quad", glm::dvec3(0), glm::vec3(0), glm::dvec3(2), glm::dvec4(1, 0.2, 0.1, 1));
-        // mat = (MaterialComponent*) quad->GetComponent("Material");        
-        // quad->Start();
-        // quad->Enable();
-        // AddObject(quad);          
-
-        // int resolution = 1024;
-        // float step = 1 / (float)resolution;
-        // int bpp = 4;
-        // std::vector<uint8_t>colors(resolution * resolution * bpp);
-        // for(int y=0; y<resolution; y++) {
-        //     float yPos = (float) y * step;
-        //     for(int x=0; x<resolution; x++) {
-        //         int inx = y * resolution * bpp + x * bpp;
-        //         float xPos = (float) x * step;
-
-        //         // float color = KikooRenderer::Util::GetValueNoise1D(xPos, 8);
-        //         // float color = KikooRenderer::Util::GetValueNoise2D(xPos,yPos, 256);
-        //         // float color = KikooRenderer::Util::GetValueNoise3D(xPos,yPos, elapsedTime, 8);
-                
-        //         // float color = KikooRenderer::Util::GetPerlinNoise1D(xPos, 256);
-        //         // float color = KikooRenderer::Util::GetPerlinNoise2D(xPos, yPos,8);
-        //         // float color = KikooRenderer::Util::GetPerlinNoise3D(xPos, yPos,elapsedTime, 8);
-
-        //         // float color = KikooRenderer::Util::GetFracNoise1D(xPos,yPos, 4, 4, 2.0, 0.5);
-        //         // float color = KikooRenderer::Util::GetFracNoise2D(xPos,yPos, 4, 4, 2.0, 0.5);
-        //         float color = KikooRenderer::Util::GetFracNoise2D(xPos,yPos, 6, 4, 2.0, 0.5);
-        //         color = color * 0.5 + 0.5;
-
-        //         uint8_t byteColor = (uint8_t)(color * 255.0f);
-        //         colors[inx + 0] = byteColor;
-        //         colors[inx + 1] = byteColor;
-        //         colors[inx + 2] = byteColor;
-        //         colors[inx + 3] = 255;
-        //     }
-        // }
-        // mat->albedoTex = Texture(GL_TEXTURE0, colors, resolution, resolution, bpp);
-        // triggerRefresh = true;
-
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
             objects3D[i]->Start();

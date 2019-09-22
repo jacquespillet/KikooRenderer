@@ -11,6 +11,10 @@ float Smooth (float t) {
     return t * t * t * (t * (t * 6.0f - 15.0f) + 10.0f);
 }
 
+float SmoothDerivative (float t) {
+    return 30.0f * t * t * (t * (t - 2.0f) + 1.0f);
+}
+
 int hash[512] = {
 		151,160,137, 91, 90, 15,131, 13,201, 95, 96, 53,194,233,  7,225,
 		140, 36,103, 30, 69,142,  8, 99, 37,240, 21, 10, 23,190,  6,148,
@@ -59,13 +63,18 @@ NoiseSample GetValueNoise1D(float x, int frequency) {
 
     int h0 = hash[i0];
     int h1 = hash[i1];
-    
+
+    float dt = SmoothDerivative(t);    
     t = Smooth(t);
-    // return hash[i0] / (float)hashMask;
+
+    float a = h0;
+    float b = h1 - h0;
+
     NoiseSample sample;
-    sample.value = Lerp(h0, h1, t) / (float)hashMask;
-    sample.derivative = glm::vec3(0, 0, 0);
+    sample.value = a + b * t / (float)hashMask;
+    sample.derivative = glm::vec3(b * dt, 0, 0);
     sample.derivative *= frequency;
+    sample.derivative /= (float)hashMask;
     return sample; 
 }
 
@@ -85,6 +94,8 @@ NoiseSample GetValueNoise2D(float x, float y, int frequency) {
     //Interpolators between bottomLeft and topRight
     float tx = x - ix0;
     float ty = y - iy0;
+    float dtx = SmoothDerivative(tx);
+    float dty = SmoothDerivative(ty);    
     tx = Smooth(tx);
     ty = Smooth(ty);
 
@@ -102,10 +113,16 @@ NoiseSample GetValueNoise2D(float x, float y, int frequency) {
     int h00 = hash[h0 + iy0];
     int h11 = hash[h1 + iy1];
 
+    float a = h00;
+    float b = h10 - h00;
+    float c = h01 - h00;
+    float d = h11 - h01 - h10 + h00;    
+
     NoiseSample sample;
-    sample.value = Lerp( Lerp(h00, h10, tx), Lerp(h01, h11, tx), ty) / (float)hashMask;
-    sample.derivative = glm::vec3(0, 0, 0);
+    sample.value = (a + b * tx + (c + d * tx) * ty) / (float)hashMask;
+    sample.derivative = glm::vec3((b + d * ty) * dtx, (c + d * tx) * dty, 0);
     sample.derivative *= frequency;
+    sample.derivative /= (float)hashMask;
     return sample; 
 }
 
@@ -120,10 +137,13 @@ NoiseSample GetValueNoise3D(float x, float y, float t, int frequency) {
 
     float tx = x - ix0;
     float ty = y - iy0;
-    float tt = t - it0;    
+    float tz = t - it0;    
+    float dtx = SmoothDerivative(tx);
+    float dty = SmoothDerivative(ty);
+    float dtz = SmoothDerivative(tz);    
     tx = Smooth(tx);
     ty = Smooth(ty);
-    tt = Smooth(tt);  
+    tz = Smooth(tz);  
 
     ix0 &= hashMask;
     iy0 &= hashMask;
@@ -147,14 +167,23 @@ NoiseSample GetValueNoise3D(float x, float y, float t, int frequency) {
     int h101 = hash[h10 + it1];
     int h011 = hash[h01 + it1];
     int h111 = hash[h11 + it1];  
+
+    float a = h000;
+    float b = h100 - h000;
+    float c = h010 - h000;
+    float d = h001 - h000;
+    float e = h110 - h010 - h100 + h000;
+    float f = h101 - h001 - h100 + h000;
+    float g = h011 - h001 - h010 + h000;
+    float h = h111 - h011 - h101 + h001 - h110 + h010 + h100 - h000;    
     
     NoiseSample sample;
-    sample.value = Lerp(
-        Lerp(Lerp(h000, h100, tx), Lerp(h010, h110, tx), ty),
-        Lerp(Lerp(h001, h101, tx), Lerp(h011, h111, tx), ty),
-        tt) * (1.0f / hashMask);
-    sample.derivative = glm::vec3(0, 0, 0);
+    sample.value = (a + b * tx + (c + e * tx) * ty + (d + f * tx + (g + h * tx) * ty) * tz) * (1.0f / hashMask);
+    sample.derivative = glm::vec3((b + e * ty + (f + h * ty) * tz) * dtx, 
+                                  (c + e * tx + (g + h * tx) * tz) * dty,
+                                  (d + f * tx + (g + h * tx) * ty) * dtz);
     sample.derivative *= frequency;
+    sample.derivative /= (float)hashMask;
     return sample; 
 }
 
@@ -179,12 +208,19 @@ NoiseSample GetPerlinNoise1D(float x, int frequency) {
     float v0 = g0 * t0;
     float v1 = g1 * t1;
 
+    float dt = SmoothDerivative(t0);
     float t = Smooth(t0);
+    
+    float a = v0;
+    float b = v1 - v0;
+
+    float da = g0;
+    float db = g1 - g0;
 
     NoiseSample sample;
-    sample.value = Lerp(v0, v1, t) * 2;
-    sample.derivative = glm::vec3(0, 0, 0);
-    sample.derivative *= frequency;
+    sample.value = (a + b * t) * 2;
+    sample.derivative = glm::vec3(da + db * t + b * dt, 0, 0);
+    sample.derivative *= frequency * 2;
     return sample; 
 
 }
@@ -232,15 +268,27 @@ NoiseSample GetPerlinNoise2D(float x, float y, int frequency) {
     
     float tx = Smooth(tx0);
     float ty = Smooth(ty0);
+    float dtx = SmoothDerivative(tx0);
+    float dty = SmoothDerivative(ty0);
 
+    float a = v00;
+    float b = v10 - v00;
+    float c = v01 - v00;
+    float d = v11 - v01 - v10 + v00;
+
+    glm::vec2 da = g00;
+    glm::vec2 db = g10 - g00;
+    glm::vec2 dc = g01 - g00;
+    glm::vec2 dd = g11 - g01 - g10 + g00;
 
     NoiseSample sample;
-    sample.value = Lerp(
-        Lerp(v00, v10, tx),
-        Lerp(v01, v11, tx),
-        ty) * sqr2;
-    sample.derivative = glm::vec3(0, 0, 0);
-    sample.derivative *= frequency;
+    sample.value = (a + b * tx + (c + d * tx) * ty) * sqr2;
+
+    glm::vec2 deriv = da + db * tx + (dc + dd * tx) * ty;
+    sample.derivative = glm::vec3(deriv.x, deriv.y, 0);
+    sample.derivative.x += (b + d * ty) * dtx;
+    sample.derivative.y += (c + d * tx) * dty;  
+    sample.derivative *= frequency * sqr2;
     return sample; 
 
 }
@@ -315,14 +363,35 @@ NoiseSample GetPerlinNoise3D(float x, float y, float z, int frequency) {
     float tx = Smooth(tx0);
     float ty = Smooth(ty0);
     float tz = Smooth(tz0);
+    float dtx = SmoothDerivative(tx0);
+    float dty = SmoothDerivative(ty0);
+    float dtz = SmoothDerivative(tz0);
 
+
+    float a = v000;
+    float b = v100 - v000;
+    float c = v010 - v000;
+    float d = v001 - v000;
+    float e = v110 - v010 - v100 + v000;
+    float f = v101 - v001 - v100 + v000;
+    float g = v011 - v001 - v010 + v000;
+    float h = v111 - v011 - v101 + v001 - v110 + v010 + v100 - v000;
+
+    glm::vec3 da = g000;
+    glm::vec3 db = g100 - g000;
+    glm::vec3 dc = g010 - g000;
+    glm::vec3 dd = g001 - g000;
+    glm::vec3 de = g110 - g010 - g100 + g000;
+    glm::vec3 df = g101 - g001 - g100 + g000;
+    glm::vec3 dg = g011 - g001 - g010 + g000;
+    glm::vec3 dh = g111 - g011 - g101 + g001 - g110 + g010 + g100 - g000;    
 
     NoiseSample sample;
-    sample.value =Lerp(
-        Lerp(Lerp(v000, v100, tx), Lerp(v010, v110, tx), ty),
-        Lerp(Lerp(v001, v101, tx), Lerp(v011, v111, tx), ty),
-        tz);
-    sample.derivative = glm::vec3(0, 0, 0);
+    sample.value = a + b * tx + (c + e * tx) * ty + (d + f * tx + (g + h * tx) * ty) * tz;
+    sample.derivative = da + db * tx + (dc + de * tx) * ty + (dd + df * tx + (dg + dh * tx) * ty) * tz;
+    sample.derivative.x += (b + e * ty + (f + h * ty) * tz) * dtx;
+    sample.derivative.y += (c + e * tx + (g + h * tx) * tz) * dty;
+    sample.derivative.z += (d + f * tx + (g + h * tx) * ty) * dtz;
     sample.derivative *= frequency;
     return sample; 
 }
