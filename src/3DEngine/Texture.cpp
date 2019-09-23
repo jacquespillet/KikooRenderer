@@ -34,7 +34,17 @@ namespace CoreEngine
 
 		stbi_set_flip_vertically_on_load(true);  
 		unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
-		GLint texType = (nrChannels == 3) ? GL_RGB : GL_RGBA;
+		GLint texType = 0;
+		
+		if(nrChannels == 4) {
+			texType = GL_RGBA;
+		} else if(nrChannels == 3) {
+			texType = GL_RGB;
+		} else if(nrChannels == 1) {
+			texType = GL_RED;
+		}
+
+		std::cout << "NUM CHANNELS " <<  nrChannels << std::endl;
 		if (data)
 		{
 			ogl->glTexImage2D(GL_TEXTURE_2D, 0, texType, width, height, 0, texType, GL_UNSIGNED_BYTE, data);

@@ -50,6 +50,7 @@ Shader GetWaterTile_2Shader() {
     uniform int numLights; 
     uniform sampler2D colorTexture;
     uniform sampler2D flowMap;
+    uniform sampler2D normalMap;
     uniform float time;
     
     in vec2 colorUv;
@@ -63,29 +64,40 @@ Shader GetWaterTile_2Shader() {
     
     vec3 flowUVW(vec2 uv, vec2 flowVector,vec2 jump, float _time, bool flowB, float tiling) {
         float phaseOffset = flowB ? 0.5 : 0;
-    	float progress = fract(_time+ phaseOffset);    
+        
+        float progress = fract(_time+ phaseOffset);
+
         vec3 uvw;
-        uvw.xy = uv - flowVector * (progress + flowOffset);
+        uvw.xy = uv - flowVector * progress;
         uvw.xy *= tiling;
-        uvw.xy += phaseOffset;
+        uvw.xy += phaseOffset; 
+
         uvw.xy += (_time - progress) * jump;
+
         uvw.z = 1 - abs(1 - 2 * progress);
+
         return uvw;
     }
  
     void main(){
         vec2 flowVector = texture(flowMap, fragUv).xy * 2.0 - 1.0;
-        float noise = texture(flowMap, fragUv).a;
-        float offsetTime = time * speed + noise;
+        flowVector *= strength;
         
-        vec3 uvwA = flowUVW(colorUv, flowVector, uvJump, offsetTime, false, tiling);
-        vec3 uvwB = flowUVW(colorUv, flowVector, uvJump, offsetTime, true, tiling);
+        float noise = texture(flowMap, fragUv).a;
+        float _time = time * speed + noise;    
 
-        vec4 tex1 = texture(colorTexture, uvwA.xy) * uvwA.z;
-        vec4 tex2 = texture(colorTexture, uvwB.xy) * uvwB.z;
+        vec3 uvwA = flowUVW(fragUv, flowVector, uvJump, _time, false, tiling);
+        vec3 uvwB = flowUVW(fragUv, flowVector, uvJump, _time, true, tiling);
 
-        outputColor = tex1 + tex2;
-        outputColor.a = 1;
+        vec3 texColorA = texture(colorTexture, uvwA.xy).rrr * uvwA.z;
+        vec3 texColorB = texture(colorTexture, uvwB.xy).rrr * uvwB.z;
+
+        vec3 normalA = texture(normalMap, uvwA.xy).rgb * 2.0 - 1.0;
+        vec3 normalB = texture(normalMap, uvwB.xy).rgb * 2.0 - 1.0;
+
+        vec3 normal = normalize(normalA + normalB);
+
+        outputColor = vec4(texColorA + texColorB, 1);
     }
     )";
     waterTileShader.name = "water tile Shader 2";

@@ -31,6 +31,7 @@ private:
 
     Texture colorTexture;    
     Texture flowMap;    
+    Texture normalMap;    
 };
 
 }

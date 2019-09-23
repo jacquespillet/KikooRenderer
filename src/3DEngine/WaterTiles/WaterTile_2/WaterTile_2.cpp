@@ -20,8 +20,9 @@ WaterTile_2::WaterTile_2(std::string name, Scene* scene) : Object3D(name, scene)
     quadMaterial->SetShader(&waterShader);
 
     // colorTexture = Texture("C:/Users/Jacques/Pictures/Textures/uv.png", GL_TEXTURE0);
-    colorTexture = Texture("C:/Users/Jacques/Pictures/Textures/WaterTiles/2/water.png", GL_TEXTURE0);
-    flowMap = Texture("C:/Users/Jacques/Pictures/Textures/WaterTiles/2/flowmap.png", GL_TEXTURE1, false);
+    colorTexture = Texture("C:/Users/GYFLYM/Pictures/Textures/Flowmaps/water.png", GL_TEXTURE0);
+    flowMap = Texture("C:/Users/GYFLYM/Pictures/Textures/Flowmaps/flowmap (1).png", GL_TEXTURE1);
+    normalMap = Texture("C:/Users/GYFLYM/Pictures/Textures/Flowmaps/flowmap (1).png", GL_TEXTURE2);
     
 }
 
@@ -52,6 +53,10 @@ void WaterTile_2::Render(glm::mat4* overrideViewMatrixp) {
     ogl->glActiveTexture(GL_TEXTURE1);
     ogl->glBindTexture(GL_TEXTURE_2D, flowMap.glTex);
     ogl->glUniform1i(ogl->glGetUniformLocation(waterShader.programShaderObject, "flowMap"), 1);
+
+    ogl->glActiveTexture(GL_TEXTURE2);
+    ogl->glBindTexture(GL_TEXTURE_2D, normalMap.glTex);
+    ogl->glUniform1i(ogl->glGetUniformLocation(waterShader.programShaderObject, "normalMap"), 2);
 
     ogl->glUniform1f(ogl->glGetUniformLocation(waterShader.programShaderObject, "time"), scene->elapsedTime);
     
