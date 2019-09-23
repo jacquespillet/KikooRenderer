@@ -14,9 +14,41 @@ namespace KikooRenderer
 	
 namespace CoreEngine
 {
-	Texture::Texture(std::string path, GLuint _texIndex) { 
+	Texture::Texture(std::string path, GLuint _texIndex, bool enableFilter) { 
+		GETGL
 		texIndex = _texIndex;
-		LoadFromFile(path);
+		ogl->glActiveTexture(texIndex);
+		ogl->glGenTextures(1, &glTex);  
+		ogl->glBindTexture(GL_TEXTURE_2D, glTex);
+
+		ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+		ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+		
+		if(enableFilter) {
+			ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		} else {
+			ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		}
+
+		stbi_set_flip_vertically_on_load(true);  
+		unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
+		GLint texType = (nrChannels == 3) ? GL_RGB : GL_RGBA;
+		if (data)
+		{
+			ogl->glTexImage2D(GL_TEXTURE_2D, 0, texType, width, height, 0, texType, GL_UNSIGNED_BYTE, data);
+			if(enableFilter) ogl->glGenerateMipmap(GL_TEXTURE_2D);
+		}
+		else
+		{
+			std::cout << "Failed to load texture" << std::endl;
+			return;
+		} 
+		stbi_image_free(data);
+		ogl->glBindTexture(GL_TEXTURE_2D, 0);
+		loaded = true; 		
+		
 	}
 
 	Texture::Texture(GLuint _texIndex, std::vector<uint8_t> data, int width, int height, int bpp) { 
@@ -46,6 +78,13 @@ namespace CoreEngine
 		GETGL;
 		ogl->glActiveTexture(texIndex);
 		ogl->glBindTexture(GL_TEXTURE_2D, glTex);
+	}
+
+	Texture::~Texture() {
+		if(loaded) {
+			GETGL
+			// ogl->glDeleteTextures(1, &glTex);
+		}
 	}
 
 	void Texture::LoadFromFile(std::string path) {

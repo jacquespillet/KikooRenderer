@@ -1,6 +1,6 @@
 #pragma once
 #include "Util/Common.h"
-#include "../Shader.hpp"
+#include "../../Shader.hpp"
 
 namespace KikooRenderer {
 

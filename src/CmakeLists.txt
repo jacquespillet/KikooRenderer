@@ -51,8 +51,10 @@ set(MainWindowSrc
 	3DEngine/ParticleSystem/Particle.cpp
 	3DEngine/ParticleSystem/ParticleShader.cpp
 
-	3DEngine/WaterTiles/WaterTile_1.cpp
-	3DEngine/WaterTiles/WaterTileShader_1.cpp
+	3DEngine/WaterTiles/WaterTile_1/WaterTile_1.cpp
+	3DEngine/WaterTiles/WaterTile_1/WaterTileShader_1.cpp
+	3DEngine/WaterTiles/WaterTile_2/WaterTile_2.cpp
+	3DEngine/WaterTiles/WaterTile_2/WaterTileShader_2.cpp
 	
 	SceneTree/SceneTree.cpp
 	

@@ -1,8 +1,8 @@
 #include "WaterTile_1.hpp"
 
 #include "WaterTileShader_1.hpp"
-#include "../BaseObjects.hpp"
-#include "../Components/MaterialComponent.hpp"
+#include "../../BaseObjects.hpp"
+#include "../../Components/MaterialComponent.hpp"
 
 
 namespace KikooRenderer {
@@ -141,6 +141,7 @@ void WaterTile_1::DepthRenderPass(LightComponent* light) {
 
 void WaterTile_1::Destroy() {
     delete reflectionFramebuffer;
+    delete refractionFramebuffer;
     delete quad;
 }
 
