@@ -16,11 +16,17 @@ Shader GetWaterTile_2Shader() {
 
     uniform mat4 modelViewProjectionMatrix;
     uniform mat4 modelMatrix;
+    uniform vec3 cameraPosition;
 
     out vec2 colorUv;
     out vec2 fragUv;
+    out vec3 fragToCam;
+    out vec4 fragPos;
 
     void main() {
+        fragPos = modelMatrix * vec4(position.x, position.y, position.z, 1.0f);
+        fragToCam = cameraPosition - fragPos.xyz;
+
         colorUv = (uv);
         fragUv = uv;
         
@@ -55,6 +61,8 @@ Shader GetWaterTile_2Shader() {
     
     in vec2 colorUv;
     in vec2 fragUv;
+    in vec3 fragToCam;
+    in vec4 fragPos;
 
     const vec2 uvJump = vec2(0.0, 0.0);
     const float tiling = 3.0;
@@ -80,6 +88,8 @@ Shader GetWaterTile_2Shader() {
     }
  
     void main(){
+        outputColor = vec4(0, 0, 0, 1);
+
         vec2 flowVector = texture(flowMap, fragUv).xy * 2.0 - 1.0;
         flowVector *= strength;
         
@@ -92,14 +102,41 @@ Shader GetWaterTile_2Shader() {
         vec3 texColorA = texture(colorTexture, uvwA.xy).rrr * uvwA.z;
         vec3 texColorB = texture(colorTexture, uvwB.xy).rrr * uvwB.z;
 
-        vec3 normalA = texture(normalMap, uvwA.xy).rgb * 2.0 - 1.0;
-        vec3 normalB = texture(normalMap, uvwB.xy).rgb * 2.0 - 1.0;
+        // vec3 normalA = texture(normalMap, uvwA.xy).rgb * uvwA.z;
+        // normalA = vec3(normalA.r * 2.0 - 1.0, normalA.b, normalA.g * 2.0 - 1.0);
+        // vec3 normalB = texture(normalMap, uvwB.xy).rgb * uvwB.z;
+        // normalB = vec3(normalB.r * 2.0 - 1.0, normalB.b, normalB.g * 2.0 - 1.0);
+        // vec3 normal = normalize(normalA + normalB);
+        vec3 normal = vec3(0, 1, 0);
 
-        vec3 normal = normalize(normalA + normalB);
+        vec4 specularHighlights = vec4(0, 0, 0, 0);
+        vec4 diffuse = vec4(0, 0, 0, 0);
+        vec3 fragToCamNorm = normalize(fragToCam);        
+        for(int i=0; i<numLights; i++) {
+            vec3 lightDirection = normalize(lights[i].direction);
+            if(lights[i].type == 1) { //Point light
+                lightDirection = normalize(fragPos.xyz - lights[i].position);
+            }
+            if(lights[i].type == 2) { //Spot light
+                lightDirection  = normalize(fragPos.xyz - lights[i].position);
+            }            
+            vec3 fragToLight = -lightDirection;
+            diffuse += vec4(0, 0, 0.1, 0) * max(dot(normal.xyz, fragToLight), 0);
 
-        outputColor = vec4(texColorA + texColorB, 1);
+            vec3 halfwayVec = normalize(fragToLight + fragToCamNorm);
+            specularHighlights +=  vec4(1, 1, 1, 1) * pow(max(dot(normal.xyz, halfwayVec),0), 8);
+            outputColor.rgb = specularHighlights.rgb;
+
+            // vec3 reflectedLight = reflect(normalize(lightDirection), normal);
+            // float specular = max(dot(reflectedLight, fragToCamNorm), 0.0);
+            // // specular = pow(specular, 20);
+            // specularHighlights += lights[i].color * specular;
+        }        
+
+        // outputColor = vec4(0, 0, 0.2, 1) * vec4(texColorA + texColorB, 1) + diffuse + specularHighlights;
+        // outputColor = vec4(normal, 1);
     }
-    )";
+    )"; 
     waterTileShader.name = "water tile Shader 2";
     waterTileShader.isLit = true;
     waterTileShader.isDepthPass = false;

@@ -112,7 +112,6 @@ Shader GetWaterTile_1Shader() {
             float specular = max(dot(reflectedLight, fragToCamNorm), 0.0);
             specular = pow(specular, 20);
             specularHighlights += lights[i].color * specular;
-            
         }
 
         outputColor = mix(reflectionColor, refractionColor, refractiveFactor);

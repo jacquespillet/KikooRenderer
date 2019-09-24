@@ -48,8 +48,8 @@ namespace CoreEngine {
         skyboxCube->Start();
         skyboxCube->Enable();
        
-       WaterTile_2* wt = new WaterTile_2("wt", this);
-       AddObject(wt);
+        WaterTile_2* wt = new WaterTile_2("wt", this);
+        AddObject(wt);
 
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
