@@ -16,11 +16,9 @@ Shader GetWaterTile_1Shader() {
 
     uniform mat4 modelViewProjectionMatrix;
     uniform mat4 modelMatrix;
-    uniform vec3 cameraPosition;
 
     out vec4 clipSpace;
     out vec2 fragUv;
-    out vec3 fragToCam;
     out vec4 fragPos;
 
     const float tiling = 6.0;
@@ -28,7 +26,6 @@ Shader GetWaterTile_1Shader() {
 
     void main() {
         fragPos = modelMatrix * vec4(position.x, position.y, position.z, 1.0f);
-        fragToCam = cameraPosition - fragPos.xyz;
 
         fragUv = uv * tiling;
         clipSpace =  modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
@@ -58,13 +55,13 @@ Shader GetWaterTile_1Shader() {
     uniform sampler2D refractionTexture;
     uniform sampler2D dudvmap;
     uniform sampler2D normalMap;
+    uniform vec3 cameraPos;
 
     uniform LightSource lights[4];
     uniform int numLights; 
 
     in vec4 clipSpace;
     in vec2 fragUv;
-    in vec3 fragToCam;
     in vec4 fragPos;
 
     uniform float moveFactor;
@@ -72,6 +69,8 @@ Shader GetWaterTile_1Shader() {
     const float waveStrength = 0.02;
     const float reflectivity = 10;
     const float blueness = 0.3;
+
+    vec3 fragToCam = normalize(cameraPos - fragPos);
     void main()
     {
         vec2 distortedTexCoords = texture(dudvmap, vec2(fragUv.x + moveFactor, fragUv.y)).rg*0.1;
@@ -89,8 +88,7 @@ Shader GetWaterTile_1Shader() {
         vec4 reflectionColor = texture(reflectionTexture, reflectTexCoords);
         vec4 refractionColor = texture(refractionTexture, refractTexCoords);
 
-        vec3 fragToCamNorm = normalize(fragToCam);
-        float refractiveFactor = dot(fragToCamNorm, vec3(0, 1, 0));
+        float refractiveFactor = dot(fragToCam, vec3(0, 1, 0));
         refractiveFactor = pow(refractiveFactor, reflectivity);
 
         vec4 normalColor = texture(normalMap, distortedTexCoords);
@@ -109,7 +107,7 @@ Shader GetWaterTile_1Shader() {
             vec3 fragToLight = -lightDirection;
             
             vec3 reflectedLight = reflect(normalize(lightDirection), normal);
-            float specular = max(dot(reflectedLight, fragToCamNorm), 0.0);
+            float specular = max(dot(reflectedLight, fragToCam), 0.0);
             specular = pow(specular, 20);
             specularHighlights += lights[i].color * specular;
         }

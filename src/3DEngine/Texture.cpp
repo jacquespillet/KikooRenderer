@@ -44,7 +44,7 @@ namespace CoreEngine
 			texType = GL_RED;
 		}
 
-		std::cout << "NUM CHANNELS " <<  nrChannels << std::endl;
+		std::cout << "NUM CHANNELS " << path << "  " <<  nrChannels << std::endl;
 		if (data)
 		{
 			ogl->glTexImage2D(GL_TEXTURE_2D, 0, texType, width, height, 0, texType, GL_UNSIGNED_BYTE, data);

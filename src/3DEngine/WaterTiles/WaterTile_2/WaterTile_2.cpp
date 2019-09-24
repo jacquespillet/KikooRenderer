@@ -12,7 +12,7 @@ namespace CoreEngine {
 WaterTile_2::WaterTile_2(std::string name, Scene* scene) : Object3D(name, scene) {
     waterShader = GetWaterTile_2Shader();
     
-    quad = GetQuad(scene, "particle", glm::dvec3(0, 0.2, 0), glm::dvec3(90, 0, 0), glm::dvec3(3 ), glm::dvec4(0.5, 0.5, 0.5, 1));
+    quad = GetQuad(scene, "plane", glm::dvec3(0, 0 , 0), glm::dvec3(90, 0, 0), glm::dvec3(1), glm::dvec4(0.5, 0.5, 0.5, 1));
     quad->Start();
     quad->Enable();
 
@@ -20,9 +20,12 @@ WaterTile_2::WaterTile_2(std::string name, Scene* scene) : Object3D(name, scene)
     quadMaterial->SetShader(&waterShader);
 
     // colorTexture = Texture("C:/Users/Jacques/Pictures/Textures/uv.png", GL_TEXTURE0);
-    colorTexture = Texture("C:/Users/Jacques/Pictures/Textures/WaterTiles/2/water.png", GL_TEXTURE0);
-    flowMap = Texture("C:/Users/Jacques/Pictures/Textures/WaterTiles/2/flowmap.png", GL_TEXTURE1);
-    normalMap = Texture("C:/Users/Jacques/Pictures/Textures/WaterTiles/2/water-normal.png", GL_TEXTURE2);
+    // colorTexture = Texture("C:/Users/Jacques/Pictures/Textures/WaterTiles/2/water.png", GL_TEXTURE0);
+    // flowMap = Texture("C:/Users/Jacques/Pictures/Textures/WaterTiles/2/flowmap.png", GL_TEXTURE1);
+    // normalMap = Texture("C:/Users/Jacques/Pictures/Textures/WaterTiles/2/water-normal.png", GL_TEXTURE2);
+    colorTexture = Texture("C:/Users/GYFLYM/Pictures/Textures/Flowmaps/water.png", GL_TEXTURE0);
+    flowMap = Texture("C:/Users/GYFLYM/Pictures/Textures/Flowmaps/flow-speed-noise.png", GL_TEXTURE1);
+    normalMap = Texture("C:/Users/GYFLYM/Pictures/Textures/Flowmaps/water-derivative-height.png", GL_TEXTURE2, false);
     
 }
 
