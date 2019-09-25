@@ -16,76 +16,59 @@ Shader GetWaveTileShader() {
 
     uniform mat4 modelViewProjectionMatrix;
     uniform mat4 modelMatrix;
+    uniform mat4 viewProjectionMatrix;
     uniform float time;
 
     out vec4 clipSpace;
     out vec2 fragUv;
-    out vec4 fragPos;
+    out vec3 fragPos;
     out vec3 fragNormal;
 
     const float PI = 3.14159265358979;
     
     //dir, steepness, wavelength
     const vec4 waveA = vec4(1, 0, 0.5, 10); 
+    const vec4 waveB = vec4(1, 1, 0.5, 4); 
+    const vec4 waveC = vec4(1, 1, 0.25, 2); 
 
     vec3 GerstnerWave(vec4 wave, vec3 p, inout vec3 tangent, inout vec3 binormal) {
-        float steepness = wave.z;
-        float wavelength = wave.w;
-        float k = 2 * PI / wavelength;
+        float k = 2 * PI / wave.w;
         float c = sqrt(9.8 / k);
         vec2 d = normalize(wave.xy);
-        float f = k * (dot(d, p.xz) - c * time);
-        float a = steepness / k;
+        float f = k * (dot(d, p.xz)- c * time);
+        float a = wave.z / k;
         
-        //p.x += d.x * (a * cos(f));
-        //p.y = a * sin(f);
-        //p.z += d.y * (a * cos(f));
-
         tangent += vec3(
-            -d.x * d.x * (steepness * sin(f)),
-            d.x * (steepness * cos(f)),
-            -d.x * d.y * (steepness * sin(f))
+            1 - d.x * d.x * (wave.z * sin(f)),
+            d.x * (wave.z * cos(f)),
+            -d.x * d.y * (wave.z * sin(f))
         );
         binormal += vec3(
-            -d.x * d.y * (steepness * sin(f)),
-            d.y * (steepness * cos(f)),
-            -d.y * d.y * (steepness * sin(f))
+            -d.x * d.y * (wave.z * sin(f)),
+            d.y * (wave.z * cos(f)),
+            1 - d.y * d.y * (wave.z * sin(f))
         );
-        return vec3(
-            d.x * (a * cos(f)),
-            a * sin(f),
-            d.y * (a * cos(f))
-        );        
 
+        p.x = d.x * (a * cos(f));
+        p.y = a * sin(f);
+        p.z = d.y * (a * cos(f));
+
+        return p;
     }
 
     void main() {
-        vec3 p = (modelMatrix * vec4(position.x, position.y, position.z, 1.0f)).xyz;
-
-        float k = 2 * PI / waveA.w;
-        float c = sqrt(9.8 / k);
-        vec2 d = normalize(waveA.xy);
-        float f = k * (dot(d, p.xz)- c * time);
-        float a = waveA.z / k;
-
-        p.x += d.x * (a * cos(f));
-        p.y = a * sin(f);
-        p.z += d.y * (a * cos(f));
-        
-        vec3 tangent = vec3(
-            1 - d.x * d.x * (waveA.z * sin(f)),
-            d.x * (waveA.z * cos(f)),
-            -d.x * d.y * (waveA.z * sin(f))
-        );
-        vec3 binormal = vec3(
-            -d.x * d.y * (waveA.z * sin(f)),
-            d.y * (waveA.z * cos(f)),
-            1 - d.y * d.y * (waveA.z * sin(f))
-        );
+        vec3 p = (modelMatrix * vec4(position.x, position.y, position.z, 1)).xyz;
+        vec3 tangent = vec3(1, 0, 0);
+        vec3 binormal = vec3(0, 0, 1);
+        p+=  GerstnerWave(waveA, p, tangent,binormal);
+        p+=  GerstnerWave(waveB, p, tangent,binormal);
+        p+=  GerstnerWave(waveB, p, tangent,binormal);
+  
+  
         fragNormal = normalize(cross(binormal, tangent));
-        
+        fragPos = p;
 
-        clipSpace =  modelViewProjectionMatrix * vec4(p.x, p.y, p.z, 1.0f);
+        clipSpace =  viewProjectionMatrix * vec4(p.x, p.y, p.z, 1.0f);
         gl_Position = clipSpace;
     }
     )";
@@ -114,7 +97,7 @@ Shader GetWaveTileShader() {
 
     in vec4 clipSpace;
     in vec2 fragUv;
-    in vec4 fragPos;
+    in vec3 fragPos;
     in vec3 fragNormal;
 
     void main()
@@ -122,14 +105,14 @@ Shader GetWaveTileShader() {
         vec3 normal = normalize(fragNormal);
         vec4 specularHighlights = vec4(0, 0, 0, 0);
         vec4 diffuse = vec4(0, 0, 0, 0);
-        vec3 fragToCam = normalize(cameraPos - fragPos.xyz);
+        vec3 fragToCam = normalize(cameraPos - fragPos);
         for(int i=0; i<numLights; i++) {
             vec3 lightDirection = normalize(lights[i].direction);
             if(lights[i].type == 1) { //Point light
-                lightDirection = normalize(fragPos.xyz - lights[i].position);
+                lightDirection = normalize(fragPos - lights[i].position);
             }
             if(lights[i].type == 2) { //Spot light
-                lightDirection  = normalize(fragPos.xyz - lights[i].position);
+                lightDirection  = normalize(fragPos - lights[i].position);
             }            
             vec3 fragToLight = -lightDirection;
             diffuse += 0.1 * vec4(0.305, 0.513, 0.658, 0) * max(dot(normal.xyz, fragToLight), 0);

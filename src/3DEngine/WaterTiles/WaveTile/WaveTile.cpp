@@ -44,6 +44,12 @@ void WaveTile::Render(glm::mat4* overrideViewMatrixp) {
     GETGL
     ogl->glUseProgram(waterShader.programShaderObject);
     ogl->glUniform1f(ogl->glGetUniformLocation(waterShader.programShaderObject, "time"), scene->elapsedTime);
+    
+    glm::mat4 viewProjection = scene->camera->GetProjectionMatrix() * scene->camera->GetViewMatrix();
+    int viewProjectionMatLoc = ogl->glGetUniformLocation(waterShader.programShaderObject, "viewProjectionMatrix"); 
+    ogl->glUniformMatrix4fv(viewProjectionMatLoc, 1, false, glm::value_ptr(viewProjection));
+
+
     quad->Render();
 }
 
