@@ -9,10 +9,11 @@ namespace KikooRenderer {
 namespace CoreEngine {
 
 class MaterialComponent;
-class MaterialComponent;
 
+enum TILE_TYPE {WATER, DIRECTIONAL};
 class WaterTile_2 : public Object3D {
 public: 
+
     WaterTile_2(std::string name, Scene* scene);
 
     void Start() override;
@@ -31,7 +32,8 @@ private:
 
     Texture colorTexture;    
     Texture flowMap;    
-    Texture normalMap;    
+    Texture normalMap;
+    TILE_TYPE tileType = TILE_TYPE::DIRECTIONAL;
 };
 
 }

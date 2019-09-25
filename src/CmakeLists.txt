@@ -55,6 +55,7 @@ set(MainWindowSrc
 	3DEngine/WaterTiles/WaterTile_1/WaterTileShader_1.cpp
 	3DEngine/WaterTiles/WaterTile_2/WaterTile_2.cpp
 	3DEngine/WaterTiles/WaterTile_2/WaterTileShader_2.cpp
+	3DEngine/WaterTiles/WaterTile_2/DirectionalFlowShader.cpp
 	
 	SceneTree/SceneTree.cpp
 	
