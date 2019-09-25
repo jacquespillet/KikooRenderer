@@ -47,9 +47,6 @@ namespace CoreEngine {
         skyboxCube = GetCube(this, "Cubemap", glm::dvec3(0), glm::vec3(0), glm::dvec3(100), glm::dvec4(0.1, 0.1, 0.1, 1));
         skyboxCube->Start();
         skyboxCube->Enable();
-       
-        WaveTile* wt = new WaveTile("wt", this);
-        AddObject(wt);
 
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {

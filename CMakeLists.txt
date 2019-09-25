@@ -73,6 +73,11 @@ install(FILES ${QT_BIN_DIR}/Qt5Core.dll
 )
 
 
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/3DEngine/Shaders/Sources/
+		DESTINATION bin/Shaders
+		COMPONENT MainWindowDist
+)
+
 install(DIRECTORY ${QT_BUILD_DIR}/plugins/platforms
 		DESTINATION bin
 		COMPONENT MainWindowDist
