@@ -6,7 +6,7 @@
 #include "Components/MaterialComponent.hpp"
 #include "Components/LightComponent.hpp"
 
-#include "WaterTiles/WaterTile_2/WaterTile_2.hpp"
+#include "WaterTiles/WaveTile/WaveTile.hpp"
 
 
 #include <QtGui/QOpenGLFunctions>
@@ -48,7 +48,7 @@ namespace CoreEngine {
         skyboxCube->Start();
         skyboxCube->Enable();
        
-        WaterTile_2* wt = new WaterTile_2("wt", this);
+        WaveTile* wt = new WaveTile("wt", this);
         AddObject(wt);
 
         //Start each object

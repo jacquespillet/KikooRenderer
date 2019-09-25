@@ -9,7 +9,7 @@ namespace KikooRenderer {
 namespace CoreEngine {
 
 class MaterialComponent;
-class MaterialComponent;
+class MeshFilterComponent;
 
 class WaveTile : public Object3D {
 public: 
@@ -26,19 +26,10 @@ public:
 
 private:
     Object3D* quad;
-	Object3D* dummyQuad;
     
     MaterialComponent* quadMaterial;
+    MeshFilterComponent* mesh;
     Shader waterShader;
-
-    Framebuffer* reflectionFramebuffer;
-    Framebuffer* refractionFramebuffer;
-
-    Texture dudvMap;
-    Texture normalMap;
-
-    float moveFactor=0;
-    float speed = 0.03;
 };
 
 }

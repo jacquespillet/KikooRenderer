@@ -16,21 +16,77 @@ Shader GetWaveTileShader() {
 
     uniform mat4 modelViewProjectionMatrix;
     uniform mat4 modelMatrix;
+    uniform float time;
 
     out vec4 clipSpace;
     out vec2 fragUv;
     out vec4 fragPos;
+    out vec3 fragNormal;
 
-    const float tiling = 6.0;
+    const float PI = 3.14159265358979;
     
+    //dir, steepness, wavelength
+    const vec4 waveA = vec4(1, 0, 0.5, 10); 
+
+    vec3 GerstnerWave(vec4 wave, vec3 p, inout vec3 tangent, inout vec3 binormal) {
+        float steepness = wave.z;
+        float wavelength = wave.w;
+        float k = 2 * PI / wavelength;
+        float c = sqrt(9.8 / k);
+        vec2 d = normalize(wave.xy);
+        float f = k * (dot(d, p.xz) - c * time);
+        float a = steepness / k;
+        
+        //p.x += d.x * (a * cos(f));
+        //p.y = a * sin(f);
+        //p.z += d.y * (a * cos(f));
+
+        tangent += vec3(
+            -d.x * d.x * (steepness * sin(f)),
+            d.x * (steepness * cos(f)),
+            -d.x * d.y * (steepness * sin(f))
+        );
+        binormal += vec3(
+            -d.x * d.y * (steepness * sin(f)),
+            d.y * (steepness * cos(f)),
+            -d.y * d.y * (steepness * sin(f))
+        );
+        return vec3(
+            d.x * (a * cos(f)),
+            a * sin(f),
+            d.y * (a * cos(f))
+        );        
+
+    }
 
     void main() {
-        fragPos = modelMatrix * vec4(position.x, position.y, position.z, 1.0f);
+        vec3 p = (modelMatrix * vec4(position.x, position.y, position.z, 1.0f)).xyz;
 
-        fragUv = uv * tiling;
-        clipSpace =  modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
-        gl_Position = clipSpace;
+        float k = 2 * PI / waveA.w;
+        float c = sqrt(9.8 / k);
+        vec2 d = normalize(waveA.xy);
+        float f = k * (dot(d, p.xz)- c * time);
+        float a = waveA.z / k;
+
+        p.x += d.x * (a * cos(f));
+        p.y = a * sin(f);
+        p.z += d.y * (a * cos(f));
         
+        vec3 tangent = vec3(
+            1 - d.x * d.x * (waveA.z * sin(f)),
+            d.x * (waveA.z * cos(f)),
+            -d.x * d.y * (waveA.z * sin(f))
+        );
+        vec3 binormal = vec3(
+            -d.x * d.y * (waveA.z * sin(f)),
+            d.y * (waveA.z * cos(f)),
+            1 - d.y * d.y * (waveA.z * sin(f))
+        );
+        fragNormal = normalize(cross(binormal, tangent));
+        
+
+        clipSpace =  modelViewProjectionMatrix * vec4(p.x, p.y, p.z, 1.0f);
+        gl_Position = clipSpace;
     }
     )";
 
@@ -51,10 +107,6 @@ Shader GetWaveTileShader() {
         float farPlane;
     };    
 
-    uniform sampler2D reflectionTexture;
-    uniform sampler2D refractionTexture;
-    uniform sampler2D dudvmap;
-    uniform sampler2D normalMap;
     uniform vec3 cameraPos;
 
     uniform LightSource lights[4];
@@ -63,39 +115,14 @@ Shader GetWaveTileShader() {
     in vec4 clipSpace;
     in vec2 fragUv;
     in vec4 fragPos;
+    in vec3 fragNormal;
 
-    uniform float moveFactor;
-    
-    const float waveStrength = 0.02;
-    const float reflectivity = 10;
-    const float blueness = 0.3;
-
-    vec3 fragToCam = normalize(cameraPos - fragPos);
     void main()
     {
-        vec2 distortedTexCoords = texture(dudvmap, vec2(fragUv.x + moveFactor, fragUv.y)).rg*0.1;
-        distortedTexCoords = fragUv + vec2(distortedTexCoords.x, distortedTexCoords.y+moveFactor);
-        vec2 totalDistortion = (texture(dudvmap, distortedTexCoords).rg * 2.0 - 1.0) * waveStrength;        
-
-        vec2 ndc = (clipSpace.xy / clipSpace.w) / 2.0 + 0.5;
-        vec2 refractTexCoords = ndc.xy + totalDistortion;
-        vec2 reflectTexCoords = vec2(ndc.x, -ndc.y) + totalDistortion;
-
-        refractTexCoords = clamp(refractTexCoords, 0.001, 0.999);
-        reflectTexCoords.x = clamp(reflectTexCoords.x, 0.001, 0.999);
-        reflectTexCoords.y = clamp(reflectTexCoords.y, -0.999, -0.001);
-
-        vec4 reflectionColor = texture(reflectionTexture, reflectTexCoords);
-        vec4 refractionColor = texture(refractionTexture, refractTexCoords);
-
-        float refractiveFactor = dot(fragToCam, vec3(0, 1, 0));
-        refractiveFactor = pow(refractiveFactor, reflectivity);
-
-        vec4 normalColor = texture(normalMap, distortedTexCoords);
-        vec3 normal = vec3(normalColor.r * 2.0 - 1.0, normalColor.b, normalColor.g * 2.0 - 1.0);
-        normal = normalize(normal);
-
+        vec3 normal = normalize(fragNormal);
         vec4 specularHighlights = vec4(0, 0, 0, 0);
+        vec4 diffuse = vec4(0, 0, 0, 0);
+        vec3 fragToCam = normalize(cameraPos - fragPos.xyz);
         for(int i=0; i<numLights; i++) {
             vec3 lightDirection = normalize(lights[i].direction);
             if(lights[i].type == 1) { //Point light
@@ -105,15 +132,14 @@ Shader GetWaveTileShader() {
                 lightDirection  = normalize(fragPos.xyz - lights[i].position);
             }            
             vec3 fragToLight = -lightDirection;
-            
-            vec3 reflectedLight = reflect(normalize(lightDirection), normal);
-            float specular = max(dot(reflectedLight, fragToCam), 0.0);
-            specular = pow(specular, 20);
-            specularHighlights += lights[i].color * specular;
-        }
+            diffuse += 0.1 * vec4(0.305, 0.513, 0.658, 0) * max(dot(normal.xyz, fragToLight), 0);
 
-        outputColor = mix(reflectionColor, refractionColor, refractiveFactor);
-        outputColor = mix(outputColor, vec4(0.0, 0.3, 0.5, 1.0), blueness) + vec4(specularHighlights.rgb, 0);
+            vec3 halfwayVec = normalize(fragToLight + fragToCam);
+            specularHighlights +=  vec4(1, 1, 1, 0) * pow(max(dot(normal.xyz, halfwayVec),0), 256);
+        }   
+
+        vec3 albedo = vec3(0.305, 0.513, 0.658);
+        outputColor = vec4(albedo.rgb, 1) + specularHighlights + diffuse;
     }
     )";
     waveTileShader.name = "water tile Shader 1";

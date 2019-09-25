@@ -70,7 +70,6 @@ Shader GetWaterTile_1Shader() {
     const float reflectivity = 10;
     const float blueness = 0.3;
 
-    vec3 fragToCam = normalize(cameraPos - fragPos);
     void main()
     {
         vec2 distortedTexCoords = texture(dudvmap, vec2(fragUv.x + moveFactor, fragUv.y)).rg*0.1;
@@ -95,6 +94,7 @@ Shader GetWaterTile_1Shader() {
         vec3 normal = vec3(normalColor.r * 2.0 - 1.0, normalColor.b, normalColor.g * 2.0 - 1.0);
         normal = normalize(normal);
 
+        vec3 fragToCam = normalize(cameraPos - fragPos.xyz);
         vec4 specularHighlights = vec4(0, 0, 0, 0);
         for(int i=0; i<numLights; i++) {
             vec3 lightDirection = normalize(lights[i].direction);
