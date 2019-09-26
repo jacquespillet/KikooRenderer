@@ -24,7 +24,6 @@ namespace CoreEngine {
     Object3D* quad;
     MaterialComponent* mat;
 	void Scene::Start() {
-        // std::cout << "sgtart0"<<std::endl;
 		GETGL
 
         this->started = true;
@@ -55,27 +54,21 @@ namespace CoreEngine {
         for(int i=0; i<objects3D.size(); i++) {
             objects3D[i]->Start();
         }
-        // std::cout << "sgtart1"<<std::endl;
     }
 
     void Scene::Enable() {
-        // std::cout << "enable0"<<std::endl;
         for(int i=0; i<objects3D.size(); i++) {
             if(!objects3D[i]->started) objects3D[i]->Start(); 
             objects3D[i]->Enable();
         }
-        // std::cout << "enable1"<<std::endl;
     }
 
     void Scene::Render() {
-        // std::cout << "render0"<<std::endl;
 		GETGL
         this->renderer->Render();
-        // std::cout << "render1"<<std::endl;
     }
 
     void Scene::OnUpdate() {
-        // std::cout << "update0"<<std::endl;
         for(int i=0; i<objects3D.size(); i++) {
             if(!objects3D[i]->started) objects3D[i]->Start(); 
             if(!objects3D[i]->enabled) objects3D[i]->Enable();
@@ -85,7 +78,6 @@ namespace CoreEngine {
             skyboxCube->Update();
         }        
         elapsedTime += deltaTime;
-        // std::cout << "update1"<<std::endl;
     }
 
 

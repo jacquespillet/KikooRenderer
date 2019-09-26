@@ -9,7 +9,6 @@
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLFunctions_3_3_Core>
 #define GLV QOpenGLFunctions_3_3_Core
-#define GETGL GLV* ogl = QOpenGLContext::currentContext()->versionFunctions<GLV>(); if(ogl==NULL){std::cout << "could not get opengl context";}
 
 
 namespace KikooRenderer {
@@ -61,7 +60,6 @@ HDRRenderer::HDRRenderer(Scene* scene) : Renderer(scene) {
     }
     )";
     quadShader.name = "quad";
-    std::cout << "StandardShaders: Compiling quadShader" << std::endl; 
     quadShader.Compile();
 
     exposure = 1.0;
@@ -127,17 +125,14 @@ void HDRRenderer::Destroy() {
 
 void HDRRenderer::Render() {
     GETGL   
-    std::cout << "hdr0"<<std::endl;
     if(useMSAA) alternateFBO->Enable();
     else quadFBO->Enable();
-    std::cout << "hdr1"<<std::endl;
     
     ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
     ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
     
     ogl->glStencilFunc(GL_ALWAYS, 1, 0xFF); 
     ogl->glStencilMask(0xFF); 
-    std::cout << "hdr2"<<std::endl;
 
     //Main pass
     for(int i=0; i<scene->objects3D.size(); i++) {
@@ -145,7 +140,6 @@ void HDRRenderer::Render() {
             scene->objects3D[i]->Render();
         }
     }
-    std::cout << "hdr3"<<std::endl;
 
     //Render skybox
     if(scene->hasSkybox) {
@@ -157,22 +151,17 @@ void HDRRenderer::Render() {
     // scene->ps->Render();
 
     //Render UI
-    std::cout << "hdr4"<<std::endl;
     if(scene->rendersUI) {
-        std::cout << "hdr5"<<std::endl;
         scene->grid->Render();
-        std::cout << "hdr6"<<std::endl;
         scene->axes->Render();
 
         if (scene->transformWidget->visible && scene->selectedObjects.size() > 0 && scene->selectedObjects[0]->visible) {
             scene->transformWidget->Render();
         }
     }
-    std::cout << "hdr5"<<std::endl;
 
     if(useMSAA) alternateFBO->Disable();
     else quadFBO->Disable();
-    std::cout << "hdr6"<<std::endl;
 
     //Render all shadow maps
     LightComponent* light;
@@ -181,14 +170,12 @@ void HDRRenderer::Render() {
         light->RenderDepthMap();
     }
 
-    std::cout << "hdr7"<<std::endl;
     ogl->glViewport(0, 0, quadFBO->width, quadFBO->height);
 
     if(useMSAA){
         alternateFBO->CopyToFramebuffer(quadFBO);
     }
     
-    std::cout << "hdr8"<<std::endl;
     if(postProcessor.numProcesses >0) {
         postProcessor.Run(quadFBO, finalFBO);
         finalFBO->RenderFBOToObject(quad);
@@ -196,7 +183,6 @@ void HDRRenderer::Render() {
         quadFBO->RenderFBOToObject(quad, false);
     }
 
-    std::cout << "hdr9"<<std::endl;
     //USE IT FOR DEBUGGING LIGHT DEPTH FRAMES    
     // for(int i=0; i<scene->lightObjects.size(); i++) {
     //     light = (LightComponent*) scene->lightObjects[i]->GetComponent("Light");
