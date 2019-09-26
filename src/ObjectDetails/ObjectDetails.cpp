@@ -51,19 +51,19 @@ namespace KikooRenderer
 		transformInspector = currentObject->transform->GetInspector();
 		rootWidget->mainLayout->addWidget(transformInspector);
 
-		material = (CoreEngine::MaterialComponent*)(currentObject->GetComponent("Material"));
+		material = (currentObject->GetComponent<CoreEngine::MaterialComponent>());
 		if (material != nullptr) {
 			CoreEngine::MaterialInspector* materialInspector = material->GetInspector();
 			rootWidget->mainLayout->addWidget(materialInspector);
 		}
 
-		CoreEngine::MeshFilterComponent* meshFilterComponent = (CoreEngine::MeshFilterComponent*)(currentObject->GetComponent("MeshFilter"));
+		CoreEngine::MeshFilterComponent* meshFilterComponent = (currentObject->GetComponent<CoreEngine::MeshFilterComponent>());
 		if (meshFilterComponent != nullptr) {
 			CoreEngine::MeshFilterInspector* meshFilterComponentInspector = meshFilterComponent->GetInspector();
 			rootWidget->mainLayout->addWidget(meshFilterComponentInspector);
 		}
 		
-		CoreEngine::LightComponent* lightComponent = (CoreEngine::LightComponent*)(currentObject->GetComponent("Light"));
+		CoreEngine::LightComponent* lightComponent = (currentObject->GetComponent<CoreEngine::LightComponent>());
 		if (lightComponent != nullptr) {
 			CoreEngine::LightInspector* lightInspector = lightComponent->GetInspector();
 			rootWidget->mainLayout->addWidget(lightInspector);

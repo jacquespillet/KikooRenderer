@@ -18,10 +18,10 @@ WaveTile::WaveTile(std::string name, Scene* scene) : Object3D(name, scene) {
     quad->Enable();
 
 
-    quadMaterial = (MaterialComponent*) quad->GetComponent("Material");
+    quadMaterial = quad->GetComponent<MaterialComponent>();
     quadMaterial->SetShader(&waterShader);
 
-    mesh = (MeshFilterComponent*) quad->GetComponent("MeshFilter");
+    mesh = quad->GetComponent<MeshFilterComponent>();
 }
 
 void WaveTile::WindowResize(int w, int h) {

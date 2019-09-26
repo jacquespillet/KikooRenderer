@@ -261,7 +261,7 @@ void LightComponent::RenderDepthMap() {
             ogl->glCullFace(GL_FRONT);
             for(int i=0; i<object3D->scene->objects3D.size(); i++) {
                 if(object3D->scene->objects3D[i] && object3D->scene->objects3D[i]->visible && object3D->scene->objects3D[i]->castShadow) {
-                    MaterialComponent* material = (MaterialComponent*) object3D->scene->objects3D[i]->GetComponent("Material");
+                    MaterialComponent* material = object3D->scene->objects3D[i]->GetComponent<MaterialComponent>();
                     if(material != nullptr) {
                         Shader* tmpShader = material->shader;
                         ShaderParams* tmpParams = material->params;
@@ -291,7 +291,7 @@ void LightComponent::RenderDepthMap() {
 
             for(int i=0; i<object3D->scene->objects3D.size(); i++) {
                 if(object3D->scene->objects3D[i] && object3D->scene->objects3D[i]->visible && object3D->scene->objects3D[i]->castShadow) {
-                    MaterialComponent* material = (MaterialComponent*) object3D->scene->objects3D[i]->GetComponent("Material");
+                    MaterialComponent* material = object3D->scene->objects3D[i]->GetComponent<MaterialComponent>();
                     if(material != nullptr) {
                         Shader* tmpShader = material->shader;
                         ShaderParams* tmpParams = material->params;
@@ -316,7 +316,7 @@ void LightComponent::RenderDepthMap() {
 
             for(int i=0; i<object3D->scene->objects3D.size(); i++) {
                 if(object3D->scene->objects3D[i] && object3D->scene->objects3D[i]->visible && object3D->scene->objects3D[i]->castShadow) {
-                    MaterialComponent* material = (MaterialComponent*) object3D->scene->objects3D[i]->GetComponent("Material");
+                    MaterialComponent* material = object3D->scene->objects3D[i]->GetComponent<MaterialComponent>();
                     if(material != nullptr) {
                         Shader* tmpShader = material->shader;
                         ShaderParams* tmpParams = material->params;

@@ -49,7 +49,7 @@ float TerrainComponent::GetZDerivative (int x, int z, int vInx) {
 }
 
 TerrainComponent::TerrainComponent(Object3D* object, float width,float height,int subdivX, int subdivY) : Component("Terrain", object) {
-    mesh = (MeshFilterComponent*) object->GetComponent("MeshFilter");
+    mesh = object->GetComponent<MeshFilterComponent>();
     this->width = width;
     this->height = height;
     this->subdivX = subdivX;

@@ -29,7 +29,7 @@ WaterTile_2::WaterTile_2(std::string name, Scene* scene) : Object3D(name, scene)
     quad->Start();
     quad->Enable();
 
-    quadMaterial = (MaterialComponent*) quad->GetComponent("Material");
+    quadMaterial = quad->GetComponent<MaterialComponent>();
     quadMaterial->SetShader(&waterShader);
 
     

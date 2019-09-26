@@ -136,10 +136,10 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
 		if (selectedItem->text() == pointLightStr) objectToAdd = CoreEngine::GetPointLight(view3D->view3DGL->scene, name.toStdString(), glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
 		if (selectedItem->text() == spotLightStr) objectToAdd = CoreEngine::GetSpotLight(view3D->view3DGL->scene, name.toStdString(), glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1), 90);
 		
-		if (selectedItem->text() == rabbitStr) objectToAdd = CoreEngine::ObjectFromOBJ(name.toStdString(), "C:/Users/Jacques/Documents/Boulot/2019/Qt BP/resources/OBJ/bunny/bunny.obj", view3D->view3DGL->scene);
-		if (selectedItem->text() == buddhaStr) objectToAdd = CoreEngine::ObjectFromOBJ(name.toStdString(), "C:/Users/Jacques/Documents/Boulot/2019/Qt BP/resources/OBJ/buddha/untitled.obj", view3D->view3DGL->scene);
-		if (selectedItem->text() == dragonStr) objectToAdd = CoreEngine::ObjectFromOBJ(name.toStdString(), "C:/Users/Jacques/Documents/Boulot/2019/Qt BP/resources/OBJ/dragon/dragon.obj", view3D->view3DGL->scene);
-		if (selectedItem->text() == teapotStr) objectToAdd = CoreEngine::ObjectFromOBJ(name.toStdString(), "C:/Users/Jacques/Documents/Boulot/2019/Qt BP/resources/OBJ/teapot/teapot.obj", view3D->view3DGL->scene);
+		if (selectedItem->text() == rabbitStr) objectToAdd = CoreEngine::ObjectFromModelFile(view3D->view3DGL->scene, name.toStdString(), "C:/Users/Jacques/Documents/Boulot/2019/Qt BP/resources/OBJ/bunny/bunny.obj");
+		if (selectedItem->text() == buddhaStr) objectToAdd = CoreEngine::ObjectFromModelFile(view3D->view3DGL->scene, name.toStdString(), "C:/Users/Jacques/Documents/Boulot/2019/Qt BP/resources/OBJ/buddha/untitled.obj");
+		if (selectedItem->text() == dragonStr) objectToAdd = CoreEngine::ObjectFromModelFile(view3D->view3DGL->scene, name.toStdString(), "C:/Users/Jacques/Documents/Boulot/2019/Qt BP/resources/OBJ/dragon/dragon.obj");
+		if (selectedItem->text() == teapotStr) objectToAdd = CoreEngine::ObjectFromModelFile(view3D->view3DGL->scene, name.toStdString(), "C:/Users/Jacques/Documents/Boulot/2019/Qt BP/resources/OBJ/teapot/teapot.obj");
 
 		if (selectedIndexes.size() > 0) {
 			TreeItem* parentItem = (TreeItem*)model->itemFromIndex(selectedIndexes[0]);

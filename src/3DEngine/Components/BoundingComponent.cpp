@@ -22,7 +22,7 @@ namespace CoreEngine {
         max = glm::dvec3(-9999, -9999, -9999);
 
 
-        MeshFilterComponent* mesh = (MeshFilterComponent*) this->object3D->GetComponent("MeshFilter");
+        MeshFilterComponent* mesh = this->object3D->GetComponent<MeshFilterComponent>();
         transform = this->object3D->transform;
         
         for(int i=0; i<mesh->vertices.size(); i++) {
@@ -57,7 +57,7 @@ namespace CoreEngine {
         max = glm::dvec3(-9999, -9999, -9999);
 
 
-        MeshFilterComponent* mesh = (MeshFilterComponent*) this->object3D->GetComponent("MeshFilter");
+        MeshFilterComponent* mesh = this->object3D->GetComponent<MeshFilterComponent>();
         transform = this->object3D->transform;
         
         for(int i=0; i<mesh->vertices.size(); i++) {

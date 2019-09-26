@@ -40,7 +40,19 @@ class Object3D {
         void AddComponent(Component* component);
         std::string AddObject(Object3D* object);
 		void ClearObjects();
-        Component*  GetComponent(std::string name);
+
+        // Component*  GetComponent(std::string name);
+        
+        template <typename T>
+        T*  GetComponent(){
+            for(int i=0; i<components.size(); i++) {
+                T* comp = reinterpret_cast<T*>(components[i]); 
+                if (comp) {
+                    return comp;
+                }
+            }
+            return nullptr;
+        }
 
         virtual void Start();
         virtual void Enable();

@@ -897,7 +897,7 @@ Object3D* GetSpotLight(Scene* scene, std::string name, glm::dvec3 _position, glm
 }
 
 
-Object3D* ObjectFromOBJ(std::string name, std::string fileName, KikooRenderer::CoreEngine::Scene* scene) {
+Object3D* ObjectFromModelFile(Scene* scene, std::string name, std::string filename) {
     Object3D* newObject = new Object3D(name, scene);
 
     std::vector<glm::dvec3> vertex;
@@ -906,7 +906,7 @@ Object3D* ObjectFromOBJ(std::string name, std::string fileName, KikooRenderer::C
     std::vector<glm::dvec4> colors;
     std::vector<int> triangles;
 
-    Util::FileIO::LoadModel(fileName, &vertex, &normals, &uv, &colors, &triangles);
+    Util::FileIO::LoadModel(filename, &vertex, &normals, &uv, &colors, &triangles);
 
     MeshFilterComponent* mesh = new MeshFilterComponent(newObject);
     mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles, false);

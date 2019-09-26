@@ -91,7 +91,7 @@ void ForwardRenderer::Render() {
         //Render selected objects
         for(int i=0; i<scene->selectedObjects.size(); i++) {
             if(scene->selectedObjects[i]->visible) {
-                MaterialComponent* material = (MaterialComponent*)(scene->selectedObjects[i]->GetComponent("Material"));
+                MaterialComponent* material = (scene->selectedObjects[i]->GetComponent<MaterialComponent>());
                 if(material) {
                     //Save shader state to set it back after this pass
                     Shader* tmpShader = material->shader;

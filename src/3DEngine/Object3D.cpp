@@ -121,24 +121,45 @@ void Object3D::Destroy() {
     }
 }
 
+// Component* Object3D::GetComponentt(){
+// 	for(int i=0; i<components.size(); i++) {
+// 		std::cout << i << std::endl; 
+// 		if (reinterpret_cast<T*>(components[i])) {
+// 			return components[i];
+// 		}
+// 	}
+// 	return nullptr;
+// }
+
+// Component* Object3D::GetComponent(std::string name) {
+// 	for(int i=0; i<components.size(); i++) {
+// 		if(components[i]->name == name) {
+// 			return components[i];
+// 		}
+// 	}
+// 	return nullptr;
+// }
 
 
-Component* Object3D::GetComponent(std::string name) {
-	for(int i=0; i<components.size(); i++) { 
-		if(components[i]->name == name) {
-			return components[i];
-		}
-	}
-	return nullptr;
-}
+// template <typename T>
+// Component* Object3D::GetComponentt() {
+// 	for(int i=0; i<components.size(); i++) { 
+// 		if (dynamic_cast<T*>(components[i])) {
+// 			std::cout << "FOUND "<< std::endl;
+// 		}
+// 	}
+// 	return nullptr;
+// }
+
 void Object3D::WindowResize(int w, int h) {}
 
 void Object3D::Render(glm::mat4* overrideViewMatrix) {
 	GETGL
-
+	std::cout << "r0"<<std::endl;
 	if(!depthTest) ogl->glDisable(GL_DEPTH_TEST);
 	
 	glm::mat4 mMatrix = transform->GetWorldModelMatrix();
+	std::cout << "r1"<<std::endl;
 
 	//Render child objects
 	for(int i=0; i<childObjects.size(); i++) {
@@ -147,11 +168,13 @@ void Object3D::Render(glm::mat4* overrideViewMatrix) {
 		childObjects[i]->Render();
 	}
 	
+	std::cout << "r2"<<std::endl;
 
 	if(transform != nullptr) {
 		glm::mat4 vMatrix = (overrideViewMatrix == nullptr) ? scene->camera->GetViewMatrix() : (*overrideViewMatrix);
 		glm::mat4 pMatrix = scene->camera->GetProjectionMatrix();
 		
+		std::cout << "r3"<<std::endl;
 		if(faceCamera) {	
 			mMatrix[0][0] = vMatrix[0][0]; mMatrix[1][0] = vMatrix[0][1]; mMatrix[2][0] = vMatrix[0][2];
 			mMatrix[0][1] = vMatrix[1][0]; mMatrix[1][1] = vMatrix[1][1]; mMatrix[2][1] = vMatrix[1][2];
@@ -161,9 +184,13 @@ void Object3D::Render(glm::mat4* overrideViewMatrix) {
 		
 		}
 		
-		MaterialComponent* material = (MaterialComponent*)(this->GetComponent("Material"));
+		std::cout << "r4"<<std::endl;
+		MaterialComponent* material = (this->GetComponent<MaterialComponent>());
+		std::cout << "r5"<<std::endl;
 		if(material != nullptr) {
+			std::cout << "r6"<<std::endl;
 			material->SetupShaderUniforms(mMatrix, vMatrix, pMatrix, this->scene);
+			std::cout << "r7"<<std::endl;
 			//Draw
 			for(int i=0; i<components.size(); i++) {
 				components[i]->OnRender();
@@ -173,8 +200,10 @@ void Object3D::Render(glm::mat4* overrideViewMatrix) {
 	
 	//unbind shader program
 	ogl->glUseProgram(0);
+		std::cout << "r6"<<std::endl;
 	ogl->glEnable(GL_DEPTH_TEST);
 	ogl->glCullFace(GL_BACK);
+		std::cout << "7"<<std::endl;
 }
 
 
@@ -196,7 +225,7 @@ void Object3D::DepthRenderPass(LightComponent* light) {
 	
 
 	if(transform != nullptr) {
-		MaterialComponent* material = (MaterialComponent*)(this->GetComponent("Material"));
+		MaterialComponent* material = (this->GetComponent<MaterialComponent>());
 		
 		ogl->glUseProgram(material->shader->programShaderObject);
 
@@ -252,7 +281,7 @@ Object3D* Object3D::Intersects(Geometry::Ray ray, double& _distance) {
 	Object3D* closest = nullptr;
 
 	//This code should be in bounding box : bb->intersectsRay();
-	BoundingBoxComponent* bb = (BoundingBoxComponent*) this->GetComponent("BoundingBox");
+	BoundingBoxComponent* bb = this->GetComponent<BoundingBoxComponent>();
 	if(bb != nullptr) {
 		glm::dvec3 min;
 		glm::dvec3 max;

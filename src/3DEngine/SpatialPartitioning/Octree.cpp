@@ -19,7 +19,7 @@ void Octree::Build(CoreEngine::Scene* scene, std::vector<CoreEngine::Object3D*> 
 	double minX = 999999; double minY = 999999; double minZ = 999999;
 	double maxX = -999999; double maxY = -999999; double maxZ = -999999;
 	for (int i = 0; i < objects.size(); i++) {
-		CoreEngine::BoundingBoxComponent* bb = (CoreEngine::BoundingBoxComponent*)(objects[i]->GetComponent("BoundingBox"));
+		CoreEngine::BoundingBoxComponent* bb = (objects[i]->GetComponent<CoreEngine::BoundingBoxComponent>());
 		if (bb != nullptr) {
 			root.objects.push_back(objects[i]);
 			glm::dvec3 min;
@@ -84,7 +84,7 @@ void Octree::Subdivide(Node parentNode) {
 }
 
 bool Octree:: isInside(Node node, CoreEngine::Object3D* object) {
-	CoreEngine::BoundingBoxComponent* bb = (CoreEngine::BoundingBoxComponent*)(object->GetComponent("BoundingBox"));
+	CoreEngine::BoundingBoxComponent* bb = (object->GetComponent<CoreEngine::BoundingBoxComponent>());
 	
 	if (bb != nullptr) {
 		glm::dvec3 objectMin;

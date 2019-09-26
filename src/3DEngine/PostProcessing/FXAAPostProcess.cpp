@@ -298,7 +298,7 @@ namespace CoreEngine {
         shader.Compile();
         
         quad = GetQuad(scene, "plane", glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
-        material = (MaterialComponent*) quad->GetComponent("Material");
+        material = quad->GetComponent<MaterialComponent>();
         material->SetShader(&shader);
         
         quad->Enable();        

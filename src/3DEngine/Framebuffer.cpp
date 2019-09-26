@@ -196,7 +196,7 @@ namespace CoreEngine {
 		albedoTex.glTex = renderDepth ? depthTexture : texture;
 		albedoTex.loaded = true;
 		albedoTex.texIndex = GL_TEXTURE0;
-		MaterialComponent* material = (MaterialComponent*)target->GetComponent("Material");
+		MaterialComponent* material = target->GetComponent<MaterialComponent>();
 		material->albedoTex = albedoTex;
 		target->Render();	
 	}

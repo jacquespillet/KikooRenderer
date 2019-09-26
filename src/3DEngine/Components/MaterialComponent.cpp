@@ -155,6 +155,7 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 		if(shader->isDepthPass) {
 			
 		} else {
+			std::cout << "0"<<std::endl;
 			if(flipNormals) ogl->glCullFace(GL_FRONT);
 
 			glm::mat4 mvpMatrix = projectionMatrix * viewMatrix * modelMatrix;
@@ -169,6 +170,7 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 
 			int modelMatrixLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "modelMatrix"); 
 			ogl->glUniformMatrix4fv(modelMatrixLocation, 1, false, glm::value_ptr(glm::mat4(modelMatrix)));
+			std::cout << "1"<<std::endl;
 
 			if (cubemap.loaded) {
 				ogl->glCullFace(GL_FRONT);
@@ -195,6 +197,7 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 				int hasAlbedoTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasAlbedoTex");
 				ogl->glUniform1i(hasAlbedoTexLocation, 0);
 			}
+			std::cout << "2"<<std::endl;
 
 			if(this->shader->isLit) {
 
@@ -215,7 +218,7 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 
 					int numLights = 0;
 					for(int i=0; i<scene->lightObjects.size(); i++) {
-						LightComponent* lightComponent = (LightComponent*) scene->lightObjects[i]->GetComponent("Light"); 
+						LightComponent* lightComponent = scene->lightObjects[i]->GetComponent<LightComponent>(); 
 						TransformComponent* transformComponent = scene->lightObjects[i]->transform; 
 						
 						if(lightComponent != nullptr) {
@@ -269,6 +272,7 @@ void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 v
 
 					int numLightsLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "numLights"); 
 					ogl->glUniform1i(numLightsLocation, numLights);
+			std::cout << "3"<<std::endl;
 
 
 				// 	// if(this->shader->GetId() == SHADER_IDS::PBR) {         

@@ -60,7 +60,7 @@ namespace CoreEngine {
     
     void FluidComponent::OnUpdate() {
         if(meshFilter == nullptr) {
-            meshFilter = (MeshFilterComponent*) object3D->GetComponent("MeshFilter");
+            meshFilter = object3D->GetComponent<MeshFilterComponent>();
         }
 
         for (long j = 1; j < height - 1; j++)  {   

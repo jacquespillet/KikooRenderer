@@ -72,7 +72,7 @@ MeshFilterInspector::MeshFilterInspector(MeshFilterComponent* meshFilterComponen
 		meshFilterComponent->LoadFromBuffers(vertex, normals, uv, colors, triangles, true);
 		meshFilterComponent->shoudRebuildBuffers = true;
 
-		BoundingBoxComponent* bb = (BoundingBoxComponent*) object->GetComponent("BoundingBox");
+		BoundingBoxComponent* bb = object->GetComponent<BoundingBoxComponent>();
 		bb->shouldRefresh = true;
 	});
 

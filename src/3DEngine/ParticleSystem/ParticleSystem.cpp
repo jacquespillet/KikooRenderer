@@ -37,14 +37,14 @@ ParticleSystem::ParticleSystem(std::string name, Scene* scene) : Object3D(name, 
     quad->Enable();
     quad->faceCamera = true;
 
-    quadMaterial = (MaterialComponent*) quad->GetComponent("Material");
+    quadMaterial =  quad->GetComponent<MaterialComponent>();
     quadMaterial->SetShader(&particleShader);
 
     Texture albedoTex = Texture("C:/Users/Jacques/Pictures/Textures/Particles/particleAtlas.png", GL_TEXTURE0);
     quadMaterial->albedoTex = albedoTex;
     numRows = 4;
 
-    quadMeshFilter = (MeshFilterComponent*) quad->GetComponent("MeshFilter");
+    quadMeshFilter = quad->GetComponent<MeshFilterComponent>();
     quadMeshFilter->renderInstanced = true;
 
     direction = glm::vec3(0, 1, 0);

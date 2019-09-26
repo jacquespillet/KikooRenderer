@@ -16,7 +16,7 @@ WaterTile_1::WaterTile_1(std::string name, Scene* scene) : Object3D(name, scene)
     quad->Start();
     quad->Enable();
 
-    quadMaterial = (MaterialComponent*) quad->GetComponent("Material");
+    quadMaterial = quad->GetComponent<MaterialComponent>();
     quadMaterial->SetShader(&waterShader);
     reflectionFramebuffer = new Framebuffer(1024, 1024,  GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, false);
     refractionFramebuffer = new Framebuffer(1024, 1024,  GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, false);
@@ -59,7 +59,7 @@ void WaterTile_1::Render(glm::mat4* overrideViewMatrixp) {
     //Render all objects
     for(int i=0; i<scene->objects3D.size(); i++) {
         if(scene->objects3D[i] && scene->objects3D[i]->visible && scene->objects3D[i] != this) {
-            MaterialComponent* material = (MaterialComponent*) scene->objects3D[i]->GetComponent("Material");
+            MaterialComponent* material = scene->objects3D[i]->GetComponent<MaterialComponent>();
             if(material != nullptr) {
                 int program = material->shader->programShaderObject;
                 ogl->glUseProgram(program);
@@ -91,7 +91,7 @@ void WaterTile_1::Render(glm::mat4* overrideViewMatrixp) {
 
     for(int i=0; i<scene->objects3D.size(); i++) {
         if(scene->objects3D[i] && scene->objects3D[i]->visible && scene->objects3D[i] != this) {
-            MaterialComponent* material = (MaterialComponent*) scene->objects3D[i]->GetComponent("Material");
+            MaterialComponent* material = scene->objects3D[i]->GetComponent<MaterialComponent>();
             if(material != nullptr) {
                 int program = material->shader->programShaderObject;
                 ogl->glUseProgram(program);
