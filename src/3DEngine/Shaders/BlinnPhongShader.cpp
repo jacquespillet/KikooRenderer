@@ -91,7 +91,7 @@ void BlinnPhongParams::SetUniforms() {
     * When textures changed in the form, load them for the incoming frame
     */
     if (shouldLoadNormal ) {
-        normalMap = KikooRenderer::CoreEngine::Texture(normalMapStr, GL_TEXTURE2);
+        normalMap = KikooRenderer::CoreEngine::Texture(normalMapStr, GL_TEXTURE2, false);
         shouldLoadNormal = false;
     }
 

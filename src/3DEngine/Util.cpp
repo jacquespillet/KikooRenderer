@@ -27,6 +27,11 @@ namespace Util {
             distance = -1; 
         return raybox;
     }
+
+	bool RayWireCircleTest(glm::dvec3 rayOrig, glm::dvec3 rayDir, glm::dmat4 transform, float radius) {
+		std::cout << "RAY WIRE"<<std::endl;
+		return true;
+	}
     
     bool CameraBoxTest(CameraScene& camera, TransformComponent* transform) {
 		Geometry::Planes planes = camera.GetPlanes();

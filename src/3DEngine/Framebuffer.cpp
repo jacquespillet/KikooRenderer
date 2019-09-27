@@ -61,14 +61,14 @@ namespace CoreEngine {
 				ogl->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
 			}
 
-			ogl->glEnable(GL_CULL_FACE); 
-			ogl->glCullFace(GL_BACK);
+			// ogl->glEnable(GL_CULL_FACE); 
+			// ogl->glCullFace(GL_BACK);
 
-			ogl->glEnable(GL_BLEND);
-			ogl->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			// ogl->glEnable(GL_BLEND);
+			// ogl->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			
-			ogl->glEnable(GL_STENCIL_TEST);    
-			ogl->glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);  
+			// ogl->glEnable(GL_STENCIL_TEST);    
+			// ogl->glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);  
 			
 			//disable writting to depth buffer
 			ogl->glEnable(GL_DEPTH_TEST);

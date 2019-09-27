@@ -249,12 +249,12 @@ namespace CoreEngine {
                     triangles->push_back(inx);
                     triangles->push_back(inx + numSlices);
                 } else { // If last of the row
+                    triangles->push_back(inx + 1);
                     triangles->push_back(inx);
                     triangles->push_back(inx - numSlices);
-                    triangles->push_back(inx + 1);
 
-                    triangles->push_back(inx);
                     triangles->push_back(inx + 1);
+                    triangles->push_back(inx);
                     triangles->push_back(inx + numSlices);
                 }
 
@@ -281,9 +281,9 @@ namespace CoreEngine {
             uv->push_back(glm::dvec2(0, 0));
             colors->push_back(glm::dvec4(255, 255, 255, 255));
             
-            triangles->push_back(i);
-            triangles->push_back(i-1);
             triangles->push_back(0);
+            triangles->push_back(i-1);
+            triangles->push_back(i);
         }
         
         triangles->push_back(numSlices);
@@ -291,6 +291,27 @@ namespace CoreEngine {
         triangles->push_back(0);
     }
 
+    void GetWireCircleBuffers(std::vector<glm::dvec3>* vertex, std::vector<glm::dvec3>* normals, std::vector<glm::dvec2>* uv, std::vector<glm::dvec4>* colors, std::vector<int>* triangles) {
+        uint32_t numSlices = 16;
+
+        for(uint32_t i=0; i<=numSlices; i++) {
+            float inx = ((float)i / (float)numSlices) * TWO_PI;
+            float x = std::cos(inx);
+            float y = std::sin(inx);
+
+            vertex->push_back(glm::dvec3(x, y, 0));
+            normals->push_back(glm::dvec3(0, 0, -1));
+            uv->push_back(glm::dvec2(0, 0));
+            colors->push_back(glm::dvec4(255, 255, 255, 255));
+            
+            triangles->push_back(i-1);
+            triangles->push_back(i);
+        }
+        
+        triangles->push_back(numSlices);
+        triangles->push_back(1);
+    }
+    
     void GetConeBuffers(std::vector<glm::dvec3>* vertex, std::vector<glm::dvec3>* normals, std::vector<glm::dvec2>* uv, std::vector<glm::dvec4>* colors, std::vector<int>* triangles) {
 
         uint32_t numSlices = 32;
@@ -496,7 +517,7 @@ namespace CoreEngine {
         mesh->jsonObj = json;
         return mesh;
     }
-    
+        
     MeshFilterComponent* GetCircleMesh(glm::dvec3 size, glm::dvec4 color, Object3D* object){
         std::vector<glm::dvec3> vertex;
         std::vector<glm::dvec3> normals;
@@ -518,6 +539,29 @@ namespace CoreEngine {
         return mesh;
 
     }
+
+    MeshFilterComponent* GetWireCircleMesh(glm::dvec3 size, glm::dvec4 color, Object3D* object){
+        std::vector<glm::dvec3> vertex;
+        std::vector<glm::dvec3> normals;
+        std::vector<glm::dvec2> uv;
+        std::vector<glm::dvec4> colors;
+        std::vector<int> triangles;
+
+        GetWireCircleBuffers(&vertex, &normals, &uv, &colors, &triangles);
+
+        //Setup mesh
+        MeshFilterComponent* mesh = new MeshFilterComponent(object);
+        mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles, false);
+        mesh->meshType = PRIMITIVE_MESH::CIRCLE_MESH;
+
+        QJsonObject json;
+        json["Type"] = QString("Primitive");
+        json["Primitive"] = QString("Circle");
+        mesh->jsonObj = json;        
+        return mesh;
+
+    }
+    
     
     MeshFilterComponent* GetConeMesh(glm::dvec3 size, glm::dvec4 color, Object3D* object){
         std::vector<glm::dvec3> vertex;

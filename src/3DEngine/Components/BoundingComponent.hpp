@@ -23,7 +23,7 @@ namespace CoreEngine {
 
         void GetWorldBounds(glm::dvec3* _min, glm::dvec3* _max);
         void GetLocalBounds(glm::dvec3* _min, glm::dvec3* _max);
-
+        
         void Refresh();
 
         glm::dvec3 min;

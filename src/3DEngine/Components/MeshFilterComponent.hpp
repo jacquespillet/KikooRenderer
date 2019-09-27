@@ -66,6 +66,7 @@ class MeshFilterComponent : public Component {
         void DestroyBuffers();
 
         GLenum drawingMode;
+        GLenum polygonMode;
         int primitiveSize;
 
         std::vector<Vertex> vertices;

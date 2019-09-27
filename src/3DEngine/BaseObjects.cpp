@@ -161,7 +161,7 @@ Object3D* GetWireCircle(Scene* scene, std::string name, glm::dvec3 _position, gl
 	//Start each Object3D in scene
 	Object3D* newObject = new Object3D(name, scene);
 
-    MeshFilterComponent* mesh = GetQuadMesh(glm::dvec3(1), _color, newObject);
+    MeshFilterComponent* mesh = GetWireCircleMesh(glm::dvec3(1), _color, newObject);
 	mesh->drawingMode = GL_LINES;
 
 	//Setup transform
@@ -186,6 +186,7 @@ Object3D* GetWireCircle(Scene* scene, std::string name, glm::dvec3 _position, gl
 
 	return newObject;
 }
+
 
 
 Object3D* GetSphere(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {

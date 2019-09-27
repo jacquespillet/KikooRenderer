@@ -2,6 +2,7 @@
 #include "BaseObjects.hpp"
 #include "Components/TransformComponent.hpp"
 #include "3DEngine/Scene.hpp"
+#include "Util.hpp"
 
 namespace KikooRenderer {
 namespace CoreEngine {
@@ -287,6 +288,12 @@ namespace CoreEngine {
 		Object3D* res = nullptr;
 		if(transformMode == TransformMode::TRANSLATE ) res = translateObject->Intersects(ray, _distance);
 		else if(transformMode == TransformMode::SCALE) res = scaleObject->Intersects(ray, _distance);
+		else if(transformMode == TransformMode::ROTATE) {
+			for(int i=0; i<rotateObject->childObjects.size(); i++) {
+				Util::RayWireCircleTest(ray.origin, ray.direction, rotateObject->childObjects[i]->transform->GetWorldModelMatrix(), 1);
+			}
+			res = rotateObject->childObjects[0];
+		}
 
 		if (res != nullptr) {
 			this->StartTransform(res);
