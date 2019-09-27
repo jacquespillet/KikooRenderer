@@ -28,9 +28,23 @@ namespace Util {
         return raybox;
     }
 
-	bool RayWireCircleTest(glm::dvec3 rayOrig, glm::dvec3 rayDir, glm::dmat4 transform, float radius) {
-		std::cout << "RAY WIRE"<<std::endl;
-		return true;
+	bool RayWireCircleTest(glm::dvec3 rayOrig, glm::dvec3 rayDir, glm::dmat4 transform, float radius, double& distance) {
+		glm::dvec3 circlePosition = glm::dvec3(glm::column(transform, 3));
+		double circleDistance = glm::length(circlePosition);
+		glm::dvec3 normal = -glm::column(transform, 2);
+		glm::dvec4 plane = glm::dvec4(normal.x, normal.y, normal.z, distance);
+
+		distance = -glm::dot(plane, glm::dvec4(rayOrig, 1)) / glm::dot(plane, glm::dvec4(rayDir, 0));
+		glm::dvec3 intersectPos = rayOrig + t * rayDir;
+
+
+		double intersectionDistance = glm::distance(intersectPos, circlePosition);
+
+		if(intersectionDistance < radius +0.1 && intersectionDistance > radius - 0.1) {
+			return true;
+		} else {
+			return false;
+		}
 	}
     
     bool CameraBoxTest(CameraScene& camera, TransformComponent* transform) {

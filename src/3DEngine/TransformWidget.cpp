@@ -79,13 +79,13 @@ namespace CoreEngine {
 		{
 			rotateObject = new Object3D("RotationWidget", scene);
 
-			Object3D* xCircle = GetWireCircle(scene, "CircleX", glm::dvec3(0, 0, 0), glm::dvec3(90, 0, 0), glm::dvec3(1), glm::dvec4(1.0, 0.0, 0.0, 1.0));
-			xCircle->depthTest = false;
-			rotateObject->AddObject(xCircle);
+			// Object3D* xCircle = GetWireCircle(scene, "CircleX", glm::dvec3(0, 0, 0), glm::dvec3(90, 0, 0), glm::dvec3(1), glm::dvec4(1.0, 0.0, 0.0, 1.0));
+			// xCircle->depthTest = false;
+			// rotateObject->AddObject(xCircle);
 
-			Object3D* yCircle = GetWireCircle(scene, "CircleY", glm::dvec3(0, 0, 0), glm::dvec3(0, 90, 0), glm::dvec3(1), glm::dvec4(0.0, 1.0, 0.0, 1.0));
-			yCircle->depthTest = false;
-			rotateObject->AddObject(yCircle);
+			// Object3D* yCircle = GetWireCircle(scene, "CircleY", glm::dvec3(0, 0, 0), glm::dvec3(0, 90, 0), glm::dvec3(1), glm::dvec4(0.0, 1.0, 0.0, 1.0));
+			// yCircle->depthTest = false;
+			// rotateObject->AddObject(yCircle);
 
 			Object3D* zCircle = GetWireCircle(scene, "CircleZ", glm::dvec3(0, 0, 0), glm::dvec3(0, 0, 0), glm::dvec3(1), glm::dvec4(0.0, 0.0, 1.0, 1.0));
 			zCircle->depthTest = false;
@@ -111,9 +111,9 @@ namespace CoreEngine {
 		visible = true;
 		isTransforming = true;
 		isFirstFrame = true;
-		if(object->name == "coneX" || object->name == "cubeX") axis = TransformAxis::X;
-		else if (object->name == "coneY" || object->name == "cubeY") axis = TransformAxis::Y;
-		else if (object->name == "coneZ" || object->name == "cubeZ") axis = TransformAxis::Z;
+		if      (object->name == "coneX" || object->name == "cubeX" || object->name == "CircleX") axis = TransformAxis::X;
+		else if (object->name == "coneY" || object->name == "cubeY" || object->name == "CircleY") axis = TransformAxis::Y;
+		else if (object->name == "coneZ" || object->name == "cubeZ" || object->name == "CircleX") axis = TransformAxis::Z;
 	}
 
 	void TransformWidget::OnMouseMoveEvent(QMouseEvent* e) {
@@ -204,6 +204,9 @@ namespace CoreEngine {
 	}
 
 	void TransformWidget::HandleRotate(QMouseEvent* e, TransformComponent* objectTransform) {
+		int newX = e->x();
+		int newY = e->y();
+
 
 	}
 
@@ -289,10 +292,19 @@ namespace CoreEngine {
 		if(transformMode == TransformMode::TRANSLATE ) res = translateObject->Intersects(ray, _distance);
 		else if(transformMode == TransformMode::SCALE) res = scaleObject->Intersects(ray, _distance);
 		else if(transformMode == TransformMode::ROTATE) {
+			double minDistance = 99999999999;
+			int intersectInx = -1;
 			for(int i=0; i<rotateObject->childObjects.size(); i++) {
-				Util::RayWireCircleTest(ray.origin, ray.direction, rotateObject->childObjects[i]->transform->GetWorldModelMatrix(), 1);
+				double currentDistance;
+				bool intersects = Util::RayWireCircleTest(ray.origin, ray.direction, rotateObject->childObjects[0]->transform->GetWorldModelMatrix(), 1, currentDistance);
+				if(intersects) {
+					if(currentDistance < minDistance) {
+						minDistance = currentDistance;
+						intersectInx = i;
+					}
+				}
 			}
-			res = rotateObject->childObjects[0];
+			if(intersectInx > 0) res = rotateObject->childObjects[intersectInx];
 		}
 
 		if (res != nullptr) {
