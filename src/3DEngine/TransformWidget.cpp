@@ -79,13 +79,13 @@ namespace CoreEngine {
 		{
 			rotateObject = new Object3D("RotationWidget", scene);
 
-			// Object3D* xCircle = GetWireCircle(scene, "CircleX", glm::dvec3(0, 0, 0), glm::dvec3(90, 0, 0), glm::dvec3(1), glm::dvec4(1.0, 0.0, 0.0, 1.0));
-			// xCircle->depthTest = false;
-			// rotateObject->AddObject(xCircle);
+			Object3D* xCircle = GetWireCircle(scene, "CircleX", glm::dvec3(0, 0, 0), glm::dvec3(90, 0, 0), glm::dvec3(1), glm::dvec4(1.0, 0.0, 0.0, 1.0));
+			xCircle->depthTest = false;
+			rotateObject->AddObject(xCircle);
 
-			// Object3D* yCircle = GetWireCircle(scene, "CircleY", glm::dvec3(0, 0, 0), glm::dvec3(0, 90, 0), glm::dvec3(1), glm::dvec4(0.0, 1.0, 0.0, 1.0));
-			// yCircle->depthTest = false;
-			// rotateObject->AddObject(yCircle);
+			Object3D* yCircle = GetWireCircle(scene, "CircleY", glm::dvec3(0, 0, 0), glm::dvec3(0, 90, 0), glm::dvec3(1), glm::dvec4(0.0, 1.0, 0.0, 1.0));
+			yCircle->depthTest = false;
+			rotateObject->AddObject(yCircle);
 
 			Object3D* zCircle = GetWireCircle(scene, "CircleZ", glm::dvec3(0, 0, 0), glm::dvec3(0, 0, 0), glm::dvec3(1), glm::dvec4(0.0, 0.0, 1.0, 1.0));
 			zCircle->depthTest = false;
@@ -111,9 +111,10 @@ namespace CoreEngine {
 		visible = true;
 		isTransforming = true;
 		isFirstFrame = true;
+		// std::cout << object->name << std::endl;
 		if      (object->name == "coneX" || object->name == "cubeX" || object->name == "CircleX") axis = TransformAxis::X;
 		else if (object->name == "coneY" || object->name == "cubeY" || object->name == "CircleY") axis = TransformAxis::Y;
-		else if (object->name == "coneZ" || object->name == "cubeZ" || object->name == "CircleX") axis = TransformAxis::Z;
+		else if (object->name == "coneZ" || object->name == "cubeZ" || object->name == "CircleZ") axis = TransformAxis::Z;
 	}
 
 	void TransformWidget::OnMouseMoveEvent(QMouseEvent* e) {
@@ -206,8 +207,64 @@ namespace CoreEngine {
 	void TransformWidget::HandleRotate(QMouseEvent* e, TransformComponent* objectTransform) {
 		int newX = e->x();
 		int newY = e->y();
+		Geometry::Ray ray = scene->camera->GetRay(newX, newY);
 
+		glm::dvec3 planeNormal = -glm::column(scene->camera->transform->GetModelMatrix(), 2);
+		glm::vec3 initialPlanePosition = firstRay.origin + (glm::dot(objectTransform->position - firstRay.origin, planeNormal) / glm::dot(firstRay.direction, planeNormal)) * firstRay.direction;
+		glm::vec3 mousePlanePosition   = ray.origin + (glm::dot(objectTransform->position - ray.origin, planeNormal) / glm::dot(ray.direction, planeNormal)) * ray.direction;
 
+		if (axis == TransformAxis::X) {
+			glm::vec2 A = glm::normalize(glm::vec2(initialPlanePosition.z, initialPlanePosition.y));
+			
+			glm::vec2 biNormalA = glm::vec2(-A.y, A.x) ;
+			glm::vec2 B = glm::normalize(glm::vec2(mousePlanePosition.z, mousePlanePosition.y));
+			
+			float displacement;
+			if(glm::dot(biNormalA, B) < 0)
+			{
+				displacement = 57.2957795131 * glm::acos(glm::dot(A, B)); 
+			}
+			else
+			{
+				displacement = 360.0f - 57.2957795131 * glm::acos(glm::dot(A, B)); 
+			}			
+			
+			objectTransform->rotation = firstRotation + glm::vec3(1, 0, 0) * displacement; 
+		}else if (axis == TransformAxis::Y) {
+			glm::vec2 A = glm::normalize(glm::vec2(initialPlanePosition.x, initialPlanePosition.z));
+			
+			glm::vec2 biNormalA = glm::vec2(-A.y, A.x) ;
+			glm::vec2 B = glm::normalize(glm::vec2(mousePlanePosition.x, mousePlanePosition.z));
+			
+			float displacement;
+			if(glm::dot(biNormalA, B) < 0)
+			{
+				displacement = 57.2957795131 * glm::acos(glm::dot(A, B)); 
+			}
+			else
+			{
+				displacement = 360.0f - 57.2957795131 * glm::acos(glm::dot(A, B)); 
+			}			
+			
+			objectTransform->rotation = firstRotation + glm::vec3(0, 1, 0) * displacement; 
+		} else  if (axis == TransformAxis::Z) {
+			glm::vec2 A = glm::normalize(glm::vec2(initialPlanePosition));
+			
+			glm::vec2 biNormalA = glm::vec2(-A.y, A.x) ;
+			glm::vec2 B = glm::normalize(glm::vec2(mousePlanePosition));
+			
+			float displacement;
+			if(glm::dot(biNormalA, B) >= 0)
+			{
+				displacement = 57.2957795131 * glm::acos(glm::dot(A, B)); 
+			}
+			else
+			{
+				displacement = 360.0f - 57.2957795131 * glm::acos(glm::dot(A, B)); 
+			}		
+
+			objectTransform->rotation = firstRotation + glm::vec3(0, 0, 1) * displacement; 
+		}
 	}
 
 	void TransformWidget::HandleScale(QMouseEvent* e, TransformComponent* objectTransform) {
@@ -296,18 +353,21 @@ namespace CoreEngine {
 			int intersectInx = -1;
 			for(int i=0; i<rotateObject->childObjects.size(); i++) {
 				double currentDistance;
-				bool intersects = Util::RayWireCircleTest(ray.origin, ray.direction, rotateObject->childObjects[0]->transform->GetWorldModelMatrix(), 1, currentDistance);
+				bool intersects = Util::RayWireCircleTest(ray.origin, ray.direction, rotateObject->childObjects[i]->transform->GetWorldModelMatrix(), 1, currentDistance);
 				if(intersects) {
-					if(currentDistance < minDistance) {
+					if(currentDistance <= minDistance) {
 						minDistance = currentDistance;
 						intersectInx = i;
 					}
 				}
 			}
-			if(intersectInx > 0) res = rotateObject->childObjects[intersectInx];
+			// std::cout << intersectInx << std::endl;
+			if(intersectInx >= 0) res = rotateObject->childObjects[intersectInx];
 		}
 
 		if (res != nullptr) {
+			firstRay = ray;
+			firstRotation = this->currentObject->transform->rotation;
 			this->StartTransform(res);
 		}
 

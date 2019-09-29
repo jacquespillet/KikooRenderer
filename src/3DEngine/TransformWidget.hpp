@@ -45,6 +45,8 @@ public:
 	double prevY = 0;
 	double prevZ = 0;
 
+	Geometry::Ray firstRay;
+	glm::vec3 firstRotation;
 }; 
 
 }

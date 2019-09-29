@@ -32,15 +32,14 @@ namespace Util {
 		glm::dvec3 circlePosition = glm::dvec3(glm::column(transform, 3));
 		double circleDistance = glm::length(circlePosition);
 		glm::dvec3 normal = -glm::column(transform, 2);
-		glm::dvec4 plane = glm::dvec4(normal.x, normal.y, normal.z, distance);
+		glm::dvec4 plane = glm::dvec4(normal.x, normal.y, normal.z, circleDistance);
 
 		distance = -glm::dot(plane, glm::dvec4(rayOrig, 1)) / glm::dot(plane, glm::dvec4(rayDir, 0));
-		glm::dvec3 intersectPos = rayOrig + t * rayDir;
+		glm::dvec3 intersectPos = rayOrig + distance * rayDir;
 
 
 		double intersectionDistance = glm::distance(intersectPos, circlePosition);
-
-		if(intersectionDistance < radius +0.1 && intersectionDistance > radius - 0.1) {
+		if(intersectionDistance <= radius + 0.1 && intersectionDistance >= radius - 0.1 ) {
 			return true;
 		} else {
 			return false;
