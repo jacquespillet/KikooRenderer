@@ -83,6 +83,18 @@ void Shader::SetId(int id) {
 	this->identifier = id; 
 }
 
+Shader& Shader::operator=(const Shader& other)
+{
+	vertSrc = other.vertSrc;
+	fragSrc = other.fragSrc;
+	geometrySrc = other.geometrySrc;
+	isLit = other.isLit;
+	isDepthPass = other.isDepthPass;
+	SetId(other.identifier);
+	Compile();	
+    return *this;
+}
+
 int Shader::GetId() { return this->identifier; }
 
 

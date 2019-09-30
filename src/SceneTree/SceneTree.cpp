@@ -124,6 +124,7 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
     {
 		QModelIndexList	selectedIndexes = tree->selectionModel()->selectedIndexes();
 		
+		view3D->view3DGL->scene->glWindow->makeCurrent();		
 		CoreEngine::Object3D* objectToAdd = nullptr;
 		QString name = QString("New ") + selectedItem->text();
 		if (selectedItem->text() == cubeStr) objectToAdd = CoreEngine::GetCube(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
@@ -159,6 +160,7 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
 		}
 
 		view3D->view3DGL->scene->triggerRefresh = true;
+		view3D->view3DGL->scene->glWindow->doneCurrent();		
     }
 }
 

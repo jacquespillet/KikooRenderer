@@ -41,6 +41,9 @@ class Shader
 
 		void Compile();
 
+		Shader& operator=(const Shader& other);
+
+
 		// QLayout* GetParamsLayout();
 		// void SetParams(ShaderParams* params);
 		// void SetParamsUniforms();

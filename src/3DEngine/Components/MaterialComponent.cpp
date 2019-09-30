@@ -49,7 +49,15 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 	connect(albedoPicker, &ColorPicker::ColorPicked, this, [this, materialComponent](QColor color) {
 		glm::vec4 albedoVec = glm::vec4(color.red(), color.green(), color.blue(), color.alpha()) * 0.00392156;
 		materialComponent->albedo = albedoVec;
+		
+
+		scene->glWindow->makeCurrent();
+		GETGL
+		ogl->glUseProgram(materialComponent->shader.programShaderObject);
+		int albedoLocation = ogl->glGetUniformLocation(materialComponent->shader.programShaderObject, "albedo"); 
+		ogl->glUniform4fv(albedoLocation, 1, glm::value_ptr(materialComponent->albedo));		
 		scene->triggerRefresh = true;
+		scene->glWindow->doneCurrent();
 	});
 
 
@@ -66,7 +74,14 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 	mainLayout->addWidget(flipNormalsCheckbox);
 	connect(flipNormalsCheckbox, &QCheckBox::stateChanged, this, [this, materialComponent](int state) {
 		materialComponent->flipNormals = state > 0;
+		
+		scene->glWindow->makeCurrent();
+		GETGL
+		ogl->glUseProgram(materialComponent->shader.programShaderObject);
+		int flipNormalsLocation = ogl->glGetUniformLocation(materialComponent->shader.programShaderObject, "flipNormals"); 
+		ogl->glUniform1i(flipNormalsLocation, materialComponent->flipNormals);			
 		scene->triggerRefresh = true;
+		scene->glWindow->doneCurrent();		
 	});
 
 	QCheckBox* receiveShadowCheckbox = new QCheckBox("Receive Shadow"); receiveShadowCheckbox->setChecked(materialComponent->receiveShadow);
@@ -142,6 +157,14 @@ void MaterialComponent::SetShader(Shader shader) {
 	}
 
     inited = true;
+
+	GETGL
+	ogl->glUseProgram(this->shader.programShaderObject);
+	
+	int albedoLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "albedo"); 
+	ogl->glUniform4fv(albedoLocation, 1, glm::value_ptr(albedo));
+
+
 }
 
 void MaterialComponent::SetCubemap(std::vector<std::string> _cubemapFilenames) {
@@ -198,16 +221,7 @@ void MaterialComponent::SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 vie
 
 			if(this->shader.isLit) {
 
-				int influenceLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "materialInfluence"); 
-				ogl->glUniform1f(influenceLocation, influence);
-				
-				int albedoLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "albedo"); 
-				ogl->glUniform4fv(albedoLocation, 1, glm::value_ptr(albedo));
 				params->SetUniforms();
-
-				int flipNormalsLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "flipNormals"); 
-				ogl->glUniform1i(flipNormalsLocation, flipNormals);
-
 
 				if(this->shader.GetId() != SHADER_IDS::UNLIT) {
 					int receiveShadowLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "receiveShadow"); 
