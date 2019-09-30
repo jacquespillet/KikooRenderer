@@ -283,6 +283,7 @@ namespace CoreEngine {
                 // return vec4(0,edge.pixelStep * finalBlend * width, 0, 1);
 			}
 			return vec4(texture(albedoTexture, blendUv).rgb, 1);
+
         }
         
 
@@ -299,7 +300,8 @@ namespace CoreEngine {
         
         quad = GetQuad(scene, "plane", glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(1, 1, 1, 1));
         material = quad->GetComponent<MaterialComponent>();
-        material->SetShader(shader);
+        // material->SetShader(shader);
+        material->shader = shader;
         
         quad->Enable();        
     }
@@ -315,21 +317,21 @@ namespace CoreEngine {
 		material->albedoTex.loaded = true;
 		material->albedoTex.texIndex = GL_TEXTURE0;
 
-        ogl->glUseProgram(shader.programShaderObject);
+        ogl->glUseProgram(material->shader.programShaderObject);
 
-        GLuint loc = ogl->glGetUniformLocation(shader.programShaderObject, "inverseTextureSize");
+        GLuint loc = ogl->glGetUniformLocation(material->shader.programShaderObject, "inverseTextureSize");
         ogl->glUniform3fv(loc, 1, glm::value_ptr(glm::vec3(1.0 / (float)framebufferIn->width, 1.0 / (float)framebufferIn->height, 0)));
 
-        loc = ogl->glGetUniformLocation(shader.programShaderObject, "minValue"); 
+        loc = ogl->glGetUniformLocation(material->shader.programShaderObject, "minValue"); 
         ogl->glUniform1f(loc, minValue);
 
-        loc = ogl->glGetUniformLocation(shader.programShaderObject, "maxSpan"); 
+        loc = ogl->glGetUniformLocation(material->shader.programShaderObject, "maxSpan"); 
         ogl->glUniform1f(loc, maxSpan);
 
-        loc = ogl->glGetUniformLocation(shader.programShaderObject, "reduceMultiplier"); 
+        loc = ogl->glGetUniformLocation(material->shader.programShaderObject, "reduceMultiplier"); 
         ogl->glUniform1f(loc, reduceMultiplier);
 
-        loc = ogl->glGetUniformLocation(shader.programShaderObject, "blendFactorMultiplier"); 
+        loc = ogl->glGetUniformLocation(material->shader.programShaderObject, "blendFactorMultiplier"); 
         ogl->glUniform1f(loc, blendFactorMultiplier);
 
         //Attach framebufferInTexture as a albedo texture

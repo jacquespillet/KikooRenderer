@@ -43,6 +43,8 @@ class Shader
 
 		Shader& operator=(const Shader& other);
 
+		bool shouldRecompile = true;
+
 
 		// QLayout* GetParamsLayout();
 		// void SetParams(ShaderParams* params);

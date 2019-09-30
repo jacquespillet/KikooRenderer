@@ -123,7 +123,7 @@ PostProcessingPreferences::PostProcessingPreferences(PreferencesWindow* mainPref
     });    
 
 
-    CustomSlider* bokehRadiusSlider = new CustomSlider(1.0f, 64.0f, 1.0, "Bokeh Radius", 8.0);
+    CustomSlider* bokehRadiusSlider = new CustomSlider(0.0f, 64.0f, 1.0, "Bokeh Radius", 8.0);
     dofLayout->addLayout(bokehRadiusSlider);
     QObject::connect(bokehRadiusSlider, &CustomSlider::Modified, [this, mainPrefWindow](double val) {
         scene = mainPrefWindow->mainWindow->view3D->view3DGL->scene;

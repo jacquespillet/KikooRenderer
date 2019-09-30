@@ -51,6 +51,7 @@ namespace CoreEngine {
         )";
         thresholdShader.name = "thresholdShader";
         thresholdShader.Compile();
+        thresholdShader.shouldRecompile = false;
 
         blurShader.vertSrc= R"(
         //attribs
@@ -108,6 +109,7 @@ namespace CoreEngine {
         )";
         blurShader.name = "blurShader";
         blurShader.Compile();
+        blurShader.shouldRecompile = false;
         
         blendShader.vertSrc= R"(
         //attribs
@@ -148,6 +150,7 @@ namespace CoreEngine {
         )";
         blendShader.name = "blendShader";
         blendShader.Compile();
+        blendShader.shouldRecompile = false;
 
         quad = GetQuad(scene, "plane", glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(1, 1, 1, 1));
         material = quad->GetComponent<MaterialComponent>();
@@ -162,25 +165,24 @@ namespace CoreEngine {
         //1. _________________________________________________________________
         //Render framebufferIn thresholded to thresholdFramebuffer
         thresholdFramebuffer->Enable();
-        material->SetShader(thresholdShader);
+        material->shader = thresholdShader;
         
         ogl->glClearColor(1.0, 1.0, 1.0, 1.0);
         ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
         
-        ogl->glUseProgram(thresholdShader.programShaderObject);
+        ogl->glUseProgram(material->shader.programShaderObject);
         
-        GLuint loc = ogl->glGetUniformLocation(thresholdShader.programShaderObject, "texelSize");
+        GLuint loc = ogl->glGetUniformLocation(material->shader.programShaderObject, "texelSize");
         ogl->glUniform3fv(loc, 1, glm::value_ptr(glm::vec3(1.0 / (float)framebufferIn->width, 1.0 / (float)framebufferIn->height, 0)));
         
         
-        ogl->glUniform1f(ogl->glGetUniformLocation(thresholdShader.programShaderObject, "brightnessThreshold"), brightnessThreshold);
+        ogl->glUniform1f(ogl->glGetUniformLocation(material->shader.programShaderObject, "brightnessThreshold"), brightnessThreshold);
         
-
         material->albedoTex.glTex =  framebufferIn->texture;
 		material->albedoTex.loaded = true;
 		material->albedoTex.texIndex = GL_TEXTURE0;
 
-        quad->Render();            
+        quad->Render();       
         thresholdFramebuffer->Disable();
 
         //2. _________________________________________________________________
@@ -190,16 +192,16 @@ namespace CoreEngine {
                 
         ogl->glClearColor(1.0, 1.0, 1.0, 1.0);
         ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
-        material->SetShader(blurShader);
+        material->shader = blurShader;
         
-        ogl->glUseProgram(blurShader.programShaderObject);
+        ogl->glUseProgram(material->shader.programShaderObject);
         
-        loc = ogl->glGetUniformLocation(blurShader.programShaderObject, "texelSize");
+        loc = ogl->glGetUniformLocation(material->shader.programShaderObject, "texelSize");
         ogl->glUniform3fv(loc, 1, glm::value_ptr(glm::vec3(1.0 / (float)framebufferIn->width, 1.0 / (float)framebufferIn->height, 0)));
 
-        ogl->glUniform1i(ogl->glGetUniformLocation(blurShader.programShaderObject, "horizontal"), 1);
-        ogl->glUniform1f(ogl->glGetUniformLocation(blurShader.programShaderObject, "kernelRadius"), kernelRadius);
-        ogl->glUniform1i(ogl->glGetUniformLocation(blurShader.programShaderObject, "kernelSize"), kernelSize);
+        ogl->glUniform1i(ogl->glGetUniformLocation(material->shader.programShaderObject, "horizontal"), 1);
+        ogl->glUniform1f(ogl->glGetUniformLocation(material->shader.programShaderObject, "kernelRadius"), kernelRadius);
+        ogl->glUniform1i(ogl->glGetUniformLocation(material->shader.programShaderObject, "kernelSize"), kernelSize);
 
         material->albedoTex.glTex =  thresholdFramebuffer->texture;
 		material->albedoTex.loaded = true;
@@ -214,16 +216,16 @@ namespace CoreEngine {
                 
         ogl->glClearColor(1.0, 1.0, 1.0, 1.0);
         ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
-        material->SetShader(blurShader);
+        material->shader = blurShader;
         
-        ogl->glUseProgram(blurShader.programShaderObject);
+        ogl->glUseProgram(material->shader.programShaderObject);
         
-        loc = ogl->glGetUniformLocation(blurShader.programShaderObject, "texelSize");
+        loc = ogl->glGetUniformLocation(material->shader.programShaderObject, "texelSize");
         ogl->glUniform3fv(loc, 1, glm::value_ptr(glm::vec3(1.0 / (float)framebufferIn->width, 1.0 / (float)framebufferIn->height, 0)));
 
-        ogl->glUniform1i(ogl->glGetUniformLocation(blurShader.programShaderObject, "horizontal"), 0);
-        ogl->glUniform1f(ogl->glGetUniformLocation(blurShader.programShaderObject, "kernelRadius"), kernelRadius);
-        ogl->glUniform1i(ogl->glGetUniformLocation(blurShader.programShaderObject, "kernelSize"), kernelSize);
+        ogl->glUniform1i(ogl->glGetUniformLocation(material->shader.programShaderObject, "horizontal"), 0);
+        ogl->glUniform1f(ogl->glGetUniformLocation(material->shader.programShaderObject, "kernelRadius"), kernelRadius);
+        ogl->glUniform1i(ogl->glGetUniformLocation(material->shader.programShaderObject, "kernelSize"), kernelSize);
 
         material->albedoTex.glTex =  framebufferOut->texture;
 		material->albedoTex.loaded = true;
@@ -238,9 +240,9 @@ namespace CoreEngine {
                 
         ogl->glClearColor(1.0, 1.0, 1.0, 1.0);
         ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
-        material->SetShader(blendShader);
+        material->shader = blendShader;
         
-        ogl->glUseProgram(blendShader.programShaderObject);
+        ogl->glUseProgram(material->shader.programShaderObject);
         
         material->albedoTex.glTex =  framebufferIn->texture;
 		material->albedoTex.loaded = true;
@@ -248,7 +250,7 @@ namespace CoreEngine {
 
         ogl->glActiveTexture(GL_TEXTURE1);
         ogl->glBindTexture(GL_TEXTURE_2D, alternateFramebuffer->texture);
-        ogl->glUniform1i(ogl->glGetUniformLocation(blendShader.programShaderObject, "bloomTexture"), 1);        
+        ogl->glUniform1i(ogl->glGetUniformLocation(material->shader.programShaderObject, "bloomTexture"), 1);        
 
         quad->Render();
         framebufferOut->Disable();

@@ -90,8 +90,14 @@ Shader& Shader::operator=(const Shader& other)
 	geometrySrc = other.geometrySrc;
 	isLit = other.isLit;
 	isDepthPass = other.isDepthPass;
+	name = other.name;
 	SetId(other.identifier);
-	Compile();	
+	
+	if(other.shouldRecompile) {
+		Compile();	
+	} else {
+		programShaderObject = other.programShaderObject;
+	}
     return *this;
 }
 

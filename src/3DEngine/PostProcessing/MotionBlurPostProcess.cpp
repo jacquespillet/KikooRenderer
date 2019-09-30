@@ -72,7 +72,7 @@ namespace CoreEngine {
         
         quad = GetQuad(scene, "plane", glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(1, 1, 1, 1));
         material =  quad->GetComponent<MaterialComponent>();
-        material->SetShader(shader);
+        material->shader = shader;
         
         quad->Enable();        
     }
@@ -84,9 +84,9 @@ namespace CoreEngine {
         ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
 		
         
-        ogl->glUseProgram(shader.programShaderObject);
+        ogl->glUseProgram(material->shader.programShaderObject);
 
-        GLuint loc = ogl->glGetUniformLocation(shader.programShaderObject, "texelSize");
+        GLuint loc = ogl->glGetUniformLocation(material->shader.programShaderObject, "texelSize");
         ogl->glUniform3fv(loc, 1, glm::value_ptr(glm::vec3(1.0 / (float)framebufferIn->width, 1.0 / (float)framebufferIn->height, 0)));
 
         material->albedoTex.glTex =  framebufferIn->texture;
@@ -95,17 +95,17 @@ namespace CoreEngine {
 
         ogl->glActiveTexture(GL_TEXTURE1);
         ogl->glBindTexture(GL_TEXTURE_2D, framebufferIn->depthTexture);
-        ogl->glUniform1i(ogl->glGetUniformLocation(shader.programShaderObject, "depthTexture"), 1);
+        ogl->glUniform1i(ogl->glGetUniformLocation(material->shader.programShaderObject, "depthTexture"), 1);
 
         glm::mat4 projectionMatrix = glm::mat4(scene->camera->GetProjectionMatrix());
         glm::mat4 viewProjectionMat = projectionMatrix * scene->camera->viewMatrix;
         glm::mat4 previousViewProjectionMat = projectionMatrix * scene->camera->previousViewMatrix;
 
-        ogl->glUniformMatrix4fv(ogl->glGetUniformLocation(shader.programShaderObject, "inverseViewProjection"), 1, false, glm::value_ptr(glm::inverse(viewProjectionMat)));
-        ogl->glUniformMatrix4fv(ogl->glGetUniformLocation(shader.programShaderObject, "previousViewProjection"), 1, false, glm::value_ptr(previousViewProjectionMat));
+        ogl->glUniformMatrix4fv(ogl->glGetUniformLocation(material->shader.programShaderObject, "inverseViewProjection"), 1, false, glm::value_ptr(glm::inverse(viewProjectionMat)));
+        ogl->glUniformMatrix4fv(ogl->glGetUniformLocation(material->shader.programShaderObject, "previousViewProjection"), 1, false, glm::value_ptr(previousViewProjectionMat));
         
-        ogl->glUniform1f( ogl->glGetUniformLocation(shader.programShaderObject, "velocityMultiplier"), velocityMultiplier);
-        ogl->glUniform1i( ogl->glGetUniformLocation(shader.programShaderObject, "numSamples"), numSamples);
+        ogl->glUniform1f( ogl->glGetUniformLocation(material->shader.programShaderObject, "velocityMultiplier"), velocityMultiplier);
+        ogl->glUniform1i( ogl->glGetUniformLocation(material->shader.programShaderObject, "numSamples"), numSamples);
         
         // ogl->glUniformMatrix4fv(ogl->glGetUniformLocation(this->shader->programShaderObject, "currentViewMatrix"); , 1, false, glm::value_ptr(scene->camera->viewMatrix));
         

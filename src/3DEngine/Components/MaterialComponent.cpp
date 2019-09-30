@@ -40,7 +40,6 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 	connect(shaderList, static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged), this, [this, materialComponent](int index) {
 		scene->glWindow->makeCurrent();
 		Shader shader = (*scene->standardShaders.shaders[index]);
-		// materialComponent->shader = shader;
 		materialComponent->SetShader(shader);
 		UpdateShaderParameters();
 		scene->triggerRefresh = true;
@@ -156,6 +155,7 @@ MaterialInspector* MaterialComponent::GetInspector() {
 	return materialInspector;
 }
 
+
 void MaterialComponent::SetShader(Shader shader) {
     this->shader = shader;
 
@@ -184,11 +184,23 @@ void MaterialComponent::SetShader(Shader shader) {
 
 	int influenceLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "materialInfluence");
 	ogl->glUniform1f(influenceLocation, influence);		
+	
+	int hasCubemapLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "hasCubemap");
+	ogl->glUniform1i(hasCubemapLocation, 0);
 }
 
 void MaterialComponent::SetCubemap(std::vector<std::string> _cubemapFilenames) {
+	GETGL
 	this->cubemapfilenames = _cubemapFilenames;
 	cubemap = Cubemap(cubemapfilenames);
+
+	ogl->glActiveTexture(GL_TEXTURE3);
+	cubemap.Use();
+	int cubemapLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "cubemapTexture");
+	ogl->glUniform1i(cubemapLocation, 3);
+
+	int hasCubemapLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "hasCubemap");
+	ogl->glUniform1i(hasCubemapLocation, 1);
 }
 
 void MaterialComponent::SetAlbedoTex(Texture tex) {
@@ -232,14 +244,6 @@ void MaterialComponent::SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 vie
 				ogl->glCullFace(GL_FRONT);
 				ogl->glActiveTexture(GL_TEXTURE3);
 				cubemap.Use();
-				int cubemapLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "cubemapTexture");
-				ogl->glUniform1i(cubemapLocation, 3);
-
-				int hasCubemapLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "hasCubemap");
-				ogl->glUniform1i(hasCubemapLocation, 1);
-			} else {
-				int hasCubemapLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "hasCubemap");
-				ogl->glUniform1i(hasCubemapLocation, 0);
 			}
 			
 
@@ -252,7 +256,7 @@ void MaterialComponent::SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 vie
 					int numLights = 0;
 					for(int i=0; i<scene->lightObjects.size(); i++) {
 						LightComponent* lightComponent = scene->lightObjects[i]->GetComponent<LightComponent>(); 
-						TransformComponent* transformComponent = scene->lightObjects[i]->transform; 
+						TransformComponent* transformComponent = scene->lightObjects[i]->transform;
 						
 						if(lightComponent != nullptr) {
 							std::string varName = "lights[" + std::to_string(i) + "].type";
