@@ -30,7 +30,7 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 	for (int i = 0; i < scene->standardShaders.shaders.size(); i++) {
 		shaderList->addItem(QString::fromStdString(scene->standardShaders.shaders[i]->name));
 	}
-	int shaderInx = materialComponent->shader->GetId();
+	int shaderInx = materialComponent->shader.GetId();
 	shaderList->setCurrentIndex(shaderInx);
 
 	shaderLayout->addWidget(shaderLabel);
@@ -38,7 +38,8 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 
 	mainLayout->addLayout(shaderLayout);
 	connect(shaderList, static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged), this, [this, materialComponent](int index) {
-		materialComponent->shader = scene->standardShaders.shaders[index];
+		Shader shader = (*scene->standardShaders.shaders[index]);
+		materialComponent->shader = shader;
 		UpdateShaderParameters();
 		scene->triggerRefresh = true;
 	});
@@ -91,9 +92,9 @@ void MaterialInspector::UpdateShaderParameters() {
 	EmptyLayout(shaderParametersLayout);
 	shaderParametersLayout = new QVBoxLayout();
 	
-	materialComponent->params = StandardShaders::GetParamsById(materialComponent->shader->GetId());
+	materialComponent->params = StandardShaders::GetParamsById(materialComponent->shader.GetId());
 
-	materialComponent->params->shader = materialComponent->shader;
+	materialComponent->params->shader = &materialComponent->shader;
 	materialComponent->params->scene = materialComponent->object3D->scene;
 
 	QLayout* shaderLayout = materialComponent->params->GetLayout(); 
@@ -112,8 +113,8 @@ MaterialComponent::MaterialComponent(Object3D* object) : Component("Material", o
 
 void MaterialComponent::OnStart(){}
 void MaterialComponent::OnEnable(){
-	params = StandardShaders::GetParamsById(shader->GetId());
-	params->shader = shader;
+	params = StandardShaders::GetParamsById(shader.GetId());
+	params->shader = &shader;
 	inited = true;
 }
 void MaterialComponent::OnUpdate(){
@@ -132,12 +133,12 @@ MaterialInspector* MaterialComponent::GetInspector() {
 }
 
 
-void MaterialComponent::SetShader(Shader* shader) {
+void MaterialComponent::SetShader(Shader shader) {
     this->shader = shader;
 
-	params = StandardShaders::GetParamsById(shader->GetId());
+	params = StandardShaders::GetParamsById(shader.GetId());
 	if(params != nullptr) {
-		params->shader = shader;
+		params->shader = &shader;
 		params->scene = object3D->scene;
 	}
 
@@ -152,65 +153,65 @@ void MaterialComponent::SetCubemap(std::vector<std::string> _cubemapFilenames) {
 void MaterialComponent::SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 viewMatrix, glm::mat4 projectionMatrix, Scene* scene) {
 	if(inited) {
 		GETGL
-		if(shader->isDepthPass) {
+		if(shader.isDepthPass) {
 			
 		} else {
 			if(flipNormals) ogl->glCullFace(GL_FRONT);
 
 			glm::mat4 mvpMatrix = projectionMatrix * viewMatrix * modelMatrix;
-			ogl->glUseProgram(shader->programShaderObject);
+			ogl->glUseProgram(shader.programShaderObject);
 
-			int modelViewProjectionMatrixLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "modelViewProjectionMatrix"); 
+			int modelViewProjectionMatrixLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "modelViewProjectionMatrix"); 
 			ogl->glUniformMatrix4fv(modelViewProjectionMatrixLocation, 1, false, glm::value_ptr(mvpMatrix));
 			
 			glm::vec3 camPos = scene->camera->transform->position;
-			int cameraPosLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "cameraPos"); 
+			int cameraPosLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "cameraPos"); 
 			ogl->glUniform3fv(cameraPosLocation,1, glm::value_ptr(camPos));
 
-			int modelMatrixLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "modelMatrix"); 
+			int modelMatrixLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "modelMatrix"); 
 			ogl->glUniformMatrix4fv(modelMatrixLocation, 1, false, glm::value_ptr(glm::mat4(modelMatrix)));
 
 			if (cubemap.loaded) {
 				ogl->glCullFace(GL_FRONT);
 				ogl->glActiveTexture(GL_TEXTURE3);
 				cubemap.Use();
-				int cubemapLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "cubemapTexture");
+				int cubemapLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "cubemapTexture");
 				ogl->glUniform1i(cubemapLocation, 3);
 
-				int hasCubemapLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasCubemap");
+				int hasCubemapLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "hasCubemap");
 				ogl->glUniform1i(hasCubemapLocation, 1);
 			} else {
-				int hasCubemapLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasCubemap");
+				int hasCubemapLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "hasCubemap");
 				ogl->glUniform1i(hasCubemapLocation, 0);
 			}
 			
 			if (albedoTex.loaded) {
 				albedoTex.Use();
-				int texLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "albedoTexture");
+				int texLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "albedoTexture");
 				ogl->glUniform1i(texLocation, 0);
 
-				int hasAlbedoTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasAlbedoTex");
+				int hasAlbedoTexLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "hasAlbedoTex");
 				ogl->glUniform1i(hasAlbedoTexLocation, 1);
 			} else {
-				int hasAlbedoTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasAlbedoTex");
+				int hasAlbedoTexLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "hasAlbedoTex");
 				ogl->glUniform1i(hasAlbedoTexLocation, 0);
 			}
 
-			if(this->shader->isLit) {
+			if(this->shader.isLit) {
 
-				int influenceLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "materialInfluence"); 
+				int influenceLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "materialInfluence"); 
 				ogl->glUniform1f(influenceLocation, influence);
 				
-				int albedoLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "albedo"); 
+				int albedoLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "albedo"); 
 				ogl->glUniform4fv(albedoLocation, 1, glm::value_ptr(albedo));
 				params->SetUniforms();
 
-				int flipNormalsLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "flipNormals"); 
+				int flipNormalsLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "flipNormals"); 
 				ogl->glUniform1i(flipNormalsLocation, flipNormals);
 
 
-				if(this->shader->GetId() != SHADER_IDS::UNLIT) {
-					int receiveShadowLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "receiveShadow"); 
+				if(this->shader.GetId() != SHADER_IDS::UNLIT) {
+					int receiveShadowLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "receiveShadow"); 
 					ogl->glUniform1i(receiveShadowLocation, (int)receiveShadow);
 
 					int numLights = 0;
@@ -220,46 +221,46 @@ void MaterialComponent::SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 vie
 						
 						if(lightComponent != nullptr) {
 							std::string varName = "lights[" + std::to_string(i) + "].type";
-							GLuint loc = ogl->glGetUniformLocation(this->shader->programShaderObject, varName.c_str());
+							GLuint loc = ogl->glGetUniformLocation(this->shader.programShaderObject, varName.c_str());
 							ogl->glUniform1i(loc, lightComponent->type);
 
 							varName = "lights[" + std::to_string(i) + "].position";
-							loc = ogl->glGetUniformLocation(this->shader->programShaderObject, varName.c_str());
+							loc = ogl->glGetUniformLocation(this->shader.programShaderObject, varName.c_str());
 							ogl->glUniform3fv(loc, 1, glm::value_ptr(glm::vec3(transformComponent->position)));
 
 							varName = "lights[" + std::to_string(i) + "].direction";
-							loc = ogl->glGetUniformLocation(this->shader->programShaderObject, varName.c_str());
+							loc = ogl->glGetUniformLocation(this->shader.programShaderObject, varName.c_str());
 							ogl->glUniform3fv(loc, 1, glm::value_ptr(glm::vec3(glm::column(transformComponent->GetModelMatrix(), 2))));
 
 							varName = "lights[" + std::to_string(i) + "].attenuation";
-							loc = ogl->glGetUniformLocation(this->shader->programShaderObject, varName.c_str());
+							loc = ogl->glGetUniformLocation(this->shader.programShaderObject, varName.c_str());
 							ogl->glUniform3fv(loc, 1, glm::value_ptr(glm::vec3(lightComponent->attenuation)));
 
 							varName = "lights[" + std::to_string(i) + "].color";
-							loc = ogl->glGetUniformLocation(this->shader->programShaderObject, varName.c_str());
+							loc = ogl->glGetUniformLocation(this->shader.programShaderObject, varName.c_str());
 							ogl->glUniform4fv(loc, 1, glm::value_ptr(glm::vec4(lightComponent->color) * (float)lightComponent->intensity));
 							
 
 							if(lightComponent->type == 0 || lightComponent->type == 2) {			
 								varName = "lights[" + std::to_string(i) + "].lightSpaceMatrix";
-								loc = ogl->glGetUniformLocation(this->shader->programShaderObject, varName.c_str());
+								loc = ogl->glGetUniformLocation(this->shader.programShaderObject, varName.c_str());
 								ogl->glUniformMatrix4fv(loc, 1, false,  glm::value_ptr(glm::mat4(lightComponent->lightSpaceMatrix)));
 
 								ogl->glActiveTexture(GL_TEXTURE4);
 								ogl->glBindTexture(GL_TEXTURE_2D, lightComponent->depthFBO->depthTexture);
 								varName = "lights[" + std::to_string(i) + "].depthMap";
-								loc = ogl->glGetUniformLocation(this->shader->programShaderObject, varName.c_str());
+								loc = ogl->glGetUniformLocation(this->shader.programShaderObject, varName.c_str());
 								ogl->glUniform1i(loc, 4);
 							} if(lightComponent->type == 1) {
 								
 								ogl->glActiveTexture(GL_TEXTURE5);
 								ogl->glBindTexture(GL_TEXTURE_CUBE_MAP, lightComponent->depthCubeFBO->depthCubemap);								
 								varName = "lights[" + std::to_string(i) + "].depthCubeMap";
-								loc = ogl->glGetUniformLocation(this->shader->programShaderObject, varName.c_str());								
+								loc = ogl->glGetUniformLocation(this->shader.programShaderObject, varName.c_str());								
 								ogl->glUniform1i(loc, 5);	
 
 								varName = "lights[" + std::to_string(i) + "].farPlane";
-								loc = ogl->glGetUniformLocation(this->shader->programShaderObject, varName.c_str());
+								loc = ogl->glGetUniformLocation(this->shader.programShaderObject, varName.c_str());
 								ogl->glUniform1f(loc, lightComponent->farClip);								
 							}
 
@@ -267,15 +268,15 @@ void MaterialComponent::SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 vie
 						}
 					}
 
-					int numLightsLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "numLights"); 
+					int numLightsLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "numLights"); 
 					ogl->glUniform1i(numLightsLocation, numLights);
 
 
-				// 	// if(this->shader->GetId() == SHADER_IDS::PBR) {         
-				// 	// 	GLuint loc = ogl->glGetUniformLocation(this->shader->programShaderObject, "roughness");
+				// 	// if(this->shader.GetId() == SHADER_IDS::PBR) {         
+				// 	// 	GLuint loc = ogl->glGetUniformLocation(this->shader.programShaderObject, "roughness");
 				// 	// 	ogl->glUniform1f(loc, 0.5);
 
-				// 	// 	loc = ogl->glGetUniformLocation(this->shader->programShaderObject, "specularFrac");
+				// 	// 	loc = ogl->glGetUniformLocation(this->shader.programShaderObject, "specularFrac");
 				// 	// 	ogl->glUniform1f(loc, 0.5);
 				// 	// }
 				}

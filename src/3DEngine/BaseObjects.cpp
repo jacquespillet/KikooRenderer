@@ -31,7 +31,11 @@ Object3D* GetCube(Scene* scene, std::string name, glm::vec3 _position, glm::vec3
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
     material->albedo = _color;
-    material->SetShader(&scene->standardShaders.unlitMeshShader);
+
+    Shader shader = scene->standardShaders.unlitMeshShader;
+    material->SetShader(shader);
+    std::cout << "In object " << &shader << std::endl;
+    std::cout << "In scene " << &scene->standardShaders.unlitMeshShader << std::endl;
 
     BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
 
@@ -60,7 +64,8 @@ Object3D* GetWireFrameBox(Scene* scene, std::string name, glm::vec3 _position, g
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
     material->albedo = _color;
-    material->SetShader(&scene->standardShaders.unlitMeshShader);
+    Shader shader = scene->standardShaders.unlitMeshShader;
+    material->SetShader(shader);
 
     newObject->AddComponent(material);
 	newObject->transform = transform;
@@ -84,7 +89,8 @@ Object3D* GetQuad(Scene* scene, std::string name, glm::vec3 _position, glm::vec3
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
     material->albedo = _color;
-    material->SetShader(&scene->standardShaders.unlitMeshShader);
+    Shader shader = scene->standardShaders.unlitMeshShader;
+    material->SetShader(shader);
 
 
     BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
@@ -113,7 +119,8 @@ Object3D* GetMiniQuad(Scene* scene, std::string name, glm::vec3 _position, glm::
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
     material->albedo = _color;
-    material->SetShader(&scene->standardShaders.unlitMeshShader);
+    Shader shader = scene->standardShaders.unlitMeshShader;
+    material->SetShader(shader);
 
 
     BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
@@ -143,7 +150,8 @@ Object3D* GetCircle(Scene* scene, std::string name, glm::vec3 _position, glm::ve
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
     material->albedo = _color;
-    material->SetShader(&scene->standardShaders.unlitMeshShader);
+    Shader shader = scene->standardShaders.unlitMeshShader;
+    material->SetShader(shader);
 
     BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
 
@@ -174,7 +182,8 @@ Object3D* GetWireCircle(Scene* scene, std::string name, glm::vec3 _position, glm
 	//Setup material
 	MaterialComponent* material = new MaterialComponent(newObject);
 	material->albedo = _color;
-	material->SetShader(&scene->standardShaders.unlitMeshShader);
+    Shader shader = scene->standardShaders.unlitMeshShader;
+    material->SetShader(shader);
 
 	BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
 
@@ -205,7 +214,8 @@ Object3D* GetSphere(Scene* scene, std::string name, glm::vec3 _position, glm::ve
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
     material->albedo = _color;
-    material->SetShader(&scene->standardShaders.unlitMeshShader);
+    Shader shader = scene->standardShaders.unlitMeshShader;
+    material->SetShader(shader);
 
     BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
 
@@ -276,7 +286,8 @@ Object3D* GetGrid(Scene* scene, std::string name) {
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
     material->albedo =  glm::vec4(0.6, 0.6, 0.6, 0.6);
-    material->SetShader(&scene->standardShaders.unlitMeshShader);
+    Shader shader = scene->standardShaders.unlitMeshShader;
+    material->SetShader(shader);
 
     newObject->AddComponent(material);
 	newObject->transform = transform;
@@ -358,7 +369,8 @@ Object3D* GetAxes(Scene* scene, std::string name) {
     MaterialComponent* material = new MaterialComponent(newObject);
     material->albedo =glm::vec4(0.6, 0.6, 0.6, 0.6);
     material->influence = 0.0;
-    material->SetShader(&scene->standardShaders.unlitMeshShader);
+    Shader shader = scene->standardShaders.unlitMeshShader;
+    material->SetShader(shader);
 
     newObject->AddComponent(material);
 	newObject->transform = transform;
@@ -384,7 +396,8 @@ Object3D* GetCone(Scene* scene, std::string name, glm::vec3 _position, glm::vec3
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
     material->albedo = _color;
-    material->SetShader(&scene->standardShaders.unlitMeshShader);
+    Shader shader = scene->standardShaders.unlitMeshShader;
+    material->SetShader(shader);
 
     BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
 
@@ -435,7 +448,8 @@ Object3D* GetLine(Scene* scene, std::string name, glm::vec3 position1, glm::vec3
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
     material->albedo =color;
-    material->SetShader(&scene->standardShaders.unlitMeshShader);
+    Shader shader = scene->standardShaders.unlitMeshShader;
+    material->SetShader(shader);
 
     newObject->AddComponent(material);
 	newObject->transform = transform;
@@ -497,7 +511,8 @@ Object3D* GetTerrain(Scene* scene, std::string name,glm::vec3 _position, glm::ve
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
     material->albedo = _color;
-    material->SetShader(&scene->standardShaders.blinnPhongShader);
+    Shader shader = scene->standardShaders.unlitMeshShader;
+    material->SetShader(shader);
 
 
     BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
@@ -552,7 +567,8 @@ Object3D* GetHermiteCurve(Scene* scene, std::string name,glm::vec3 _position, gl
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
     material->albedo = _color;
-    material->SetShader(&scene->standardShaders.unlitMeshShader);
+    Shader shader = scene->standardShaders.unlitMeshShader;
+    material->SetShader(shader);
 
     newObject->AddComponent(material);
 	newObject->transform = transform;
@@ -604,7 +620,8 @@ Object3D* GetBezierCurve(Scene* scene, std::string name,glm::vec3 _position, glm
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
     material->albedo = _color;
-    material->SetShader(&scene->standardShaders.unlitMeshShader);
+    Shader shader = scene->standardShaders.unlitMeshShader;
+    material->SetShader(shader);
 
     newObject->AddComponent(material);
 	newObject->transform = transform;
@@ -676,7 +693,8 @@ Object3D* GetCatmutRollSpline(Scene* scene, std::string name,glm::vec3 _position
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
     material->albedo = _color;
-    material->SetShader(&scene->standardShaders.unlitMeshShader);
+    Shader shader = scene->standardShaders.unlitMeshShader;
+    material->SetShader(shader);
 
     newObject->AddComponent(material);
 	newObject->transform = transform;
@@ -775,7 +793,8 @@ Object3D* GetNonUniformBSpline(Scene* scene, std::string name,glm::vec3 _positio
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
     material->albedo = _color;
-    material->SetShader(&scene->standardShaders.unlitMeshShader);
+    Shader shader = scene->standardShaders.unlitMeshShader;
+    material->SetShader(shader);
 
 
     newObject->AddComponent(material);
@@ -851,7 +870,8 @@ Object3D* GetNURBS(Scene* scene, std::string name,glm::vec3 _position, glm::vec3
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
     material->albedo = _color;
-    material->SetShader(&scene->standardShaders.unlitMeshShader);
+    Shader shader = scene->standardShaders.unlitMeshShader;
+    material->SetShader(shader);
 
     newObject->AddComponent(material);
 	newObject->transform = transform;
@@ -916,7 +936,8 @@ Object3D* ObjectFromModelFile(Scene* scene, std::string name, std::string filena
     
     //Setup material
     MaterialComponent* material = new  MaterialComponent(newObject);
-    material->SetShader(&scene->standardShaders.blinnPhongShader);
+    Shader shader = scene->standardShaders.blinnPhongShader;
+    material->SetShader(shader);
 
     BoundingBoxComponent* boundingBox = new  BoundingBoxComponent(newObject);
 

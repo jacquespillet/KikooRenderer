@@ -37,10 +37,10 @@ class MaterialComponent : public Component {
 
 		MaterialInspector* GetInspector();
         
-        void SetShader(Shader* shader);
+        void SetShader(Shader shader);
         void SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 viewMatrix, glm::mat4 projectionMatrix, Scene* scene);
 
-        Shader* shader;
+        Shader shader;
 
         float influence;
 

@@ -20,13 +20,13 @@ class StandardShaders
 		std::vector<Shader*> shaders;
 
 		Shader unlitMeshShader;
-        Shader selectedObjectShader;
-        Shader gouraudShader;
-        Shader blinnPhongShader;
-        Shader PBRShader;
-        void Compile();
+    Shader selectedObjectShader;
+    Shader gouraudShader;
+    Shader blinnPhongShader;
+    Shader PBRShader;
+    void Compile();
 
-        static ShaderParams* GetParamsById(int id);
+    static ShaderParams* GetParamsById(int id);
 };
 }
 }
