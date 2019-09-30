@@ -38,10 +38,13 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 
 	mainLayout->addLayout(shaderLayout);
 	connect(shaderList, static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged), this, [this, materialComponent](int index) {
+		scene->glWindow->makeCurrent();
 		Shader shader = (*scene->standardShaders.shaders[index]);
-		materialComponent->shader = shader;
+		// materialComponent->shader = shader;
+		materialComponent->SetShader(shader);
 		UpdateShaderParameters();
 		scene->triggerRefresh = true;
+		scene->glWindow->doneCurrent();
 	});
 
 	ColorPicker* albedoPicker = new ColorPicker("Albedo", 210, 15, 60, 255);
@@ -65,8 +68,9 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 	FilePicker* albedoTexPicker = new FilePicker("Albedo Texture");
 	mainLayout->addWidget(albedoTexPicker);
 	connect(albedoTexPicker, &FilePicker::FileModified, this, [this, materialComponent](QString string) {
-		materialComponent->albedoTexStr = string.toStdString();
-		materialComponent->shouldLoadAlbedo = true;
+		scene->glWindow->makeCurrent();
+		materialComponent->SetAlbedoTex(KikooRenderer::CoreEngine::Texture(string.toStdString(), GL_TEXTURE0));		
+		scene->glWindow->doneCurrent();
 		scene->triggerRefresh = true;
 	});
 
@@ -88,7 +92,14 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 	mainLayout->addWidget(receiveShadowCheckbox);
 	connect(receiveShadowCheckbox, &QCheckBox::stateChanged, this, [this, materialComponent](int state) {
 		materialComponent->receiveShadow = state > 0;
+		
+		scene->glWindow->makeCurrent();
+		GETGL
+		ogl->glUseProgram(materialComponent->shader.programShaderObject);
+		int receiveShadowLocation = ogl->glGetUniformLocation(materialComponent->shader.programShaderObject, "receiveShadow"); 
+		ogl->glUniform1i(receiveShadowLocation, (int)materialComponent->receiveShadow);		
 		scene->triggerRefresh = true;
+		scene->glWindow->doneCurrent();			
 	});
 
 	shaderParametersLayout = new QVBoxLayout();
@@ -134,8 +145,6 @@ void MaterialComponent::OnEnable(){
 }
 void MaterialComponent::OnUpdate(){
 	if (shouldLoadAlbedo ) {
-		albedoTex = KikooRenderer::CoreEngine::Texture(albedoTexStr, GL_TEXTURE0);
-		shouldLoadAlbedo = false;
 	}
 }
 void MaterialComponent::OnRender(){} 
@@ -164,12 +173,36 @@ void MaterialComponent::SetShader(Shader shader) {
 	int albedoLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "albedo"); 
 	ogl->glUniform4fv(albedoLocation, 1, glm::value_ptr(albedo));
 
+	int flipNormalsLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "flipNormals"); 
+	ogl->glUniform1i(flipNormalsLocation, this->flipNormals);		
 
+	int receiveShadowLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "receiveShadow"); 
+	ogl->glUniform1i(receiveShadowLocation, (int)this->receiveShadow);	
+
+	int hasAlbedoTexLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "hasAlbedoTex");
+	ogl->glUniform1i(hasAlbedoTexLocation, 0);	
+
+	int influenceLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "materialInfluence");
+	ogl->glUniform1f(influenceLocation, influence);		
 }
 
 void MaterialComponent::SetCubemap(std::vector<std::string> _cubemapFilenames) {
 	this->cubemapfilenames = _cubemapFilenames;
 	cubemap = Cubemap(cubemapfilenames);
+}
+
+void MaterialComponent::SetAlbedoTex(Texture tex) {
+	if(albedoTex.glTex != tex.glTex) {
+		GETGL
+		ogl->glUseProgram(shader.programShaderObject);
+		albedoTex.Use(); 
+		albedoTex = tex;
+		int texLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "albedoTexture");
+		ogl->glUniform1i(texLocation, 0);
+
+		int hasAlbedoTexLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "hasAlbedoTex");
+		ogl->glUniform1i(hasAlbedoTexLocation, 1);
+	}
 }
 
 void MaterialComponent::SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 viewMatrix, glm::mat4 projectionMatrix, Scene* scene) {
@@ -192,6 +225,8 @@ void MaterialComponent::SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 vie
 
 			int modelMatrixLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "modelMatrix"); 
 			ogl->glUniformMatrix4fv(modelMatrixLocation, 1, false, glm::value_ptr(glm::mat4(modelMatrix)));
+			
+			if(albedoTex.loaded) albedoTex.Use();
 
 			if (cubemap.loaded) {
 				ogl->glCullFace(GL_FRONT);
@@ -207,25 +242,12 @@ void MaterialComponent::SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 vie
 				ogl->glUniform1i(hasCubemapLocation, 0);
 			}
 			
-			if (albedoTex.loaded) {
-				albedoTex.Use();
-				int texLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "albedoTexture");
-				ogl->glUniform1i(texLocation, 0);
-
-				int hasAlbedoTexLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "hasAlbedoTex");
-				ogl->glUniform1i(hasAlbedoTexLocation, 1);
-			} else {
-				int hasAlbedoTexLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "hasAlbedoTex");
-				ogl->glUniform1i(hasAlbedoTexLocation, 0);
-			}
 
 			if(this->shader.isLit) {
 
 				params->SetUniforms();
 
 				if(this->shader.GetId() != SHADER_IDS::UNLIT) {
-					int receiveShadowLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "receiveShadow"); 
-					ogl->glUniform1i(receiveShadowLocation, (int)receiveShadow);
 
 					int numLights = 0;
 					for(int i=0; i<scene->lightObjects.size(); i++) {

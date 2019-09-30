@@ -13,6 +13,7 @@ uniform mat4 modelMatrix;
 uniform vec4 albedo; 
 uniform int hasCubemap;
 uniform vec4 clipPlane;
+uniform float materialInfluence;
 
 //outputs
 out vec4 fragmentColor;  
@@ -25,7 +26,7 @@ void main()
     vec4 worldPos =  modelMatrix * vec4(position.x, position.y, position.z, 1.0f);
     gl_ClipDistance[0] = dot(worldPos, clipPlane);
 
-    fragmentColor = albedo;
+    fragmentColor = materialInfluence * albedo + (1.0 - materialInfluence) * color;
 
     vec4 finalPosition = modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
 

@@ -51,6 +51,7 @@ class MaterialComponent : public Component {
 		bool shouldLoadAlbedo = false;
 
 		void SetCubemap(std::vector<std::string> cubemapFilenames);
+		void SetAlbedoTex(Texture tex);
 		std::vector<std::string> cubemapfilenames;
         Cubemap cubemap;
 		bool shouldLoadCubemap = false;
