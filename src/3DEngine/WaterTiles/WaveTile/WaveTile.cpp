@@ -19,7 +19,7 @@ WaveTile::WaveTile(std::string name, Scene* scene) : Object3D(name, scene) {
 
 
     quamaterial = quad->GetComponent<MaterialComponent>();
-    quamaterial->SetShader(&waterShader);
+    quamaterial->SetShader(waterShader);
 
     mesh = quad->GetComponent<MeshFilterComponent>();
 }

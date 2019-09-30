@@ -132,7 +132,6 @@ MaterialInspector* MaterialComponent::GetInspector() {
 	return materialInspector;
 }
 
-
 void MaterialComponent::SetShader(Shader shader) {
     this->shader = shader;
 

@@ -66,7 +66,7 @@ HDRRenderer::HDRRenderer(Scene* scene) : Renderer(scene) {
 
     quad = GetQuad(scene, "plane", glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(1, 1, 1, 1));
     MaterialComponent* material = quad->GetComponent<MaterialComponent>();
-    material->SetShader(&quadShader);
+    material->SetShader(quadShader);
     
     // int exposureLocation = ogl->glGetUniformLocation(quadShader.programShaderObject, "exposure"); 
     // ogl->glUniform1f(exposureLocation, exposure);

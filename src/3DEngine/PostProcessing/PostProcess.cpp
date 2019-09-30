@@ -48,7 +48,7 @@ namespace CoreEngine {
         
         quad = GetQuad(scene, "plane", glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(1, 1, 1, 1));
         material =  quad->GetComponent<MaterialComponent>();
-        material->SetShader(&shader);
+        material->SetShader(shader);
         
         quad->Enable();        
     }

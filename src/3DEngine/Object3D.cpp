@@ -217,7 +217,7 @@ void Object3D::DepthRenderPass(LightComponent* light) {
 	if(transform != nullptr) {
 		MaterialComponent* material = (this->GetComponent<MaterialComponent>());
 		
-		ogl->glUseProgram(material->shader->programShaderObject);
+		ogl->glUseProgram(material->shader.programShaderObject);
 
 		if(light->type == 0 || light->type == 2) { //Directional light
 			//Set MVP matrix from the light POV
@@ -225,22 +225,22 @@ void Object3D::DepthRenderPass(LightComponent* light) {
 			glm::mat4 pMatrix = light->lightProjection;
 
 			glm::mat4 mvpMatrix = pMatrix * vMatrix * mMatrix;
-			int modelViewProjectionMatrixLocation = ogl->glGetUniformLocation(material->shader->programShaderObject, "modelViewProjectionMatrix"); 
+			int modelViewProjectionMatrixLocation = ogl->glGetUniformLocation(material->shader.programShaderObject, "modelViewProjectionMatrix"); 
 			ogl->glUniformMatrix4fv(modelViewProjectionMatrixLocation, 1, false, glm::value_ptr(mvpMatrix));
 		}
 		if(light->type == 1) { //Point light, Set the 6 MVP matrices
-			int modelMatrixLocation = ogl->glGetUniformLocation(material->shader->programShaderObject, "modelMatrix"); 
+			int modelMatrixLocation = ogl->glGetUniformLocation(material->shader.programShaderObject, "modelMatrix"); 
 			ogl->glUniformMatrix4fv(modelMatrixLocation, 1, false, glm::value_ptr(mMatrix));
 		
             for (unsigned int i = 0; i < 6; ++i) {
 				std::string uniformName = "shadowMatrices[" + std::to_string(i) + "]";
-				int modelViewProjectionMatrixLocation = ogl->glGetUniformLocation(material->shader->programShaderObject, uniformName.c_str()); 
+				int modelViewProjectionMatrixLocation = ogl->glGetUniformLocation(material->shader.programShaderObject, uniformName.c_str()); 
 				ogl->glUniformMatrix4fv(modelViewProjectionMatrixLocation, 1, false, glm::value_ptr(light->lightSpaceMatrices[i]));
 			}
-			int farPlaneLocation = ogl->glGetUniformLocation(material->shader->programShaderObject,"farPlane"); 
+			int farPlaneLocation = ogl->glGetUniformLocation(material->shader.programShaderObject,"farPlane"); 
 			ogl->glUniform1f(farPlaneLocation, light->farClip);
 
-			int lightPosLocation = ogl->glGetUniformLocation(material->shader->programShaderObject, "lightPos"); 
+			int lightPosLocation = ogl->glGetUniformLocation(material->shader.programShaderObject, "lightPos"); 
 			ogl->glUniform3fv(lightPosLocation, 1, glm::value_ptr(glm::vec3(light->object3D->transform->position)));
 		}
 		

@@ -263,11 +263,11 @@ void LightComponent::RenderDepthMap() {
                 if(object3D->scene->objects3D[i] && object3D->scene->objects3D[i]->visible && object3D->scene->objects3D[i]->castShadow) {
                     MaterialComponent* material = object3D->scene->objects3D[i]->GetComponent<MaterialComponent>();
                     if(material != nullptr) {
-                        Shader* tmpShader = &material->shader;
+                        Shader tmpShader = material->shader;
                         ShaderParams* tmpParams = material->params;
                         material->SetShader(depthPassShader);
                         object3D->scene->objects3D[i]->DepthRenderPass(this); 
-                        material->SetShader((*tmpShader));
+                        material->SetShader(tmpShader);
                         material->params = tmpParams;
                     }
                 }
@@ -293,13 +293,13 @@ void LightComponent::RenderDepthMap() {
                 if(object3D->scene->objects3D[i] && object3D->scene->objects3D[i]->visible && object3D->scene->objects3D[i]->castShadow) {
                     MaterialComponent* material = object3D->scene->objects3D[i]->GetComponent<MaterialComponent>();
                     if(material != nullptr) {
-                        Shader* tmpShader = &material->shader;
+                        Shader tmpShader = material->shader;
                         ShaderParams* tmpParams = material->params;
                         material->SetShader(cubeDepthPassShader);
                         
                         object3D->scene->objects3D[i]->DepthRenderPass(this); 
                         
-                        material->SetShader((*tmpShader));
+                        material->SetShader(tmpShader);
                         material->params = tmpParams;
                     }
                 }
@@ -318,11 +318,11 @@ void LightComponent::RenderDepthMap() {
                 if(object3D->scene->objects3D[i] && object3D->scene->objects3D[i]->visible && object3D->scene->objects3D[i]->castShadow) {
                     MaterialComponent* material = object3D->scene->objects3D[i]->GetComponent<MaterialComponent>();
                     if(material != nullptr) {
-                        Shader* tmpShader = &material->shader;
+                        Shader tmpShader = material->shader;
                         ShaderParams* tmpParams = material->params;
                         material->SetShader(depthPassShader);
                         object3D->scene->objects3D[i]->DepthRenderPass(this); 
-                        material->SetShader((*tmpShader));
+                        material->SetShader(tmpShader);
                         material->params = tmpParams;
                     }
                 }

@@ -17,7 +17,7 @@ WaterTile_1::WaterTile_1(std::string name, Scene* scene) : Object3D(name, scene)
     quad->Enable();
 
     quamaterial = quad->GetComponent<MaterialComponent>();
-    quamaterial->SetShader(&waterShader);
+    quamaterial->SetShader(waterShader);
     reflectionFramebuffer = new Framebuffer(1024, 1024,  GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, false);
     refractionFramebuffer = new Framebuffer(1024, 1024,  GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, false);
 
@@ -61,7 +61,7 @@ void WaterTile_1::Render(glm::mat4* overrideViewMatrixp) {
         if(scene->objects3D[i] && scene->objects3D[i]->visible && scene->objects3D[i] != this) {
             MaterialComponent* material = scene->objects3D[i]->GetComponent<MaterialComponent>();
             if(material != nullptr) {
-                int program = material->shader->programShaderObject;
+                int program = material->shader.programShaderObject;
                 ogl->glUseProgram(program);
                 GLuint loc = ogl->glGetUniformLocation(program, "clipPlane");
                 ogl->glUniform4fv(loc, 1, glm::value_ptr(glm::vec4(0, 1, 0, -this->transform->position.y)));
@@ -93,7 +93,7 @@ void WaterTile_1::Render(glm::mat4* overrideViewMatrixp) {
         if(scene->objects3D[i] && scene->objects3D[i]->visible && scene->objects3D[i] != this) {
             MaterialComponent* material = scene->objects3D[i]->GetComponent<MaterialComponent>();
             if(material != nullptr) {
-                int program = material->shader->programShaderObject;
+                int program = material->shader.programShaderObject;
                 ogl->glUseProgram(program);
                 GLuint loc = ogl->glGetUniformLocation(program, "clipPlane");
                 ogl->glUniform4fv(loc, 1, glm::value_ptr(glm::vec4(0, -1, 0, this->transform->position.y)));

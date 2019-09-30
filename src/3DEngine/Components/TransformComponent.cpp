@@ -56,32 +56,56 @@ TransformInspector::TransformInspector(TransformComponent* transformComponent) :
 	mainLayout->addWidget(scaleLabel);
 	mainLayout->addLayout(scaleLayout);
 
-	connect(xPositionSpinBox, SIGNAL(valueChanged(double)), this, SLOT(SetPositionX(double)));
-	connect(yPositionSpinBox, SIGNAL(valueChanged(double)), this, SLOT(SetPositionY(double)));
-	connect(zPositionSpinBox, SIGNAL(valueChanged(double)), this, SLOT(SetPositionZ(double)));
+	connect(xPositionSpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, transformComponent](double value) {
+		transformComponent->position.x = value; 
+		scene->triggerRefresh = true;
+    });
+	
+	connect(yPositionSpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, transformComponent](double value) {
+		transformComponent->position.y = value; 
+		scene->triggerRefresh = true;
+    });
+	
+	connect(zPositionSpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, transformComponent](double value) {
+		transformComponent->position.z = value; 
+		scene->triggerRefresh = true;
+    });
 
-	connect(xRotationSpinBox, SIGNAL(valueChanged(double)), this, SLOT(SetRotationX(double)));
-	connect(yRotationSpinBox, SIGNAL(valueChanged(double)), this, SLOT(SetRotationY(double)));
-	connect(zRotationSpinBox, SIGNAL(valueChanged(double)), this, SLOT(SetRotationZ(double)));
 
-	connect(xScaleSpinBox, SIGNAL(valueChanged(double)), this, SLOT(SetScaleX(double)));
-	connect(yScaleSpinBox, SIGNAL(valueChanged(double)), this, SLOT(SetScaleY(double)));
-	connect(zScaleSpinBox, SIGNAL(valueChanged(double)), this, SLOT(SetScaleZ(double)));
+	connect(xRotationSpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, transformComponent](double value) {
+		transformComponent->rotation.x = value; 
+		scene->triggerRefresh = true;
+    });
+	
+	connect(yRotationSpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, transformComponent](double value) {
+		transformComponent->rotation.y = value; 
+		scene->triggerRefresh = true;
+    });
+	
+	connect(zRotationSpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, transformComponent](double value) {
+		transformComponent->rotation.z = value; 
+		scene->triggerRefresh = true;
+    });
+
+
+	connect(xScaleSpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, transformComponent](double value) {
+		transformComponent->scale.x = value; 
+		scene->triggerRefresh = true;
+    });
+	
+	connect(yScaleSpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, transformComponent](double value) {
+		transformComponent->scale.y = value; 
+		scene->triggerRefresh = true;
+    });
+	
+	connect(zScaleSpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, transformComponent](double value) {
+		transformComponent->scale.z = value; 
+		scene->triggerRefresh = true;
+    });
 
 	setLayout(mainLayout);
 }
 
-void TransformInspector::SetScaleX(float x) { transformComponent->scale.x = x; scene->triggerRefresh = true; }
-void TransformInspector::SetScaleY(float y) { transformComponent->scale.y = y; scene->triggerRefresh = true;}
-void TransformInspector::SetScaleZ(float z) { transformComponent->scale.z = z; scene->triggerRefresh = true;}
-
-void TransformInspector::SetRotationX(float x) { transformComponent->rotation.x = x; scene->triggerRefresh = true;}
-void TransformInspector::SetRotationY(float y) { transformComponent->rotation.y = y; scene->triggerRefresh = true;}
-void TransformInspector::SetRotationZ(float z) { transformComponent->rotation.z = z; scene->triggerRefresh = true;}
-
-void TransformInspector::SetPositionX(float x) { transformComponent->position.x = x; scene->triggerRefresh = true;}
-void TransformInspector::SetPositionY(float y) { transformComponent->position.y = y; scene->triggerRefresh = true;}
-void TransformInspector::SetPositionZ(float z) { transformComponent->position.z = z; scene->triggerRefresh = true;}
 
 void TransformInspector::Refresh() {
 	xPositionSpinBox->setValue(transformComponent->position.x);
@@ -101,6 +125,7 @@ TransformComponent::TransformComponent(Object3D* object) : Component("Transform"
     rotation = glm::vec3(0, 0, 0);
     scale = glm::vec3(1, 1, 1);   
 }
+
 void TransformComponent::OnStart(){}
 void TransformComponent::OnEnable(){}
 void TransformComponent::OnUpdate(){}

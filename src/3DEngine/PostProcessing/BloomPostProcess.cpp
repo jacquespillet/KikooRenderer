@@ -162,7 +162,7 @@ namespace CoreEngine {
         //1. _________________________________________________________________
         //Render framebufferIn thresholded to thresholdFramebuffer
         thresholdFramebuffer->Enable();
-        material->SetShader(&thresholdShader);
+        material->SetShader(thresholdShader);
         
         ogl->glClearColor(1.0, 1.0, 1.0, 1.0);
         ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
@@ -190,7 +190,7 @@ namespace CoreEngine {
                 
         ogl->glClearColor(1.0, 1.0, 1.0, 1.0);
         ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
-        material->SetShader(&blurShader);
+        material->SetShader(blurShader);
         
         ogl->glUseProgram(blurShader.programShaderObject);
         
@@ -214,7 +214,7 @@ namespace CoreEngine {
                 
         ogl->glClearColor(1.0, 1.0, 1.0, 1.0);
         ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
-        material->SetShader(&blurShader);
+        material->SetShader(blurShader);
         
         ogl->glUseProgram(blurShader.programShaderObject);
         
@@ -238,7 +238,7 @@ namespace CoreEngine {
                 
         ogl->glClearColor(1.0, 1.0, 1.0, 1.0);
         ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
-        material->SetShader(&blendShader);
+        material->SetShader(blendShader);
         
         ogl->glUseProgram(blendShader.programShaderObject);
         

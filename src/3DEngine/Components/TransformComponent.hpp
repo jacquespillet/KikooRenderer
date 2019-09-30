@@ -27,18 +27,6 @@ public:
 
 
 	void Refresh();
-public slots:
-	void SetScaleX(float x);
-	void SetScaleY(float y);
-	void SetScaleZ(float z);
-
-	void SetRotationX(float x);
-	void SetRotationY(float y);
-	void SetRotationZ(float z);
-
-	void SetPositionX(float x);
-	void SetPositionY(float y);
-	void SetPositionZ(float z);
 };
 
 class TransformComponent : public Component {
