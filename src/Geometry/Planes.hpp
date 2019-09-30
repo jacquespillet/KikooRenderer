@@ -6,12 +6,12 @@ namespace KikooRenderer {
 namespace Geometry {
 
 	struct Planes {
-		glm::dvec4 rightPlane;
-		glm::dvec4 leftPlane;
-		glm::dvec4 topPlane;
-		glm::dvec4 bottomPlane;
-		glm::dvec4 nearPlane;
-		glm::dvec4 farPlane;
+		glm::vec4 rightPlane;
+		glm::vec4 leftPlane;
+		glm::vec4 topPlane;
+		glm::vec4 bottomPlane;
+		glm::vec4 nearPlane;
+		glm::vec4 farPlane;
 	};
 }
 }

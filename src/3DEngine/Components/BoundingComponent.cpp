@@ -18,8 +18,8 @@ namespace CoreEngine {
    
     void BoundingBoxComponent::OnEnable() {
         inited = false;
-        min = glm::dvec3(9999, 9999, 9999);
-        max = glm::dvec3(-9999, -9999, -9999);
+        min = glm::vec3(9999, 9999, 9999);
+        max = glm::vec3(-9999, -9999, -9999);
 
 
         MeshFilterComponent* mesh = this->object3D->GetComponent<MeshFilterComponent>();
@@ -35,26 +35,26 @@ namespace CoreEngine {
             if(mesh->vertices[i].position.z > max.z) max.z = mesh->vertices[i].position.z;
         }
 		
-		positions.push_back(glm::dvec3(min.x, min.y, min.z));
-		positions.push_back(glm::dvec3(min.x, max.y, min.z));
-		positions.push_back(glm::dvec3(max.x, max.y, min.z));
-		positions.push_back(glm::dvec3(max.x, min.y, min.z));
-		positions.push_back(glm::dvec3(min.x, min.y, max.z));
-		positions.push_back(glm::dvec3(min.x, max.y, max.z));
-		positions.push_back(glm::dvec3(max.x, max.y, max.z));
-		positions.push_back(glm::dvec3(max.x, min.y, max.z));
+		positions.push_back(glm::vec3(min.x, min.y, min.z));
+		positions.push_back(glm::vec3(min.x, max.y, min.z));
+		positions.push_back(glm::vec3(max.x, max.y, min.z));
+		positions.push_back(glm::vec3(max.x, min.y, min.z));
+		positions.push_back(glm::vec3(min.x, min.y, max.z));
+		positions.push_back(glm::vec3(min.x, max.y, max.z));
+		positions.push_back(glm::vec3(max.x, max.y, max.z));
+		positions.push_back(glm::vec3(max.x, min.y, max.z));
 
         
         
-        glm::dvec3 position = (max + min) * 0.5;
-        boxObject = GetWireFrameBox(object3D->scene, "BoundingBox", position, glm::dvec3(0), glm::dvec3(1), glm::dvec4(0, 1, 0, 1));
+        glm::vec3 position = (max + min) * 0.5;
+        boxObject = GetWireFrameBox(object3D->scene, "BoundingBox", position, glm::vec3(0), glm::vec3(1), glm::vec4(0, 1, 0, 1));
         inited = true;
 
     }
 
     void BoundingBoxComponent::Refresh() {
-        min = glm::dvec3(9999, 9999, 9999);
-        max = glm::dvec3(-9999, -9999, -9999);
+        min = glm::vec3(9999, 9999, 9999);
+        max = glm::vec3(-9999, -9999, -9999);
 
 
         MeshFilterComponent* mesh = this->object3D->GetComponent<MeshFilterComponent>();
@@ -70,19 +70,19 @@ namespace CoreEngine {
             if(mesh->vertices[i].position.z > max.z) max.z = mesh->vertices[i].position.z;
         }
 		
-		positions.push_back(glm::dvec3(min.x, min.y, min.z));
-		positions.push_back(glm::dvec3(min.x, max.y, min.z));
-		positions.push_back(glm::dvec3(max.x, max.y, min.z));
-		positions.push_back(glm::dvec3(max.x, min.y, min.z));
-		positions.push_back(glm::dvec3(min.x, min.y, max.z));
-		positions.push_back(glm::dvec3(min.x, max.y, max.z));
-		positions.push_back(glm::dvec3(max.x, max.y, max.z));
-		positions.push_back(glm::dvec3(max.x, min.y, max.z));
+		positions.push_back(glm::vec3(min.x, min.y, min.z));
+		positions.push_back(glm::vec3(min.x, max.y, min.z));
+		positions.push_back(glm::vec3(max.x, max.y, min.z));
+		positions.push_back(glm::vec3(max.x, min.y, min.z));
+		positions.push_back(glm::vec3(min.x, min.y, max.z));
+		positions.push_back(glm::vec3(min.x, max.y, max.z));
+		positions.push_back(glm::vec3(max.x, max.y, max.z));
+		positions.push_back(glm::vec3(max.x, min.y, max.z));
 
         
         
-        glm::dvec3 position = (max + min) * 0.5;
-        boxObject = GetWireFrameBox(object3D->scene, "BoundingBox", position, glm::dvec3(0), glm::dvec3(1), glm::dvec4(0, 1, 0, 1));
+        glm::vec3 position = (max + min) * 0.5;
+        boxObject = GetWireFrameBox(object3D->scene, "BoundingBox", position, glm::vec3(0), glm::vec3(1), glm::vec4(0, 1, 0, 1));
     }
     
     void BoundingBoxComponent::OnUpdate() {
@@ -104,13 +104,13 @@ namespace CoreEngine {
         return boxObject;
     }
 
-    void BoundingBoxComponent::GetWorldBounds(glm::dvec3* _min, glm::dvec3* _max) {
-		wmin = glm::dvec3(9999, 9999, 9999);
-		wmax = glm::dvec3(-9999, -9999, -9999);
-		glm::dmat4 modelMatrix = transform->GetWorldModelMatrix();
+    void BoundingBoxComponent::GetWorldBounds(glm::vec3* _min, glm::vec3* _max) {
+		wmin = glm::vec3(9999, 9999, 9999);
+		wmax = glm::vec3(-9999, -9999, -9999);
+		glm::mat4 modelMatrix = transform->GetWorldModelMatrix();
 
 		for (int i = 0; i < positions.size(); i++) {
-			glm::dvec4 wPos = modelMatrix * glm::dvec4(positions[i], 1);
+			glm::vec4 wPos = modelMatrix * glm::vec4(positions[i], 1);
 
 			if (wPos.x < wmin.x) wmin.x = wPos.x;
 			if (wPos.y < wmin.y) wmin.y = wPos.y;
@@ -126,9 +126,9 @@ namespace CoreEngine {
 		(*_max) = wmax;
     }
 
-    void BoundingBoxComponent::GetLocalBounds(glm::dvec3* _min, glm::dvec3* _max) {
-        (*_min) =  glm::dvec4(this->min, 1.0);
-        (*_max) =  glm::dvec4(this->max, 1.0);
+    void BoundingBoxComponent::GetLocalBounds(glm::vec3* _min, glm::vec3* _max) {
+        (*_min) =  glm::vec4(this->min, 1.0);
+        (*_max) =  glm::vec4(this->max, 1.0);
     }
 }
 }

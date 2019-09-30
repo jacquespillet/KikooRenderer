@@ -12,12 +12,12 @@ namespace CoreEngine {
 WaterTile_1::WaterTile_1(std::string name, Scene* scene) : Object3D(name, scene) {
     waterShader = GetWaterTile_1Shader();
     
-    quad = GetQuad(scene, "particle", glm::dvec3(0, 0.2, 0), glm::dvec3(90, 0, 0), glm::dvec3(20), glm::dvec4(0.5, 0.5, 0.5, 1));
+    quad = GetQuad(scene, "particle", glm::vec3(0, 0.2, 0), glm::vec3(90, 0, 0), glm::vec3(20), glm::vec4(0.5, 0.5, 0.5, 1));
     quad->Start();
     quad->Enable();
 
-    quadMaterial = quad->GetComponent<MaterialComponent>();
-    quadMaterial->SetShader(&waterShader);
+    quamaterial = quad->GetComponent<MaterialComponent>();
+    quamaterial->SetShader(&waterShader);
     reflectionFramebuffer = new Framebuffer(1024, 1024,  GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, false);
     refractionFramebuffer = new Framebuffer(1024, 1024,  GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, false);
 

@@ -27,7 +27,7 @@ public:
 private:
     Object3D* quad;
     
-    MaterialComponent* quadMaterial;
+    MaterialComponent* quamaterial;
     MeshFilterComponent* mesh;
     Shader waterShader;
 };

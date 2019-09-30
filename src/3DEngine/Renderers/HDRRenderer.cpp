@@ -64,7 +64,7 @@ HDRRenderer::HDRRenderer(Scene* scene) : Renderer(scene) {
 
     exposure = 1.0;
 
-    quad = GetQuad(scene, "plane", glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
+    quad = GetQuad(scene, "plane", glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(1, 1, 1, 1));
     MaterialComponent* material = quad->GetComponent<MaterialComponent>();
     material->SetShader(&quadShader);
     

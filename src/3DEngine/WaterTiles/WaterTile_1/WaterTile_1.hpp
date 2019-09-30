@@ -28,7 +28,7 @@ private:
     Object3D* quad;
 	Object3D* dummyQuad;
     
-    MaterialComponent* quadMaterial;
+    MaterialComponent* quamaterial;
     Shader waterShader;
 
     Framebuffer* reflectionFramebuffer;

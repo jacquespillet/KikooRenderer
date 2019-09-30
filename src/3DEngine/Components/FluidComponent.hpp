@@ -25,9 +25,9 @@ namespace CoreEngine {
 
         int renderBuffer=0;
 
-        std::vector<glm::dvec3> buffer[2];
-        std::vector<glm::dvec3> normal;
-        std::vector<glm::dvec3> tangent;
+        std::vector<glm::vec3> buffer[2];
+        std::vector<glm::vec3> normal;
+        std::vector<glm::vec3> tangent;
 
         float t = 0.1; //time interval
         float c = 0.4; //velocity

@@ -7,16 +7,16 @@ namespace OfflineRenderer {
 
 class Camera {
     public: 
-        Camera(glm::dvec3 lookfrom, glm::dvec3 lookat, glm::dvec3 up, double fovy, double aspectRatio, double aperture, double focusDistance, double t0, double t1);
+        Camera(glm::vec3 lookfrom, glm::vec3 lookat, glm::vec3 up, double fovy, double aspectRatio, double aperture, double focusDistance, double t0, double t1);
         KikooRenderer::Geometry::Ray GetRay(double u, double v);
 
     private:
-        glm::dvec3 position;
-        glm::dvec3 lowerLeft;
-        glm::dvec3 horizontal;
-        glm::dvec3 vertical;
+        glm::vec3 position;
+        glm::vec3 lowerLeft;
+        glm::vec3 horizontal;
+        glm::vec3 vertical;
 
-        glm::dvec3 u, v, w;
+        glm::vec3 u, v, w;
         
         double lensRadius;
 

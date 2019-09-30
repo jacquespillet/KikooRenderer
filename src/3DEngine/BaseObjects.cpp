@@ -14,7 +14,7 @@ namespace KikooRenderer {
 namespace CoreEngine {
 
 
-Object3D* GetCube(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
+Object3D* GetCube(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color) {
      //Start each Object3D in scene
     Object3D* newObject = new Object3D(name, scene);
    
@@ -44,7 +44,7 @@ Object3D* GetCube(Scene* scene, std::string name, glm::dvec3 _position, glm::dve
     return newObject;
 }
 
-Object3D* GetWireFrameBox(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
+Object3D* GetWireFrameBox(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color) {
     //Start each Object3D in scene
     Object3D* newObject = new Object3D(name, scene);
 
@@ -69,11 +69,11 @@ Object3D* GetWireFrameBox(Scene* scene, std::string name, glm::dvec3 _position, 
     return newObject;
 }
 
-Object3D* GetQuad(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
+Object3D* GetQuad(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color) {
     //Start each Object3D in scene
     Object3D* newObject = new Object3D(name, scene);
  
-    MeshFilterComponent* mesh = GetQuadMesh(glm::dvec3(1), _color, newObject);
+    MeshFilterComponent* mesh = GetQuadMesh(glm::vec3(1), _color, newObject);
 
     //Setup transform
     TransformComponent* transform = new TransformComponent(newObject );
@@ -98,11 +98,11 @@ Object3D* GetQuad(Scene* scene, std::string name, glm::dvec3 _position, glm::dve
     return newObject;
 }
 
-Object3D* GetMiniQuad(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
+Object3D* GetMiniQuad(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color) {
      //Start each Object3D in scene
     Object3D* newObject = new Object3D(name, scene);
  
-    MeshFilterComponent* mesh = GetMiniQuadMesh(glm::dvec3(1), _color, newObject);
+    MeshFilterComponent* mesh = GetMiniQuadMesh(glm::vec3(1), _color, newObject);
 
     //Setup transform
     TransformComponent* transform = new TransformComponent(newObject );
@@ -127,11 +127,11 @@ Object3D* GetMiniQuad(Scene* scene, std::string name, glm::dvec3 _position, glm:
     return newObject;
 }
 
-Object3D* GetCircle(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
+Object3D* GetCircle(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color) {
      //Start each Object3D in scene
     Object3D* newObject = new Object3D(name, scene);
 
-    MeshFilterComponent* mesh = GetCircleMesh(glm::dvec3(1), _color, newObject);
+    MeshFilterComponent* mesh = GetCircleMesh(glm::vec3(1), _color, newObject);
 
     //Setup transform
     TransformComponent* transform = new TransformComponent(newObject );
@@ -157,11 +157,11 @@ Object3D* GetCircle(Scene* scene, std::string name, glm::dvec3 _position, glm::d
 }
 
 
-Object3D* GetWireCircle(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
+Object3D* GetWireCircle(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color) {
 	//Start each Object3D in scene
 	Object3D* newObject = new Object3D(name, scene);
 
-    MeshFilterComponent* mesh = GetWireCircleMesh(glm::dvec3(1), _color, newObject);
+    MeshFilterComponent* mesh = GetWireCircleMesh(glm::vec3(1), _color, newObject);
 	mesh->drawingMode = GL_LINES;
 
 	//Setup transform
@@ -189,11 +189,11 @@ Object3D* GetWireCircle(Scene* scene, std::string name, glm::dvec3 _position, gl
 
 
 
-Object3D* GetSphere(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
+Object3D* GetSphere(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color) {
     //Start each Object3D in scene
     Object3D* newObject = new Object3D(name, scene);
     
-    MeshFilterComponent* mesh = GetSphereMesh(glm::dvec3(1), _color, newObject);
+    MeshFilterComponent* mesh = GetSphereMesh(glm::vec3(1), _color, newObject);
 
     //Setup transform
     TransformComponent* transform = new TransformComponent(newObject );
@@ -220,25 +220,25 @@ Object3D* GetSphere(Scene* scene, std::string name, glm::dvec3 _position, glm::d
 Object3D* GetGrid(Scene* scene, std::string name) {
    //Start each Object3D in scene
     Object3D* newObject = new Object3D(name, scene);
-    std::vector<glm::dvec3> vertex;
-    std::vector<glm::dvec3> normals;
-    std::vector<glm::dvec2> uv;
-    std::vector<glm::dvec4> colors;
+    std::vector<glm::vec3> vertex;
+    std::vector<glm::vec3> normals;
+    std::vector<glm::vec2> uv;
+    std::vector<glm::vec4> colors;
     std::vector<int> triangles;
 
     for(int i=0, z=-5; z<=5; i++, z++) {
         if(z != 0) {
-            vertex.push_back(glm::dvec3( -5, 0,  z)); 
-            vertex.push_back(glm::dvec3(  5, 0,  z)); 
+            vertex.push_back(glm::vec3( -5, 0,  z)); 
+            vertex.push_back(glm::vec3(  5, 0,  z)); 
 
-            normals.push_back(glm::dvec3(0, 0, 1));
-            normals.push_back(glm::dvec3(0, 0, 1));
+            normals.push_back(glm::vec3(0, 0, 1));
+            normals.push_back(glm::vec3(0, 0, 1));
 
-            uv.push_back(glm::dvec2(0, 0));
-            uv.push_back(glm::dvec2(0, 0));
+            uv.push_back(glm::vec2(0, 0));
+            uv.push_back(glm::vec2(0, 0));
 
-            colors.push_back(glm::dvec4(255, 255, 255, 255));
-            colors.push_back(glm::dvec4(255, 255, 255, 255));
+            colors.push_back(glm::vec4(255, 255, 255, 255));
+            colors.push_back(glm::vec4(255, 255, 255, 255));
 
             triangles.push_back(vertex.size()-1);
             triangles.push_back(vertex.size()-2);        
@@ -247,17 +247,17 @@ Object3D* GetGrid(Scene* scene, std::string name) {
 
    for(int i=0, x=-5; x<=5; i++, x++) {
        if(x != 0) {
-            vertex.push_back(glm::dvec3( x, 0,  -5)); //bottom left
-            vertex.push_back(glm::dvec3(  x, 0,  5)); // top left
+            vertex.push_back(glm::vec3( x, 0,  -5)); //bottom left
+            vertex.push_back(glm::vec3(  x, 0,  5)); // top left
 
-            normals.push_back(glm::dvec3(0, 0, 1));
-            normals.push_back(glm::dvec3(0, 0, 1));
+            normals.push_back(glm::vec3(0, 0, 1));
+            normals.push_back(glm::vec3(0, 0, 1));
 
-            uv.push_back(glm::dvec2(0, 0));
-            uv.push_back(glm::dvec2(0, 0));
+            uv.push_back(glm::vec2(0, 0));
+            uv.push_back(glm::vec2(0, 0));
 
-            colors.push_back(glm::dvec4(255, 255, 255, 255));
-            colors.push_back(glm::dvec4(255, 255, 255, 255));
+            colors.push_back(glm::vec4(255, 255, 255, 255));
+            colors.push_back(glm::vec4(255, 255, 255, 255));
 
             triangles.push_back(vertex.size()-1);
             triangles.push_back(vertex.size()-2);
@@ -288,57 +288,57 @@ Object3D* GetGrid(Scene* scene, std::string name) {
 
 Object3D* GetAxes(Scene* scene, std::string name) {
     Object3D* newObject = new Object3D(name, scene);
-    std::vector<glm::dvec3> vertex;
-    std::vector<glm::dvec3> normals;
-    std::vector<glm::dvec2> uv;
-    std::vector<glm::dvec4> colors;
+    std::vector<glm::vec3> vertex;
+    std::vector<glm::vec3> normals;
+    std::vector<glm::vec2> uv;
+    std::vector<glm::vec4> colors;
     std::vector<int> triangles;
 
 
     //X axis
-    vertex.push_back(glm::dvec3( -100, 0,  0)); 
-    vertex.push_back(glm::dvec3(  100, 0,  0)); 
+    vertex.push_back(glm::vec3( -100, 0,  0)); 
+    vertex.push_back(glm::vec3(  100, 0,  0)); 
 
-    normals.push_back(glm::dvec3(0, 0, 1));
-    normals.push_back(glm::dvec3(0, 0, 1));
+    normals.push_back(glm::vec3(0, 0, 1));
+    normals.push_back(glm::vec3(0, 0, 1));
 
-    uv.push_back(glm::dvec2(0, 0));
-    uv.push_back(glm::dvec2(0, 0));
+    uv.push_back(glm::vec2(0, 0));
+    uv.push_back(glm::vec2(0, 0));
 
-    colors.push_back(glm::dvec4(255, 0, 0, 255));
-    colors.push_back(glm::dvec4(255, 0, 0, 255));
+    colors.push_back(glm::vec4(255, 0, 0, 255));
+    colors.push_back(glm::vec4(255, 0, 0, 255));
 
     triangles.push_back(vertex.size()-1);
     triangles.push_back(vertex.size()-2);     
 
     //Y axis
-    vertex.push_back(glm::dvec3( 0, -100,  0)); 
-    vertex.push_back(glm::dvec3( 0,  100,  0)); 
+    vertex.push_back(glm::vec3( 0, -100,  0)); 
+    vertex.push_back(glm::vec3( 0,  100,  0)); 
 
-    normals.push_back(glm::dvec3(0, 0, 1));
-    normals.push_back(glm::dvec3(0, 0, 1));
+    normals.push_back(glm::vec3(0, 0, 1));
+    normals.push_back(glm::vec3(0, 0, 1));
 
-    uv.push_back(glm::dvec2(0, 0));
-    uv.push_back(glm::dvec2(0, 0));
+    uv.push_back(glm::vec2(0, 0));
+    uv.push_back(glm::vec2(0, 0));
 
-    colors.push_back(glm::dvec4(0, 255, 0, 255));
-    colors.push_back(glm::dvec4(0, 255, 0, 255));
+    colors.push_back(glm::vec4(0, 255, 0, 255));
+    colors.push_back(glm::vec4(0, 255, 0, 255));
 
     triangles.push_back(vertex.size()-1);
     triangles.push_back(vertex.size()-2);
     
     //Z axis
-    vertex.push_back(glm::dvec3( 0,  0, -100)); 
-    vertex.push_back(glm::dvec3( 0,  0,  100)); 
+    vertex.push_back(glm::vec3( 0,  0, -100)); 
+    vertex.push_back(glm::vec3( 0,  0,  100)); 
 
-    normals.push_back(glm::dvec3(0, 0, 1));
-    normals.push_back(glm::dvec3(0, 0, 1));
+    normals.push_back(glm::vec3(0, 0, 1));
+    normals.push_back(glm::vec3(0, 0, 1));
 
-    uv.push_back(glm::dvec2(0, 0));
-    uv.push_back(glm::dvec2(0, 0));
+    uv.push_back(glm::vec2(0, 0));
+    uv.push_back(glm::vec2(0, 0));
 
-    colors.push_back(glm::dvec4(0, 0, 255, 255));
-    colors.push_back(glm::dvec4(0, 0, 255, 255));
+    colors.push_back(glm::vec4(0, 0, 255, 255));
+    colors.push_back(glm::vec4(0, 0, 255, 255));
 
     triangles.push_back(vertex.size()-1);
     triangles.push_back(vertex.size()-2);
@@ -368,11 +368,11 @@ Object3D* GetAxes(Scene* scene, std::string name) {
 }
 
 
-Object3D* GetCone(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color, bool isScreenSize) {
+Object3D* GetCone(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, bool isScreenSize) {
     //Start each Object3D in scene
     Object3D* newObject = new Object3D(name, scene);
     
-    MeshFilterComponent* mesh = GetConeMesh(glm::dvec3(1), _color, newObject);
+    MeshFilterComponent* mesh = GetConeMesh(glm::vec3(1), _color, newObject);
 
     //Setup transform
     TransformComponent* transform = new TransformComponent(newObject);
@@ -397,12 +397,12 @@ Object3D* GetCone(Scene* scene, std::string name, glm::dvec3 _position, glm::dve
 }
 
 
-Object3D* GetLine(Scene* scene, std::string name, glm::dvec3 position1, glm::dvec3 position2, glm::dvec4 color, bool isScreenSize) {
+Object3D* GetLine(Scene* scene, std::string name, glm::vec3 position1, glm::vec3 position2, glm::vec4 color, bool isScreenSize) {
     Object3D* newObject = new Object3D(name, scene);
-    std::vector<glm::dvec3> vertex;
-    std::vector<glm::dvec3> normals;
-    std::vector<glm::dvec2> uv;
-    std::vector<glm::dvec4> colors;
+    std::vector<glm::vec3> vertex;
+    std::vector<glm::vec3> normals;
+    std::vector<glm::vec2> uv;
+    std::vector<glm::vec4> colors;
     std::vector<int> triangles;
 
 
@@ -410,11 +410,11 @@ Object3D* GetLine(Scene* scene, std::string name, glm::dvec3 position1, glm::dve
     vertex.push_back(position1); 
     vertex.push_back(position2); 
 
-    normals.push_back(glm::dvec3(0, 0, 1));
-    normals.push_back(glm::dvec3(0, 0, 1));
+    normals.push_back(glm::vec3(0, 0, 1));
+    normals.push_back(glm::vec3(0, 0, 1));
 
-    uv.push_back(glm::dvec2(0, 0));
-    uv.push_back(glm::dvec2(0, 0));
+    uv.push_back(glm::vec2(0, 0));
+    uv.push_back(glm::vec2(0, 0));
 
     colors.push_back(color);
     colors.push_back(color);
@@ -445,13 +445,13 @@ Object3D* GetLine(Scene* scene, std::string name, glm::dvec3 position1, glm::dve
 }
 
 
-Object3D* GetTerrain(Scene* scene, std::string name,glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color, float width, float height, int subdivisionsX, int subdivisionsY) {
+Object3D* GetTerrain(Scene* scene, std::string name,glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, float width, float height, int subdivisionsX, int subdivisionsY) {
  //Start each Object3D in scene
     Object3D* newObject = new Object3D(name, scene);
-    std::vector<glm::dvec3> vertex;
-    std::vector<glm::dvec3> normals;
-    std::vector<glm::dvec2> uv;
-    std::vector<glm::dvec4> colors;
+    std::vector<glm::vec3> vertex;
+    std::vector<glm::vec3> normals;
+    std::vector<glm::vec2> uv;
+    std::vector<glm::vec4> colors;
     std::vector<int> triangles;
 
     float xOffset = width / (float)subdivisionsX;
@@ -463,10 +463,10 @@ Object3D* GetTerrain(Scene* scene, std::string name,glm::dvec3 _position, glm::d
     int numAdded=0;
     for(float y=0, yInx=0; yInx<subdivisionsY; y+=yOffset, yInx++) {
         for(float x=0, xInx=0; xInx<subdivisionsX; x+= xOffset, xInx++) {
-            vertex.push_back(glm::dvec3(x, 0, y));
-            normals.push_back(glm::dvec3(0, 1, 0));
-            uv.push_back(glm::dvec2(0, 0));
-            colors.push_back(glm::dvec4(255, 255, 255, 255));  
+            vertex.push_back(glm::vec3(x, 0, y));
+            normals.push_back(glm::vec3(0, 1, 0));
+            uv.push_back(glm::vec2(0, 0));
+            colors.push_back(glm::vec4(255, 255, 255, 255));  
 
             if(xInx < subdivisionsX-1 && yInx < subdivisionsY-1) {
                 triangles.push_back(numAdded);
@@ -512,12 +512,12 @@ Object3D* GetTerrain(Scene* scene, std::string name,glm::dvec3 _position, glm::d
     return newObject;    
 }
 
-Object3D* GetHermiteCurve(Scene* scene, std::string name,glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color, glm::dvec3 point1, glm::dvec3 point2, glm::dvec3 tan1, glm::dvec3 tan2) {
+Object3D* GetHermiteCurve(Scene* scene, std::string name,glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, glm::vec3 point1, glm::vec3 point2, glm::vec3 tan1, glm::vec3 tan2) {
     Object3D* newObject = new Object3D(name, scene);
-    std::vector<glm::dvec3> vertex;
-    std::vector<glm::dvec3> normals;
-    std::vector<glm::dvec2> uv;
-    std::vector<glm::dvec4> colors;
+    std::vector<glm::vec3> vertex;
+    std::vector<glm::vec3> normals;
+    std::vector<glm::vec2> uv;
+    std::vector<glm::vec4> colors;
     std::vector<int> triangles;
 
 
@@ -529,15 +529,15 @@ Object3D* GetHermiteCurve(Scene* scene, std::string name,glm::dvec3 _position, g
             triangles.push_back(inx);
         }
 
-        glm::dvec3 first  = (1 - 3 * t * t + 2 * t * t * t) * point1;
-        glm::dvec3 second = (t*t) * (3 - 2*t) * point2;
-        glm::dvec3 third  = t * ((t-1) * (t-1)) * tan1;
-        glm::dvec3 fourth = (t * t) * (t-1) * tan2;
-        glm::dvec3 H = first + second + third + fourth;
+        glm::vec3 first  = (1 - 3 * t * t + 2 * t * t * t) * point1;
+        glm::vec3 second = (t*t) * (3 - 2*t) * point2;
+        glm::vec3 third  = t * ((t-1) * (t-1)) * tan1;
+        glm::vec3 fourth = (t * t) * (t-1) * tan2;
+        glm::vec3 H = first + second + third + fourth;
         
         vertex.push_back(H); 
-        normals.push_back(glm::dvec3(0, 0, 1));
-        uv.push_back(glm::dvec2(0, 0));
+        normals.push_back(glm::vec3(0, 0, 1));
+        uv.push_back(glm::vec2(0, 0));
         colors.push_back(_color);
     }
     //Setup mesh
@@ -561,12 +561,12 @@ Object3D* GetHermiteCurve(Scene* scene, std::string name,glm::dvec3 _position, g
     return newObject;
 }
 
-Object3D* GetBezierCurve(Scene* scene, std::string name,glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color, glm::dvec3 point0, glm::dvec3 point1, glm::dvec3 point2, glm::dvec3 point3) {
+Object3D* GetBezierCurve(Scene* scene, std::string name,glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, glm::vec3 point0, glm::vec3 point1, glm::vec3 point2, glm::vec3 point3) {
     Object3D* newObject = new Object3D(name, scene);
-    std::vector<glm::dvec3> vertex;
-    std::vector<glm::dvec3> normals;
-    std::vector<glm::dvec2> uv;
-    std::vector<glm::dvec4> colors;
+    std::vector<glm::vec3> vertex;
+    std::vector<glm::vec3> normals;
+    std::vector<glm::vec2> uv;
+    std::vector<glm::vec4> colors;
     std::vector<int> triangles;
 
 
@@ -578,18 +578,18 @@ Object3D* GetBezierCurve(Scene* scene, std::string name,glm::dvec3 _position, gl
             triangles.push_back(inx);
         }
 
-        glm::dvec3 tan1 =  3.0 * (point1 - point0);
-        glm::dvec3 tan2 = -3.0 * (point2 - point3);
+        glm::vec3 tan1 =  3.0 * (point1 - point0);
+        glm::vec3 tan2 = -3.0 * (point2 - point3);
 
-        glm::dvec3 first  = (1 - 3 * t * t + 2 * t * t * t) * point0;
-        glm::dvec3 second = (t*t) * (3 - 2*t) * point3;
-        glm::dvec3 third  = t * ((t-1) * (t-1)) * tan1;
-        glm::dvec3 fourth = (t * t) * (t-1) * tan2;
-        glm::dvec3 H = first + second + third + fourth;
+        glm::vec3 first  = (1 - 3 * t * t + 2 * t * t * t) * point0;
+        glm::vec3 second = (t*t) * (3 - 2*t) * point3;
+        glm::vec3 third  = t * ((t-1) * (t-1)) * tan1;
+        glm::vec3 fourth = (t * t) * (t-1) * tan2;
+        glm::vec3 H = first + second + third + fourth;
         
         vertex.push_back(H); 
-        normals.push_back(glm::dvec3(0, 0, 1));
-        uv.push_back(glm::dvec2(0, 0));
+        normals.push_back(glm::vec3(0, 0, 1));
+        uv.push_back(glm::vec2(0, 0));
         colors.push_back(_color);
     }
     //Setup mesh
@@ -613,12 +613,12 @@ Object3D* GetBezierCurve(Scene* scene, std::string name,glm::dvec3 _position, gl
     return newObject;
 }
 
-Object3D* GetCatmutRollSpline(Scene* scene, std::string name,glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color, std::vector<glm::dvec3> points) {
+Object3D* GetCatmutRollSpline(Scene* scene, std::string name,glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, std::vector<glm::vec3> points) {
     Object3D* newObject = new Object3D(name, scene);
-    std::vector<glm::dvec3> vertex;
-    std::vector<glm::dvec3> normals;
-    std::vector<glm::dvec2> uv;
-    std::vector<glm::dvec4> colors;
+    std::vector<glm::vec3> vertex;
+    std::vector<glm::vec3> normals;
+    std::vector<glm::vec2> uv;
+    std::vector<glm::vec4> colors;
     std::vector<int> triangles;
 
     double offset = 0.01;
@@ -634,32 +634,32 @@ Object3D* GetCatmutRollSpline(Scene* scene, std::string name,glm::dvec3 _positio
                 triangles.push_back(inx);
             }
 
-            // glm::dmat4 basis = glm::dmat4(0);
+            // glm::mat4 basis = glm::mat4(0);
             // basis[0][0] = 0; basis[1][0] = -1; basis[2][0] =  2; basis[3][0] = -1; 
             // basis[0][1] = 2; basis[1][1] =  0; basis[2][1] = -5; basis[3][1] =  3; 
             // basis[0][2] = 0; basis[1][2] =  1; basis[2][2] =  4; basis[3][2] = -3; 
             // basis[0][3] = 0; basis[1][3] =  0; basis[2][3] = -1; basis[3][3] =  1;
             // basis *= 0.5;
-            glm::dmat4 basis = glm::dmat4(0);
+            glm::mat4 basis = glm::mat4(0);
             basis[0][0] = 1; basis[1][0] = -3; basis[2][0] =  3; basis[3][0] = -1; 
             basis[0][1] = 4; basis[1][1] =  0; basis[2][1] = -6; basis[3][1] =  3; 
             basis[0][2] = 1; basis[1][2] =  3; basis[2][2] =  3; basis[3][2] = -3; 
             basis[0][3] = 0; basis[1][3] =  0; basis[2][3] =  0; basis[3][3] =  1;
             basis *= (1.0 / 6.0);
 
-            glm::dmat4 geometry = glm::dmat4(0);
-            geometry[0] = glm::dvec4(points[i-1], 1);
-            geometry[1] = glm::dvec4(points[i], 1);
-            geometry[2] = glm::dvec4(points[i+1], 1);
-            geometry[3] = glm::dvec4(points[i+2], 1);
+            glm::mat4 geometry = glm::mat4(0);
+            geometry[0] = glm::vec4(points[i-1], 1);
+            geometry[1] = glm::vec4(points[i], 1);
+            geometry[2] = glm::vec4(points[i+1], 1);
+            geometry[3] = glm::vec4(points[i+2], 1);
 
-            glm::dvec4 tVec = glm::dvec4(1, t, t*t, t*t*t);
+            glm::vec4 tVec = glm::vec4(1, t, t*t, t*t*t);
 
-            glm::dvec3 H = geometry * basis * tVec;
+            glm::vec3 H = geometry * basis * tVec;
 
             vertex.push_back(H); 
-            normals.push_back(glm::dvec3(0, 0, 1));
-            uv.push_back(glm::dvec2(0, 0));
+            normals.push_back(glm::vec3(0, 0, 1));
+            uv.push_back(glm::vec2(0, 0));
             colors.push_back(_color);
         }
     }
@@ -716,12 +716,12 @@ double CoxDeBoor(double i, double k, double u, std::vector<double> knotVector) {
     }
 }
 
-Object3D* GetNonUniformBSpline(Scene* scene, std::string name,glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color, std::vector<glm::dvec3> points) {
+Object3D* GetNonUniformBSpline(Scene* scene, std::string name,glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, std::vector<glm::vec3> points) {
     Object3D* newObject = new Object3D(name, scene);
-    std::vector<glm::dvec3> vertex;
-    std::vector<glm::dvec3> normals;
-    std::vector<glm::dvec2> uv;
-    std::vector<glm::dvec4> colors;
+    std::vector<glm::vec3> vertex;
+    std::vector<glm::vec3> normals;
+    std::vector<glm::vec2> uv;
+    std::vector<glm::vec4> colors;
     std::vector<int> triangles;
 
     double offset = 0.01;
@@ -745,15 +745,15 @@ Object3D* GetNonUniformBSpline(Scene* scene, std::string name,glm::dvec3 _positi
     double globalU = 0.0;
     for(int i=1; i<=points.size()-2; i++) {
         for(double u=0; u<1; u+=offset, globalU+=offset) {
-            glm::dvec3 H = glm::dvec3(0);
+            glm::vec3 H = glm::vec3(0);
             for(int k=0; k<=3; k++) {
                 double N = CoxDeBoor((double)i+k-1, 3.0, globalU, knotVector);
                 H +=  N * points[i+k-1];
             }
 
             vertex.push_back(H); 
-            normals.push_back(glm::dvec3(0, 0, 1));
-            uv.push_back(glm::dvec2(0, 0));
+            normals.push_back(glm::vec3(0, 0, 1));
+            uv.push_back(glm::vec2(0, 0));
             colors.push_back(_color);
             inx++;
             if(inx < totalPoints) {
@@ -786,12 +786,12 @@ Object3D* GetNonUniformBSpline(Scene* scene, std::string name,glm::dvec3 _positi
 }
 
 
-Object3D* GetNURBS(Scene* scene, std::string name,glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color, std::vector<glm::dvec4> points) {
+Object3D* GetNURBS(Scene* scene, std::string name,glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, std::vector<glm::vec4> points) {
     Object3D* newObject = new Object3D(name, scene);
-    std::vector<glm::dvec3> vertex;
-    std::vector<glm::dvec3> normals;
-    std::vector<glm::dvec2> uv;
-    std::vector<glm::dvec4> colors;
+    std::vector<glm::vec3> vertex;
+    std::vector<glm::vec3> normals;
+    std::vector<glm::vec2> uv;
+    std::vector<glm::vec4> colors;
     std::vector<int> triangles;
 
     double offset = 0.01;
@@ -815,7 +815,7 @@ Object3D* GetNURBS(Scene* scene, std::string name,glm::dvec3 _position, glm::dve
     double globalU = 0.0;
     for(int i=1; i<=points.size()-2; i++) {
         for(double u=0; u<1; u+=offset, globalU+=offset) {
-            glm::dvec4 H = glm::dvec4(0);
+            glm::vec4 H = glm::vec4(0);
             for(int k=0; k<=3; k++) {
                 double N = CoxDeBoor((double)i+k-1, 3.0, globalU, knotVector);
                 double numerator =(N * points[i+k-1].w); 
@@ -827,9 +827,9 @@ Object3D* GetNURBS(Scene* scene, std::string name,glm::dvec3 _position, glm::dve
                 H +=  N * points[i+k-1];
             }
 
-            vertex.push_back(glm::dvec3(H) / H.w); 
-            normals.push_back(glm::dvec3(0, 0, 1));
-            uv.push_back(glm::dvec2(0, 0));
+            vertex.push_back(glm::vec3(H) / H.w); 
+            normals.push_back(glm::vec3(0, 0, 1));
+            uv.push_back(glm::vec2(0, 0));
             colors.push_back(_color);
             inx++;
             if(inx < totalPoints) {
@@ -861,37 +861,37 @@ Object3D* GetNURBS(Scene* scene, std::string name,glm::dvec3 _position, glm::dve
 }
 
 
-Object3D* GetBezierSurface(Scene* scene, std::string name,glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color, std::vector<glm::dvec4> controlPoints) {
+Object3D* GetBezierSurface(Scene* scene, std::string name,glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, std::vector<glm::vec4> controlPoints) {
     return nullptr;
 }
 
 
-Object3D* GetDirectionalLight(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
+Object3D* GetDirectionalLight(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color) {
     Object3D* dirLight = new Object3D(name, scene);
 	dirLight->transform->position = _position;
 	dirLight->transform->rotation = _rotation;
 	dirLight->transform->scale = _scale;
-	LightComponent* lightComponent = new LightComponent(dirLight, _color, glm::dvec3(0.25, 0.05, 0.001), 0);
+	LightComponent* lightComponent = new LightComponent(dirLight, _color, glm::vec3(0.25, 0.05, 0.001), 0);
 	dirLight->AddComponent(lightComponent);
 	return dirLight;
 }
 
-Object3D* GetPointLight(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color) {
+Object3D* GetPointLight(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color) {
 	Object3D* pointLight = new Object3D(name, scene);
 	pointLight->transform->position = _position;
 	pointLight->transform->rotation = _rotation;
 	pointLight->transform->scale = _scale;
-	LightComponent* lightComponent = new LightComponent(pointLight, _color, glm::dvec3(0.25, 0.05, 0.001), 1);
+	LightComponent* lightComponent = new LightComponent(pointLight, _color, glm::vec3(0.25, 0.05, 0.001), 1);
 	pointLight->AddComponent(lightComponent);
 	return pointLight;
 }
 
-Object3D* GetSpotLight(Scene* scene, std::string name, glm::dvec3 _position, glm::dvec3 _rotation, glm::dvec3 _scale, glm::dvec4 _color, double FOV) {
+Object3D* GetSpotLight(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, double FOV) {
 	Object3D* spotLight = new Object3D(name, scene);
 	spotLight->transform->position = _position;
 	spotLight->transform->rotation = _rotation;
 	spotLight->transform->scale = _scale;
-	LightComponent* lightComponent = new LightComponent(spotLight, _color, glm::dvec3(0.25, 0.05, 0.001), 2);
+	LightComponent* lightComponent = new LightComponent(spotLight, _color, glm::vec3(0.25, 0.05, 0.001), 2);
 	lightComponent->fov = FOV;
 	spotLight->AddComponent(lightComponent);
 	return spotLight;
@@ -901,10 +901,10 @@ Object3D* GetSpotLight(Scene* scene, std::string name, glm::dvec3 _position, glm
 Object3D* ObjectFromModelFile(Scene* scene, std::string name, std::string filename) {
     Object3D* newObject = new Object3D(name, scene);
 
-    std::vector<glm::dvec3> vertex;
-    std::vector<glm::dvec3> normals;
-    std::vector<glm::dvec2> uv;
-    std::vector<glm::dvec4> colors;
+    std::vector<glm::vec3> vertex;
+    std::vector<glm::vec3> normals;
+    std::vector<glm::vec2> uv;
+    std::vector<glm::vec4> colors;
     std::vector<int> triangles;
 
     Util::FileIO::LoadModel(filename, &vertex, &normals, &uv, &colors, &triangles);

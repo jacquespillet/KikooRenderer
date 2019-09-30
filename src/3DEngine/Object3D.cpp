@@ -247,7 +247,7 @@ void Object3D::DepthRenderPass(LightComponent* light) {
 		if(material != nullptr) {
 			//Won't use the MVP matrices of the current object but those of the light. 
 			//The needed MVP matrices are already binded before
-			material->SetupShaderUniforms(glm::dmat4(1), glm::dmat4(1), glm::dmat4(1), this->scene);
+			material->SetupShaderUniforms(glm::mat4(1), glm::mat4(1), glm::mat4(1), this->scene);
 			//Draw
 			for(int i=0; i<components.size(); i++) {
 				components[i]->OnRender();
@@ -273,16 +273,16 @@ Object3D* Object3D::Intersects(Geometry::Ray ray, double& _distance) {
 	//This code should be in bounding box : bb->intersectsRay();
 	BoundingBoxComponent* bb = this->GetComponent<BoundingBoxComponent>();
 	if(bb != nullptr) {
-		glm::dvec3 min;
-		glm::dvec3 max;
+		glm::vec3 min;
+		glm::vec3 max;
 		bb->GetLocalBounds(&min, &max);
 
 		TransformComponent* transform = this->transform;
-		glm::dmat4 transformMat = transform->GetWorldTransRotMatrix();
+		glm::mat4 transformMat = transform->GetWorldTransRotMatrix();
 		
-		glm::dvec3 worldScale = transform->GetWorldScale();
-		glm::dvec3 minScale = min * worldScale;
-		glm::dvec3 maxScale = max * worldScale;
+		glm::vec3 worldScale = transform->GetWorldScale();
+		glm::vec3 minScale = min * worldScale;
+		glm::vec3 maxScale = max * worldScale;
 
 		double distance;
 		bool intersect = Util::RayBoxTest(ray.origin, ray.direction, transformMat, minScale, maxScale, distance);

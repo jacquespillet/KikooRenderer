@@ -26,23 +26,23 @@ namespace CoreEngine {
         normal.resize(numVert);
         tangent.resize(numVert);
 
-        glm::dvec2 center = glm::dvec2((width * d) / 2,(height * d) / 2);
+        glm::vec2 center = glm::vec2((width * d) / 2,(height * d) / 2);
         long a = 0;
         for (long j = 0; j < height; j++)  {  
             float y = d * j;
             for (long i = 0; i < width; i++)   {
                 // float z = (float)i / (float)width * 3;
                 float z = 0;
-                glm::dvec2 position= glm::dvec2(d * i, y);
+                glm::vec2 position= glm::vec2(d * i, y);
                 float distanceWithCenter = glm::distance(position, center);
                 if(distanceWithCenter < 1) {
                     z = -(1-distanceWithCenter) * 10;
                 }
-                buffer[0][a] = glm::dvec3(d * i, y, z);
+                buffer[0][a] = glm::vec3(d * i, y, z);
                 buffer[1][a] = buffer[0][a];
                 
-                normal[a] = glm::dvec3(0.0F, 0.0F, 1.0F * d);
-                tangent[a] = glm::dvec3(1.0F * d, 0.0F, 0.0F);
+                normal[a] = glm::vec3(0.0F, 0.0F, 1.0F * d);
+                tangent[a] = glm::vec3(1.0F * d, 0.0F, 0.0F);
                 a++;
             }
         }        

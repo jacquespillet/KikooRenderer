@@ -4,10 +4,10 @@ namespace KikooRenderer {
 namespace Util {
 namespace FileIO {
 
-    Image::Image(int width, int height, glm::dvec4 color) {
+    Image::Image(int width, int height, glm::vec4 color) {
         this->width = width;
         this->height = height;
-        colorBuffer = std::vector<glm::dvec4>(width * height, color);
+        colorBuffer = std::vector<glm::vec4>(width * height, color);
     }
 
     void Image::toPPM(std::string fileName) {
@@ -24,14 +24,14 @@ namespace FileIO {
         fs.close();
     }
 
-    void Image::SetPixel(int x, int y, glm::dvec4 color) {
+    void Image::SetPixel(int x, int y, glm::vec4 color) {
         int inx = y * width + x;
         colorBuffer[inx] = color;
     }
 
-    void Image::SetPixel(int x, int y, glm::dvec3 color) {
+    void Image::SetPixel(int x, int y, glm::vec3 color) {
         int inx = y * width + x;
-        colorBuffer[inx] = glm::dvec4(color, 1);
+        colorBuffer[inx] = glm::vec4(color, 1);
     }
 }
 }

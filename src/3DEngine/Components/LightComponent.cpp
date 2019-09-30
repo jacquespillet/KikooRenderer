@@ -39,7 +39,7 @@ LightInspector::LightInspector(LightComponent* lightComponent) : QGroupBox("Ligh
 	ColorPicker* lightColorPicker = new ColorPicker("LightColor", 255, 255, 255, 255);
 	mainLayout->addWidget(lightColorPicker);
 	connect(lightColorPicker, &ColorPicker::ColorPicked, this, [this, lightComponent](QColor color) {
-        lightComponent->color = glm::dvec4(color.red(), color.green(), color.blue(), color.alpha()) * 0.00392156;
+        lightComponent->color = glm::vec4(color.red(), color.green(), color.blue(), color.alpha()) * 0.00392156;
 		scene->triggerRefresh = true;
 	});
 
@@ -93,7 +93,7 @@ LightInspector::LightInspector(LightComponent* lightComponent) : QGroupBox("Ligh
 	setLayout(mainLayout);
 }
 
-LightComponent::LightComponent(Object3D* object, glm::dvec4 color, glm::dvec3 attenuation, int type) : Component("Light", object) {
+LightComponent::LightComponent(Object3D* object, glm::vec4 color, glm::vec3 attenuation, int type) : Component("Light", object) {
     this->attenuation =  attenuation;
     this->color = color;   
     this->fov = 80;
@@ -252,8 +252,8 @@ void LightComponent::RenderDepthMap() {
             ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
             ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
 
-            glm::dmat4 model = object3D->transform->GetWorldRotationMatrix();
-            glm::dvec3 lightPos = -20.0 * glm::dvec4(glm::column(model, 2));
+            glm::mat4 model = object3D->transform->GetWorldRotationMatrix();
+            glm::vec3 lightPos = -20.0 * glm::vec4(glm::column(model, 2));
             model = glm::translate(model, lightPos);
             viewMat = glm::inverse(model);
             lightSpaceMatrix = lightProjection * viewMat;
@@ -310,7 +310,7 @@ void LightComponent::RenderDepthMap() {
             ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
             ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
 
-            glm::dmat4 model = object3D->transform->GetWorldModelMatrix();
+            glm::mat4 model = object3D->transform->GetWorldModelMatrix();
             viewMat = glm::inverse(model);
             lightSpaceMatrix = lightProjection * viewMat;
 

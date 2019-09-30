@@ -46,7 +46,7 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGr
 	ColorPicker* albedoPicker = new ColorPicker("Albedo", 210, 15, 60, 255);
 	mainLayout->addWidget(albedoPicker);
 	connect(albedoPicker, &ColorPicker::ColorPicked, this, [this, materialComponent](QColor color) {
-		glm::dvec4 albedoVec = glm::dvec4(color.red(), color.green(), color.blue(), color.alpha()) * 0.00392156;
+		glm::vec4 albedoVec = glm::vec4(color.red(), color.green(), color.blue(), color.alpha()) * 0.00392156;
 		materialComponent->albedo = albedoVec;
 		scene->triggerRefresh = true;
 	});
@@ -105,7 +105,7 @@ void MaterialInspector::UpdateShaderParameters() {
 MaterialComponent::MaterialComponent(Object3D* object) : Component("Material", object), albedoTex(), cubemap()  {
     inited= false;
     influence = 1.0;
-    albedo = glm::dvec4(0.75, 0.75, 0.75, 1.0);
+    albedo = glm::vec4(0.75, 0.75, 0.75, 1.0);
 
 }
 
@@ -149,7 +149,7 @@ void MaterialComponent::SetCubemap(std::vector<std::string> _cubemapFilenames) {
 	cubemap = Cubemap(cubemapfilenames);
 }
 
-void MaterialComponent::SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 viewMatrix, glm::dmat4 projectionMatrix, Scene* scene) {
+void MaterialComponent::SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 viewMatrix, glm::mat4 projectionMatrix, Scene* scene) {
 	if(inited) {
 		GETGL
 		if(shader->isDepthPass) {

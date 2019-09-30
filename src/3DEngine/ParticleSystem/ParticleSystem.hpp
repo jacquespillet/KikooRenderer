@@ -30,7 +30,7 @@ public:
 private:
     std::vector<Particle> particles;
     Object3D* quad;
-    MaterialComponent* quadMaterial;
+    MaterialComponent* quamaterial;
     MeshFilterComponent* quadMeshFilter;
     Shader particleShader;
 

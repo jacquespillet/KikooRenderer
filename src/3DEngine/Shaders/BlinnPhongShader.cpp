@@ -16,7 +16,7 @@ namespace CoreEngine
     ColorPicker* specularColorPicker = new ColorPicker("specular Color", 210, 15, 60, 255);
     shaderParamsLayout->addWidget(specularColorPicker);
     connect(specularColorPicker, &ColorPicker::ColorPicked, this, [this](QColor color) {
-        glm::vec4 specularColorVec = glm::dvec4(color.red(), color.green(), color.blue(), color.alpha()) * 0.00392156;
+        glm::vec4 specularColorVec = glm::vec4(color.red(), color.green(), color.blue(), color.alpha()) * 0.00392156;
         specularColor = specularColorVec;
         scene->triggerRefresh = true;
     });

@@ -8,8 +8,8 @@ namespace Geometry {
 class Box {
     public: 
         Box();
-        glm::dvec3 position;
-        glm::dvec3 size;
+        glm::vec3 position;
+        glm::vec3 size;
 };
 }
 }

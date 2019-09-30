@@ -62,10 +62,10 @@ MeshFilterInspector::MeshFilterInspector(MeshFilterComponent* meshFilterComponen
 	connect(modelPicker, &FilePicker::FileModified, this, [this, meshFilterComponent, object](QString value) {
 		meshFilterComponent->modelpath = value.toStdString();
 
-		std::vector<glm::dvec3> vertex;
-		std::vector<glm::dvec3> normals;
-		std::vector<glm::dvec2> uv;
-		std::vector<glm::dvec4> colors;
+		std::vector<glm::vec3> vertex;
+		std::vector<glm::vec3> normals;
+		std::vector<glm::vec2> uv;
+		std::vector<glm::vec4> colors;
 		std::vector<int> triangles;
 		Util::FileIO::GetModelBuffers(meshFilterComponent->modelpath, &vertex, &normals, &uv, &colors, &triangles);
 		
@@ -79,10 +79,10 @@ MeshFilterInspector::MeshFilterInspector(MeshFilterComponent* meshFilterComponen
 
 	connect(modelList, static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged), this, [this,meshFilterComponent, modelPicker, object](int index) {
 		if(index != PRIMITIVE_MESH::MODEL_MESH) {
-			std::vector<glm::dvec3> vertex;
-			std::vector<glm::dvec3> normals;
-			std::vector<glm::dvec2> uv;
-			std::vector<glm::dvec4> colors;
+			std::vector<glm::vec3> vertex;
+			std::vector<glm::vec3> normals;
+			std::vector<glm::vec2> uv;
+			std::vector<glm::vec4> colors;
 			std::vector<int> triangles;
 
 			meshFilterComponent->meshType =(PRIMITIVE_MESH)index;
@@ -156,7 +156,7 @@ MeshFilterInspector* MeshFilterComponent::GetInspector() {
 	return meshFilterInspector;
 }
 
-void MeshFilterComponent::CalculateTangents(std::vector<glm::vec4>& tangents ,std::vector<glm::dvec3> _vertices,  std::vector<glm::dvec3> normals, std::vector<glm::dvec2> uv,std::vector<int> triangles) {
+void MeshFilterComponent::CalculateTangents(std::vector<glm::vec4>& tangents ,std::vector<glm::vec3> _vertices,  std::vector<glm::vec3> normals, std::vector<glm::vec2> uv,std::vector<int> triangles) {
 	std::vector<glm::vec4> tan1(_vertices.size(), glm::vec4(0));
 	std::vector<glm::vec4> tan2(_vertices.size(), glm::vec4(0));
 	for(uint64_t i=0; i<triangles.size(); i+=3) {
@@ -205,10 +205,10 @@ void MeshFilterComponent::CalculateTangents(std::vector<glm::vec4>& tangents ,st
 }
 
 
-void MeshFilterComponent::LoadFromBuffers(std::vector<glm::dvec3> _vertex,
-        std::vector<glm::dvec3> _normals,
-        std::vector<glm::dvec2> _uv,
-        std::vector<glm::dvec4> _colors,
+void MeshFilterComponent::LoadFromBuffers(std::vector<glm::vec3> _vertex,
+        std::vector<glm::vec3> _normals,
+        std::vector<glm::vec2> _uv,
+        std::vector<glm::vec4> _colors,
         std::vector<int> _triangles, 
         bool calculateTangents) {
     this->triangles = _triangles;

@@ -18,7 +18,7 @@ namespace KikooRenderer {
 
 namespace CoreEngine {
     Scene::Scene(){
-		camera = new CameraScene(this, 1.0, 70 * DEGTORAD, 0.1, 1000.0, 1.0);
+		camera = new CameraScene(this, 1.0, 70 * DEGTORAD, 0.0001, 1000.0, 1.0);
         this->started = false;
     }
     Object3D* quad;
@@ -44,7 +44,7 @@ namespace CoreEngine {
         transformWidget->Start();
 		transformWidget->Enable();
 
-        skyboxCube = GetCube(this, "Cubemap", glm::dvec3(0), glm::vec3(0), glm::dvec3(100), glm::dvec4(0.1, 0.1, 0.1, 1));
+        skyboxCube = GetCube(this, "Cubemap", glm::vec3(0), glm::vec3(0), glm::vec3(100), glm::vec4(0.1, 0.1, 0.1, 1));
         skyboxCube->Start();
         skyboxCube->Enable();
 

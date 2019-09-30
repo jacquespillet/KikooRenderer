@@ -5,7 +5,7 @@
 namespace KikooRenderer {
 namespace CoreEngine {
 
-CameraScene::CameraScene(Scene* _scene, double _eyeDistance, double _fov, double _near, double _far, double _aspect) {
+CameraScene::CameraScene(Scene* _scene, float _eyeDistance, float _fov, float _near, float _far, float _aspect) {
 	transform = new TransformComponent(nullptr);
 
     this->scene = _scene;
@@ -23,32 +23,34 @@ CameraScene::CameraScene(Scene* _scene, double _eyeDistance, double _fov, double
 
 	projectionType = ProjectionType::Perspective;
     viewMatrix = glm::inverse(this->transform->GetModelMatrix()); 
+
+    orthoFOV = 10;
 }
 
-glm::dvec3 CameraScene::GetPosition() {
+glm::vec3 CameraScene::GetPosition() {
     return this->transform->position;
 }
 
-glm::dmat4 CameraScene::GetProjectionMatrix() {
+glm::mat4 CameraScene::GetProjectionMatrix() {
     return this->projectionMatrix;
 }
 
-glm::dmat4 CameraScene::GetViewMatrix() {
+glm::mat4 CameraScene::GetViewMatrix() {
     return glm::inverse(this->transform->GetModelMatrix());
 }
 
-glm::dmat4 CameraScene::GetModelTransform() {
+glm::mat4 CameraScene::GetModelTransform() {
     return this->transform->GetModelMatrix();
 }
 
 void CameraScene::UpdateProjectionMatrix() {
 	if(projectionType == ProjectionType::Perspective)  this->projectionMatrix = glm::perspectiveLH(this->fov, this->aspect, this->nearClip, this->farClip);     
-	else this->projectionMatrix = glm::orthoLH(-10.0, 10.0, -10.0, 10.0, 0.01, this->farClip);
+	else this->projectionMatrix = glm::orthoLH(-orthoFOV * this->aspect, orthoFOV * this->aspect, -orthoFOV, orthoFOV, 0.0001f, this->farClip);
 }
 
 void CameraScene::OnKeyPressEvent(QKeyEvent *e){
     if(isRightClicked) {
-        glm::dmat4 transform = this->transform->GetModelMatrix();
+        glm::mat4 transform = this->transform->GetModelMatrix();
 
         if(e->key() == Qt::Key_Z) {
             this->transform->position.x += glm::column(transform, 2).x * speedFactor;
@@ -129,7 +131,7 @@ void CameraScene::OnMouseMoveEvent(QMouseEvent *e) {
         int xOffset = newX - previousX;
         int yOffset = newY - previousY;
 
-        glm::dmat4 transform = this->transform->GetModelMatrix();
+        glm::mat4 transform = this->transform->GetModelMatrix();
 
         this->transform->position.x -= glm::column(transform, 0).x * xOffset * speedFactor * 0.1;
         this->transform->position.y -= glm::column(transform, 0).y * xOffset * speedFactor * 0.1;
@@ -148,66 +150,84 @@ void CameraScene::OnMouseMoveEvent(QMouseEvent *e) {
 void CameraScene::OnWheelEvent(QWheelEvent *event) {
     QPoint point = event->angleDelta();
 
-    glm::dmat4 transform = this->transform->GetModelMatrix();
+    glm::mat4 transform = this->transform->GetModelMatrix();
     if(point.y() > 0) {
         this->transform->position.x += glm::column(transform, 2).x * speedFactor;
         this->transform->position.y += glm::column(transform, 2).y * speedFactor;
         this->transform->position.z += glm::column(transform, 2).z * speedFactor;
+        orthoFOV -= 0.5;
     } else if(point.y() < 0) {
         this->transform->position.x -= glm::column(transform, 2).x * speedFactor;
         this->transform->position.y -= glm::column(transform, 2).y * speedFactor;
         this->transform->position.z -= glm::column(transform, 2).z * speedFactor;
+        orthoFOV += 0.5;
     }
+
+    UpdateProjectionMatrix();
+
     previousViewMatrix = glm::mat4(viewMatrix);
     viewMatrix = glm::inverse(this->transform->GetModelMatrix());
 }
 
 Geometry::Ray CameraScene::GetRay(int x, int y) {
     Geometry::Ray ray;
-    glm::dmat4 localToWorld = this->transform->GetModelMatrix();
+    glm::mat4 localToWorld = this->transform->GetModelMatrix();
 
     int width = this->scene->windowWidth;
     int height = this->scene->windowHeight;
     float ndcX = ((((float)x / (float)width) * 2.0) - 1.0) * this->aspect;
     float ndcY = 1.0 - (((float)y / (float)height) * 2.0);
     float ndcZ = 1 / std::tan(this->fov/2.0);
-
-    ray.origin = localToWorld *  glm::dvec4(0, 0, 0, 1);
-    ray.direction = glm::normalize(localToWorld * glm::dvec4(ndcX, ndcY, ndcZ, 0));
+    if(projectionType == ProjectionType::Perspective) {
+        ray.origin = localToWorld *  glm::vec4(0, 0, 0, 1);
+        ray.direction = glm::normalize(localToWorld * glm::vec4(ndcX, ndcY, ndcZ, 0));
+    } else {
+		glm::vec4 posCameraSpace = glm::vec4(orthoFOV * ndcX * this->aspect, orthoFOV *ndcY, 0.0, 1.0);
+        std::cout << glm::to_string(posCameraSpace) << std::endl;
+		ray.origin = glm::vec3(localToWorld * posCameraSpace);
+		ray.direction = glm::vec3(localToWorld * glm::vec4(0.0, 0.0, 1.0, 0.0));
+    }
 
     return ray;
 }
 
 Geometry::Ray CameraScene::GetRay(double x, double y) {
     Geometry::Ray ray;
-    glm::dmat4 localToWorld = this->transform->GetModelMatrix();
+    glm::mat4 localToWorld = this->transform->GetModelMatrix();
 
     int width = this->scene->windowWidth;
     int height = this->scene->windowHeight;
+
     double ndcX = (((x / (double)width) * 2.0) - 1.0) * this->aspect;
     double ndcY = 1.0 - ((y / (double)height) * 2.0);
     double ndcZ = 1 / std::tan(this->fov/2.0);
+    std::cout << "HERE" << std::endl;
+    if(projectionType == ProjectionType::Perspective) {
+        ray.origin = localToWorld *  glm::vec4(0, 0, 0, 1);
+        ray.direction = glm::normalize(localToWorld * glm::vec4(ndcX, ndcY, ndcZ, 0));
 
-    ray.origin = localToWorld *  glm::dvec4(0, 0, 0, 1);
-    ray.direction = glm::normalize(localToWorld * glm::dvec4(ndcX, ndcY, ndcZ, 0));
-
+    } else {
+		glm::vec4 posCameraSpace = glm::vec4(orthoFOV * ndcX * this->aspect, orthoFOV *ndcY, 0.0, 1.0);
+		ray.origin = glm::vec3(localToWorld * posCameraSpace);
+		ray.direction = glm::vec3(localToWorld * glm::vec4(0.0, 0.0, 1.0, 0.0));
+	}
     return ray;
 }
 
 Geometry::Planes CameraScene::GetPlanes()
 {
-	glm::dmat4 transformMatrix = glm::inverseTranspose(transform->GetModelMatrix());
+	glm::mat4 transformMatrix = glm::inverseTranspose(transform->GetModelMatrix());
 	
-	glm::dmat4 projectionMatrix = GetProjectionMatrix();
+	glm::mat4 projectionMatrix = GetProjectionMatrix();
 
-	glm::dvec4 nearPlane = glm::normalize(glm::row(projectionMatrix, 3) + glm::row(projectionMatrix, 2));
-	glm::dvec4 farPlane = glm::normalize(glm::row(projectionMatrix, 3) - glm::row(projectionMatrix, 2));
+	glm::vec4 nearPlane = glm::normalize(glm::row(projectionMatrix, 3) + glm::row(projectionMatrix, 2));
+	glm::vec4 farPlane = glm::normalize(glm::row(projectionMatrix, 3) - glm::row(projectionMatrix, 2));
 
-	glm::dvec4 leftPlane = glm::normalize(glm::row(projectionMatrix, 3) + glm::row(projectionMatrix, 0));
-	glm::dvec4 rightPlane = glm::normalize(glm::row(projectionMatrix, 3) - glm::row(projectionMatrix, 0));
+	glm::vec4 leftPlane = glm::normalize(glm::row(projectionMatrix, 3) + glm::row(projectionMatrix, 0));
+	glm::vec4 rightPlane = glm::normalize(glm::row(projectionMatrix, 3) - glm::row(projectionMatrix, 0));
 
-	glm::dvec4 bottomPlane = glm::normalize(glm::row(projectionMatrix, 3) + glm::row(projectionMatrix, 1));
-	glm::dvec4 topPlane = glm::normalize(glm::row(projectionMatrix, 3) - glm::row(projectionMatrix, 1));
+	glm::vec4 bottomPlane = glm::normalize(glm::row(projectionMatrix, 3) + glm::row(projectionMatrix, 1));
+	glm::vec4 topPlane = glm::normalize(glm::row(projectionMatrix, 3) - glm::row(projectionMatrix, 1));
 
 	Geometry::Planes planes = {
 		transformMatrix * rightPlane,

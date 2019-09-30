@@ -21,18 +21,18 @@ namespace CoreEngine {
         void OnDestroy();
         void Recompute(){}
 
-        void GetWorldBounds(glm::dvec3* _min, glm::dvec3* _max);
-        void GetLocalBounds(glm::dvec3* _min, glm::dvec3* _max);
+        void GetWorldBounds(glm::vec3* _min, glm::vec3* _max);
+        void GetLocalBounds(glm::vec3* _min, glm::vec3* _max);
         
         void Refresh();
 
-        glm::dvec3 min;
-        glm::dvec3 max;
+        glm::vec3 min;
+        glm::vec3 max;
 
-        glm::dvec3 wmin;
-        glm::dvec3 wmax;
+        glm::vec3 wmin;
+        glm::vec3 wmax;
 
-		std::vector<glm::dvec3> positions;
+		std::vector<glm::vec3> positions;
 
         Object3D* GetBoxObject();
 

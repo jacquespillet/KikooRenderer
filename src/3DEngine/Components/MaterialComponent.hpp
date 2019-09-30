@@ -38,7 +38,7 @@ class MaterialComponent : public Component {
 		MaterialInspector* GetInspector();
         
         void SetShader(Shader* shader);
-        void SetupShaderUniforms(glm::dmat4 modelMatrix, glm::dmat4 viewMatrix, glm::dmat4 projectionMatrix, Scene* scene);
+        void SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 viewMatrix, glm::mat4 projectionMatrix, Scene* scene);
 
         Shader* shader;
 

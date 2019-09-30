@@ -7,7 +7,7 @@ namespace KikooRenderer {
 namespace CoreEngine {
 
 TransformInspector::TransformInspector(TransformComponent* transformComponent) : QGroupBox("Transform") {
-	setLocale(QLocale("C")); //For . as , in double spin boxes
+	setLocale(QLocale("C")); //For . as , in float spin boxes
 
 	this->transformComponent = transformComponent;
 	Object3D* object = transformComponent->object3D;
@@ -71,17 +71,17 @@ TransformInspector::TransformInspector(TransformComponent* transformComponent) :
 	setLayout(mainLayout);
 }
 
-void TransformInspector::SetScaleX(double x) { transformComponent->scale.x = x; scene->triggerRefresh = true; }
-void TransformInspector::SetScaleY(double y) { transformComponent->scale.y = y; scene->triggerRefresh = true;}
-void TransformInspector::SetScaleZ(double z) { transformComponent->scale.z = z; scene->triggerRefresh = true;}
+void TransformInspector::SetScaleX(float x) { transformComponent->scale.x = x; scene->triggerRefresh = true; }
+void TransformInspector::SetScaleY(float y) { transformComponent->scale.y = y; scene->triggerRefresh = true;}
+void TransformInspector::SetScaleZ(float z) { transformComponent->scale.z = z; scene->triggerRefresh = true;}
 
-void TransformInspector::SetRotationX(double x) { transformComponent->rotation.x = x; scene->triggerRefresh = true;}
-void TransformInspector::SetRotationY(double y) { transformComponent->rotation.y = y; scene->triggerRefresh = true;}
-void TransformInspector::SetRotationZ(double z) { transformComponent->rotation.z = z; scene->triggerRefresh = true;}
+void TransformInspector::SetRotationX(float x) { transformComponent->rotation.x = x; scene->triggerRefresh = true;}
+void TransformInspector::SetRotationY(float y) { transformComponent->rotation.y = y; scene->triggerRefresh = true;}
+void TransformInspector::SetRotationZ(float z) { transformComponent->rotation.z = z; scene->triggerRefresh = true;}
 
-void TransformInspector::SetPositionX(double x) { transformComponent->position.x = x; scene->triggerRefresh = true;}
-void TransformInspector::SetPositionY(double y) { transformComponent->position.y = y; scene->triggerRefresh = true;}
-void TransformInspector::SetPositionZ(double z) { transformComponent->position.z = z; scene->triggerRefresh = true;}
+void TransformInspector::SetPositionX(float x) { transformComponent->position.x = x; scene->triggerRefresh = true;}
+void TransformInspector::SetPositionY(float y) { transformComponent->position.y = y; scene->triggerRefresh = true;}
+void TransformInspector::SetPositionZ(float z) { transformComponent->position.z = z; scene->triggerRefresh = true;}
 
 void TransformInspector::Refresh() {
 	xPositionSpinBox->setValue(transformComponent->position.x);
@@ -97,9 +97,9 @@ void TransformInspector::Refresh() {
 
 
 TransformComponent::TransformComponent(Object3D* object) : Component("Transform", object) {
-    position = glm::dvec3(0, 0, 0);
-    rotation = glm::dvec3(0, 0, 0);
-    scale = glm::dvec3(1, 1, 1);   
+    position = glm::vec3(0, 0, 0);
+    rotation = glm::vec3(0, 0, 0);
+    scale = glm::vec3(1, 1, 1);   
 }
 void TransformComponent::OnStart(){}
 void TransformComponent::OnEnable(){}
@@ -113,54 +113,54 @@ TransformInspector* TransformComponent::GetInspector() {
 
 void TransformComponent::Recompute() {}
 
-glm::dmat4 TransformComponent::GetModelMatrix() {
-	glm::dmat4 translateM = glm::translate(glm::dmat4(1.0f), this->position);
+glm::mat4 TransformComponent::GetModelMatrix() {
+	glm::mat4 translateM = glm::translate(glm::mat4(1.0f), this->position);
 
-	double distanceFactor = 1;
+	float distanceFactor = 1;
 	// if(isScreenSize) {
 	// 	distanceFactor = 0.1 * glm::distance( object3D->scene->camera.GetPosition(), this->position);		
 	// }
 	
-	glm::dmat4 scaleM = glm::scale(glm::dmat4(1.0f), scale * distanceFactor);
+	glm::mat4 scaleM = glm::scale(glm::mat4(1.0f), scale * distanceFactor);
 
-	glm::dmat4 rotxPM = glm::rotate(glm::dmat4(1.0f), rotation.x * DEGTORAD, glm::dvec3(1.0f, 0.0f, 0.0f));//rot x axis
-	glm::dmat4 rotyPM = glm::rotate(glm::dmat4(1.0f), rotation.y * DEGTORAD, glm::dvec3(0.0f, 1.0f, 0.0f));//rot y axis
-	glm::dmat4 rotzPM = glm::rotate(glm::dmat4(1.0f), rotation.z * DEGTORAD, glm::dvec3(0.0f, 0.0f, 1.0f));//rot z axis
+	glm::mat4 rotxPM = glm::rotate(glm::mat4(1.0f), rotation.x * (float)DEGTORAD, glm::vec3(1.0f, 0.0f, 0.0f));//rot x axis
+	glm::mat4 rotyPM = glm::rotate(glm::mat4(1.0f), rotation.y * (float)DEGTORAD, glm::vec3(0.0f, 1.0f, 0.0f));//rot y axis
+	glm::mat4 rotzPM = glm::rotate(glm::mat4(1.0f), rotation.z * (float)DEGTORAD, glm::vec3(0.0f, 0.0f, 1.0f));//rot z axis
 
-	glm::dmat4 rotM = rotyPM * rotxPM * rotzPM; 	
+	glm::mat4 rotM = rotyPM * rotxPM * rotzPM; 	
 		
 	return translateM * rotM * scaleM;
 }
-glm::dmat4 TransformComponent::GetWorldRotationMatrix() {
-	glm::dmat4 rotxPM = glm::rotate(glm::dmat4(1.0f), rotation.x * DEGTORAD, glm::dvec3(1.0f, 0.0f, 0.0f));//rot x axis
-	glm::dmat4 rotyPM = glm::rotate(glm::dmat4(1.0f), rotation.y * DEGTORAD, glm::dvec3(0.0f, 1.0f, 0.0f));//rot y axis
-	glm::dmat4 rotzPM = glm::rotate(glm::dmat4(1.0f), rotation.z * DEGTORAD, glm::dvec3(0.0f, 0.0f, 1.0f));//rot z axis
+glm::mat4 TransformComponent::GetWorldRotationMatrix() {
+	glm::mat4 rotxPM = glm::rotate(glm::mat4(1.0f), rotation.x * (float)DEGTORAD, glm::vec3(1.0f, 0.0f, 0.0f));//rot x axis
+	glm::mat4 rotyPM = glm::rotate(glm::mat4(1.0f), rotation.y * (float)DEGTORAD, glm::vec3(0.0f, 1.0f, 0.0f));//rot y axis
+	glm::mat4 rotzPM = glm::rotate(glm::mat4(1.0f), rotation.z * (float)DEGTORAD, glm::vec3(0.0f, 0.0f, 1.0f));//rot z axis
 
-	glm::dmat4 rotM = rotyPM * rotxPM * rotzPM; 	
+	glm::mat4 rotM = rotyPM * rotxPM * rotzPM; 	
 		
 	return rotM;
 }
-glm::dmat4 TransformComponent::GetTransRotMatrix() {
-	glm::dmat4 translateM = glm::translate(glm::dmat4(1.0f), this->position);
+glm::mat4 TransformComponent::GetTransRotMatrix() {
+	glm::mat4 translateM = glm::translate(glm::mat4(1.0f), this->position);
 	
-	glm::dmat4 rotxPM = glm::rotate(glm::dmat4(1.0f), rotation.x * DEGTORAD, glm::dvec3(1.0f, 0.0f, 0.0f));//rot x axis
-	glm::dmat4 rotyPM = glm::rotate(glm::dmat4(1.0f), rotation.y * DEGTORAD, glm::dvec3(0.0f, 1.0f, 0.0f));//rot y axis
-	glm::dmat4 rotzPM = glm::rotate(glm::dmat4(1.0f), rotation.z * DEGTORAD, glm::dvec3(0.0f, 0.0f, 1.0f));//rot z axis
+	glm::mat4 rotxPM = glm::rotate(glm::mat4(1.0f), rotation.x * (float)DEGTORAD, glm::vec3(1.0f, 0.0f, 0.0f));//rot x axis
+	glm::mat4 rotyPM = glm::rotate(glm::mat4(1.0f), rotation.y * (float)DEGTORAD, glm::vec3(0.0f, 1.0f, 0.0f));//rot y axis
+	glm::mat4 rotzPM = glm::rotate(glm::mat4(1.0f), rotation.z * (float)DEGTORAD, glm::vec3(0.0f, 0.0f, 1.0f));//rot z axis
 
-	glm::dmat4 rotM = rotyPM * rotxPM * rotzPM; 	
+	glm::mat4 rotM = rotyPM * rotxPM * rotzPM; 	
 		
 	return translateM * rotM;
 }
 
-glm::dvec3 TransformComponent::GetScale() {
-	double distanceFactor = 1;
+glm::vec3 TransformComponent::GetScale() {
+	float distanceFactor = 1;
 
 	//Get world position
-	glm::dmat4 transformMat = GetWorldModelMatrix();
-	glm::dvec4 worldPosition = transformMat * glm::dvec4(0, 0, 0, 1);
+	glm::mat4 transformMat = GetWorldModelMatrix();
+	glm::vec4 worldPosition = transformMat * glm::vec4(0, 0, 0, 1);
 
 	if(isScreenSize) {
-		distanceFactor = 0.1 * glm::distance( object3D->scene->camera->GetPosition(), glm::dvec3(worldPosition));		
+		distanceFactor = 0.1 * glm::distance( object3D->scene->camera->GetPosition(), glm::vec3(worldPosition));		
 	}
 	
 	return distanceFactor * scale;
@@ -169,43 +169,43 @@ glm::dvec3 TransformComponent::GetScale() {
 
 glm::mat4 TransformComponent::GetWorldModelMatrix() {
 	//Get world position
-	glm::dmat4 transformMat = GetModelMatrix();
+	glm::mat4 transformMat = GetModelMatrix();
 	Object3D* currentObject = object3D;
 	while(currentObject->parent != nullptr) {
 		TransformComponent* parentTransform = currentObject->parent->transform;
-		glm::dmat4 parentTransformMat = parentTransform->GetModelMatrix();
+		glm::mat4 parentTransformMat = parentTransform->GetModelMatrix();
 		transformMat = parentTransformMat * transformMat;
 		currentObject = currentObject->parent;
 	}
 	return transformMat;
 }
 
-glm::dvec3 TransformComponent::GetWorldPosition() {
-	glm::dvec3 pos = glm::column(GetWorldModelMatrix(), 3);
+glm::vec3 TransformComponent::GetWorldPosition() {
+	glm::vec3 pos = glm::column(GetWorldModelMatrix(), 3);
 	return pos;
 }
 
-glm::dvec3 TransformComponent::GetWorldScale() {
-	glm::dvec3 worldScale = scale;
+glm::vec3 TransformComponent::GetWorldScale() {
+	glm::vec3 worldScale = scale;
 	Object3D* currentObject = object3D;
 	while (currentObject->parent != nullptr) {
-		glm::dvec3 parentScale = currentObject->parent->transform->scale;
+		glm::vec3 parentScale = currentObject->parent->transform->scale;
 		worldScale *= parentScale ;
 		currentObject = currentObject->parent;
 	}
 	return worldScale;
 }
 
-glm::dmat4 TransformComponent::GetWorldTransRotMatrix() {
-	glm::dmat4 transformMat = GetTransRotMatrix();
+glm::mat4 TransformComponent::GetWorldTransRotMatrix() {
+	glm::mat4 transformMat = GetTransRotMatrix();
 	Object3D* currentObject = object3D;
 	while (currentObject->parent != nullptr) {
-		glm::dmat4 parentTransformMat = currentObject->parent->transform->GetTransRotMatrix();
+		glm::mat4 parentTransformMat = currentObject->parent->transform->GetTransRotMatrix();
 		transformMat = parentTransformMat * transformMat;		
 		currentObject = currentObject->parent;
 	}
 
-	glm::dvec3 wPos = GetWorldPosition();
+	glm::vec3 wPos = GetWorldPosition();
 
 	transformMat[3][0] = wPos.x;
 	transformMat[3][1] = wPos.y;
@@ -214,54 +214,54 @@ glm::dmat4 TransformComponent::GetWorldTransRotMatrix() {
 }
 
 
-glm::dmat4 TransformComponent::GetWorldTransScaleMatrix() {
-	glm::dvec3 worldPos = position;
-	glm::dvec3 worldScale = scale;
+glm::mat4 TransformComponent::GetWorldTransScaleMatrix() {
+	glm::vec3 worldPos = position;
+	glm::vec3 worldScale = scale;
 
 	Object3D* currentObject = object3D;
 	while (currentObject->parent != nullptr) {
-		glm::dvec3 parentScale = currentObject->parent->transform->scale;
-		glm::dvec3 parentPos = currentObject->parent->transform->position;
+		glm::vec3 parentScale = currentObject->parent->transform->scale;
+		glm::vec3 parentPos = currentObject->parent->transform->position;
 		worldScale *= parentScale ;
 		worldPos += parentPos;
 		currentObject = currentObject->parent;
 	}
 
-	glm::dmat4 translateM = glm::translate(glm::dmat4(1.0f), worldPos);
-	glm::dmat4 scaleM = glm::scale(glm::dmat4(1.0f), worldScale);
+	glm::mat4 translateM = glm::translate(glm::mat4(1.0f), worldPos);
+	glm::mat4 scaleM = glm::scale(glm::mat4(1.0f), worldScale);
 	return translateM * scaleM;
 }
 
 
-void TransformComponent::SetWorldX(double x) {
+void TransformComponent::SetWorldX(float x) {
 	if (object3D->parent == nullptr) {
 		this->position.x = x;
 	}
 	else {
-		glm::dvec3 parentPos = object3D->parent->transform->GetWorldPosition();
-		double scaleFac = object3D->parent->transform->GetWorldScale().x;
+		glm::vec3 parentPos = object3D->parent->transform->GetWorldPosition();
+		float scaleFac = object3D->parent->transform->GetWorldScale().x;
 		this->position.x = (x - parentPos.x) / scaleFac;
 	}
 }
 
-void TransformComponent::SetWorldY(double y) {
+void TransformComponent::SetWorldY(float y) {
 	if (object3D->parent == nullptr) {
 		this->position.y = y;
 	}
 	else {
-		glm::dvec3 parentPos = object3D->parent->transform->GetWorldPosition();
-		double scaleFac = object3D->parent->transform->GetWorldScale().y;
+		glm::vec3 parentPos = object3D->parent->transform->GetWorldPosition();
+		float scaleFac = object3D->parent->transform->GetWorldScale().y;
 		this->position.y = (y - parentPos.y) / scaleFac;
 	}
 }
 
-void TransformComponent::SetWorldZ(double z) {
+void TransformComponent::SetWorldZ(float z) {
 	if (object3D->parent == nullptr) {
 		this->position.z = z;
 	}
 	else {
-		glm::dvec3 parentPos = object3D->parent->transform->GetWorldPosition();
-		double scaleFac = object3D->parent->transform->GetWorldScale().z;
+		glm::vec3 parentPos = object3D->parent->transform->GetWorldPosition();
+		float scaleFac = object3D->parent->transform->GetWorldScale().z;
 		this->position.z = (z - parentPos.z) / scaleFac;
 	}
 }

@@ -13,13 +13,13 @@ namespace CoreEngine {
 WaveTile::WaveTile(std::string name, Scene* scene) : Object3D(name, scene) {
     waterShader = GetWaveTileShader();
     
-    quad = GetTerrain(scene, "particle", glm::dvec3(-1, 0.01, -1), glm::dvec3(0, 0, 0), glm::dvec3(1), glm::dvec4(0.5, 0.5, 0.5, 1), 10, 10, 100, 100);
+    quad = GetTerrain(scene, "particle", glm::vec3(-1, 0.01, -1), glm::vec3(0, 0, 0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1), 10, 10, 100, 100);
     quad->Start();
     quad->Enable();
 
 
-    quadMaterial = quad->GetComponent<MaterialComponent>();
-    quadMaterial->SetShader(&waterShader);
+    quamaterial = quad->GetComponent<MaterialComponent>();
+    quamaterial->SetShader(&waterShader);
 
     mesh = quad->GetComponent<MeshFilterComponent>();
 }

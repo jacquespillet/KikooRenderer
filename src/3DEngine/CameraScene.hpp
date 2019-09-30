@@ -15,25 +15,25 @@ class CameraScene{
 			Orthographic
 		};
 
-        CameraScene(Scene* scene, double eyeDistance, double fov, double near, double far, double aspect);
+        CameraScene(Scene* scene, float eyeDistance, float fov, float near, float far, float aspect);
         
 		CameraScene();
         Scene* scene;
-        double eyeDistance;
-        double fov;
-        double nearClip;
-        double farClip;
-        double aspect;
+        float eyeDistance;
+        float fov;
+        float nearClip;
+        float farClip;
+        float aspect;
         glm::mat4 projectionMatrix;
         TransformComponent* transform;
 
 		ProjectionType projectionType;
 
 
-        glm::dmat4 GetProjectionMatrix();
-        glm::dmat4 GetViewMatrix();
-        glm::dmat4 GetModelTransform();
-        glm::dvec3 GetPosition();
+        glm::mat4 GetProjectionMatrix();
+        glm::mat4 GetViewMatrix();
+        glm::mat4 GetModelTransform();
+        glm::vec3 GetPosition();
         
         void UpdateProjectionMatrix();
 
@@ -58,6 +58,7 @@ class CameraScene{
         int previousY;
 
         float speedFactor = 0.1;
+        float orthoFOV = 10.0;
 };
 
 }

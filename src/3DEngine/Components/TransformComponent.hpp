@@ -28,17 +28,17 @@ public:
 
 	void Refresh();
 public slots:
-	void SetScaleX(double x);
-	void SetScaleY(double y);
-	void SetScaleZ(double z);
+	void SetScaleX(float x);
+	void SetScaleY(float y);
+	void SetScaleZ(float z);
 
-	void SetRotationX(double x);
-	void SetRotationY(double y);
-	void SetRotationZ(double z);
+	void SetRotationX(float x);
+	void SetRotationY(float y);
+	void SetRotationZ(float z);
 
-	void SetPositionX(double x);
-	void SetPositionY(double y);
-	void SetPositionZ(double z);
+	void SetPositionX(float x);
+	void SetPositionY(float y);
+	void SetPositionZ(float z);
 };
 
 class TransformComponent : public Component {
@@ -53,26 +53,26 @@ class TransformComponent : public Component {
 
 		TransformInspector* GetInspector();
 
-        glm::dvec3 position;
-        glm::dvec3 rotation;
-        glm::dvec3 scale;
+        glm::vec3 position;
+        glm::vec3 rotation;
+        glm::vec3 scale;
 
-        glm::dmat4 GetTransRotMatrix(); 
-        glm::dmat4 GetModelMatrix(); 
-        glm::dvec3 GetScale(); 
+        glm::mat4 GetTransRotMatrix(); 
+        glm::mat4 GetModelMatrix(); 
+        glm::vec3 GetScale(); 
         
         glm::mat4 GetWorldModelMatrix();
 
-        glm::dmat4 GetWorldTransRotMatrix(); 
-        glm::dmat4 GetWorldTransScaleMatrix(); 
-        glm::dmat4 GetWorldRotationMatrix();
+        glm::mat4 GetWorldTransRotMatrix(); 
+        glm::mat4 GetWorldTransScaleMatrix(); 
+        glm::mat4 GetWorldRotationMatrix();
 
-		glm::dvec3 GetWorldPosition();
-		glm::dvec3 GetWorldScale();
+		glm::vec3 GetWorldPosition();
+		glm::vec3 GetWorldScale();
 
-		void SetWorldX(double x);
-		void SetWorldY(double y);
-		void SetWorldZ(double z);
+		void SetWorldX(float x);
+		void SetWorldY(float y);
+		void SetWorldZ(float z);
 
         bool isScreenSize = false;
 

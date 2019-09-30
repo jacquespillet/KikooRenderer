@@ -13,17 +13,17 @@ namespace KikooRenderer {
 namespace Util {
 namespace FileIO {
 
-void GetModelBuffers(std::string filename, std::vector<glm::dvec3>* vertex, std::vector<glm::dvec3>* normals, std::vector<glm::dvec2>* uv, std::vector<glm::dvec4>* colors, std::vector<int>* triangles) {
+void GetModelBuffers(std::string filename, std::vector<glm::vec3>* vertex, std::vector<glm::vec3>* normals, std::vector<glm::vec2>* uv, std::vector<glm::vec4>* colors, std::vector<int>* triangles) {
     FILE * file = fopen(filename.c_str(), "r");
     if( file == NULL ){
         std::cout << "Cannot open OBJ file" << std::endl;
         return;
     }
 
-    std::vector<glm::dvec3> tmpVertex;
-    std::vector<glm::dvec3> tmpNormals;
-    std::vector<glm::dvec2> tmpUv;
-    std::vector<glm::dvec4> tmpColors;
+    std::vector<glm::vec3> tmpVertex;
+    std::vector<glm::vec3> tmpNormals;
+    std::vector<glm::vec2> tmpUv;
+    std::vector<glm::vec4> tmpColors;
     std::vector<int> uvIndices;
     std::vector<int> normalIndices;
 
@@ -66,9 +66,9 @@ void GetModelBuffers(std::string filename, std::vector<glm::dvec3>* vertex, std:
         }     
     }
     (*vertex) = tmpVertex;
-    (*normals).resize(triangles->size(), glm::dvec3(1, 0, 0));
-    (*uv).resize(triangles->size(), glm::dvec2(0, 0));
-    (*colors).resize(triangles->size(), glm::dvec4(1, 1, 1, 1));
+    (*normals).resize(triangles->size(), glm::vec3(1, 0, 0));
+    (*uv).resize(triangles->size(), glm::vec2(0, 0));
+    (*colors).resize(triangles->size(), glm::vec4(1, 1, 1, 1));
 
     for(int i=0; i<triangles->size(); i++) {
         (*normals)[(*triangles)[i]] = tmpNormals[normalIndices[i]];
@@ -76,7 +76,7 @@ void GetModelBuffers(std::string filename, std::vector<glm::dvec3>* vertex, std:
     }  
 }
 
-void processNode(aiNode *node, const aiScene *scene, std::vector<glm::dvec3>* vertex, std::vector<glm::dvec3>* normals, std::vector<glm::dvec2>* uv, std::vector<glm::dvec4>* colors, std::vector<int>* triangles) {
+void processNode(aiNode *node, const aiScene *scene, std::vector<glm::vec3>* vertex, std::vector<glm::vec3>* normals, std::vector<glm::vec2>* uv, std::vector<glm::vec4>* colors, std::vector<int>* triangles) {
     // process all the node's meshes (if any)
     std::cout << "Processing node " <<node->mNumMeshes <<  std::endl;
     for(unsigned int i = 0; i < node->mNumMeshes; i++)
@@ -122,7 +122,7 @@ void processNode(aiNode *node, const aiScene *scene, std::vector<glm::dvec3>* ve
     }
 }
 
-void LoadModel(std::string filename, std::vector<glm::dvec3>* vertex, std::vector<glm::dvec3>* normals, std::vector<glm::dvec2>* uv, std::vector<glm::dvec4>* colors, std::vector<int>* triangles) {
+void LoadModel(std::string filename, std::vector<glm::vec3>* vertex, std::vector<glm::vec3>* normals, std::vector<glm::vec2>* uv, std::vector<glm::vec4>* colors, std::vector<int>* triangles) {
     Assimp::Importer import;
     const aiScene *scene = import.ReadFile(filename, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_FlipWindingOrder); 
 

@@ -11,8 +11,8 @@ struct Node {
     Node* parent;
     std::vector<Node*> children;
     std::vector<CoreEngine::Object3D*> objects;
-    glm::dvec3 position;
-    glm::dvec3 size;
+    glm::vec3 position;
+    glm::vec3 size;
 	int level;
 };
 

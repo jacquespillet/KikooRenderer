@@ -25,12 +25,12 @@ WaterTile_2::WaterTile_2(std::string name, Scene* scene) : Object3D(name, scene)
     }
     
     
-    quad = GetQuad(scene, "plane", glm::dvec3(0, 0 , 0), glm::dvec3(90, 0, 0), glm::dvec3(1), glm::dvec4(0.5, 0.5, 0.5, 1));
+    quad = GetQuad(scene, "plane", glm::vec3(0, 0 , 0), glm::vec3(90, 0, 0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
     quad->Start();
     quad->Enable();
 
-    quadMaterial = quad->GetComponent<MaterialComponent>();
-    quadMaterial->SetShader(&waterShader);
+    quamaterial = quad->GetComponent<MaterialComponent>();
+    quamaterial->SetShader(&waterShader);
 
     
 }

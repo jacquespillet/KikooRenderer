@@ -25,7 +25,7 @@ class LightInspector : public QGroupBox {
 
 class LightComponent : public Component {
     public:
-        LightComponent(Object3D* object, glm::dvec4 color, glm::dvec3 attenuation, int type);
+        LightComponent(Object3D* object, glm::vec4 color, glm::vec3 attenuation, int type);
         void OnStart();
         void OnEnable();
         void OnUpdate();
@@ -40,8 +40,8 @@ class LightComponent : public Component {
         LightInspector* GetInspector();
 
         int type; //0 directional, 1 point, 2 spot
-        glm::dvec3 attenuation;
-        glm::dvec4 color;
+        glm::vec3 attenuation;
+        glm::vec4 color;
         double intensity=1;
 		double fov;
 
@@ -54,9 +54,9 @@ class LightComponent : public Component {
         //Directional Shadow Map
         Shader depthPassShader;
 	    Framebuffer* depthFBO;
-        glm::dmat4 lightProjection;
-        glm::dmat4 viewMat;
-        glm::dmat4 lightSpaceMatrix;
+        glm::mat4 lightProjection;
+        glm::mat4 viewMat;
+        glm::mat4 lightSpaceMatrix;
 
         //Cubemap shadow map
         Shader cubeDepthPassShader;

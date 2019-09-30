@@ -55,10 +55,10 @@ class MeshFilterComponent : public Component {
 
 
 
-        void LoadFromBuffers(std::vector<glm::dvec3> _vertex,
-        std::vector<glm::dvec3> _normals,
-        std::vector<glm::dvec2> _uv,
-        std::vector<glm::dvec4> _colors,
+        void LoadFromBuffers(std::vector<glm::vec3> _vertex,
+        std::vector<glm::vec3> _normals,
+        std::vector<glm::vec2> _uv,
+        std::vector<glm::vec4> _colors,
         std::vector<int> _triangles, 
         bool calculateTangents = false);
         
@@ -88,7 +88,7 @@ class MeshFilterComponent : public Component {
 		}
     private: 
         void InitBuffers();
-        void CalculateTangents(std::vector<glm::vec4>& tangents, std::vector<glm::dvec3> _vertices, std::vector<glm::dvec3> _normals, std::vector<glm::dvec2> _uv,std::vector<int> _triangles);
+        void CalculateTangents(std::vector<glm::vec4>& tangents, std::vector<glm::vec3> _vertices, std::vector<glm::vec3> _normals, std::vector<glm::vec2> _uv,std::vector<int> _triangles);
 
         std::vector<int> triangles;
 

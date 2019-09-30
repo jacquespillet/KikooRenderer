@@ -9,9 +9,9 @@ namespace KikooRenderer
 namespace CoreEngine
 {
 namespace Util {
-    bool RayBoxTest(glm::dvec3 rayOrig, glm::dvec3 rayDir, glm::dmat4 transform, glm::dvec3 minScale,glm::dvec3 maxScale, double& distance);
+    bool RayBoxTest(glm::vec3 rayOrig, glm::vec3 rayDir, glm::mat4 transform, glm::vec3 minScale,glm::vec3 maxScale, double& distance);
 
-	bool RayWireCircleTest(glm::dvec3 rayOrig, glm::dvec3 rayDir, glm::dmat4 transform, float radius, double& distance);
+	bool RayWireCircleTest(glm::vec3 rayOrig, glm::vec3 rayDir, glm::mat4 transform, float radius, double& distance);
 
     
     bool CameraBoxTest(CameraScene& camera, TransformComponent* transform);

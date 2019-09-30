@@ -32,16 +32,16 @@ void InsertionSort(std::vector<Particle>& arr)
 ParticleSystem::ParticleSystem(std::string name, Scene* scene) : Object3D(name, scene) {
     particleShader = GetParticleShader();
     
-    quad = GetQuad(scene, "particle", glm::dvec3(0), glm::dvec3(0), glm::dvec3(0.3), glm::dvec4(0.5, 0.5, 0.5, 1));
+    quad = GetQuad(scene, "particle", glm::vec3(0), glm::vec3(0), glm::vec3(0.3), glm::vec4(0.5, 0.5, 0.5, 1));
     quad->Start();
     quad->Enable();
     quad->faceCamera = true;
 
-    quadMaterial =  quad->GetComponent<MaterialComponent>();
-    quadMaterial->SetShader(&particleShader);
+    quamaterial =  quad->GetComponent<MaterialComponent>();
+    quamaterial->SetShader(&particleShader);
 
     Texture albedoTex = Texture("C:/Users/Jacques/Pictures/Textures/Particles/particleAtlas.png", GL_TEXTURE0);
-    quadMaterial->albedoTex = albedoTex;
+    quamaterial->albedoTex = albedoTex;
     numRows = 4;
 
     quadMeshFilter = quad->GetComponent<MeshFilterComponent>();

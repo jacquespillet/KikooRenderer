@@ -16,8 +16,8 @@ namespace OfflineRenderer {
     }
 
 
-    glm::dvec3 RayTracer::GetColor(KikooRenderer::Geometry::Ray ray, int depth) {
-        Point closestPoint = {99999999999999999, glm::dvec3(0), glm::dvec3(0)};
+    glm::vec3 RayTracer::GetColor(KikooRenderer::Geometry::Ray ray, int depth) {
+        Point closestPoint = {99999999999999999, glm::vec3(0), glm::vec3(0)};
         bool hit = false;
         for(int i=0; i<objects.size(); i++) {
             Point hitPoint;
@@ -32,16 +32,16 @@ namespace OfflineRenderer {
 
         if(hit) {
             KikooRenderer::Geometry::Ray scattered;
-            glm::dvec3 attenuation;
+            glm::vec3 attenuation;
             if(depth < 50 && closestPoint.material->Scatter(ray, closestPoint, attenuation, scattered)) {
                 return attenuation * GetColor(scattered, depth+1);
             } else {
-                return glm::dvec3(0, 0, 0);
+                return glm::vec3(0, 0, 0);
             }
         } else {                   
-             glm::dvec3 direction = glm::normalize(ray.direction);
+             glm::vec3 direction = glm::normalize(ray.direction);
             double t = 0.5 * direction.y + 1.0;
-            glm::dvec3 backgroundColor = (1.0 - t) * glm::dvec3(1, 1, 1) + t * glm::dvec3(0.5, 0.7, 1);
+            glm::vec3 backgroundColor = (1.0 - t) * glm::vec3(1, 1, 1) + t * glm::vec3(0.5, 0.7, 1);
             return backgroundColor;
         }
     }
@@ -52,14 +52,14 @@ namespace OfflineRenderer {
         int numSamples = 100;
 
         KikooRenderer::Util::FileIO::Image image(width, height); 
-        glm::dvec3 camPos = glm::dvec3(1, 1, 1.5);
-        glm::dvec3 lookAt = glm::dvec3(0, 0, 0);
+        glm::vec3 camPos = glm::vec3(1, 1, 1.5);
+        glm::vec3 lookAt = glm::vec3(0, 0, 0);
         double distanceToFocus = glm::distance(camPos, lookAt);
-        Camera camera(camPos, lookAt, glm::dvec3(0, 1, 0), 90, (double)width/(double)height, 0.0001, distanceToFocus, 0, 1);
+        Camera camera(camPos, lookAt, glm::vec3(0, 1, 0), 90, (double)width/(double)height, 0.0001, distanceToFocus, 0, 1);
         
         {
-            Material material(glm::dvec4(0.2, 0.2, 0.2, 1.0), false);
-            Sphere* sphere = new Sphere(glm::dvec3(0, -1000, 0), 1000, material);
+            Material material(glm::vec4(0.2, 0.2, 0.2, 1.0), false);
+            Sphere* sphere = new Sphere(glm::vec3(0, -1000, 0), 1000, material);
             objects.push_back(sphere);
         }
 
@@ -74,38 +74,38 @@ namespace OfflineRenderer {
                 double b = ((double) rand()) / (double) RAND_MAX;
                 if(materialRandom < 0.2) { //Dielectric
                     double refInx = ((double) rand()) / (double) RAND_MAX + 1.0;
-                    Material material(glm::dvec4(r, g, b, 0.5), false);
+                    Material material(glm::vec4(r, g, b, 0.5), false);
                     material.refInx = refInx; 
-                    Sphere* sphere = new Sphere(glm::dvec3(xPos, 0.2, zPos), radius, material);
+                    Sphere* sphere = new Sphere(glm::vec3(xPos, 0.2, zPos), radius, material);
                     objects.push_back(sphere);
                 } else if(materialRandom < 0.5) { // Metallic
                     double fuzz = ((double) rand()) / (double) RAND_MAX;
-                    Material material(glm::dvec4(r, g, b, 1.0), true);
+                    Material material(glm::vec4(r, g, b, 1.0), true);
                     material.fuzz = fuzz;
-                    Sphere* sphere = new Sphere(glm::dvec3(xPos, 0.2, zPos), radius, material);
+                    Sphere* sphere = new Sphere(glm::vec3(xPos, 0.2, zPos), radius, material);
                     objects.push_back(sphere);
                 } else { //Diffuse
-                    Material material(glm::dvec4(r, g, b, 1.0), false);
-                    Sphere* sphere = new Sphere(glm::dvec3(xPos, 0.2, zPos), radius, material);
+                    Material material(glm::vec4(r, g, b, 1.0), false);
+                    Sphere* sphere = new Sphere(glm::vec3(xPos, 0.2, zPos), radius, material);
                     objects.push_back(sphere);
                 }
             }
         }
 
-        Material material(glm::dvec4(0.7,0.6,0.5, 1.0), true);
+        Material material(glm::vec4(0.7,0.6,0.5, 1.0), true);
         material.fuzz = 0.0;
-        Sphere* sphere = new Sphere(glm::dvec3(0,1, 0), 1.0, material);
+        Sphere* sphere = new Sphere(glm::vec3(0,1, 0), 1.0, material);
         objects.push_back(sphere);
 
-        Material material2(glm::dvec4(0,1,0, 0.5), true);
+        Material material2(glm::vec4(0,1,0, 0.5), true);
         material2.refInx = 1.5;
-        Sphere* sphere2 = new Sphere(glm::dvec3(-4,1, 0), 1.0, material2);
+        Sphere* sphere2 = new Sphere(glm::vec3(-4,1, 0), 1.0, material2);
         objects.push_back(sphere2);
 
 
         for(int y=0; y<height; y++) {
             for(int x=0; x<width; x++) {
-                glm::dvec3 color(0);
+                glm::vec3 color(0);
 
                 for(int i=0; i<numSamples; i++) {
                     double randomX = ((double) rand()) / (double) RAND_MAX;

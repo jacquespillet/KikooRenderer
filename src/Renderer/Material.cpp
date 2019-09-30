@@ -6,15 +6,15 @@
 namespace KikooRenderer{
 namespace OfflineRenderer {
 
-    Material::Material(glm::dvec4 albedo, bool metallic) : albedo(albedo), metallic(metallic) {}
-    bool Material::Scatter(KikooRenderer::Geometry::Ray in,  Point point, glm::dvec3& attenuation, KikooRenderer::Geometry::Ray& scattered) {
+    Material::Material(glm::vec4 albedo, bool metallic) : albedo(albedo), metallic(metallic) {}
+    bool Material::Scatter(KikooRenderer::Geometry::Ray in,  Point point, glm::vec3& attenuation, KikooRenderer::Geometry::Ray& scattered) {
         //Lambertian
         if(albedo.a < 1.0) {
-             glm::dvec3 outNormal;
-             glm::dvec3 reflected = glm::reflect(in.direction, point.normal);
+             glm::vec3 outNormal;
+             glm::vec3 reflected = glm::reflect(in.direction, point.normal);
              double niOverNt;
-             attenuation = glm::dvec3(1.0, 1.0, 1.0);
-             glm::dvec3 refracted;
+             attenuation = glm::vec3(1.0, 1.0, 1.0);
+             glm::vec3 refracted;
              double probability;
              double cosine;
              if (glm::dot(in.direction, point.normal) > 0) {
@@ -43,14 +43,14 @@ namespace OfflineRenderer {
              }
              return true;
         } else if(!metallic) {
-            glm::dvec3 target = point.position + point.normal + Geometry::randomInSphere();
+            glm::vec3 target = point.position + point.normal + Geometry::randomInSphere();
             scattered = Geometry::Ray(point.position, target-point.position);
             attenuation = albedo;
             return true;
         } else {
             // double fuzz = 0;
             //Metallic
-            glm::dvec3 reflected = glm::reflect(glm::normalize(in.direction), glm::normalize(point.normal));
+            glm::vec3 reflected = glm::reflect(glm::normalize(in.direction), glm::normalize(point.normal));
             scattered = Geometry::Ray(point.position, reflected + fuzz * Geometry::randomInSphere());
             attenuation = albedo;
             return glm::dot(scattered.direction, point.normal) > 0;

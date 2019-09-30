@@ -297,7 +297,7 @@ namespace CoreEngine {
         shader.name = "nullFXAAPostProcess";
         shader.Compile();
         
-        quad = GetQuad(scene, "plane", glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
+        quad = GetQuad(scene, "plane", glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(1, 1, 1, 1));
         material = quad->GetComponent<MaterialComponent>();
         material->SetShader(&shader);
         
