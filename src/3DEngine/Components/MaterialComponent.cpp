@@ -15,7 +15,7 @@ namespace KikooRenderer {
 namespace CoreEngine {
 
 
-MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : QGroupBox("Material") {
+MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : ComponentInspector("Material", materialComponent) {
 	this->materialComponent = materialComponent;
 	Object3D* object = materialComponent->object3D;
 	scene = object->scene;
@@ -151,7 +151,7 @@ void MaterialComponent::OnRender(){}
 void MaterialComponent::OnDestroy(){} 
 void MaterialComponent::Recompute(){} 
 
-MaterialInspector* MaterialComponent::GetInspector() {
+ComponentInspector* MaterialComponent::GetInspector() {
 	materialInspector = new MaterialInspector(this);
 	return materialInspector;
 }
@@ -271,7 +271,6 @@ void MaterialComponent::SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 vie
 								varName = "lights[" + std::to_string(i) + "].direction";
 								loc = ogl->glGetUniformLocation(this->shader.programShaderObject, varName.c_str());
 								ogl->glUniform3fv(loc, 1, glm::value_ptr(glm::vec3(glm::column(transformComponent->GetModelMatrix(), 2))));
-								std::cout << "Setting transforms" << std::endl;
 
 								transformComponent->hasChanged = false;
 							}
@@ -312,7 +311,6 @@ void MaterialComponent::SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 vie
 									loc = ogl->glGetUniformLocation(this->shader.programShaderObject, varName.c_str());
 									ogl->glUniform1f(loc, lightComponent->farClip);								
 								}
-								std::cout << "Setting lights" << std::endl;
 								lightComponent->hasChanged = false;
 							}
 

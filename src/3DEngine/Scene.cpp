@@ -48,8 +48,6 @@ namespace CoreEngine {
         skyboxCube->Start();
         skyboxCube->Enable();
 
-
-
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
             objects3D[i]->Start();
@@ -142,7 +140,7 @@ namespace CoreEngine {
     //Disable
 
     void Scene::OnDestroy() { 
-        std::cout << "Destroying scene" << std::endl;
+        std::cout << "Scene:OnDestroy: Destroying scene" << std::endl;
         for(int i=0; i<objects3D.size(); i++) {
             objects3D[i]->Destroy();
             delete objects3D[i];
@@ -233,7 +231,7 @@ namespace CoreEngine {
     void Scene::HandleSelection(int x, int y) {
         Object3D* intersectedObject = GetIntersectObject(x, y);
         if(intersectedObject != nullptr) {
-			std::cout << intersectedObject->name << std::endl;
+			std::cout <<"Scene:HandleSelection:" << intersectedObject->name << std::endl;
 			AddObjectToSelection(true, intersectedObject);
         } else if(!transformWidget->visible) { 
             ClearSelection();

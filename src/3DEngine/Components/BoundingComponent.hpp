@@ -24,6 +24,8 @@ namespace CoreEngine {
         void GetWorldBounds(glm::vec3* _min, glm::vec3* _max);
         void GetLocalBounds(glm::vec3* _min, glm::vec3* _max);
         
+        ComponentInspector* GetInspector(){return nullptr;}
+        
         void Refresh();
 
         glm::vec3 min;

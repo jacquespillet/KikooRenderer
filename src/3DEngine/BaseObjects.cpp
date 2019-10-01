@@ -34,8 +34,6 @@ Object3D* GetCube(Scene* scene, std::string name, glm::vec3 _position, glm::vec3
 
     Shader shader = scene->standardShaders.unlitMeshShader;
     material->SetShader(shader);
-    std::cout << "In object " << &shader << std::endl;
-    std::cout << "In scene " << &scene->standardShaders.unlitMeshShader << std::endl;
 
     BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
 

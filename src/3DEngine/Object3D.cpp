@@ -121,36 +121,6 @@ void Object3D::Destroy() {
     }
 }
 
-// Component* Object3D::GetComponentt(){
-// 	for(int i=0; i<components.size(); i++) {
-// 		std::cout << i << std::endl; 
-// 		if (reinterpret_cast<T*>(components[i])) {
-// 			return components[i];
-// 		}
-// 	}
-// 	return nullptr;
-// }
-
-// Component* Object3D::GetComponent(std::string name) {
-// 	for(int i=0; i<components.size(); i++) {
-// 		if(components[i]->name == name) {
-// 			return components[i];
-// 		}
-// 	}
-// 	return nullptr;
-// }
-
-
-// template <typename T>
-// Component* Object3D::GetComponentt() {
-// 	for(int i=0; i<components.size(); i++) { 
-// 		if (dynamic_cast<T*>(components[i])) {
-// 			std::cout << "FOUND "<< std::endl;
-// 		}
-// 	}
-// 	return nullptr;
-// }
-
 void Object3D::WindowResize(int w, int h) {}
 
 void Object3D::Render(glm::mat4* overrideViewMatrix) {

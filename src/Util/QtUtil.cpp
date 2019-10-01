@@ -3,7 +3,7 @@
 namespace KikooRenderer {
 void EmptyLayout(QLayout* layout)  {
 	if (!layout) {
-		std::cout << "layout null" << std::endl;
+		std::cout << "QtUtil:EmptyLayout: layout null" << std::endl;
 		return;
 	}
 	while(layout->count() > 0)

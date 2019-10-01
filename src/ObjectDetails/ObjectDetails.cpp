@@ -47,28 +47,17 @@ namespace KikooRenderer
 		connect(rootWidget, &ObjectDetailRoot::InspectorModified, [this]() {
 			currentObject->scene->triggerRefresh = true;
 		});
+		
 
 		transformInspector = currentObject->transform->GetInspector();
 		rootWidget->mainLayout->addWidget(transformInspector);
 
-		material = (currentObject->GetComponent<CoreEngine::MaterialComponent>());
-		if (material != nullptr) {
-			CoreEngine::MaterialInspector* materialInspector = material->GetInspector();
-			rootWidget->mainLayout->addWidget(materialInspector);
+		for(int i=0; i<currentObject->components.size(); i++) {
+			CoreEngine::ComponentInspector* inspector = currentObject->components[i]->GetInspector();
+			if(inspector !=nullptr) {
+				rootWidget->mainLayout->addWidget(inspector);
+			}
 		}
-
-		CoreEngine::MeshFilterComponent* meshFilterComponent = (currentObject->GetComponent<CoreEngine::MeshFilterComponent>());
-		if (meshFilterComponent != nullptr) {
-			CoreEngine::MeshFilterInspector* meshFilterComponentInspector = meshFilterComponent->GetInspector();
-			rootWidget->mainLayout->addWidget(meshFilterComponentInspector);
-		}
-		
-		CoreEngine::LightComponent* lightComponent = (currentObject->GetComponent<CoreEngine::LightComponent>());
-		if (lightComponent != nullptr) {
-			CoreEngine::LightInspector* lightInspector = lightComponent->GetInspector();
-			rootWidget->mainLayout->addWidget(lightInspector);
-		}
-
 	}
 
 	void ObjectDetailsPanel::Refresh() {

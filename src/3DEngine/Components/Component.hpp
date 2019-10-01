@@ -3,7 +3,23 @@
 
 namespace KikooRenderer {
 namespace CoreEngine {
+
+class Component;
+class Scene;
 class Object3D;
+
+class ComponentInspector : public QGroupBox {
+	Q_OBJECT
+	public:
+		ComponentInspector(std::string name, Component* component);
+		Component* component;
+		Scene* scene;
+
+		QVBoxLayout* mainLayout;
+
+		void Refresh();
+};
+
 class Component  {
     public: 
         std::string name;
@@ -16,6 +32,7 @@ class Component  {
         virtual void OnRender()=0;
         virtual void OnDestroy()=0;
         virtual void Recompute()=0;
+        virtual ComponentInspector* GetInspector()=0;
 
         bool inited;
 

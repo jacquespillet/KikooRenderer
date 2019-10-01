@@ -44,7 +44,7 @@ namespace CoreEngine
 			texType = GL_RED;
 		}
 
-		std::cout << "NUM CHANNELS " << path << "  " <<  nrChannels << std::endl;
+		std::cout << "Texture:Constructor: Num channels " << path << "  " <<  nrChannels << std::endl;
 		if (data)
 		{
 			ogl->glTexImage2D(GL_TEXTURE_2D, 0, texType, width, height, 0, texType, GL_UNSIGNED_BYTE, data);
@@ -52,7 +52,7 @@ namespace CoreEngine
 		}
 		else
 		{
-			std::cout << "Failed to load texture" << std::endl;
+			std::cout << "Texture:Constructor: ERROR::Failed to load texture" << std::endl;
 			return;
 		} 
 		stbi_image_free(data);
@@ -119,7 +119,7 @@ namespace CoreEngine
 		}
 		else
 		{
-			std::cout << "Failed to load texture" << std::endl;
+			std::cout << "Texture:Constructor: ERROR::Failed to load texture" << std::endl;
 			return;
 		} 
 		stbi_image_free(data);

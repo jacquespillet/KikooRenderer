@@ -16,7 +16,7 @@ namespace FileIO {
 void GetModelBuffers(std::string filename, std::vector<glm::vec3>* vertex, std::vector<glm::vec3>* normals, std::vector<glm::vec2>* uv, std::vector<glm::vec4>* colors, std::vector<int>* triangles) {
     FILE * file = fopen(filename.c_str(), "r");
     if( file == NULL ){
-        std::cout << "Cannot open OBJ file" << std::endl;
+        std::cout << "ModelLoader:GetModelBuffers: Cannot open OBJ file" << std::endl;
         return;
     }
 
@@ -51,7 +51,7 @@ void GetModelBuffers(std::string filename, std::vector<glm::vec3>* vertex, std::
             unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
             int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2] );
             if (matches != 9){
-                std::cout << "Cannot read OBJ : Try exporting with other options " <<std::endl;
+                std::cout << "ModelLoader:GetModelBuffers: Cannot read OBJ : Try exporting with other options " <<std::endl;
                 return;
             }
             triangles->push_back(vertexIndex[0] - 1);
@@ -78,7 +78,7 @@ void GetModelBuffers(std::string filename, std::vector<glm::vec3>* vertex, std::
 
 void processNode(aiNode *node, const aiScene *scene, std::vector<glm::vec3>* vertex, std::vector<glm::vec3>* normals, std::vector<glm::vec2>* uv, std::vector<glm::vec4>* colors, std::vector<int>* triangles) {
     // process all the node's meshes (if any)
-    std::cout << "Processing node " <<node->mNumMeshes <<  std::endl;
+    std::cout << "ModelLoader:processNode: Processing node " <<node->mNumMeshes <<  std::endl;
     for(unsigned int i = 0; i < node->mNumMeshes; i++)
     {
         aiMesh *mesh = scene->mMeshes[node->mMeshes[i]]; 
@@ -128,7 +128,7 @@ void LoadModel(std::string filename, std::vector<glm::vec3>* vertex, std::vector
 
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) 
     {
-        std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
+        std::cout << "ModelLoader:LoaderModel: ERROR::" << import.GetErrorString() << std::endl;
         return;
     }
     std::string directory = filename.substr(0, filename.find_last_of('/'));

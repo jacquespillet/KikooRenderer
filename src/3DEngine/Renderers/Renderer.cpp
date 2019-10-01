@@ -23,7 +23,6 @@ void Renderer::AddPostEffect(PostProcess* postProcess) {}
 void Renderer::RemovePostEffect(PostProcess* postProcess) {}
 
 void Renderer::SetGammaCorrection(bool value) {
-//     std::cout << "HERE"<<std::endl;
 //     this->scene->glWindow->makeCurrent();
 //     GETGL
 //     if(value) ogl->glEnable(GL_FRAMEBUFFER_SRGB); 

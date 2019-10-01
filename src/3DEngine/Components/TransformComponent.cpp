@@ -6,7 +6,7 @@
 namespace KikooRenderer {
 namespace CoreEngine {
 
-TransformInspector::TransformInspector(TransformComponent* transformComponent) : QGroupBox("Transform") {
+TransformInspector::TransformInspector(TransformComponent* transformComponent) : ComponentInspector("Transform", transformComponent)  {
 	setLocale(QLocale("C")); //For . as , in float spin boxes
 
 	this->transformComponent = transformComponent;
@@ -140,7 +140,8 @@ void TransformComponent::OnEnable(){}
 void TransformComponent::OnUpdate(){}
 void TransformComponent::OnRender(){} 
 void TransformComponent::OnDestroy(){} 
-TransformInspector* TransformComponent::GetInspector() {
+
+ComponentInspector* TransformComponent::GetInspector() {
 	transformInspector = new TransformInspector(this);
 	return transformInspector;
 }

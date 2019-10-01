@@ -111,7 +111,6 @@ namespace CoreEngine {
 		visible = true;
 		isTransforming = true;
 		isFirstFrame = true;
-		// std::cout << object->name << std::endl;
 		if      (object->name == "coneX" || object->name == "cubeX" || object->name == "CircleX") axis = TransformAxis::X;
 		else if (object->name == "coneY" || object->name == "cubeY" || object->name == "CircleY") axis = TransformAxis::Y;
 		else if (object->name == "coneZ" || object->name == "cubeZ" || object->name == "CircleZ") axis = TransformAxis::Z;
@@ -367,7 +366,6 @@ namespace CoreEngine {
 					}
 				}
 			}
-			// std::cout << intersectInx << std::endl;
 			if(intersectInx >= 0) res = rotateObject->childObjects[intersectInx];
 		}
 

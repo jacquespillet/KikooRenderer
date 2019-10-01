@@ -10,7 +10,7 @@
 namespace KikooRenderer {
 namespace CoreEngine {
     
-LightInspector::LightInspector(LightComponent* lightComponent) : QGroupBox("Light") {
+LightInspector::LightInspector(LightComponent* lightComponent) : ComponentInspector("Light", lightComponent) {
 	this->lightComponent = lightComponent;
 	Object3D* object = lightComponent->object3D;
 	scene = object->scene;
@@ -138,7 +138,7 @@ void LightComponent::SetType(int type) {
         depthPassShader.name = "quad";
         depthPassShader.isLit = false;
         depthPassShader.isDepthPass = true;
-        std::cout << "StandardShaders: Compiling depthPassShader" << std::endl; 
+        std::cout << "LightComponent:SetType:Compiling directional light depth Pass Shader" << std::endl; 
         depthPassShader.Compile();
         depthPassShader.shouldRecompile = false;
 
@@ -206,7 +206,7 @@ void LightComponent::SetType(int type) {
         cubeDepthPassShader.name = "quad";
         cubeDepthPassShader.isLit = false;
         cubeDepthPassShader.isDepthPass = true;
-        std::cout << "StandardShaders: Compiling cubeDepthPassShader" << std::endl; 
+        std::cout << "LightComponent:SetType: Compiling pointlight Depth Pass Shader" << std::endl; 
         cubeDepthPassShader.Compile();
         cubeDepthPassShader.shouldRecompile = false;
     } else if(type==2) {
@@ -237,7 +237,7 @@ void LightComponent::SetType(int type) {
         depthPassShader.name = "quad";
         depthPassShader.isLit = false;
         depthPassShader.isDepthPass = true;
-        std::cout << "StandardShaders: Compiling depthPassShader" << std::endl; 
+        std::cout << "LightComponent:SetType: Compiling spotlight Depth Pass Shader" << std::endl; 
         depthPassShader.Compile();
         depthPassShader.shouldRecompile = false;
     }
@@ -246,8 +246,7 @@ void LightComponent::SetType(int type) {
     
 }
 
-
-LightInspector* LightComponent::GetInspector() {
+ComponentInspector* LightComponent::GetInspector() {
 	lightInspector = new LightInspector(this);
 	return lightInspector;
 }

@@ -27,7 +27,6 @@ public:
     virtual void SetUniforms() {
         GETGL
 
-        // std::cout << "INSIDE " << this->shader << "  " <<  this->shader->programShaderObject << std::endl;
         int ambientFactorLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "ambientFactor");
         ogl->glUniform1f(ambientFactorLocation, ambientFactor);
 

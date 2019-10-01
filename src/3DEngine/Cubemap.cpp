@@ -36,7 +36,7 @@ Cubemap::Cubemap(std::vector<std::string> files) {
         }
         else
         {
-            std::cout << "Cubemap texture failed to load at path: " << files[i] << std::endl;
+            std::cout << "Cubemap:Constructor: Cubemap texture failed to load at path: " << files[i] << std::endl;
             stbi_image_free(data);
         }
     }

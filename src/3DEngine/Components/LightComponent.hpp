@@ -10,7 +10,7 @@ namespace KikooRenderer {
 namespace CoreEngine {
 
 class LightComponent;
-class LightInspector : public QGroupBox {
+class LightInspector : public ComponentInspector {
 	Q_OBJECT
 	public:
 		LightInspector(LightComponent* lightComponent);
@@ -37,8 +37,7 @@ class LightComponent : public Component {
 
         
         LightInspector* lightInspector;
-        LightInspector* GetInspector();
-
+        ComponentInspector* GetInspector();
         int type; //0 directional, 1 point, 2 spot
         glm::vec3 attenuation;
         glm::vec4 color;

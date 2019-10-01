@@ -37,7 +37,7 @@ std::string MeshFilterInspector::GetByPrimitiveMesh(PRIMITIVE_MESH type) {
 			break;
 	}
 }
-MeshFilterInspector::MeshFilterInspector(MeshFilterComponent* meshFilterComponent) : QGroupBox("Mesh Filter") {
+MeshFilterInspector::MeshFilterInspector(MeshFilterComponent* meshFilterComponent) : ComponentInspector("Mesh", meshFilterComponent) {
 	this->meshFilterComponent = meshFilterComponent;
 	Object3D* object = meshFilterComponent->object3D;
 	scene = object->scene;
@@ -151,10 +151,12 @@ void MeshFilterComponent::OnDestroy() {
 }
 void MeshFilterComponent::Recompute() {}
 
-MeshFilterInspector* MeshFilterComponent::GetInspector() {
+ComponentInspector* MeshFilterComponent::GetInspector() {
 	meshFilterInspector = new MeshFilterInspector(this);
 	return meshFilterInspector;
+
 }
+
 
 void MeshFilterComponent::CalculateTangents(std::vector<glm::vec4>& tangents ,std::vector<glm::vec3> _vertices,  std::vector<glm::vec3> normals, std::vector<glm::vec2> uv,std::vector<int> triangles) {
 	std::vector<glm::vec4> tan1(_vertices.size(), glm::vec4(0));

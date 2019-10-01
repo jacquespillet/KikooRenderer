@@ -8,7 +8,7 @@ class Object3D;
 class TransformComponent;
 class Scene;
 
-class TransformInspector : public QGroupBox {
+class TransformInspector : public ComponentInspector {
 	Q_OBJECT
 public:
 	TransformInspector(TransformComponent* transformComponent);
@@ -39,7 +39,7 @@ class TransformComponent : public Component {
         void OnDestroy();
 		void Recompute();
 
-		TransformInspector* GetInspector();
+        ComponentInspector* GetInspector();
 
         glm::vec3 position;
         glm::vec3 rotation;

@@ -40,7 +40,7 @@ ParticleSystem::ParticleSystem(std::string name, Scene* scene) : Object3D(name, 
     quamaterial =  quad->GetComponent<MaterialComponent>();
     quamaterial->SetShader(particleShader);
 
-    Texture albedoTex = Texture("C:/Users/Jacques/Pictures/Textures/Particles/particleAtlas.png", GL_TEXTURE0);
+    Texture albedoTex = Texture("resources/Textures/Particles/particleAtlas.png", GL_TEXTURE0);
     quamaterial->albedoTex = albedoTex;
     numRows = 4;
 

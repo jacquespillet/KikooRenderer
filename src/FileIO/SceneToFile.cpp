@@ -2,12 +2,11 @@
 
 namespace KikooRenderer {
     void SceneToFile(CoreEngine::Scene* scene, std::string fileName){
-        std::cout << fileName << std::endl;
+        std::cout <<"SceneToFile:SceneToFile: " << fileName << std::endl;
         QJsonObject sceneJson = scene->ToJSON();
 
 
         QJsonDocument saveDoc(sceneJson);
-        std::cout << saveDoc.toJson().constData() << std::endl;
         // saveFile.write(saveFormat == Json
         //     ? saveDoc.toJson()
         //     : saveDoc.toBinaryData());

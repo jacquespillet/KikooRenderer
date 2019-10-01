@@ -45,7 +45,7 @@ void Shader::Compile()
 		ogl->glShaderSource(geometryShaderObject, 1, gsrc, NULL);
 		ogl->glCompileShader(geometryShaderObject); 
 	}
-	std::cout << "Shader:Linking shader:" << std::endl;
+	std::cout << "Shader:Compile: Linking shader" << std::endl;
 	
 	//link vertex and fragment shader to create shader program object
 	programShaderObject = ogl->glCreateProgram();
@@ -53,7 +53,7 @@ void Shader::Compile()
 	ogl->glAttachShader(programShaderObject, fragmentShaderObject);
 	if(hasGeometry) ogl->glAttachShader(programShaderObject, geometryShaderObject);
 	ogl->glLinkProgram(programShaderObject);
-	std::cout << "Shader:checking shader status:" << std::endl;
+	std::cout << "Shader:Compile: checking shader status" << std::endl;
 	
 	//Check status of shader and log any compile time errors
 	int linkStatus;
@@ -63,7 +63,7 @@ void Shader::Compile()
 		char log[5000];
 		int logLen; 
 		ogl->glGetProgramInfoLog(programShaderObject, 5000, &logLen, log);
-		std::cerr << "Shader:Could not link program: " << std::endl;
+		std::cerr << "Shader:Compile: Could not link program: " << std::endl;
 		std::cerr << log << std::endl;
 		ogl->glGetShaderInfoLog(vertexShaderObject, 5000, &logLen, log);
 		std::cerr << "vertex shader log:\n" << log << std::endl;
@@ -74,7 +74,7 @@ void Shader::Compile()
 	}
 	else
 	{
-		std::cout << "Shader:compile success " << std::endl;
+		std::cout << "Shader:Compile: compile success " << std::endl;
 		compiled = true; 
 	}
 }

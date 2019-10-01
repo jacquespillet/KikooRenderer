@@ -102,7 +102,7 @@ namespace KikooRenderer {
         for(int i=0; i<skyboxStrings.size(); i++) {
             if(skyboxStrings[i] == "") { 
                 res = false;
-                std::cout << i << "Is not set "<<std::endl;
+                std::cout <<"BackgroundPreferences:IsAllPlanes: " << i << "Is not set "<<std::endl;
                 break;
             }
         }           

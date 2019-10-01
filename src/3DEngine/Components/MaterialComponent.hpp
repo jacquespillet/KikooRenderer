@@ -11,7 +11,7 @@ namespace CoreEngine {
 class MaterialComponent;
 
 
-class MaterialInspector : public QGroupBox {
+class MaterialInspector : public ComponentInspector {
 	Q_OBJECT
 	public:
 		MaterialInspector(MaterialComponent* materialComponent);
@@ -35,7 +35,7 @@ class MaterialComponent : public Component {
         void OnDestroy();
 		void Recompute();
 
-		MaterialInspector* GetInspector();
+        ComponentInspector* GetInspector();
         
         void SetShader(Shader shader);
         void SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 viewMatrix, glm::mat4 projectionMatrix, Scene* scene);

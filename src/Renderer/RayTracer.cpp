@@ -125,7 +125,6 @@ namespace OfflineRenderer {
 
                 image.SetPixel(x, height - y - 1, color);
             }
-            std::cout  << " y " << y << std::endl;
         }
 
         image.toPPM("Test.ppm");

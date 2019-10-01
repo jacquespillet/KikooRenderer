@@ -307,7 +307,6 @@ namespace CoreEngine {
     }
     void FXAAPostProcess::Run(Framebuffer* framebufferIn, Framebuffer* framebufferOut) {
         GETGL
-        // std::cout << "Writing " << framebufferOut << std::endl;
         framebufferOut->Enable();
         ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
         ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);

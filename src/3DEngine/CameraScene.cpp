@@ -183,7 +183,6 @@ Geometry::Ray CameraScene::GetRay(int x, int y) {
         ray.direction = glm::normalize(localToWorld * glm::vec4(ndcX, ndcY, ndcZ, 0));
     } else {
 		glm::vec4 posCameraSpace = glm::vec4(orthoFOV * ndcX * this->aspect, orthoFOV *ndcY, 0.0, 1.0);
-        std::cout << glm::to_string(posCameraSpace) << std::endl;
 		ray.origin = glm::vec3(localToWorld * posCameraSpace);
 		ray.direction = glm::vec3(localToWorld * glm::vec4(0.0, 0.0, 1.0, 0.0));
     }
@@ -201,7 +200,6 @@ Geometry::Ray CameraScene::GetRay(double x, double y) {
     double ndcX = (((x / (double)width) * 2.0) - 1.0) * this->aspect;
     double ndcY = 1.0 - ((y / (double)height) * 2.0);
     double ndcZ = 1 / std::tan(this->fov/2.0);
-    std::cout << "HERE" << std::endl;
     if(projectionType == ProjectionType::Perspective) {
         ray.origin = localToWorld *  glm::vec4(0, 0, 0, 1);
         ray.direction = glm::normalize(localToWorld * glm::vec4(ndcX, ndcY, ndcZ, 0));

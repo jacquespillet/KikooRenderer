@@ -19,6 +19,8 @@ namespace CoreEngine {
 
         MeshFilterComponent* meshFilter;
 
+        ComponentInspector* GetInspector(){return nullptr;}
+        
         int width = 100;
         int height = 100;
         int numVert;

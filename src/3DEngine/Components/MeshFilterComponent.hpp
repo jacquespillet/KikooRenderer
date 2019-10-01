@@ -8,7 +8,7 @@ namespace CoreEngine {
 enum PRIMITIVE_MESH {MODEL_MESH=0, CUBE_MESH=1, SPHERE_MESH=2, CIRCLE_MESH=3, CONE_MESH=4, QUAD_MESH=5, MESH_PRIMITIVE_ENUM_SIZE=6};
 
 class MeshFilterComponent;    
-class MeshFilterInspector : public QGroupBox {
+class MeshFilterInspector : public ComponentInspector {
 	Q_OBJECT
 	public:
 		MeshFilterInspector(MeshFilterComponent* meshFilterComponent);
@@ -51,7 +51,7 @@ class MeshFilterComponent : public Component {
 		void Recompute();
 
         MeshFilterInspector* meshFilterInspector;
-        MeshFilterInspector* GetInspector();
+        ComponentInspector* GetInspector();
 
 
 

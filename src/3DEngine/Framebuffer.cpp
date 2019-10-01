@@ -75,9 +75,9 @@ namespace CoreEngine {
 
 			// now that we actually created the fbo and added all attachments we want to check if it is actually complete now
 			if (ogl->glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
-				std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << width << "  " << height << std::endl;
+				std::cout << "Framebuffer:Constructor: ERROR:: Framebuffer is not complete!" << width << "  " << height << std::endl;
 			} else {
-				std::cout << "Succeffuly created FBO"<<std::endl;
+				std::cout << "Framebuffer:Constructor:  Framebuffer OK!"<<std::endl;
 			}
 		} else {
 			ogl->glGenFramebuffers(1, &fbo);
@@ -108,9 +108,9 @@ namespace CoreEngine {
 
 
 			if (ogl->glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-				std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+				std::cout << "Framebuffer:Constructor: ERROR:: Multisampled Framebuffer is not complete!" << std::endl;
 			} else {
-				std::cout << "ERROR::FRAMEBUFFER:: Framebuffer OK!" << std::endl;
+				std::cout << "Framebuffer:Constructor:  Multisampled Framebuffer OK!" << std::endl;
 			}
 		}
 		ogl->glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);		

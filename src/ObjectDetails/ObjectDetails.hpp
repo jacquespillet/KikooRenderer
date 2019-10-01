@@ -59,8 +59,7 @@ public:
 	CoreEngine::Object3D* currentObject;
 
 	//Component inspectors
-	CoreEngine::TransformInspector* transformInspector;
-	CoreEngine::MaterialComponent * material;
+	CoreEngine::ComponentInspector* transformInspector;
 
 
 	void Refresh();
