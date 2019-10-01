@@ -58,48 +58,57 @@ TransformInspector::TransformInspector(TransformComponent* transformComponent) :
 
 	connect(xPositionSpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, transformComponent](double value) {
 		transformComponent->position.x = value; 
+		transformComponent->hasChanged = true;
 		scene->triggerRefresh = true;
     });
 	
 	connect(yPositionSpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, transformComponent](double value) {
 		transformComponent->position.y = value; 
+		transformComponent->hasChanged = true;
 		scene->triggerRefresh = true;
     });
 	
 	connect(zPositionSpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, transformComponent](double value) {
 		transformComponent->position.z = value; 
+		transformComponent->hasChanged = true;
 		scene->triggerRefresh = true;
     });
 
 
 	connect(xRotationSpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, transformComponent](double value) {
 		transformComponent->rotation.x = value; 
+		transformComponent->hasChanged = true;
 		scene->triggerRefresh = true;
     });
 	
 	connect(yRotationSpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, transformComponent](double value) {
 		transformComponent->rotation.y = value; 
+		transformComponent->hasChanged = true;
 		scene->triggerRefresh = true;
     });
 	
 	connect(zRotationSpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, transformComponent](double value) {
 		transformComponent->rotation.z = value; 
+		transformComponent->hasChanged = true;
 		scene->triggerRefresh = true;
     });
 
 
 	connect(xScaleSpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, transformComponent](double value) {
 		transformComponent->scale.x = value; 
+		transformComponent->hasChanged = true;
 		scene->triggerRefresh = true;
     });
 	
 	connect(yScaleSpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, transformComponent](double value) {
 		transformComponent->scale.y = value; 
+		transformComponent->hasChanged = true;
 		scene->triggerRefresh = true;
     });
 	
 	connect(zScaleSpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, transformComponent](double value) {
 		transformComponent->scale.z = value; 
+		transformComponent->hasChanged = true;
 		scene->triggerRefresh = true;
     });
 
@@ -267,6 +276,7 @@ void TransformComponent::SetWorldX(float x) {
 		float scaleFac = object3D->parent->transform->GetWorldScale().x;
 		this->position.x = (x - parentPos.x) / scaleFac;
 	}
+	hasChanged = true;
 }
 
 void TransformComponent::SetWorldY(float y) {
@@ -278,6 +288,7 @@ void TransformComponent::SetWorldY(float y) {
 		float scaleFac = object3D->parent->transform->GetWorldScale().y;
 		this->position.y = (y - parentPos.y) / scaleFac;
 	}
+	hasChanged = true;
 }
 
 void TransformComponent::SetWorldZ(float z) {
@@ -289,6 +300,7 @@ void TransformComponent::SetWorldZ(float z) {
 		float scaleFac = object3D->parent->transform->GetWorldScale().z;
 		this->position.z = (z - parentPos.z) / scaleFac;
 	}
+	hasChanged = true;
 }
 
 QJsonObject TransformComponent::ToJSON() {

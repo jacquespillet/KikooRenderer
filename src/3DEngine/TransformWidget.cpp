@@ -230,6 +230,7 @@ namespace CoreEngine {
 			}			
 			
 			objectTransform->rotation = firstRotation + glm::vec3(1, 0, 0) * displacement; 
+			objectTransform->hasChanged = true;
 		}else if (axis == TransformAxis::Y) {
 			glm::vec2 A = glm::normalize(glm::vec2(initialPlanePosition.x, initialPlanePosition.z));
 			
@@ -247,6 +248,7 @@ namespace CoreEngine {
 			}			
 			
 			objectTransform->rotation = firstRotation + glm::vec3(0, 1, 0) * displacement; 
+			objectTransform->hasChanged = true;
 		} else  if (axis == TransformAxis::Z) {
 			glm::vec2 A = glm::normalize(glm::vec2(initialPlanePosition));
 			
@@ -264,6 +266,7 @@ namespace CoreEngine {
 			}		
 
 			objectTransform->rotation = firstRotation + glm::vec3(0, 0, 1) * displacement; 
+			objectTransform->hasChanged = true;
 		}
 	}
 
@@ -295,6 +298,7 @@ namespace CoreEngine {
 				double diff = newX - prevX;
 				prevX = newX;
 				objectTransform->scale.x += diff;
+				objectTransform->hasChanged = true;
 			}
 		} else if (axis == TransformAxis::Y) {
 			double xsign = transform->position.x > 0 ? -1 : 1;
@@ -314,6 +318,7 @@ namespace CoreEngine {
 				double diff = newY - prevY;
 				prevY = newY;
 				objectTransform->scale.y += diff;
+				objectTransform->hasChanged = true;
 			}
 		} else if (axis == TransformAxis::Z) {
 			double xsign = transform->position.x > 0 ? -1 : 1;
@@ -332,6 +337,7 @@ namespace CoreEngine {
 				double diff = newZ - prevZ;
 				prevZ = newZ;
 				objectTransform->scale.z += diff;
+				objectTransform->hasChanged = true;
 			}
 		}
 	}

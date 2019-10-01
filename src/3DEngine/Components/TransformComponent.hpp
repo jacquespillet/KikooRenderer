@@ -66,6 +66,8 @@ class TransformComponent : public Component {
 
 		TransformInspector* transformInspector;
 
+		bool hasChanged = true;
+
 		QJsonObject ToJSON();
 };
 }

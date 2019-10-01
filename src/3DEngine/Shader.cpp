@@ -92,7 +92,7 @@ Shader& Shader::operator=(const Shader& other)
 	isDepthPass = other.isDepthPass;
 	name = other.name;
 	SetId(other.identifier);
-	
+	shouldRecompile = other.shouldRecompile;
 	if(other.shouldRecompile) {
 		Compile();	
 	} else {

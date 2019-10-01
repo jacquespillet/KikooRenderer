@@ -32,6 +32,7 @@ LightInspector::LightInspector(LightComponent* lightComponent) : QGroupBox("Ligh
     mainLayout->addLayout(lightTypeLayout);
 
 	connect(lightTypeList, static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged), this, [this,lightComponent](int index) {
+        lightComponent->hasChanged = true;    
         lightComponent->SetType(index);
     });
 
@@ -40,6 +41,7 @@ LightInspector::LightInspector(LightComponent* lightComponent) : QGroupBox("Ligh
 	mainLayout->addWidget(lightColorPicker);
 	connect(lightColorPicker, &ColorPicker::ColorPicked, this, [this, lightComponent](QColor color) {
         lightComponent->color = glm::vec4(color.red(), color.green(), color.blue(), color.alpha()) * 0.00392156;
+        lightComponent->hasChanged = true;
 		scene->triggerRefresh = true;
 	});
 
@@ -47,6 +49,7 @@ LightInspector::LightInspector(LightComponent* lightComponent) : QGroupBox("Ligh
     mainLayout->addLayout(intensitySlider);
     QObject::connect(intensitySlider, &CustomSlider::Modified, [this,lightComponent](double val) {
         lightComponent->intensity = val;
+        lightComponent->hasChanged = true;
         scene->triggerRefresh = true;
     });
 
@@ -55,6 +58,7 @@ LightInspector::LightInspector(LightComponent* lightComponent) : QGroupBox("Ligh
     mainLayout->addLayout(attenuationSlider);
     QObject::connect(attenuationSlider, &CustomSlider::Modified, [this,lightComponent](double val) {
         lightComponent->attenuation.x = val;
+        lightComponent->hasChanged = true;
         scene->triggerRefresh = true;
     });
 
@@ -62,6 +66,7 @@ LightInspector::LightInspector(LightComponent* lightComponent) : QGroupBox("Ligh
     mainLayout->addLayout(biasSlider);
     QObject::connect(biasSlider, &CustomSlider::Modified, [this,lightComponent](double val) {
         lightComponent->bias = val;
+        lightComponent->hasChanged = true;
         scene->triggerRefresh = true;
     });    
 
@@ -74,6 +79,7 @@ LightInspector::LightInspector(LightComponent* lightComponent) : QGroupBox("Ligh
         if(lightComponent->depthFBO != nullptr) lightComponent->depthFBO->Clear();
         if(lightComponent->depthCubeFBO != nullptr) lightComponent->depthCubeFBO->Clear();
         scene->glWindow->doneCurrent();
+        lightComponent->hasChanged = true;
         scene->triggerRefresh = true;
     });
 
@@ -134,6 +140,7 @@ void LightComponent::SetType(int type) {
         depthPassShader.isDepthPass = true;
         std::cout << "StandardShaders: Compiling depthPassShader" << std::endl; 
         depthPassShader.Compile();
+        depthPassShader.shouldRecompile = false;
 
 
     } else if(type == 1) {
@@ -201,6 +208,7 @@ void LightComponent::SetType(int type) {
         cubeDepthPassShader.isDepthPass = true;
         std::cout << "StandardShaders: Compiling cubeDepthPassShader" << std::endl; 
         cubeDepthPassShader.Compile();
+        cubeDepthPassShader.shouldRecompile = false;
     } else if(type==2) {
         //Avant dernier arg TRUE pour debug, doit etre FALSE
         depthFBO = new Framebuffer(1024, 1024, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, false, true);
@@ -231,6 +239,7 @@ void LightComponent::SetType(int type) {
         depthPassShader.isDepthPass = true;
         std::cout << "StandardShaders: Compiling depthPassShader" << std::endl; 
         depthPassShader.Compile();
+        depthPassShader.shouldRecompile = false;
     }
     object3D->scene->glWindow->doneCurrent();
     object3D->scene->triggerRefresh = true;
@@ -263,6 +272,7 @@ void LightComponent::RenderDepthMap() {
                 if(object3D->scene->objects3D[i] && object3D->scene->objects3D[i]->visible && object3D->scene->objects3D[i]->castShadow) {
                     MaterialComponent* material = object3D->scene->objects3D[i]->GetComponent<MaterialComponent>();
                     if(material != nullptr) {
+                        material->shader.shouldRecompile = false;
                         Shader tmpShader = material->shader;
                         ShaderParams* tmpParams = material->params;
                         material->SetShader(depthPassShader);
@@ -293,8 +303,11 @@ void LightComponent::RenderDepthMap() {
                 if(object3D->scene->objects3D[i] && object3D->scene->objects3D[i]->visible && object3D->scene->objects3D[i]->castShadow) {
                     MaterialComponent* material = object3D->scene->objects3D[i]->GetComponent<MaterialComponent>();
                     if(material != nullptr) {
+                        material->shader.shouldRecompile = false;
                         Shader tmpShader = material->shader;
+
                         ShaderParams* tmpParams = material->params;
+                        
                         material->SetShader(cubeDepthPassShader);
                         
                         object3D->scene->objects3D[i]->DepthRenderPass(this); 
@@ -318,6 +331,7 @@ void LightComponent::RenderDepthMap() {
                 if(object3D->scene->objects3D[i] && object3D->scene->objects3D[i]->visible && object3D->scene->objects3D[i]->castShadow) {
                     MaterialComponent* material = object3D->scene->objects3D[i]->GetComponent<MaterialComponent>();
                     if(material != nullptr) {
+                        material->shader.shouldRecompile = false;
                         Shader tmpShader = material->shader;
                         ShaderParams* tmpParams = material->params;
                         material->SetShader(depthPassShader);

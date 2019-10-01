@@ -64,6 +64,7 @@ class LightComponent : public Component {
         std::vector<glm::mat4> lightSpaceMatrices;
         float nearPlane;
     
+        bool hasChanged = true;
 
         void SetShaderUniforms();
 

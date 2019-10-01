@@ -64,6 +64,8 @@ class MaterialComponent : public Component {
 		
 		ShaderParams* params;
 
+		bool firstIter = true;
+
 		QJsonObject ToJSON();		
 };
 }

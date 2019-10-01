@@ -34,6 +34,7 @@ class Object3D {
 
         bool faceCamera = false;
 
+
         Object3D(std::string name, Scene* scene);
         ~Object3D();
 
