@@ -90,6 +90,8 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
 	QString dragonStr = "Dragon";
 	QString teapotStr = "Teapot";
 
+	QString particleSystemStr = "Particle System";
+
 	QPoint menuPos;
 	if(!fromMainWindow) menuPos = tree->mapToGlobal(pos);
 	else menuPos = tree->mapFromParent(pos);
@@ -116,7 +118,11 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
     addMeshesMenu->addAction(teapotStr);
     addObjectMenu->addMenu(addMeshesMenu);
 
-    myMenu.addMenu(addObjectMenu);
+	addObjectMenu->addSeparator();
+
+    addObjectMenu->addAction(particleSystemStr);
+    
+	myMenu.addMenu(addObjectMenu);
     QAction* selectedItem = myMenu.exec(menuPos);
 
 
@@ -141,6 +147,8 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
 		if (selectedItem->text() == buddhaStr) objectToAdd = CoreEngine::ObjectFromModelFile(view3D->view3DGL->scene, name.toStdString(), "C:/Users/Jacques/Documents/Boulot/2019/Qt BP/resources/OBJ/buddha/untitled.obj");
 		if (selectedItem->text() == dragonStr) objectToAdd = CoreEngine::ObjectFromModelFile(view3D->view3DGL->scene, name.toStdString(), "C:/Users/Jacques/Documents/Boulot/2019/Qt BP/resources/OBJ/dragon/dragon.obj");
 		if (selectedItem->text() == teapotStr) objectToAdd = CoreEngine::ObjectFromModelFile(view3D->view3DGL->scene, name.toStdString(), "C:/Users/Jacques/Documents/Boulot/2019/Qt BP/resources/OBJ/teapot/teapot.obj");
+		
+		if (selectedItem->text() == particleSystemStr) objectToAdd = CoreEngine::GetParticleSystem(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
 
 		if (selectedIndexes.size() > 0) {
 			TreeItem* parentItem = (TreeItem*)model->itemFromIndex(selectedIndexes[0]);

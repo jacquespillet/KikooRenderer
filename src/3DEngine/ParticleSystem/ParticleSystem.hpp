@@ -23,35 +23,39 @@ public:
     void Update() override;
     void Destroy() override;
     void Recompute() override;
+    std::vector<QWidget*> GetInspectorWidgets() override;
 
     void GenerateParticles();
     void EmitParticle();
 
+    QWidget* GetMainParameters();
+
 private:
     std::vector<Particle> particles;
     Object3D* quad;
-    MaterialComponent* quamaterial;
+    MaterialComponent* quadmaterial;
     MeshFilterComponent* quadMeshFilter;
     Shader particleShader;
+
+    std::string textureFile ="resources/Textures/Particles/particleAtlas.png";
 
     //_________________________
     // Main parameters
     float pps = 200;
-    float speed = 2;
-    float scale = 2;
+    float speed = 5;
+    float scale = 1;
     float lifeLength = 10;
-    float gravityFactor = 0.01;
+    float gravityFactor = 0.2;
     
     //_________________________
     // Randomization parameters
     float speedError = 0.3;
     float lifeError = 0.5;
-    float scaleError = 0.5;
+    float scaleError = 0.2;
     bool isRandomRotation = true;
 
     //_________________________
     // System direction parameters
-    glm::vec3 direction;
     bool useDirection = true;
     float directionDeviation = 0.4;
 
@@ -65,7 +69,7 @@ private:
 
     int numRows = 1;
 
-    bool useCurlNoise = true;
+    bool useCurlNoise = false;
 };
 
 }

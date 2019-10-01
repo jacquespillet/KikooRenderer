@@ -48,14 +48,10 @@ namespace KikooRenderer
 			currentObject->scene->triggerRefresh = true;
 		});
 		
-
-		transformInspector = currentObject->transform->GetInspector();
-		rootWidget->mainLayout->addWidget(transformInspector);
-
-		for(int i=0; i<currentObject->components.size(); i++) {
-			CoreEngine::ComponentInspector* inspector = currentObject->components[i]->GetInspector();
-			if(inspector !=nullptr) {
-				rootWidget->mainLayout->addWidget(inspector);
+		std::vector<QWidget*> widgets = currentObject->GetInspectorWidgets();
+		for(int i=0; i<widgets.size(); i++) {
+			if(widgets[i] != nullptr) {
+				rootWidget->mainLayout->addWidget(widgets[i]);
 			}
 		}
 	}

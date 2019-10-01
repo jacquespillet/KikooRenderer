@@ -8,6 +8,7 @@
 #include "Components/LightComponent.hpp"
 #include "Components/BaseMeshes.hpp"
 #include "../Util/ModelLoader.hpp"
+#include "ParticleSystem/ParticleSystem.hpp"
 
 namespace KikooRenderer {
 
@@ -941,11 +942,16 @@ Object3D* ObjectFromModelFile(Scene* scene, std::string name, std::string filena
 
 
     newObject->AddComponent(material);
-    newObject->AddComponent(transform);
+    newObject->transform = transform;
     newObject->AddComponent(mesh);
     newObject->AddComponent(boundingBox);
 
     return newObject;
+}
+
+Object3D* GetParticleSystem(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color) {
+    ParticleSystem* ps = new ParticleSystem("Particle System", scene);
+    return ps;
 }
 
 

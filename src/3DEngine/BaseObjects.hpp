@@ -53,5 +53,8 @@ namespace CoreEngine {
 
     //Object From Files
     CoreEngine::Object3D* ObjectFromModelFile(Scene* scene, std::string name, std::string filename);
+
+    //Particle System
+    Object3D* GetParticleSystem(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color);
 }
 }

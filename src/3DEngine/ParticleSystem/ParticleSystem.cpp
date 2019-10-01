@@ -37,17 +37,16 @@ ParticleSystem::ParticleSystem(std::string name, Scene* scene) : Object3D(name, 
     quad->Enable();
     quad->faceCamera = true;
 
-    quamaterial =  quad->GetComponent<MaterialComponent>();
-    quamaterial->SetShader(particleShader);
+    quadmaterial =  quad->GetComponent<MaterialComponent>();
+    quadmaterial->SetShader(particleShader);
 
-    Texture albedoTex = Texture("resources/Textures/Particles/particleAtlas.png", GL_TEXTURE0);
-    quamaterial->albedoTex = albedoTex;
+    Texture albedoTex = Texture(textureFile, GL_TEXTURE0);
+    quadmaterial->albedoTex = albedoTex;
     numRows = 4;
 
     quadMeshFilter = quad->GetComponent<MeshFilterComponent>();
     quadMeshFilter->renderInstanced = true;
 
-    direction = glm::vec3(0, 1, 0);
 }
 
 
@@ -64,8 +63,8 @@ void ParticleSystem::Render(glm::mat4* overrideViewMatrix) {
     ogl->glDepthMask(false);
     ogl->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);    
 
-    ogl->glUseProgram(particleShader.programShaderObject);
-    ogl->glUniform1i(ogl->glGetUniformLocation(particleShader.programShaderObject, "rowNum"), numRows);
+    ogl->glUseProgram(quadmaterial->shader.programShaderObject);
+    ogl->glUniform1i(ogl->glGetUniformLocation(quadmaterial->shader.programShaderObject, "rowNum"), numRows);
     
     quadMeshFilter->numInstances = particles.size();
     std::vector<MeshFilterComponent::InstanceAttribute> instanceAttributes = std::vector<MeshFilterComponent::InstanceAttribute>(particles.size());
@@ -145,7 +144,7 @@ void ParticleSystem::GenerateParticles() {
 void ParticleSystem::EmitParticle() {
     glm::vec3 velocity(0);
     if(useDirection){
-        velocity = Util::GenerateRandomUnitVectorWithinCone(direction, directionDeviation);
+        velocity = Util::GenerateRandomUnitVectorWithinCone(transform->rotation, directionDeviation);
     }else{
         velocity = Util::GenerateRandomUnitVector();
     }
@@ -158,6 +157,93 @@ void ParticleSystem::EmitParticle() {
 
     Particle particle(scene, numRows, this->transform->position, velocity, gravityFactor, finalLifeLength, finalRotation, finalScale, useCurlNoise);   
     particles.push_back(particle); 
+}
+
+QWidget* ParticleSystem::GetMainParameters() {
+    QGroupBox* mainGroupbox = new QGroupBox("Particle System");
+    QVBoxLayout* mainLayout = new QVBoxLayout();
+    mainGroupbox->setLayout(mainLayout);
+
+    CustomSlider* ppsSlider = new CustomSlider(1, 10000, 1, "Particles Per Second", pps);
+    mainLayout->addLayout(ppsSlider);
+    QObject::connect( ppsSlider, &CustomSlider::Modified, [this](double val) {
+        pps = val;
+    });
+
+
+    CustomSlider* speedSlider = new CustomSlider(1, 50, 0.1, "Speed", speed);
+    mainLayout->addLayout(speedSlider);
+    QObject::connect( speedSlider, &CustomSlider::Modified, [this](double val) {
+        speed = val;
+    });    
+
+
+    CustomSlider* scaleSlider = new CustomSlider(1, 30, 0.1, "scale", scale);
+    mainLayout->addLayout(scaleSlider);
+    QObject::connect( scaleSlider, &CustomSlider::Modified, [this](double val) {
+        scale = val;
+    });        
+
+    CustomSlider* lifeLengthSlider = new CustomSlider(1, 100, 0.1, "lifeLength", lifeLength);
+    mainLayout->addLayout(lifeLengthSlider);
+    QObject::connect( lifeLengthSlider, &CustomSlider::Modified, [this](double val) {
+        lifeLength = val;
+    });  
+
+    CustomSlider* gravityEffectSlider = new CustomSlider(1, 1, 0.01, "gravityEffect", gravityFactor);
+    mainLayout->addLayout(gravityEffectSlider);
+    QObject::connect( gravityEffectSlider, &CustomSlider::Modified, [this](double val) {
+        gravityFactor = val;
+    });  
+
+    CustomSlider* speedErrorSlider = new CustomSlider(0, 5, 0.01, "speedError", speedError);
+    mainLayout->addLayout(speedErrorSlider);
+    QObject::connect( speedErrorSlider, &CustomSlider::Modified, [this](double val) {
+        speedError = val;
+    });  
+
+    CustomSlider* lifeErrorSlider = new CustomSlider(0, 5, 0.01, "lifeError", lifeError);
+    mainLayout->addLayout(lifeErrorSlider);
+    QObject::connect( lifeErrorSlider, &CustomSlider::Modified, [this](double val) {
+        lifeError = val;
+    });  
+    
+    CustomSlider* scaleErrorSlider = new CustomSlider(0, 5, 0.01, "scaleError", scaleError);
+    mainLayout->addLayout(scaleErrorSlider);
+    QObject::connect( scaleErrorSlider, &CustomSlider::Modified, [this](double val) {
+        scaleError = val;
+    });  
+
+    QCheckBox* randomRotCheckbox = new QCheckBox("Random Rotation");
+    mainLayout->addWidget(randomRotCheckbox);
+    QObject::connect( randomRotCheckbox, &QCheckBox::stateChanged, [this](int state) {
+        isRandomRotation = state>0;
+    });
+
+    //Texture map
+    FilePicker* texturePicker = new FilePicker("texture Atlas", textureFile);
+    mainLayout->addWidget(texturePicker);
+    QObject::connect(texturePicker, &FilePicker::FileModified, [this](QString string) {
+        textureFile = string.toStdString();
+        scene->glWindow->makeCurrent();
+        Texture albedoTex = Texture(textureFile, GL_TEXTURE0);
+        quadmaterial->albedoTex = albedoTex;        
+        scene->glWindow->doneCurrent();
+    });
+    
+    CustomSlider* numRowsSlider = new CustomSlider(0, 100, 1, "numRows", numRows);
+    mainLayout->addLayout(numRowsSlider);
+    QObject::connect( numRowsSlider, &CustomSlider::Modified, [this](double val) {
+        numRows = val;
+    });
+
+    return mainGroupbox;
+}
+
+std::vector<QWidget*> ParticleSystem::GetInspectorWidgets() {
+    std::vector<QWidget*> res;
+    res.push_back(GetMainParameters());
+	return res;
 }
 
 

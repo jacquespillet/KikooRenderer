@@ -20,7 +20,7 @@ Object3D::Object3D(std::string _name, Scene* _scene) {
     this->scene = _scene;
 
 	transform = new TransformComponent(this);
-	this->AddComponent(transform);
+	// this->AddComponent(transform);
 }
 
 Object3D::~Object3D() {
@@ -122,6 +122,16 @@ void Object3D::Destroy() {
 }
 
 void Object3D::WindowResize(int w, int h) {}
+
+std::vector<QWidget*> Object3D::GetInspectorWidgets() {
+	std::vector<QWidget*> res;
+	res.push_back(this->transform->GetInspector());
+	for(int i=0; i<this->components.size(); i++) {
+		res.push_back(this->components[i]->GetInspector());
+	}
+
+	return res;
+}
 
 void Object3D::Render(glm::mat4* overrideViewMatrix) {
 	GETGL

@@ -63,6 +63,7 @@ class Object3D {
         virtual void Destroy();
         virtual void Recompute();
         virtual void WindowResize(int w, int h);
+        virtual std::vector<QWidget*> GetInspectorWidgets();
 
 
         Object3D* Intersects(Geometry::Ray ray, double& distance);

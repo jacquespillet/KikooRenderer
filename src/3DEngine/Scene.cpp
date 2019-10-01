@@ -48,6 +48,8 @@ namespace CoreEngine {
         skyboxCube->Start();
         skyboxCube->Enable();
 
+     
+
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
             objects3D[i]->Start();
