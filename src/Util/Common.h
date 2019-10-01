@@ -31,6 +31,7 @@
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QColorDialog>
+#include <QtWidgets/QToolBar>
 #include <QtGui/QStandardItemModel>
 #include <QtGui/QKeyEvent>
 #include <QtCore/QJsonValue>
