@@ -144,7 +144,8 @@ void ParticleSystem::GenerateParticles() {
 void ParticleSystem::EmitParticle() {
     glm::vec3 velocity(0);
     if(useDirection){
-        velocity = Util::GenerateRandomUnitVectorWithinCone(transform->rotation, directionDeviation);
+        glm::vec3 direction = glm::column(transform->GetWorldModelMatrix(), 2);
+        velocity = Util::GenerateRandomUnitVectorWithinCone(direction, directionDeviation);
     }else{
         velocity = Util::GenerateRandomUnitVector();
     }
@@ -164,33 +165,33 @@ QWidget* ParticleSystem::GetMainParameters() {
     QVBoxLayout* mainLayout = new QVBoxLayout();
     mainGroupbox->setLayout(mainLayout);
 
-    CustomSlider* ppsSlider = new CustomSlider(1, 10000, 1, "Particles Per Second", pps);
+    CustomSlider* ppsSlider = new CustomSlider(1, 10000, 10, "Particles Per Second", pps);
     mainLayout->addLayout(ppsSlider);
     QObject::connect( ppsSlider, &CustomSlider::Modified, [this](double val) {
         pps = val;
     });
 
 
-    CustomSlider* speedSlider = new CustomSlider(1, 50, 0.1, "Speed", speed);
+    CustomSlider* speedSlider = new CustomSlider(1, 50, 0.5, "Speed", speed);
     mainLayout->addLayout(speedSlider);
     QObject::connect( speedSlider, &CustomSlider::Modified, [this](double val) {
         speed = val;
     });    
 
 
-    CustomSlider* scaleSlider = new CustomSlider(1, 30, 0.1, "scale", scale);
+    CustomSlider* scaleSlider = new CustomSlider(0.1, 15, 0.1, "scale", scale);
     mainLayout->addLayout(scaleSlider);
     QObject::connect( scaleSlider, &CustomSlider::Modified, [this](double val) {
         scale = val;
     });        
 
-    CustomSlider* lifeLengthSlider = new CustomSlider(1, 100, 0.1, "lifeLength", lifeLength);
+    CustomSlider* lifeLengthSlider = new CustomSlider(1, 60, 0.1, "lifeLength", lifeLength);
     mainLayout->addLayout(lifeLengthSlider);
     QObject::connect( lifeLengthSlider, &CustomSlider::Modified, [this](double val) {
         lifeLength = val;
     });  
 
-    CustomSlider* gravityEffectSlider = new CustomSlider(1, 1, 0.01, "gravityEffect", gravityFactor);
+    CustomSlider* gravityEffectSlider = new CustomSlider(0, 1, 0.01, "gravityEffect", gravityFactor);
     mainLayout->addLayout(gravityEffectSlider);
     QObject::connect( gravityEffectSlider, &CustomSlider::Modified, [this](double val) {
         gravityFactor = val;
@@ -226,8 +227,7 @@ QWidget* ParticleSystem::GetMainParameters() {
     QObject::connect(texturePicker, &FilePicker::FileModified, [this](QString string) {
         textureFile = string.toStdString();
         scene->glWindow->makeCurrent();
-        Texture albedoTex = Texture(textureFile, GL_TEXTURE0);
-        quadmaterial->albedoTex = albedoTex;        
+        quadmaterial->SetAlbedoTex(Texture(textureFile, GL_TEXTURE0));		
         scene->glWindow->doneCurrent();
     });
     
@@ -237,11 +237,19 @@ QWidget* ParticleSystem::GetMainParameters() {
         numRows = val;
     });
 
+    
+    QCheckBox* curlNoiseCheckbox = new QCheckBox("Use Curl Noise");
+    mainLayout->addWidget(curlNoiseCheckbox);
+    QObject::connect( curlNoiseCheckbox, &QCheckBox::stateChanged, [this](int state) {
+        useCurlNoise = state>0;
+    });
+
     return mainGroupbox;
 }
 
 std::vector<QWidget*> ParticleSystem::GetInspectorWidgets() {
     std::vector<QWidget*> res;
+    res.push_back(this->transform->GetInspector());
     res.push_back(GetMainParameters());
 	return res;
 }

@@ -121,6 +121,7 @@ Shader GetWaterTile_1Shader() {
     waterTileShader.isDepthPass = false;
     waterTileShader.SetId(1);
     waterTileShader.Compile();
+    waterTileShader.shouldRecompile = false;
 
     return waterTileShader;
 }

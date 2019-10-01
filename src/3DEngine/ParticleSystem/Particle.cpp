@@ -9,7 +9,7 @@ namespace CoreEngine {
 Particle::Particle(Scene* scene, int numRows, glm::vec3 position, glm::vec3 velocity, float gravityEffect, float lifeLength, float rotation, float scale, bool useCurlNoise) {
     this->scene =scene;
     this->position =position;
-    // this->velocity =velocity;
+    this->velocity =velocity;
     this->gravityEffect =gravityEffect;
     this->lifeLength =lifeLength;
     this->rotation =rotation;
@@ -52,8 +52,6 @@ bool Particle::Update(glm::vec3 camPos) {
         curl.z = sampleY.derivative.x - sampleX.derivative.y;              
         
         velocity = 4.0f * glm::normalize(curl);
-        
-
     }
 
     glm::vec3 change(velocity);
