@@ -17,6 +17,5 @@ namespace KikooRenderer {
         
         QCheckBox* renderAxesCheckbox  = new QCheckBox("Render Axes");
         GUI3DPreferencesLayout->addWidget(renderAxesCheckbox);
-
     }
 }

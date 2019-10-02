@@ -29,7 +29,6 @@ View3D::View3D() : QDockWidget("3D View")
     QIcon translateIcon("resources/UI/Widgets/TranslationIcon.png");
     QAction *translateAct = new QAction(translateIcon, tr("&Translate"), this);
     translateAct->setCheckable(true);
-    translateAct->setChecked(true);
     viewportToolbar->addAction(translateAct);
     
     QIcon scaleIcon("resources/UI/Widgets/ScaleIcon.png");

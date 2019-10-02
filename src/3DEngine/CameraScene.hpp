@@ -6,8 +6,11 @@
 
 namespace KikooRenderer {
 namespace CoreEngine {
+
 class TransformComponent;
 class Scene;
+class CameraController;
+
 class CameraScene{
     public: 
 		enum ProjectionType {
@@ -42,6 +45,8 @@ class CameraScene{
 		void OnMouseReleaseEvent(QMouseEvent *e);
 		void OnMouseMoveEvent(QMouseEvent *e);
 		void OnWheelEvent(QWheelEvent *event);
+		void OnKeyReleaseEvent(QKeyEvent *e);
+		void OnUpdate();
 
         Geometry::Ray GetRay(int x, int y);
         Geometry::Ray GetRay(double x, double y);
@@ -50,15 +55,10 @@ class CameraScene{
         glm::mat4 viewMatrix;
         glm::mat4 previousViewMatrix;
 
-    private: 
-        bool isRightClicked = false;
-        bool isLeftClicked = false;
-        bool isMiddleClicked = false;
-        int previousX;
-        int previousY;
+        CameraController* cameraController;
 
-        float speedFactor = 0.1;
         float orthoFOV = 10.0;
+        float speedFactor = 0.1;
 };
 
 }

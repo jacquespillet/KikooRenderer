@@ -58,6 +58,8 @@ set(MainWindowSrc
 	3DEngine/WaterTiles/WaterTile_2/DirectionalFlowShader.cpp
 	3DEngine/WaterTiles/WaveTile/WaveTile.cpp
 	3DEngine/WaterTiles/WaveTile/WaveTileShader.cpp
+
+	3DEngine/CameraControllers/CameraController.cpp
 	
 	SceneTree/SceneTree.cpp
 	

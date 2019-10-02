@@ -102,7 +102,10 @@ void HDRRenderer::SetFramebuffers() {
     finalFBO = new Framebuffer(scene->windowWidth, scene->windowHeight, GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, false);
     
 }
-
+ 
+void HDRRenderer::SetGammaCorrection(bool value) {
+    
+}
 
 
 void HDRRenderer::SetMSAA(bool value) {

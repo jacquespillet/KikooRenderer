@@ -28,6 +28,7 @@
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QRadioButton>
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QColorDialog>

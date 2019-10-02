@@ -1,6 +1,7 @@
 #include "CameraScene.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Scene.hpp"
+#include "CameraControllers/CameraController.hpp"
 
 namespace KikooRenderer {
 namespace CoreEngine {
@@ -25,6 +26,8 @@ CameraScene::CameraScene(Scene* _scene, float _eyeDistance, float _fov, float _n
     viewMatrix = glm::inverse(this->transform->GetModelMatrix()); 
 
     orthoFOV = 10;
+
+    cameraController = new CameraController(this);
 }
 
 glm::vec3 CameraScene::GetPosition() {
@@ -48,35 +51,16 @@ void CameraScene::UpdateProjectionMatrix() {
 	else this->projectionMatrix = glm::orthoLH(-orthoFOV * this->aspect, orthoFOV * this->aspect, -orthoFOV, orthoFOV, 0.0001f, this->farClip);
 }
 
+void CameraScene::OnKeyReleaseEvent(QKeyEvent *e){
+    cameraController->OnKeyReleaseEvent(e);
+}
+
+void CameraScene::OnUpdate(){
+    cameraController->OnUpdate();
+}
+
 void CameraScene::OnKeyPressEvent(QKeyEvent *e){
-    if(isRightClicked) {
-        glm::mat4 transform = this->transform->GetModelMatrix();
-
-        if(e->key() == Qt::Key_Z) {
-            this->transform->position.x += glm::column(transform, 2).x * speedFactor;
-            this->transform->position.y += glm::column(transform, 2).y * speedFactor;
-            this->transform->position.z += glm::column(transform, 2).z * speedFactor;
-        }  
-        if(e->key() == Qt::Key_S) {
-            this->transform->position.x -= glm::column(transform, 2).x * speedFactor;
-            this->transform->position.y -= glm::column(transform, 2).y * speedFactor;
-            this->transform->position.z -= glm::column(transform, 2).z * speedFactor;
-        } 
-        if(e->key() == Qt::Key_Q) {
-            this->transform->position.x -= glm::column(transform, 0).x * speedFactor;
-            this->transform->position.y -= glm::column(transform, 0).y * speedFactor;
-            this->transform->position.z -= glm::column(transform, 0).z * speedFactor;
-        } 
-        if(e->key() == Qt::Key_D) {
-            this->transform->position.x += glm::column(transform, 0).x * speedFactor;
-            this->transform->position.y += glm::column(transform, 0).y * speedFactor;
-            this->transform->position.z += glm::column(transform, 0).z * speedFactor;
-        }
-
-        previousViewMatrix = glm::mat4(viewMatrix);
-        viewMatrix = glm::inverse(this->transform->GetModelMatrix());
-    }  
-
+    cameraController->OnKeyPressEvent(e);
 	if (e->key() == Qt::Key_5) {
 		if (projectionType == ProjectionType::Perspective) projectionType = ProjectionType::Orthographic;
 		else projectionType = ProjectionType::Perspective;
@@ -84,87 +68,26 @@ void CameraScene::OnKeyPressEvent(QKeyEvent *e){
 		UpdateProjectionMatrix();
 
 	}
-}
-
-void CameraScene::OnMousePressEvent(QMouseEvent *e) {
-    if(e->button() == Qt::LeftButton) {
-        isLeftClicked = true;
-    }
-    
-    if(e->button() == Qt::RightButton) {
-        isRightClicked = true;
-    }
-
-    if(e->button() == Qt::MidButton) {
-        isMiddleClicked = true;
-    }
-
-    previousX = e->x();
-    previousY = e->y();
-}
-void CameraScene::OnMouseReleaseEvent(QMouseEvent *e) {
-    if(isLeftClicked) isLeftClicked = false;
-    if(isRightClicked) isRightClicked = false;
-    if(isMiddleClicked) isMiddleClicked = false;
-}
-void CameraScene::OnMouseMoveEvent(QMouseEvent *e) {
-    if(isLeftClicked) {
-    }
-    if(isRightClicked) {
-        int newX = e->x();
-        int newY = e->y();
-
-        int xOffset = newX - previousX;
-        int yOffset = newY - previousY;
-
-        this->transform->rotation.y += (float)xOffset * 0.1;
-        this->transform->rotation.x += (float)yOffset * 0.1;
-
-        previousX = newX;
-        previousY = newY;
-    }
-
-    if(isMiddleClicked) {
-        int newX = e->x();
-        int newY = e->y();
-
-        int xOffset = newX - previousX;
-        int yOffset = newY - previousY;
-
-        glm::mat4 transform = this->transform->GetModelMatrix();
-
-        this->transform->position.x -= glm::column(transform, 0).x * xOffset * speedFactor * 0.1;
-        this->transform->position.y -= glm::column(transform, 0).y * xOffset * speedFactor * 0.1;
-        this->transform->position.z -= glm::column(transform, 0).z * xOffset * speedFactor * 0.1;
-        
-        this->transform->position.x += glm::column(transform, 1).x * yOffset * speedFactor * 0.1;
-        this->transform->position.y += glm::column(transform, 1).y * yOffset * speedFactor * 0.1;
-        this->transform->position.z += glm::column(transform, 1).z * yOffset * speedFactor * 0.1;
-
-        previousX = newX;
-        previousY = newY;        
-    }
     previousViewMatrix = glm::mat4(viewMatrix);
     viewMatrix = glm::inverse(this->transform->GetModelMatrix());
 }
-void CameraScene::OnWheelEvent(QWheelEvent *event) {
-    QPoint point = event->angleDelta();
 
-    glm::mat4 transform = this->transform->GetModelMatrix();
-    if(point.y() > 0) {
-        this->transform->position.x += glm::column(transform, 2).x * speedFactor;
-        this->transform->position.y += glm::column(transform, 2).y * speedFactor;
-        this->transform->position.z += glm::column(transform, 2).z * speedFactor;
-        orthoFOV -= 0.5;
-    } else if(point.y() < 0) {
-        this->transform->position.x -= glm::column(transform, 2).x * speedFactor;
-        this->transform->position.y -= glm::column(transform, 2).y * speedFactor;
-        this->transform->position.z -= glm::column(transform, 2).z * speedFactor;
-        orthoFOV += 0.5;
-    }
+void CameraScene::OnMousePressEvent(QMouseEvent *e) {
+    cameraController->OnMousePressEvent(e);
+}
+void CameraScene::OnMouseReleaseEvent(QMouseEvent *e) {
+    cameraController->OnMouseReleaseEvent(e);
+}
+void CameraScene::OnMouseMoveEvent(QMouseEvent *e) {
+    cameraController->OnMouseMoveEvent(e);
+
+    previousViewMatrix = glm::mat4(viewMatrix);
+    viewMatrix = glm::inverse(this->transform->GetModelMatrix());
+}
+void CameraScene::OnWheelEvent(QWheelEvent *e) {
+    cameraController->OnWheelEvent(e);
 
     UpdateProjectionMatrix();
-
     previousViewMatrix = glm::mat4(viewMatrix);
     viewMatrix = glm::inverse(this->transform->GetModelMatrix());
 }

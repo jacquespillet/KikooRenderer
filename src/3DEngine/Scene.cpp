@@ -69,6 +69,7 @@ namespace CoreEngine {
     }
 
     void Scene::OnUpdate() {
+        camera->OnUpdate();
         for(int i=0; i<objects3D.size(); i++) {
             if(!objects3D[i]->started) objects3D[i]->Start(); 
             if(!objects3D[i]->enabled) objects3D[i]->Enable();
@@ -180,6 +181,7 @@ namespace CoreEngine {
         if(e->button() == Qt::LeftButton) HandleSelection(e->x(), e->y());
     }
 	void Scene::OnKeyReleaseEvent(QKeyEvent* e) {
+        camera->OnKeyReleaseEvent(e);
 		if (e->key() == Qt::Key_Control) {
 			isControlKey = false;
 		}

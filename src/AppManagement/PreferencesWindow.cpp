@@ -63,10 +63,10 @@ namespace KikooRenderer
         });
         layout->addWidget(msaaCheckbox);
 
-        // QCheckBox* gammaCorrectionCheckbox = new QCheckBox("Gamma Correction");
-        // connect(gammaCorrectionCheckbox, &QCheckBox::stateChanged, this, [this, mainPrefWindow](int state) {
-        //     mainPrefWindow->mainWindow->view3D->view3DGL->scene->renderer->SetGammaCorrection(state > 0);
-        // });
-        // layout->addWidget(gammaCorrectionCheckbox);
+        QCheckBox* gammaCorrectionCheckbox = new QCheckBox("Gamma Correction");
+        connect(gammaCorrectionCheckbox, &QCheckBox::stateChanged, this, [this, mainPrefWindow](int state) {
+            mainPrefWindow->mainWindow->view3D->view3DGL->scene->renderer->SetGammaCorrection(state > 0);
+        });
+        layout->addWidget(gammaCorrectionCheckbox);
     }    
 }

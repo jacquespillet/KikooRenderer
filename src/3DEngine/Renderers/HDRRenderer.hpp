@@ -20,6 +20,7 @@ public:
     virtual void Destroy();
     virtual void AddPostEffect(PostProcess* postProcess);
     virtual void RemovePostEffect(PostProcess* postProcess);
+    virtual void SetGammaCorrection(bool value);
 
     void SetFramebuffers();
 
