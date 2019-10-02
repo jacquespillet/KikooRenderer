@@ -32,10 +32,12 @@ public:
     float exposure;
 	Object3D* quad;
 	Object3D* dummyQuad;
+    MaterialComponent* quadMaterial;
 
     Shader quadShader;
 
     bool useMSAA = true;
+    bool gammaCorrection = true;
 
     PostProcessor postProcessor;
 // protected:

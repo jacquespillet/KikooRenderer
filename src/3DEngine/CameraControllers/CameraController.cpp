@@ -64,7 +64,6 @@ void CameraController::MoveToPos(glm::vec3 position) {
 void CameraController::OnKeyPressEvent(QKeyEvent *e) {
     if(isRightClicked) {
         if(e->key() == Qt::Key_W) {
-            // std::cout <<"PRESSED" << std::endl;
             forwardPressed = true;
         }  
         if(e->key() == Qt::Key_S) {
@@ -128,13 +127,13 @@ void CameraController::OnMouseMoveEvent(QMouseEvent *e) {
 
         glm::mat4 transform = this->camera->transform->GetModelMatrix();
 
-        this->camera->transform->position.x -= glm::column(transform, 0).x * xOffset * speedFactor * 0.1;
-        this->camera->transform->position.y -= glm::column(transform, 0).y * xOffset * speedFactor * 0.1;
-        this->camera->transform->position.z -= glm::column(transform, 0).z * xOffset * speedFactor * 0.1;
+        this->camera->transform->position.x -= glm::column(transform, 0).x * xOffset * speedFactor * 0.001;
+        this->camera->transform->position.y -= glm::column(transform, 0).y * xOffset * speedFactor * 0.001;
+        this->camera->transform->position.z -= glm::column(transform, 0).z * xOffset * speedFactor * 0.001;
         
-        this->camera->transform->position.x += glm::column(transform, 1).x * yOffset * speedFactor * 0.1;
-        this->camera->transform->position.y += glm::column(transform, 1).y * yOffset * speedFactor * 0.1;
-        this->camera->transform->position.z += glm::column(transform, 1).z * yOffset * speedFactor * 0.1;
+        this->camera->transform->position.x += glm::column(transform, 1).x * yOffset * speedFactor * 0.001;
+        this->camera->transform->position.y += glm::column(transform, 1).y * yOffset * speedFactor * 0.001;
+        this->camera->transform->position.z += glm::column(transform, 1).z * yOffset * speedFactor * 0.001;
 
         previousX = newX;
         previousY = newY;
@@ -146,14 +145,14 @@ void CameraController::OnWheelEvent(QWheelEvent *e) {
 
     glm::mat4 transform = this->camera->transform->GetModelMatrix();
     if(point.y() > 0) {
-        this->camera->transform->position.x += glm::column(transform, 2).x * speedFactor;
-        this->camera->transform->position.y += glm::column(transform, 2).y * speedFactor;
-        this->camera->transform->position.z += glm::column(transform, 2).z * speedFactor;
+        this->camera->transform->position.x += glm::column(transform, 2).x * speedFactor * 0.1;
+        this->camera->transform->position.y += glm::column(transform, 2).y * speedFactor * 0.1;
+        this->camera->transform->position.z += glm::column(transform, 2).z * speedFactor * 0.1;
         this->camera->orthoFOV -= 0.5;
     } else if(point.y() < 0) {
-        this->camera->transform->position.x -= glm::column(transform, 2).x * speedFactor;
-        this->camera->transform->position.y -= glm::column(transform, 2).y * speedFactor;
-        this->camera->transform->position.z -= glm::column(transform, 2).z * speedFactor;
+        this->camera->transform->position.x -= glm::column(transform, 2).x * speedFactor * 0.1;
+        this->camera->transform->position.y -= glm::column(transform, 2).y * speedFactor * 0.1;
+        this->camera->transform->position.z -= glm::column(transform, 2).z * speedFactor * 0.1;
         this->camera->orthoFOV += 0.5;
     }
 }

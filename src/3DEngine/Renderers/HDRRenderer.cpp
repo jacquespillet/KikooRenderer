@@ -45,17 +45,22 @@ HDRRenderer::HDRRenderer(Scene* scene) : Renderer(scene) {
     layout(location = 0) out vec4 outputColor; 
     uniform sampler2D albedoTexture;
     uniform float exposure;
+    uniform int isGammaCorrection;
 
     //main
     void main()
     {   
-        const float gamma = 2.2;
-        vec3 hdrColor = texture(albedoTexture, fragmentUv).rgb;
-    
-        vec3 mapped = hdrColor / (hdrColor + vec3(1.0));
-        mapped = pow(mapped, vec3(1.0 / gamma));
-    
-        outputColor = vec4(mapped, 1.0);
+        if(isGammaCorrection > 0) {
+            const float gamma = 2.2;
+            vec3 hdrColor = texture(albedoTexture, fragmentUv).rgb;
+        
+            vec3 mapped = hdrColor / (hdrColor + vec3(1.0));
+            mapped = pow(mapped, vec3(1.0 / gamma));
+        
+            outputColor = vec4(mapped, 1.0);
+        } else {
+            outputColor = vec4(texture(albedoTexture, fragmentUv).rgb, 1);
+        }
 
     }
     )";
@@ -65,8 +70,8 @@ HDRRenderer::HDRRenderer(Scene* scene) : Renderer(scene) {
     exposure = 1.0;
 
     quad = GetQuad(scene, "plane", glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(1, 1, 1, 1));
-    MaterialComponent* material = quad->GetComponent<MaterialComponent>();
-    material->SetShader(quadShader);
+    quadMaterial = quad->GetComponent<MaterialComponent>();
+    quadMaterial->SetShader(quadShader);
     
     // int exposureLocation = ogl->glGetUniformLocation(quadShader.programShaderObject, "exposure"); 
     // ogl->glUniform1f(exposureLocation, exposure);
@@ -104,7 +109,13 @@ void HDRRenderer::SetFramebuffers() {
 }
  
 void HDRRenderer::SetGammaCorrection(bool value) {
-    
+    scene->glWindow->makeCurrent();
+    GETGL
+    gammaCorrection = value;
+    ogl->glUseProgram(quadMaterial->shader.programShaderObject);
+    ogl->glUniform1i(ogl->glGetUniformLocation(quadMaterial->shader.programShaderObject, "isGammaCorrection"), gammaCorrection);	
+    scene->glWindow->doneCurrent();
+    scene->triggerRefresh = true;
 }
 
 
@@ -182,7 +193,7 @@ void HDRRenderer::Render() {
     if(postProcessor.numProcesses >0) {
         postProcessor.Run(quadFBO, finalFBO);
         finalFBO->RenderFBOToObject(quad);
-    } else {
+    } else {	
         quadFBO->RenderFBOToObject(quad, false);
     }
 

@@ -64,7 +64,7 @@ selectedObjectShader.name = "Selected";
 shaders.push_back(&selectedObjectShader);
 std::cout << "StandardShaders:Compile: Compiling selectedObjectShader" << std::endl; 
 selectedObjectShader.Compile();
-
+selectedObjectShader.shouldRecompile = false;
 }
 }
 }

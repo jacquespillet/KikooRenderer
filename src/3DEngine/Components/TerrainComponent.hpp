@@ -16,6 +16,7 @@ class TerrainComponent : public Component {
         void OnRender();
         void OnDestroy();
 		void Recompute();
+        ComponentInspector* GetInspector(){return nullptr;}
 
 		QJsonObject ToJSON();
     private:

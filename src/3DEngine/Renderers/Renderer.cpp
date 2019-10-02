@@ -23,12 +23,12 @@ void Renderer::AddPostEffect(PostProcess* postProcess) {}
 void Renderer::RemovePostEffect(PostProcess* postProcess) {}
 
 void Renderer::SetGammaCorrection(bool value) {
-//     this->scene->glWindow->makeCurrent();
-//     GETGL
-//     if(value) ogl->glEnable(GL_FRAMEBUFFER_SRGB); 
-//     else ogl->glDisable(GL_FRAMEBUFFER_SRGB); 
-//     this->scene->glWindow->doneCurrent();
-//     scene->triggerRefresh = true;
+    this->scene->glWindow->makeCurrent();
+    GETGL
+    if(value) ogl->glEnable(GL_FRAMEBUFFER_SRGB); 
+    else ogl->glDisable(GL_FRAMEBUFFER_SRGB); 
+    this->scene->glWindow->doneCurrent();
+    scene->triggerRefresh = true;
 
     isGammaCorrected = value;
 }
@@ -93,6 +93,7 @@ void ForwardRenderer::Render() {
                 MaterialComponent* material = (scene->selectedObjects[i]->GetComponent<MaterialComponent>());
                 if(material) {
                     //Save shader state to set it back after this pass
+                    material->shader.shouldRecompile = false;
                     Shader tmpShader = material->shader;
                     ShaderParams* tmpParams = material->params;
 
@@ -100,6 +101,7 @@ void ForwardRenderer::Render() {
                     scene->selectedObjects[i]->Render();
                     material->SetShader(tmpShader);
                     material->params = tmpParams;
+                    material->shader.shouldRecompile = true;
                 }
             }
         }
