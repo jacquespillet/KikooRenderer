@@ -8,12 +8,12 @@ Q_OBJECT
 public:
     BackgroundPreferences();
     
-    FilePicker* skyboxRightPicker;
-    FilePicker* skyboxLeftPicker;
-    FilePicker* skyboxTopPicker;
-    FilePicker* skyboxBottomPicker;
-    FilePicker* skyboxFrontPicker;
-    FilePicker* skyboxBackPicker;
+    TexturePicker* skyboxRightPicker;
+    TexturePicker* skyboxLeftPicker;
+    TexturePicker* skyboxTopPicker;
+    TexturePicker* skyboxBottomPicker;
+    TexturePicker* skyboxFrontPicker;
+    TexturePicker* skyboxBackPicker;
 
     std::vector<std::string> skyboxStrings;
 

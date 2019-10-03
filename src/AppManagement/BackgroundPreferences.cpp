@@ -8,9 +8,9 @@ namespace KikooRenderer {
         setLayout(backgroundGroupLayout);
         
         //- Right - Left - Top - Bottom - Front - Back
-        skyboxRightPicker = new FilePicker("Right Skybox Plane", "", true);
+        skyboxRightPicker = new TexturePicker("Right Skybox Plane", "", true);
         backgroundGroupLayout->addWidget(skyboxRightPicker);
-        connect(skyboxRightPicker, &FilePicker::FileModified, this, [this](QString filenames) {
+        connect(skyboxRightPicker, &TexturePicker::FileModified, this, [this](QString filenames) {
             if(filenames.size() > 0) {
                 skyboxStrings[0] = filenames.toStdString();
                 LookForSkybox(filenames); // Look for all the skybox files in the folder
@@ -21,9 +21,9 @@ namespace KikooRenderer {
         });
 
 
-        skyboxLeftPicker = new FilePicker("Left Skybox Plane", "", true);
+        skyboxLeftPicker = new TexturePicker("Left Skybox Plane", "", true);
         backgroundGroupLayout->addWidget(skyboxLeftPicker);
-        connect(skyboxLeftPicker, &FilePicker::FileModified, this, [this](QString filenames) {
+        connect(skyboxLeftPicker, &TexturePicker::FileModified, this, [this](QString filenames) {
             if(filenames.size() > 0) {
                 skyboxStrings[1] = filenames.toStdString();
                 LookForSkybox(filenames); // Look for all the skybox files in the folder
@@ -34,9 +34,9 @@ namespace KikooRenderer {
         });
 
         
-        skyboxTopPicker = new FilePicker("Top Skybox Plane", "", true);
+        skyboxTopPicker = new TexturePicker("Top Skybox Plane", "", true);
         backgroundGroupLayout->addWidget(skyboxTopPicker);
-        connect(skyboxTopPicker, &FilePicker::FileModified, this, [this](QString filenames) {
+        connect(skyboxTopPicker, &TexturePicker::FileModified, this, [this](QString filenames) {
             if(filenames.size() > 0) {
                 skyboxStrings[2] = filenames.toStdString();
                 LookForSkybox(filenames); // Look for all the skybox files in the folder
@@ -47,9 +47,9 @@ namespace KikooRenderer {
         });
 
         
-        skyboxBottomPicker = new FilePicker("Bottom Skybox Plane", "", true);
+        skyboxBottomPicker = new TexturePicker("Bottom Skybox Plane", "", true);
         backgroundGroupLayout->addWidget(skyboxBottomPicker);
-        connect(skyboxBottomPicker, &FilePicker::FileModified, this, [this](QString filenames) {
+        connect(skyboxBottomPicker, &TexturePicker::FileModified, this, [this](QString filenames) {
             if(filenames.size() > 0) {
                 skyboxStrings[3] = filenames.toStdString();
                 LookForSkybox(filenames); // Look for all the skybox files in the folder
@@ -60,9 +60,9 @@ namespace KikooRenderer {
         });
 
         
-        skyboxFrontPicker = new FilePicker("Front Skybox Plane", "", true);
+        skyboxFrontPicker = new TexturePicker("Front Skybox Plane", "", true);
         backgroundGroupLayout->addWidget(skyboxFrontPicker);
-        connect(skyboxFrontPicker, &FilePicker::FileModified, this, [this](QString filenames) {
+        connect(skyboxFrontPicker, &TexturePicker::FileModified, this, [this](QString filenames) {
             if(filenames.size() > 0) {
                 skyboxStrings[4] = filenames.toStdString();
                 LookForSkybox(filenames); // Look for all the skybox files in the folder
@@ -73,9 +73,9 @@ namespace KikooRenderer {
         });
 
         
-        skyboxBackPicker = new FilePicker("Back Skybox Plane", "", true);
+        skyboxBackPicker = new TexturePicker("Back Skybox Plane", "", true);
         backgroundGroupLayout->addWidget(skyboxBackPicker);
-        connect(skyboxBackPicker, &FilePicker::FileModified, this, [this](QString filenames) {
+        connect(skyboxBackPicker, &TexturePicker::FileModified, this, [this](QString filenames) {
             if(filenames.size() > 0) {
                 skyboxStrings[5] = filenames.toStdString();
                 LookForSkybox(filenames); // Look for all the skybox files in the folder

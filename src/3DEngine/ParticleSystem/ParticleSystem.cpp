@@ -222,9 +222,9 @@ QWidget* ParticleSystem::GetMainParameters() {
     });
 
     //Texture map
-    FilePicker* texturePicker = new FilePicker("texture Atlas", textureFile);
+    TexturePicker* texturePicker = new TexturePicker("texture Atlas", textureFile);
     mainLayout->addWidget(texturePicker);
-    QObject::connect(texturePicker, &FilePicker::FileModified, [this](QString string) {
+    QObject::connect(texturePicker, &TexturePicker::FileModified, [this](QString string) {
         textureFile = string.toStdString();
         scene->glWindow->makeCurrent();
         quadmaterial->SetAlbedoTex(Texture(textureFile, GL_TEXTURE0));		

@@ -22,9 +22,9 @@ namespace CoreEngine
     });
 
     // Normal Map
-    FilePicker* normalMapPicker = new FilePicker("Normal Map", normalMapStr);
+    TexturePicker* normalMapPicker = new TexturePicker("Normal Map", normalMapStr);
     shaderParamsLayout->addWidget(normalMapPicker);
-    connect(normalMapPicker, &FilePicker::FileModified, this, [this](QString string) {
+    connect(normalMapPicker, &TexturePicker::FileModified, this, [this](QString string) {
         normalMapStr = string.toStdString();
         shouldLoadNormal = true;
         scene->triggerRefresh = true;
@@ -38,9 +38,9 @@ namespace CoreEngine
     });
 
     //Specular Map
-    FilePicker* specularPicker = new FilePicker("Specular Map", specularMapStr);
+    TexturePicker* specularPicker = new TexturePicker("Specular Map", specularMapStr);
     shaderParamsLayout->addWidget(specularPicker);
-    connect(specularPicker, &FilePicker::FileModified, this, [this](QString string) {
+    connect(specularPicker, &TexturePicker::FileModified, this, [this](QString string) {
         specularMapStr = string.toStdString();
         shouldLoadSpecular = true;
         scene->triggerRefresh = true;

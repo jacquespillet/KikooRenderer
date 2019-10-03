@@ -56,10 +56,10 @@ MeshFilterInspector::MeshFilterInspector(MeshFilterComponent* meshFilterComponen
 	modelLayout->addWidget(modelList);
 	mainLayout->addLayout(modelLayout);
 
-	FilePicker* modelPicker = new FilePicker("Model File Name");
+	TexturePicker* modelPicker = new TexturePicker("Model File Name");
 	mainLayout->addWidget(modelPicker);
 	modelPicker->setVisible((meshFilterComponent->meshType == PRIMITIVE_MESH::MODEL_MESH));
-	connect(modelPicker, &FilePicker::FileModified, this, [this, meshFilterComponent, object](QString value) {
+	connect(modelPicker, &TexturePicker::FileModified, this, [this, meshFilterComponent, object](QString value) {
 		meshFilterComponent->modelpath = value.toStdString();
 
 		std::vector<glm::vec3> vertex;

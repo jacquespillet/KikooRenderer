@@ -65,9 +65,9 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : Com
 
 
 	//Albedo tex
-	FilePicker* albedoTexPicker = new FilePicker("Albedo Texture");
+	TexturePicker* albedoTexPicker = new TexturePicker("Albedo Texture");
 	mainLayout->addWidget(albedoTexPicker);
-	connect(albedoTexPicker, &FilePicker::FileModified, this, [this, materialComponent](QString string) {
+	connect(albedoTexPicker, &TexturePicker::FileModified, this, [this, materialComponent](QString string) {
 		scene->glWindow->makeCurrent();
 		materialComponent->SetAlbedoTex(KikooRenderer::CoreEngine::Texture(string.toStdString(), GL_TEXTURE0));		
 		scene->glWindow->doneCurrent();
