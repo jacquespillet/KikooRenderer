@@ -12,22 +12,24 @@ namespace CoreEngine {
 WaterTile_1::WaterTile_1(std::string name, Scene* scene) : Object3D(name, scene) {
     waterShader = GetWaterTile_1Shader();
     
-    quad = GetQuad(scene, "particle", glm::vec3(0, 0.2, 0), glm::vec3(90, 0, 0), glm::vec3(20), glm::vec4(0.5, 0.5, 0.5, 1));
+    quad = GetQuad(scene, "waterTile", glm::vec3(0, 0.2, 0), glm::vec3(90, 0, 0), glm::vec3(2), glm::vec4(0.5, 0.5, 0.5, 1));
     quad->Start();
     quad->Enable();
 
     quamaterial = quad->GetComponent<MaterialComponent>();
     quamaterial->SetShader(waterShader);
-    reflectionFramebuffer = new Framebuffer(1024, 1024,  GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, false);
-    refractionFramebuffer = new Framebuffer(1024, 1024,  GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, false);
+    reflectionFramebuffer = new Framebuffer(scene->windowWidth,  scene->windowHeight,  GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, false);
+    refractionFramebuffer = new Framebuffer(scene->windowWidth,  scene->windowHeight,  GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, false);
 
-    dudvMap = Texture("C:/Users/Jacques/Pictures/Textures/WaterTiles/1/waterDUDV (1).png", GL_TEXTURE2);
-    normalMap = Texture("C:/Users/Jacques/Pictures/Textures/WaterTiles/1/matchingNormalMap.png", GL_TEXTURE3);
+    dudvMap = Texture("resources/Textures/WaterTiles/1/waterDUDV.png", GL_TEXTURE2);
+    normalMap = Texture("resources/Textures/WaterTiles/1/matchingNormalMap.png", GL_TEXTURE3);
 }
 
 void WaterTile_1::WindowResize(int w, int h) {
+    std::cout << "Resize framebuffers " << std::endl;
     reflectionFramebuffer = new Framebuffer(w, h,  GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, false);
     refractionFramebuffer = new Framebuffer(w, h,  GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, false);
+    std::cout << w << "  " << h << std::endl;
 }
 
 
@@ -40,7 +42,7 @@ void WaterTile_1::Enable() {
 }
 
 void WaterTile_1::Update() {
-    // scene->triggerRefresh = true;
+    scene->triggerRefresh = true;
 }
 
 void WaterTile_1::Render(glm::mat4* overrideViewMatrixp) {
@@ -81,10 +83,10 @@ void WaterTile_1::Render(glm::mat4* overrideViewMatrixp) {
     scene->camera->transform->rotation.x = -scene->camera->transform->rotation.x; 
     //Disable fb
     reflectionFramebuffer->Disable();
-    //____________________________________________
+    // ____________________________________________
     
-    //2. Render refraction
-    //____________________________________________
+    // 2. Render refraction
+    // ____________________________________________
     refractionFramebuffer->Enable();    
     ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
     ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
@@ -103,6 +105,7 @@ void WaterTile_1::Render(glm::mat4* overrideViewMatrixp) {
     }
 
     refractionFramebuffer->Disable();
+
     //____________________________________________
     ogl->glDisable(GL_CLIP_DISTANCE0); 
 
@@ -128,9 +131,6 @@ void WaterTile_1::Render(glm::mat4* overrideViewMatrixp) {
     moveFactor = moveFactor >= 1 ? 0 : moveFactor;
     
     ogl->glUniform1f(ogl->glGetUniformLocation(waterShader.programShaderObject, "moveFactor"), moveFactor);
-
-    glm::vec3 camPos = scene->camera->transform->position;
-    ogl->glUniform3fv(ogl->glGetUniformLocation(waterShader.programShaderObject, "cameraPosition"),1, glm::value_ptr(camPos));    
 
     quad->Render();
     ogl->glBindTexture(GL_TEXTURE_2D, 0);

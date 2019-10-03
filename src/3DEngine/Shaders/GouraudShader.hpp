@@ -26,7 +26,7 @@ public:
     //GL Uniforms
     virtual void SetUniforms() {
         GETGL
-
+        
         int ambientFactorLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "ambientFactor");
         ogl->glUniform1f(ambientFactorLocation, ambientFactor);
 

@@ -9,6 +9,7 @@
 #include "Components/BaseMeshes.hpp"
 #include "../Util/ModelLoader.hpp"
 #include "ParticleSystem/ParticleSystem.hpp"
+#include "WaterTiles/WaterTile_1/WaterTile_1.hpp"
 
 namespace KikooRenderer {
 
@@ -950,8 +951,14 @@ Object3D* ObjectFromModelFile(Scene* scene, std::string name, std::string filena
 }
 
 Object3D* GetParticleSystem(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color) {
-    ParticleSystem* ps = new ParticleSystem("Particle System", scene);
+    ParticleSystem* ps = new ParticleSystem(name, scene);
     return ps;
+}
+
+Object3D* GetWaterTile_1(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color) {
+    WaterTile_1* wt1 = new WaterTile_1(name, scene);
+    // ParticleSystem* ps = new ParticleSystem("Particle System", scene);
+    return wt1;
 }
 
 

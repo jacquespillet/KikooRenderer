@@ -95,6 +95,7 @@ TexturePicker::TexturePicker(std::string label, std::string value  , bool isMult
     mainHorizLayout->addWidget(texPreview);
 
     fileLineEdit = new QLineEdit(QString::fromStdString(value));
+    fileLineEdit->setAcceptDrops(true);
     mainHorizLayout->addWidget(fileLineEdit);
 
     QPushButton* button = new QPushButton("Choose File");
@@ -132,15 +133,9 @@ TexturePicker::TexturePicker(std::string label, std::string value  , bool isMult
 
 void TexturePicker::dropEvent(QDropEvent *event)
 {
-    event->acceptProposedAction();
-    std::cout << "HEEEEEEEEEEEER" << std::endl;
-    // QFileInfo info(event->mimeData()->uris()[0]);
-    // QString texPath = event->mimeData()->text();
-    // texPath.remove(0, 4);
-    // std::cout << "texPath.toStdString()" << std::endl;
-    // std::cout << texPath.toStdString() << std::endl;
-
-    // fileLineEdit->setText(texPath);
+    QString texPath = event->mimeData()->text();
+    texPath.remove(0, 8);
+    fileLineEdit->setText(texPath);
 }
 
 void TexturePicker::dragLeaveEvent(QDragLeaveEvent *event)

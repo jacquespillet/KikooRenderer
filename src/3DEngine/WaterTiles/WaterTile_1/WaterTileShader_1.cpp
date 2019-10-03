@@ -27,13 +27,12 @@ Shader GetWaterTile_1Shader() {
     void main() {
         fragPos = modelMatrix * vec4(position.x, position.y, position.z, 1.0f);
 
-        fragUv = uv * tiling;
+        fragUv = uv;
         clipSpace =  modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
         gl_Position = clipSpace;
-        
     }
     )";
-
+  
     waterTileShader.fragSrc = R"(
     #version 440
     layout(location = 0) out vec4 outputColor; 
@@ -87,6 +86,8 @@ Shader GetWaterTile_1Shader() {
         vec4 reflectionColor = texture(reflectionTexture, reflectTexCoords);
         vec4 refractionColor = texture(refractionTexture, refractTexCoords);
 
+        vec3 fragToCam = normalize(cameraPos - fragPos.xyz);
+
         float refractiveFactor = dot(fragToCam, vec3(0, 1, 0));
         refractiveFactor = pow(refractiveFactor, reflectivity);
 
@@ -94,7 +95,6 @@ Shader GetWaterTile_1Shader() {
         vec3 normal = vec3(normalColor.r * 2.0 - 1.0, normalColor.b, normalColor.g * 2.0 - 1.0);
         normal = normalize(normal);
 
-        vec3 fragToCam = normalize(cameraPos - fragPos.xyz);
         vec4 specularHighlights = vec4(0, 0, 0, 0);
         for(int i=0; i<numLights; i++) {
             vec3 lightDirection = normalize(lights[i].direction);
@@ -119,7 +119,7 @@ Shader GetWaterTile_1Shader() {
     waterTileShader.name = "water tile Shader 1";
     waterTileShader.isLit = true;
     waterTileShader.isDepthPass = false;
-    waterTileShader.SetId(1);
+    waterTileShader.SetId(4);
     waterTileShader.Compile();
     waterTileShader.shouldRecompile = false;
 

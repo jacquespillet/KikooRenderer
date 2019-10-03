@@ -92,6 +92,9 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
 
 	QString particleSystemStr = "Particle System";
 
+	QString waterTile1Str = "Simple DUDV";
+
+
 	QPoint menuPos;
 	if(!fromMainWindow) menuPos = tree->mapToGlobal(pos);
 	else menuPos = tree->mapFromParent(pos);
@@ -121,7 +124,13 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
 	addObjectMenu->addSeparator();
 
     addObjectMenu->addAction(particleSystemStr);
+
+	addObjectMenu->addSeparator();
     
+	QMenu* addWaterTilesMenu = new QMenu("Water tiles");
+    addWaterTilesMenu->addAction(waterTile1Str);
+    addObjectMenu->addMenu(addWaterTilesMenu);
+
 	myMenu.addMenu(addObjectMenu);
     QAction* selectedItem = myMenu.exec(menuPos);
 
@@ -149,6 +158,8 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
 		if (selectedItem->text() == teapotStr) objectToAdd = CoreEngine::ObjectFromModelFile(view3D->view3DGL->scene, name.toStdString(), "C:/Users/Jacques/Documents/Boulot/2019/Qt BP/resources/OBJ/teapot/teapot.obj");
 		
 		if (selectedItem->text() == particleSystemStr) objectToAdd = CoreEngine::GetParticleSystem(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
+		
+		if (selectedItem->text() == waterTile1Str) objectToAdd = CoreEngine::GetWaterTile_1(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
 
 		if (selectedIndexes.size() > 0) {
 			TreeItem* parentItem = (TreeItem*)model->itemFromIndex(selectedIndexes[0]);
