@@ -179,9 +179,13 @@ void HDRRenderer::Render() {
 
     //Render all shadow maps
     LightComponent* light;
+    TransformComponent* lightTransform;
     for(int i=0; i<scene->lightObjects.size(); i++) {
         light = scene->lightObjects[i]->GetComponent<LightComponent>();
         light->RenderDepthMap();
+
+        if(light->hasChanged) light->hasChanged = false;
+        if(scene->lightObjects[i]->transform->hasChanged) scene->lightObjects[i]->transform->hasChanged = false;
     }
 
     ogl->glViewport(0, 0, quadFBO->width, quadFBO->height);

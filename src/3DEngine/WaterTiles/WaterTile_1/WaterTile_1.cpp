@@ -18,6 +18,9 @@ WaterTile_1::WaterTile_1(std::string name, Scene* scene) : Object3D(name, scene)
 
     quamaterial = quad->GetComponent<MaterialComponent>();
     quamaterial->SetShader(waterShader);
+    quad->transform = this->transform;
+    transform->rotation.x = 90;
+
     reflectionFramebuffer = new Framebuffer(scene->windowWidth,  scene->windowHeight,  GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, false);
     refractionFramebuffer = new Framebuffer(scene->windowWidth,  scene->windowHeight,  GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, false);
 
@@ -26,10 +29,8 @@ WaterTile_1::WaterTile_1(std::string name, Scene* scene) : Object3D(name, scene)
 }
 
 void WaterTile_1::WindowResize(int w, int h) {
-    std::cout << "Resize framebuffers " << std::endl;
     reflectionFramebuffer = new Framebuffer(w, h,  GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, false);
     refractionFramebuffer = new Framebuffer(w, h,  GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, false);
-    std::cout << w << "  " << h << std::endl;
 }
 
 
@@ -43,6 +44,26 @@ void WaterTile_1::Enable() {
 
 void WaterTile_1::Update() {
     scene->triggerRefresh = true;
+}
+
+std::vector<QWidget*> WaterTile_1::GetInspectorWidgets() {
+    std::vector<QWidget*> res;
+    res.push_back(this->transform->GetInspector());
+    
+    QGroupBox* mainGroupbox = new QGroupBox("Particle System");
+    QVBoxLayout* mainLayout = new QVBoxLayout();
+    mainGroupbox->setLayout(mainLayout);
+
+    CustomSlider* waveStrengthSlider = new CustomSlider(0, 1, 0.01, "Wave Strength", waveStrength);
+    mainLayout->addLayout(waveStrengthSlider);
+    QObject::connect( waveStrengthSlider, &CustomSlider::Modified, [this](double val) {
+        waveStrength = val;
+    });
+
+    res.push_back(mainGroupbox);
+
+
+    return res;
 }
 
 void WaterTile_1::Render(glm::mat4* overrideViewMatrixp) {
@@ -131,6 +152,12 @@ void WaterTile_1::Render(glm::mat4* overrideViewMatrixp) {
     moveFactor = moveFactor >= 1 ? 0 : moveFactor;
     
     ogl->glUniform1f(ogl->glGetUniformLocation(waterShader.programShaderObject, "moveFactor"), moveFactor);
+    
+    ogl->glUniform1f(ogl->glGetUniformLocation(waterShader.programShaderObject, "waveStrength"), waveStrength);
+    
+    ogl->glUniform1i(ogl->glGetUniformLocation(waterShader.programShaderObject, "reflectivity"), reflectivity);
+
+    ogl->glUniform1f(ogl->glGetUniformLocation(waterShader.programShaderObject, "blueness"), blueness);
 
     quad->Render();
     ogl->glBindTexture(GL_TEXTURE_2D, 0);

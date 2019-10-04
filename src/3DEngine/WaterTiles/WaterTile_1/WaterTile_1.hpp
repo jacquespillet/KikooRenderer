@@ -23,6 +23,8 @@ public:
     void Destroy() override;
     void Recompute() override;
     void WindowResize(int w, int h) override;
+    std::vector<QWidget*> GetInspectorWidgets() override;
+
 
 private:
     Object3D* quad;
@@ -38,7 +40,10 @@ private:
     Texture normalMap;
 
     float moveFactor=0;
+    float waveStrength = 0.02;
+    int reflectivity = 10;
     float speed = 0.03;
+    float blueness = 0.3;
 };
 
 }

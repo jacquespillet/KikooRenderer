@@ -257,11 +257,14 @@ void MaterialComponent::SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 vie
 
 
 				int numLights = 0;
+
 				for(int i=0; i<scene->lightObjects.size(); i++) {
 					LightComponent* lightComponent = scene->lightObjects[i]->GetComponent<LightComponent>(); 
 					TransformComponent* transformComponent = scene->lightObjects[i]->transform;
 					
 					if(lightComponent != nullptr) {
+						
+
 						if(transformComponent->hasChanged || firstIter) {
 							std::string varName = "lights[" + std::to_string(i) + "].position";
 							GLuint loc = ogl->glGetUniformLocation(this->shader.programShaderObject, varName.c_str());
@@ -270,8 +273,6 @@ void MaterialComponent::SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 vie
 							varName = "lights[" + std::to_string(i) + "].direction";
 							loc = ogl->glGetUniformLocation(this->shader.programShaderObject, varName.c_str());
 							ogl->glUniform3fv(loc, 1, glm::value_ptr(glm::vec3(glm::column(transformComponent->GetModelMatrix(), 2))));
-
-							transformComponent->hasChanged = false;
 						}
 
 						if(lightComponent->hasChanged || firstIter) {
@@ -310,7 +311,6 @@ void MaterialComponent::SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 vie
 								loc = ogl->glGetUniformLocation(this->shader.programShaderObject, varName.c_str());
 								ogl->glUniform1f(loc, lightComponent->farClip);								
 							}
-							lightComponent->hasChanged = false;
 						}
 
 						if(lightComponent->type == 0 || lightComponent->type == 2) {			

@@ -65,9 +65,9 @@ Shader GetWaterTile_1Shader() {
 
     uniform float moveFactor;
     
-    const float waveStrength = 0.02;
-    const float reflectivity = 10;
-    const float blueness = 0.3;
+    uniform float waveStrength;
+    uniform int reflectivity;
+    uniform float blueness;
 
     void main()
     {
