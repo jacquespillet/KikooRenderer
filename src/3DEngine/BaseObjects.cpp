@@ -10,6 +10,8 @@
 #include "../Util/ModelLoader.hpp"
 #include "ParticleSystem/ParticleSystem.hpp"
 #include "WaterTiles/WaterTile_1/WaterTile_1.hpp"
+#include "WaterTiles/WaterTile_2/WaterTile_2.hpp"
+#include "WaterTiles/Wavetile/WaveTile.hpp"
 
 namespace KikooRenderer {
 
@@ -957,10 +959,22 @@ Object3D* GetParticleSystem(Scene* scene, std::string name, glm::vec3 _position,
 
 Object3D* GetWaterTile_1(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color) {
     WaterTile_1* wt1 = new WaterTile_1(name, scene);
-    // ParticleSystem* ps = new ParticleSystem("Particle System", scene);
     return wt1;
 }
 
+Object3D* GetWaterTile_2(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color) {
+    WaterTile_2* wt2 = new WaterTile_2(name, scene);
+    return wt2;
+}
 
+Object3D* GetWaterTile_3(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color) {
+    WaterTile_2* wt3 = new WaterTile_2(name, scene, TILE_TYPE::WATER);
+    return wt3;
+} 
+
+Object3D* GetWaterTile_4(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color) {
+    WaveTile* wt = new WaveTile(name, scene);
+    return wt;
+} 
 }
 }

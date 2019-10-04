@@ -27,9 +27,9 @@ Shader GetWaveTileShader() {
     const float PI = 3.14159265358979;
     
     //dir, steepness, wavelength
-    const vec4 waveA = vec4(1, 0, 0.5, 10); 
-    const vec4 waveB = vec4(1, 1, 0.5, 4); 
-    const vec4 waveC = vec4(1, 1, 0.25, 2); 
+    uniform vec4 waves[20];
+    uniform int numWaves;
+
 
     vec3 GerstnerWave(vec4 wave, vec3 p, inout vec3 tangent, inout vec3 binormal) {
         float k = 2 * PI / wave.w;
@@ -60,9 +60,10 @@ Shader GetWaveTileShader() {
         vec3 p = (modelMatrix * vec4(position.x, position.y, position.z, 1)).xyz;
         vec3 tangent = vec3(1, 0, 0);
         vec3 binormal = vec3(0, 0, 1);
-        p+=  GerstnerWave(waveA, p, tangent,binormal);
-        p+=  GerstnerWave(waveB, p, tangent,binormal);
-        p+=  GerstnerWave(waveB, p, tangent,binormal);
+
+        for(int i=0; i<numWaves; i++) {
+            p+= GerstnerWave(waves[i], p, tangent,binormal);
+        }
   
   
         fragNormal = normalize(cross(binormal, tangent));
@@ -128,8 +129,9 @@ Shader GetWaveTileShader() {
     waveTileShader.name = "water tile Shader 1";
     waveTileShader.isLit = true;
     waveTileShader.isDepthPass = false;
-    waveTileShader.SetId(1);
+    waveTileShader.SetId(4);
     waveTileShader.Compile();
+    waveTileShader.shouldRecompile = false;
 
     return waveTileShader;
 }

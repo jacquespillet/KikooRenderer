@@ -93,6 +93,9 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
 	QString particleSystemStr = "Particle System";
 
 	QString waterTile1Str = "Simple DUDV";
+	QString waterTile2Str = "Directional Flow";
+	QString waterTile3Str = "Texture Distortion";
+	QString waterTile4Str = "Gerstner Wave";
 
 
 	QPoint menuPos;
@@ -129,6 +132,9 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
     
 	QMenu* addWaterTilesMenu = new QMenu("Water tiles");
     addWaterTilesMenu->addAction(waterTile1Str);
+    addWaterTilesMenu->addAction(waterTile2Str);
+    addWaterTilesMenu->addAction(waterTile3Str);
+    addWaterTilesMenu->addAction(waterTile4Str);
     addObjectMenu->addMenu(addWaterTilesMenu);
 
 	myMenu.addMenu(addObjectMenu);
@@ -160,6 +166,9 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
 		if (selectedItem->text() == particleSystemStr) objectToAdd = CoreEngine::GetParticleSystem(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
 		
 		if (selectedItem->text() == waterTile1Str) objectToAdd = CoreEngine::GetWaterTile_1(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
+		if (selectedItem->text() == waterTile2Str) objectToAdd = CoreEngine::GetWaterTile_2(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
+		if (selectedItem->text() == waterTile3Str) objectToAdd = CoreEngine::GetWaterTile_3(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
+		if (selectedItem->text() == waterTile4Str) objectToAdd = CoreEngine::GetWaterTile_4(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
 
 		if (selectedIndexes.size() > 0) {
 			TreeItem* parentItem = (TreeItem*)model->itemFromIndex(selectedIndexes[0]);

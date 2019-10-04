@@ -58,13 +58,12 @@ Shader GetWaterTile_2Shader() {
     in vec2 fragUv;
     in vec4 fragPos;
 
-    const vec2 uvJump = vec2(0.0, 0.0);
-    const float tiling = 3;
-    const float speed = 0.5;
-    const float strength = 0.1;
-    const float flowOffset = 0;
-    const float constantHeightScale = 0.25;
-    const float modulatedHeightScale = 0.75;
+    uniform vec2 uvJump;
+    uniform float tiling;
+    uniform float speed;
+    uniform float strength;
+    uniform float constantHeightScale;
+    uniform float modulatedHeightScale;
 
     vec3 UnpackDerivativeHeight (vec4 textureData) {
         vec3 dh = textureData.agb;
@@ -137,8 +136,9 @@ Shader GetWaterTile_2Shader() {
     waterTileShader.name = "water tile Shader 2";
     waterTileShader.isLit = true;
     waterTileShader.isDepthPass = false;
-    waterTileShader.SetId(1);
+    waterTileShader.SetId(4);
     waterTileShader.Compile(); 
+    waterTileShader.shouldRecompile = false;
 
     return waterTileShader;
 }

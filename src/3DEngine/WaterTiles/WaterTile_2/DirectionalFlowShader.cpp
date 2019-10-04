@@ -58,15 +58,14 @@ Shader GetDirectionalFlowShader() {
     in vec2 fragUv;
     in vec4 fragPos;
 
-    const float tiling = 1;
-    const float speed = 1;
-    const float strength = 0.1;
-    const float flowOffset = 0;
-    const float constantHeightScale = 0.5;
-    const float modulatedHeightScale = 10;
-    const float gridResolution = 30;
-    const float modulatedTiling = 50;
-    const int dualGrid = 1;
+    uniform float tiling;
+    uniform float speed;
+    uniform float strength;
+    uniform float constantHeightScale;
+    uniform float modulatedHeightScale;
+    uniform float gridResolution;
+    uniform float modulatedTiling;
+    uniform int dualGrid;
 
     vec3 UnpackDerivativeHeight (vec4 textureData) {
         vec3 dh = textureData.agb;
@@ -175,9 +174,10 @@ Shader GetDirectionalFlowShader() {
     directionalFlowShader.name = "water tile Shader 2";
     directionalFlowShader.isLit = true;
     directionalFlowShader.isDepthPass = false;
-    directionalFlowShader.SetId(1);
+    directionalFlowShader.SetId(4);
     directionalFlowShader.Compile(); 
-
+    directionalFlowShader.shouldRecompile = false;
+    
     return directionalFlowShader;
 }
 }

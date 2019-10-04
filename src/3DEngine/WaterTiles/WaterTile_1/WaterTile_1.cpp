@@ -50,7 +50,7 @@ std::vector<QWidget*> WaterTile_1::GetInspectorWidgets() {
     std::vector<QWidget*> res;
     res.push_back(this->transform->GetInspector());
     
-    QGroupBox* mainGroupbox = new QGroupBox("Particle System");
+    QGroupBox* mainGroupbox = new QGroupBox("Simple DUDV flow");
     QVBoxLayout* mainLayout = new QVBoxLayout();
     mainGroupbox->setLayout(mainLayout);
 
@@ -58,6 +58,26 @@ std::vector<QWidget*> WaterTile_1::GetInspectorWidgets() {
     mainLayout->addLayout(waveStrengthSlider);
     QObject::connect( waveStrengthSlider, &CustomSlider::Modified, [this](double val) {
         waveStrength = val;
+    });
+
+    
+    CustomSlider* reflectivitySlider = new CustomSlider(0, 512, 2, "Reflectivity", reflectivity);
+    mainLayout->addLayout(reflectivitySlider);
+    QObject::connect( reflectivitySlider, &CustomSlider::Modified, [this](double val) {
+        reflectivity = val;
+    });
+
+    CustomSlider* speedSlider = new CustomSlider(0, 1, 0.01, "Speed", speed);
+    mainLayout->addLayout(speedSlider);
+    QObject::connect( speedSlider, &CustomSlider::Modified, [this](double val) {
+        speed = val;
+    });
+
+    
+    CustomSlider* bluenessSlider = new CustomSlider(0, 1, 0.01, "blueness", blueness);
+    mainLayout->addLayout(bluenessSlider);
+    QObject::connect( bluenessSlider, &CustomSlider::Modified, [this](double val) {
+        blueness = val;
     });
 
     res.push_back(mainGroupbox);

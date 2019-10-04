@@ -55,6 +55,7 @@ Shader GetWaterTile_1Shader() {
     uniform sampler2D dudvmap;
     uniform sampler2D normalMap;
     uniform vec3 cameraPos;
+    uniform mat4 modelMatrix;
 
     uniform LightSource lights[4];
     uniform int numLights; 
@@ -92,7 +93,7 @@ Shader GetWaterTile_1Shader() {
         refractiveFactor = pow(refractiveFactor, reflectivity);
 
         vec4 normalColor = texture(normalMap, distortedTexCoords);
-        vec3 normal = vec3(normalColor.r * 2.0 - 1.0, normalColor.b, normalColor.g * 2.0 - 1.0);
+        vec3 normal = (transpose(inverse(modelMatrix)) * vec4(normalColor.r * 2.0 - 1.0, normalColor.g, normalColor.b * 2.0 - 1.0, 0)).xyz;
         normal = normalize(normal);
 
         vec4 specularHighlights = vec4(0, 0, 0, 0);
@@ -108,7 +109,7 @@ Shader GetWaterTile_1Shader() {
             
             vec3 reflectedLight = reflect(normalize(lightDirection), normal);
             float specular = max(dot(reflectedLight, fragToCam), 0.0);
-            specular = pow(specular, 20);
+            specular = pow(specular, reflectivity);
             specularHighlights += lights[i].color * specular;
         }
 
