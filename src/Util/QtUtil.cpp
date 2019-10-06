@@ -153,6 +153,121 @@ void TexturePicker::dragMoveEvent(QDragMoveEvent *event) {
     event->acceptProposedAction();
 }
 
+Vector4Inspector::Vector4Inspector(std::string label, glm::vec4 value) {
+
+	QVBoxLayout* mainLayout = new QVBoxLayout();
+
+	//Position
+	QLabel* positionLabel = new QLabel(QString::fromStdString(label));
+	QHBoxLayout* positionLayout = new QHBoxLayout();
+
+	QLabel* xLabel = new QLabel("x"); xSpinBox = new QDoubleSpinBox(); 
+	xSpinBox->setDecimals(4); xSpinBox->setRange(-500, 500);  xSpinBox->setValue(value.x);  positionLayout->addWidget(xLabel); positionLayout->addWidget(xSpinBox);
+	QLabel* yLabel = new QLabel("y"); ySpinBox = new QDoubleSpinBox(); 
+	ySpinBox->setDecimals(4); ySpinBox->setRange(-500, 500); ySpinBox->setValue(value.y); positionLayout->addWidget(yLabel);  positionLayout->addWidget(ySpinBox);
+	QLabel* zLabel = new QLabel("z"); zSpinBox = new QDoubleSpinBox(); 
+	zSpinBox->setDecimals(4); zSpinBox->setRange(-500, 500); zSpinBox->setValue(value.z); positionLayout->addWidget(zLabel);  positionLayout->addWidget(zSpinBox);
+	QLabel* wLabel = new QLabel("w"); wSpinBox = new QDoubleSpinBox(); 
+	wSpinBox->setDecimals(4); wSpinBox->setRange(-500, 500); wSpinBox->setValue(value.w); positionLayout->addWidget(wLabel);  positionLayout->addWidget(wSpinBox);
+
+    connect(xSpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, mainLayout](double value) {
+        vector.x = value;
+        emit Modified(vector);
+    });
+
+    connect(ySpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, mainLayout](double value) {
+        vector.y = value;
+        emit Modified(vector);
+    });
+    
+    connect(zSpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, mainLayout](double value) {
+        vector.z = value;
+        emit Modified(vector);
+    });
+    
+    connect(wSpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, mainLayout](double value) {
+        vector.w = value;
+        emit Modified(vector);
+    });
+    setLayout(positionLayout);
+}
+
+void Vector4Inspector::Setvalue(glm::vec4 value) {
+    xSpinBox->setValue(value.x);
+    ySpinBox->setValue(value.y);
+    zSpinBox->setValue(value.z);
+    wSpinBox->setValue(value.w);
+}
+void Vector4Inspector::Setvalue(float x, float y, float z, float w) {
+    xSpinBox->setValue(x);
+    ySpinBox->setValue(y);
+    zSpinBox->setValue(z);
+    wSpinBox->setValue(w);
+}
+glm::vec4 Vector4Inspector::GetValue() {
+    return vector;
+}
+
+Vector4ArrayInspector::Vector4ArrayInspector(std::string label, std::vector<glm::vec4> values, glm::vec4 defaultVec) {
+	this->vectors = values;
+    this->defaultVec = defaultVec;
+
+    QVBoxLayout* mainLayout = new QVBoxLayout();
+
+	//Label & Vector size
+	QLabel* xLabel = new QLabel("size"); sizeSpinBox = new QSpinBox(); 
+	sizeSpinBox->setRange(-500, 500);  sizeSpinBox->setValue(vectors.size());  
+    mainLayout->addWidget(xLabel); 
+    mainLayout->addWidget(sizeSpinBox);
+
+    //Layout for vector
+    QVBoxLayout* vectorsLayout = new QVBoxLayout();
+    mainLayout->addLayout(vectorsLayout);
+
+    //Add all vectors
+    for(int i=0; i<vectors.size(); i++) {
+        Vector4Inspector* vi = new Vector4Inspector(std::to_string(i), vectors[i]);
+        vectorsLayout->addWidget(vi);
+    }    
+
+    connect(sizeSpinBox, static_cast<void (QSpinBox::*)(int value)>(&QSpinBox::valueChanged), this, [this, vectorsLayout, mainLayout](int size) {
+        EmptyLayout(vectorsLayout);
+        vectors.resize(size);
+        for(int i=0; i<size; i++) {
+            Vector4Inspector* vi = new Vector4Inspector(std::to_string(i), vectors[i]);
+            vectorsLayout->addWidget(vi);
+
+            connect(vi, &Vector4Inspector::Modified, this, [this, i](glm::vec4 vector) {
+                vectors[i] = vector;
+                emit Modified(vectors);
+            });
+        }
+        emit Modified(vectors);
+    });
+    
+    setLayout(mainLayout);
+}
+
+void Vector4ArrayInspector::SetSize(int size) {
+
+}
+
+void Vector4ArrayInspector::Setvalue(std::vector<glm::vec4> values) {
+
+}
+
+std::vector<glm::vec4> Vector4ArrayInspector::GetValue() {
+    std::vector<glm::vec4> res;
+    return res;
+}
+
+glm::vec4 At() {
+    return glm::vec4(0);
+}
+
+
+
+
 void EmptyLayout(QLayout* layout)  {
 	if (!layout) {
 		std::cout << "QtUtil:EmptyLayout: layout null" << std::endl;

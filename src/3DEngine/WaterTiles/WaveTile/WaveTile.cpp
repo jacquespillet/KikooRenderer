@@ -40,6 +40,26 @@ void WaveTile::Update() {
     scene->triggerRefresh = true;
 }
 
+std::vector<QWidget*> WaveTile::GetInspectorWidgets() {
+    std::vector<QWidget*> res;
+    res.push_back(this->quad->transform->GetInspector());
+    
+    QGroupBox* mainGroupbox = new QGroupBox("Waves Inspector");
+    QVBoxLayout* mainLayout = new QVBoxLayout();
+    
+    Vector4ArrayInspector* wavesInspector = new Vector4ArrayInspector("Waves", waves, glm::vec4(1, 0, 0.75, 6)); 
+    QObject::connect(wavesInspector, &Vector4ArrayInspector::Modified, [this](std::vector<glm::vec4> vectors) {
+        waves = vectors;
+    });    
+    mainLayout->addWidget(wavesInspector);
+
+    mainGroupbox->setLayout(mainLayout);
+    res.push_back(mainGroupbox);
+
+    return res;
+}
+
+
 void WaveTile::Render(glm::mat4* overrideViewMatrixp) {
     GETGL
     ogl->glUseProgram(waterShader.programShaderObject);
@@ -49,19 +69,14 @@ void WaveTile::Render(glm::mat4* overrideViewMatrixp) {
     int viewProjectionMatLoc = ogl->glGetUniformLocation(waterShader.programShaderObject, "viewProjectionMatrix"); 
     ogl->glUniformMatrix4fv(viewProjectionMatLoc, 1, false, glm::value_ptr(viewProjection));
 
-    ogl->glUniform4fv(ogl->glGetUniformLocation(waterShader.programShaderObject, "waves[0]"), 1, glm::value_ptr(glm::vec4(1, 0, 0.75, 6)));
-    ogl->glUniform4fv(ogl->glGetUniformLocation(waterShader.programShaderObject, "waves[1]"), 1, glm::value_ptr(glm::vec4(1, 1, 0.75, 4)));
-    ogl->glUniform4fv(ogl->glGetUniformLocation(waterShader.programShaderObject, "waves[2]"), 1, glm::value_ptr(glm::vec4(1, 1, 0.5, 2)));
-    ogl->glUniform4fv(ogl->glGetUniformLocation(waterShader.programShaderObject, "waves[3]"), 1, glm::value_ptr(glm::vec4(-1, 0, 0.35, 1.8)));
-    ogl->glUniform4fv(ogl->glGetUniformLocation(waterShader.programShaderObject, "waves[4]"), 1, glm::value_ptr(glm::vec4(1, -1, 0.25, 1.5)));
-    ogl->glUniform4fv(ogl->glGetUniformLocation(waterShader.programShaderObject, "waves[5]"), 1, glm::value_ptr(glm::vec4(-1, 1, 0.20, 1.3)));
-    ogl->glUniform4fv(ogl->glGetUniformLocation(waterShader.programShaderObject, "waves[6]"), 1, glm::value_ptr(glm::vec4(0, -1, 0.15, 1)));
-    ogl->glUniform4fv(ogl->glGetUniformLocation(waterShader.programShaderObject, "waves[7]"), 1, glm::value_ptr(glm::vec4(-1, -1, 0.1, 0.8)));
-    ogl->glUniform4fv(ogl->glGetUniformLocation(waterShader.programShaderObject, "waves[8]"), 1, glm::value_ptr(glm::vec4(-1, 0, 0.05, 0.5)));
-    ogl->glUniform4fv(ogl->glGetUniformLocation(waterShader.programShaderObject, "waves[9]"), 1, glm::value_ptr(glm::vec4(1, -1, 0.01, 0.23)));
-    ogl->glUniform4fv(ogl->glGetUniformLocation(waterShader.programShaderObject, "waves[10]"), 1, glm::value_ptr(glm::vec4(-1, 1, 0.01, 0.1)));
-    ogl->glUniform1i(ogl->glGetUniformLocation(waterShader.programShaderObject, "numWaves"), 11);
+    for(int i=0; i<waves.size(); i++) {
+        std::string name = "waves[" + std::to_string(i) + "]";
+        ogl->glUniform4fv(ogl->glGetUniformLocation(waterShader.programShaderObject, name.c_str()), 1, glm::value_ptr(waves[i]));
+    }
 
+    // ogl->glUniform4fv(ogl->glGetUniformLocation(waterShader.programShaderObject, "waves[0]"), 1, glm::value_ptr(glm::vec4(1, 0, 0.75, 6)));
+    
+    ogl->glUniform1i(ogl->glGetUniformLocation(waterShader.programShaderObject, "numWaves"), waves.size());
 
     quad->Render();
 }

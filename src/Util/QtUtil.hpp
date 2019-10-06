@@ -70,5 +70,38 @@ signals:
 	void FilesModified(QStringList fileNames);
 };
 
+class Vector4Inspector : public QWidget {
+	Q_OBJECT
+public:
+	Vector4Inspector(std::string label, glm::vec4 value);
+	void Setvalue(glm::vec4 value);
+	void Setvalue(float x, float y, float z, float w);
+	glm::vec4 GetValue();
+private:
+	QDoubleSpinBox* xSpinBox;
+	QDoubleSpinBox* ySpinBox;
+	QDoubleSpinBox* zSpinBox;
+	QDoubleSpinBox* wSpinBox;
+	glm::vec4 vector;
+signals: 
+	void Modified(glm::vec4 value);	
+};
+
+
+class Vector4ArrayInspector : public QWidget {
+	Q_OBJECT
+public:
+	Vector4ArrayInspector(std::string label, std::vector<glm::vec4> values, glm::vec4 defaultVec=glm::vec4(0));
+	void SetSize(int size);
+	void Setvalue(std::vector<glm::vec4> values);
+	std::vector<glm::vec4> GetValue();
+	glm::vec4 At();
+private:
+	QSpinBox* sizeSpinBox;
+	std::vector<glm::vec4> vectors;
+signals: 
+	void Modified(std::vector<glm::vec4> value);	
+};
+
 
 }

@@ -23,8 +23,9 @@ public:
     void Destroy() override;
     void Recompute() override;
     void WindowResize(int w, int h) override;
-
+    std::vector<QWidget*> GetInspectorWidgets() override;
 private:
+    std::vector<glm::vec4> waves;
     Object3D* quad;
     
     MaterialComponent* quamaterial;
