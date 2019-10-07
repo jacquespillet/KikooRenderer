@@ -215,7 +215,7 @@ Vector4ArrayInspector::Vector4ArrayInspector(std::string label, std::vector<glm:
     QVBoxLayout* mainLayout = new QVBoxLayout();
 
 	//Label & Vector size
-	QLabel* xLabel = new QLabel("size"); sizeSpinBox = new QSpinBox(); 
+	QLabel* xLabel = new QLabel(QString::fromStdString(label)); sizeSpinBox = new QSpinBox(); 
 	sizeSpinBox->setRange(-500, 500);  sizeSpinBox->setValue(vectors.size());  
     mainLayout->addWidget(xLabel); 
     mainLayout->addWidget(sizeSpinBox);

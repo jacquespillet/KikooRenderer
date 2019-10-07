@@ -47,7 +47,7 @@ std::vector<QWidget*> WaveTile::GetInspectorWidgets() {
     QGroupBox* mainGroupbox = new QGroupBox("Waves Inspector");
     QVBoxLayout* mainLayout = new QVBoxLayout();
     
-    Vector4ArrayInspector* wavesInspector = new Vector4ArrayInspector("Waves", waves, glm::vec4(1, 0, 0.75, 6)); 
+    Vector4ArrayInspector* wavesInspector = new Vector4ArrayInspector("Waves : x, y, steepness, wavelength", waves, glm::vec4(1, 0, 0.75, 6)); 
     QObject::connect(wavesInspector, &Vector4ArrayInspector::Modified, [this](std::vector<glm::vec4> vectors) {
         waves = vectors;
     });    

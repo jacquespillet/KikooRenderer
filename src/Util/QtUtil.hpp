@@ -99,6 +99,7 @@ public:
 private:
 	QSpinBox* sizeSpinBox;
 	std::vector<glm::vec4> vectors;
+	glm::vec4 defaultVec;
 signals: 
 	void Modified(std::vector<glm::vec4> value);	
 };

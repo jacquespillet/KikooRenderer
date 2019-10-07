@@ -360,6 +360,20 @@ void MeshFilterComponent::SetInstanceAttributes(std::vector<InstanceAttribute> i
 }
 
 
+QJsonObject MeshFilterComponent::ToJSON() {
+	QJsonObject json;
+	json["type"] = "MeshFilter";
+	json["drawingMode"] = (int)drawingMode;
+	json["polygonMode"] = (int)polygonMode;
+	json["primitiveSize"] = primitiveSize;
+	json["meshType"] = meshType;
+	json["modelPath"] = QString::fromStdString(modelpath);
+	json["renderInstanced"] = renderInstanced;
+	json["numInstances"] = numInstances;
+	return json;
+}	
+
+
 
 }
 }
