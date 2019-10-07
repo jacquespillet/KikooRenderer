@@ -30,6 +30,27 @@ public:
 
     QWidget* GetMainParameters();
 
+    QJsonObject ToJSON() {
+        QJsonObject json;
+        json["type"] = "ParticleSystem";
+        json["pps"] = pps;
+        json["speed"] = speed;
+        json["scale"] = scale;
+        json["lifeLength"] = lifeLength;
+        json["gravityFactor"] = gravityFactor;
+        json["speedError"] = speedError;
+        json["lifeError"] = lifeError;
+        json["scaleError"] = scaleError;
+        json["isRandomRotation"] = isRandomRotation;
+        json["useDirection"] = useDirection;
+        json["directionDeviation"] = directionDeviation;
+        json["blendingMode"] = blendingMode;
+        json["numRows"] = numRows;
+        json["useCurlNoise"] = useCurlNoise;
+        json["textureFile"] = QString::fromStdString(textureFile);
+        return json;        
+    }       
+
 private:
     std::vector<Particle> particles;
     Object3D* quad;

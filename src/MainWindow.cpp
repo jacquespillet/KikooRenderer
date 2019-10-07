@@ -73,7 +73,14 @@ namespace KikooRenderer {
         
         // QObject::connect(saveAsAction, SIGNAL(triggered()), this, SLOT(SaveAsProject()));
 
-        // QObject::connect(loadAction, SIGNAL(triggered()), this, SLOT(LoadProject()));
+        QObject::connect(loadAction, &QAction::triggered, this, [this]() {
+            QString fileName = QFileDialog::getOpenFileName(this, tr("Open Project"), tr(currentFolderPath.c_str()), tr("Project File (*.rendproj)"));
+            if(fileName.length() > 0)
+            {
+                SceneFromFile(view3D->view3DGL->scene, fileName.toStdString());
+                setWindowTitle(QFileInfo(fileName).fileName() + " - KikooRenderer");
+            }            
+        });
         
         //QObject::connect(view3DAction, SIGNAL(triggered()), this, SLOT(Start3DView()));
         QObject::connect(preferencesAction, &QAction::triggered, this, [this]() {

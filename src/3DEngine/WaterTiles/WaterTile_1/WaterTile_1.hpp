@@ -26,6 +26,17 @@ public:
     std::vector<QWidget*> GetInspectorWidgets() override;
 
 
+    QJsonObject ToJSON() {
+        QJsonObject json;
+        json["type"] = "WaterTile_1";
+        json["moveFactor"] = moveFactor;
+        json["waveStrength"] = waveStrength;
+        json["reflectivity"] = reflectivity;
+        json["speed"] = speed;
+        json["blueness"] = blueness;
+        return json;        
+    }  
+
 private:
     Object3D* quad;
 	Object3D* dummyQuad;
@@ -44,26 +55,7 @@ private:
     int reflectivity = 10;
     float speed = 0.03;
     float blueness = 0.3;
-
-
-    QJsonObject ToJSON() {
-        QJsonObject json;
-        json["type"] = "BoundingBox";
-
-        QJsonObject minJson;
-        minJson["x"] = min.x;
-        minJson["y"] = min.y;
-        minJson["z"] = min.z;
-        json["min"] = minJson;
-
-        QJsonObject maxJson;
-        maxJson["x"] = max.x;
-        maxJson["y"] = max.y;
-        maxJson["z"] = max.z;
-        json["max"] = maxJson;
-        
-        return json;        
-    }    
+  
 };
 
 }

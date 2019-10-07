@@ -324,5 +324,15 @@ namespace CoreEngine {
         json["objects"] = objectArray;        
         return json;
     }
+
+    void Scene::FromJSON(QJsonDocument json) {
+        QJsonArray objectArray = json["objects"].toArray();
+        for (int objectIndex = 0; objectIndex < objectArray.size(); ++objectIndex) {
+            QJsonObject objectJson = objectArray[objectIndex].toObject();
+            Object3D* object = Object3D::FromJSON(objectJson);
+            // AddObject(object);
+        }        
+    }
+
 }
 }

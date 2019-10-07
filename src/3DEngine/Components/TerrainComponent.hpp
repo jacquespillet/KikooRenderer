@@ -19,6 +19,9 @@ class TerrainComponent : public Component {
         ComponentInspector* GetInspector(){return nullptr;}
 
 		QJsonObject ToJSON();
+        static void FromJSON(QJsonObject json, Object3D* obj) {
+            
+        }
     private:
         int width;
         int height;

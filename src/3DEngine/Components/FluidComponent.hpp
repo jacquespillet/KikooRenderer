@@ -46,6 +46,10 @@ namespace CoreEngine {
 			json["classType"] = "mClassType";
 			return json;
 		}
+
+        static void FromJSON(QJsonObject json, Object3D* obj) {
+            
+        }
     };
 }
 }

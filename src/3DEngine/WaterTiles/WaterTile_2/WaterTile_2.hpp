@@ -26,6 +26,30 @@ public:
     void WindowResize(int w, int h) override;
     std::vector<QWidget*> GetInspectorWidgets() override;
 
+
+
+    QJsonObject ToJSON() {
+        QJsonObject json;
+        json["type"] = "WaterTile_2";
+        json["tileType"] = (int) tileType;
+        json["tiling"] = tiling;
+        json["strength"] = strength;
+        json["constantHeightScale"] = constantHeightScale;
+        json["modulatedHeightScale"] = modulatedHeightScale;
+        json["gridResolution"] = gridResolution;
+        json["modulatedTiling"] = modulatedTiling;
+        json["dualGrid"] = dualGrid;
+
+        json["distortionTiling"] = distortionTiling;
+        json["distortionSpeed"] = distortionSpeed;
+        json["distortionStrength"] = distortionStrength;
+        json["flowOffset"] = flowOffset;
+        json["distortionConstantHeightScale"] = distortionConstantHeightScale;
+        json["distortionModulatedHeightScale"] = distortionModulatedHeightScale;
+        json["uvJumpX"] = uvJump.x;
+        json["uvJumpY"] = uvJump.y;
+        return json;        
+    }   
 private:
     Object3D* quad;    
     MaterialComponent* quamaterial;
@@ -57,6 +81,7 @@ private:
     float flowOffset = 0;
     float distortionConstantHeightScale = 0.25;
     float distortionModulatedHeightScale = 0.75;
+   
 
 };
 

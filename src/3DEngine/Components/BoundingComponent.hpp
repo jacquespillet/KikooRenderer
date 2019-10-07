@@ -12,7 +12,7 @@ namespace CoreEngine {
     // }
 
     class BoundingBoxComponent : public Component {
-        public:
+    public:
         BoundingBoxComponent(Object3D* object);
         void OnStart();
         void OnEnable();
@@ -39,7 +39,12 @@ namespace CoreEngine {
         Object3D* GetBoxObject();
 
         bool shouldRefresh = false;
-        private: 
+   
+        static void FromJSON(QJsonObject json, Object3D* obj) {
+            
+        } 
+    
+    private: 
         Object3D* boxObject;
         TransformComponent* transform;
 
@@ -64,6 +69,7 @@ namespace CoreEngine {
 
 			return json;
 		}
+
     };
     
     // class BoundingSphere : public Component {

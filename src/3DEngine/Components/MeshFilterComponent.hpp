@@ -84,6 +84,10 @@ class MeshFilterComponent : public Component {
 
         QJsonObject jsonObj;
         QJsonObject ToJSON();
+        static void FromJSON(QJsonObject json, Object3D* obj) {
+            
+        }
+
 
         
     private: 

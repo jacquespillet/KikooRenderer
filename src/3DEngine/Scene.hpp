@@ -90,6 +90,7 @@ class Scene {
 		
 		//For saving the scene
 		QJsonObject ToJSON();
+		void FromJSON(QJsonDocument json);
 
 
 		void SetRenderPipeline(RENDER_PIPELINE pipeline);

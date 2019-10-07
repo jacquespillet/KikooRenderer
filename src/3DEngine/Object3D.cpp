@@ -289,9 +289,12 @@ Object3D* Object3D::Intersects(Geometry::Ray ray, double& _distance) {
 QJsonObject Object3D::ToJSON() {
 	QJsonObject json;
 	json["Name"] = QString::fromStdString(name);
-	json["visible"] = QString((int)visible);
-	json["depthTest"] = QString((int)depthTest);
-	json["isStatic"] = QString((int)isStatic);
+	json["visible"] = (int)visible;
+	json["depthTest"] = (int)depthTest;
+	json["isStatic"] = (int)isStatic;
+	json["type"] = "BaseObject";
+
+	json["transform"] = transform->ToJSON();
 
 	QJsonArray componentsArray;
 	for(int i=0; i<components.size(); i++) {
@@ -311,5 +314,31 @@ QJsonObject Object3D::ToJSON() {
 	}
 	return json;
 }
+
+Object3D* Object3D::FromJSON(QJsonObject json) {
+	Object3D* obj = new Object3D("", nullptr);
+
+	obj->name = json["name"].toString().toStdString();
+	obj->visible = (bool) json["visible"].toInt();
+	obj->depthTest = (bool) json["depthTest"].toInt();
+	obj->isStatic = (bool) json["isStatic"].toInt();
+
+	QJsonArray componentArray = json["components"].toArray();
+	for (int componentIndex = 0; componentIndex < componentArray.size(); ++componentIndex) {
+		QJsonObject componentJson = componentArray[componentIndex].toObject();
+		Component::FromJSON(componentJson, obj);
+	}
+
+	QJsonArray childrenArray = json["childObjects"].toArray();
+	for (int childrenIndex = 0; childrenIndex < childrenArray.size(); ++childrenIndex) {
+		QJsonObject childrenJson = childrenArray[childrenIndex].toObject();
+		Object3D* child = Object3D::FromJSON(childrenJson);
+		obj->AddObject(child);
+	}
+
+	return obj;
+
+}
+
 }
 }

@@ -37,6 +37,7 @@ class Component  {
         bool inited;
 
         virtual QJsonObject ToJSON() = 0;
+        static void FromJSON(QJsonObject json, Object3D* obj);
     protected: 
 };
 

@@ -69,6 +69,7 @@ class Object3D {
         Object3D* Intersects(Geometry::Ray ray, double& distance);
 
         QJsonObject ToJSON();
+        static Object3D* FromJSON(QJsonObject json);
 };
 }
 

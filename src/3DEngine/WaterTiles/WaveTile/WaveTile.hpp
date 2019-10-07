@@ -24,6 +24,25 @@ public:
     void Recompute() override;
     void WindowResize(int w, int h) override;
     std::vector<QWidget*> GetInspectorWidgets() override;
+
+
+    QJsonObject ToJSON() {
+        QJsonObject json;
+        json["type"] = "WaveTile";
+        json["numWaves"] = (int)(waves.size());
+
+        QJsonArray wavesArray;
+        for(int i=0; i<waves.size(); i++) {
+            QJsonObject waveJson;
+            waveJson["x"] = waves[i].x;
+            waveJson["y"] = waves[i].y;
+            waveJson["z"] = waves[i].z;
+            waveJson["w"] = waves[i].w;
+            wavesArray.append(waveJson);
+        }
+        json["waves"] = wavesArray;
+    }
+
 private:
     std::vector<glm::vec4> waves;
     Object3D* quad;
