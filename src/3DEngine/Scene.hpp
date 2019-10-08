@@ -11,10 +11,12 @@
 
 namespace KikooRenderer {
 class ObjectDetailsPanel;
-class Renderer;
-class ParticleSystem;
+class SceneTree;
 
 namespace CoreEngine {
+
+class Renderer;
+
 class Scene {
     public: 
         Scene();
@@ -97,6 +99,8 @@ class Scene {
 		Renderer* renderer;
 
 		QOpenGLWidget* glWindow; //Useful for catching GL context
+
+		SceneTree* sceneTree;
 
 	protected:
 		Object3D* GetIntersectObject(int x, int y);

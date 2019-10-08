@@ -72,6 +72,13 @@ void SceneTree::Refresh() {
 	}
 }
 
+void SceneTree::AddObject(CoreEngine::Object3D* objectToAdd, CoreEngine::Object3D* parent) {
+	QString name = QString::fromStdString(objectToAdd->name);
+	TreeItem* itemToAdd = new TreeItem(name);
+	itemToAdd->object3D = objectToAdd;
+	model->appendRow(itemToAdd);
+}
+
 //Handles menu Creation
 void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
 {   
@@ -170,22 +177,17 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
 		if (selectedItem->text() == waterTile3Str) objectToAdd = CoreEngine::GetWaterTile_3(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
 		if (selectedItem->text() == waterTile4Str) objectToAdd = CoreEngine::GetWaterTile_4(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
 
-		if (selectedIndexes.size() > 0) {
-			TreeItem* parentItem = (TreeItem*)model->itemFromIndex(selectedIndexes[0]);
-			parentItem->object3D->AddObject(objectToAdd);
+		// if (selectedIndexes.size() > 0) {
+		// 	TreeItem* parentItem = (TreeItem*)model->itemFromIndex(selectedIndexes[0]);
+		// 	parentItem->object3D->AddObject(objectToAdd);
 
-			TreeItem* itemToAdd = new TreeItem(QString(name));
-			itemToAdd->object3D = objectToAdd;
-			parentItem->appendRow(itemToAdd);
-		}
-		else {
-			std::string finalName = view3D->view3DGL->scene->AddObject(objectToAdd);
-			name = QString::fromStdString(finalName);
-			TreeItem* itemToAdd = new TreeItem(name);
-
-			itemToAdd->object3D = objectToAdd;
-			model->appendRow(itemToAdd);
-		}
+		// 	TreeItem* itemToAdd = new TreeItem(QString(name));
+		// 	itemToAdd->object3D = objectToAdd;
+		// 	parentItem->appendRow(itemToAdd);
+		// }
+		// else {
+			view3D->view3DGL->scene->AddObject(objectToAdd);
+		// }
 
 		view3D->view3DGL->scene->triggerRefresh = true;
 		view3D->view3DGL->scene->glWindow->doneCurrent();		

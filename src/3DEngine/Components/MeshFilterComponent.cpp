@@ -373,6 +373,42 @@ QJsonObject MeshFilterComponent::ToJSON() {
 	return json;
 }	
 
+void MeshFilterComponent::FromJSON(QJsonObject json, Object3D* obj) {
+	std::vector<glm::vec3> vertex;
+	std::vector<glm::vec3> normals;
+	std::vector<glm::vec2> uv;
+	std::vector<glm::vec4> colors;
+	std::vector<int> triangles;
+
+	MeshFilterComponent* mesh = new MeshFilterComponent(obj);
+	mesh->drawingMode = json["drawingMode"].toInt();
+	mesh->polygonMode = json["polygonMode"].toInt();
+	mesh->primitiveSize = json["primitiveSize"].toInt();
+	mesh->modelpath = json["modelPath"].toString().toStdString();
+	mesh->renderInstanced = json["renderInstanced"].toBool();
+	mesh->numInstances = json["numInstances"].toInt();
+
+	mesh->meshType = (PRIMITIVE_MESH) json["meshType"].toInt();
+	enum PRIMITIVE_MESH {MODEL_MESH=0, CUBE_MESH=1, SPHERE_MESH=2, CIRCLE_MESH=3, CONE_MESH=4, QUAD_MESH=5, MESH_PRIMITIVE_ENUM_SIZE=6};
+	if(mesh->meshType == PRIMITIVE_MESH::MODEL_MESH) {
+		Util::FileIO::LoadModel(mesh->modelpath, &vertex, &normals, &uv, &colors, &triangles);
+	} else if(mesh->meshType == PRIMITIVE_MESH::CUBE_MESH) {
+        GetCubeBuffers(&vertex, &normals, &uv, &colors, &triangles);
+	} else if(mesh->meshType == PRIMITIVE_MESH::SPHERE_MESH) {
+        GetSphereBuffers(&vertex, &normals, &uv, &colors, &triangles);
+	} else if(mesh->meshType == PRIMITIVE_MESH::CIRCLE_MESH) {
+        GetCircleBuffers(&vertex, &normals, &uv, &colors, &triangles);
+	} else if(mesh->meshType == PRIMITIVE_MESH::CONE_MESH) {
+        GetConeBuffers(&vertex, &normals, &uv, &colors, &triangles);
+	} else if(mesh->meshType == PRIMITIVE_MESH::QUAD_MESH) {
+        GetQuadBuffers(&vertex, &normals, &uv, &colors, &triangles);
+	}  
+	
+	mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles, true);
+	
+	obj->AddComponent(mesh);
+}
+
 
 
 }

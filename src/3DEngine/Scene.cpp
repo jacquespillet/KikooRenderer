@@ -112,6 +112,10 @@ namespace CoreEngine {
 		if (light != nullptr) {
 			lightObjects.push_back(object);
 		}
+
+        sceneTree->AddObject(object);
+        
+
         return currentName;
     }
 
@@ -326,12 +330,14 @@ namespace CoreEngine {
     }
 
     void Scene::FromJSON(QJsonDocument json) {
+        glWindow->makeCurrent();
         QJsonArray objectArray = json["objects"].toArray();
         for (int objectIndex = 0; objectIndex < objectArray.size(); ++objectIndex) {
             QJsonObject objectJson = objectArray[objectIndex].toObject();
-            Object3D* object = Object3D::FromJSON(objectJson);
-            // AddObject(object);
-        }        
+            Object3D* object = Object3D::FromJSON(objectJson, this);
+            AddObject(object);
+        }
+        glWindow->doneCurrent();
     }
 
 }

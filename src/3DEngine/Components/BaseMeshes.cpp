@@ -237,10 +237,10 @@ namespace CoreEngine {
 
                 vertex->push_back(glm::vec3(posx, posy, posz));
                 normals->push_back(glm::vec3(posx, posy, posz));
-                uv->push_back(glm::vec2(0, 0));
+                uv->push_back(glm::vec2((float)x / (float) numSlices, (float)y / (float) numSlices));
                 colors->push_back(glm::vec4(255, 255, 255, 255));
 
-                if(y < numSlices) {
+                if(y < numSlices && x < numSlices) {
                     triangles->push_back(inx + 1);
                     triangles->push_back(inx);
                     triangles->push_back(inx + numSlices+1);
@@ -248,7 +248,7 @@ namespace CoreEngine {
                     triangles->push_back(inx + numSlices + 1);
                     triangles->push_back(inx);
                     triangles->push_back(inx + numSlices);
-                } else { // If last of the row
+                } else if(x < numSlices){ // If last of the row
                     triangles->push_back(inx + 1);
                     triangles->push_back(inx);
                     triangles->push_back(inx - numSlices);

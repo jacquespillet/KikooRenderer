@@ -24,6 +24,7 @@ public:
 
     virtual QJsonObject ToJSON() {
         QJsonObject json;
+        json["type"] = "Unlit";
         return json;
     }
 };

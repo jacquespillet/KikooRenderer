@@ -18,6 +18,8 @@ namespace KikooRenderer {
 		objectDetails->sceneTree = sceneTree;
         sceneTree->view3D = view3D;
         view3D->sceneTree = sceneTree;
+		view3D->view3DGL->scene->sceneTree = view3D->sceneTree;
+
 
         //Run raytracer scene
          //rayTracer.WriteImage();
@@ -62,7 +64,7 @@ namespace KikooRenderer {
         // QObject::connect(newAction, SIGNAL(triggered()), this, SLOT(NewProject()));
         
         QObject::connect(saveAction, &QAction::triggered, this, [this]() {
-            QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"), tr(currentFolderPath.c_str()), tr("Scene File (*.kikooScene)"));
+            QString fileName = QFileDialog::getSaveFileName(this, tr("Save Scene"), tr(currentFolderPath.c_str()), tr("Scene File (*.kikooScene)"));
             if(fileName.length() > 0)
             {
                 std::string currentProjectFilePath = fileName.toStdString();
@@ -74,7 +76,7 @@ namespace KikooRenderer {
         // QObject::connect(saveAsAction, SIGNAL(triggered()), this, SLOT(SaveAsProject()));
 
         QObject::connect(loadAction, &QAction::triggered, this, [this]() {
-            QString fileName = QFileDialog::getOpenFileName(this, tr("Open Project"), tr(currentFolderPath.c_str()), tr("Project File (*.rendproj)"));
+            QString fileName = QFileDialog::getOpenFileName(this, tr("Open Scene"), tr(currentFolderPath.c_str()), tr("Scene File (*.kikooScene)"));
             if(fileName.length() > 0)
             {
                 SceneFromFile(view3D->view3DGL->scene, fileName.toStdString());

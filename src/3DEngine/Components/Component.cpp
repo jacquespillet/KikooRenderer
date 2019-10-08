@@ -24,11 +24,12 @@ Component::Component(std::string name, Object3D* object) {
 }
 
 void Component::FromJSON(QJsonObject json, Object3D* obj) {
-	QString type = json["type"].toString();
-	if(type=="BoundingBox") {
+	QString type = json["type"].toString(); 
+	std::cout << type.toStdString() << std::endl;
+	if(type=="BoundingBox") {   
 		BoundingBoxComponent::FromJSON(json, obj);
 	} else if(type=="Light") {
-		LightComponent::FromJSON(json, obj);
+		LightComponent::FromJSON(json, obj); 
 	} else if(type=="Material") {
 		MaterialComponent::FromJSON(json, obj);
 	}else if(type=="MeshFilter") {

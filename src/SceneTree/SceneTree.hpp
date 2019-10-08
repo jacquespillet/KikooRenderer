@@ -22,6 +22,7 @@ class SceneTree : public QDockWidget
 
 		void Refresh();
 		void DeleteObject(CoreEngine::Object3D* object);
+		void AddObject(CoreEngine::Object3D* object, CoreEngine::Object3D* parent=nullptr);
 
 	protected:
 		virtual void keyPressEvent(QKeyEvent* e);
@@ -51,8 +52,6 @@ public:
     virtual ~SceneTreeView() {}
 	SceneTree* sceneTree;
 	QStandardItemModel* model;
-
-
 
 private:
 	virtual void mousePressEvent(QMouseEvent *event);

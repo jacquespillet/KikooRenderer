@@ -67,9 +67,7 @@ class MaterialComponent : public Component {
 		bool firstIter = true;
 
 		QJsonObject ToJSON();		
-        static void FromJSON(QJsonObject json, Object3D* obj) {
-			
-		}
+        static void FromJSON(QJsonObject json, Object3D* obj);
 };
 }
 }

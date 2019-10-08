@@ -4,6 +4,7 @@
 #include "3DEngine/Object3D.hpp"
 #include "3DEngine/StandardShaders.hpp"
 #include "3DEngine/Shaders/ShaderParams.hpp"
+#include "../Shaders/BlinnPhongShader.hpp"
 
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLFunctions_3_3_Core>
@@ -134,7 +135,6 @@ MaterialComponent::MaterialComponent(Object3D* object) : Component("Material", o
     inited= false;
     influence = 1.0;
     albedo = glm::vec4(0.75, 0.75, 0.75, 1.0);
-
 }
 
 
@@ -159,7 +159,7 @@ ComponentInspector* MaterialComponent::GetInspector() {
 
 
 void MaterialComponent::SetShader(Shader shader) {
-    this->shader = shader;
+	this->shader = shader;
 
 	params = StandardShaders::GetParamsById(shader.GetId());
 	if(params != nullptr) {
@@ -347,7 +347,7 @@ void MaterialComponent::SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 vie
 QJsonObject MaterialComponent::ToJSON() {
 	QJsonObject json;
 	json["type"] = "Material";
-	json["Shader"] = params->ToJSON();
+	json["shader"] = params->ToJSON();
 	json["influence"] = influence;
 
 	QJsonObject albedoObj;
@@ -361,6 +361,55 @@ QJsonObject MaterialComponent::ToJSON() {
 
 	return json;
 }	
+
+void MaterialComponent::FromJSON(QJsonObject json, Object3D* obj) {
+	MaterialComponent* material = new MaterialComponent(obj);
+    
+	QJsonObject albedoObj = json["albedo"].toObject();
+	material->albedo.x = albedoObj["r"].toDouble();
+	material->albedo.y = albedoObj["g"].toDouble();
+	material->albedo.z = albedoObj["b"].toDouble();
+	material->albedo.w = albedoObj["a"].toDouble();
+
+	material->albedoTexStr = json["albedoTexture"].toString().toStdString();
+
+	QJsonObject shaderJson = json["shader"].toObject();
+
+	std::string shaderType = shaderJson["type"].toString().toStdString();
+	if(shaderType == "Unlit") {
+		Shader shader = obj->scene->standardShaders.unlitMeshShader;
+		material->SetShader(shader);
+	} else if(shaderType == "BlinnPhong") {
+		Shader shader = obj->scene->standardShaders.blinnPhongShader;
+		material->SetShader(shader);
+
+		BlinnPhongParams* params = (BlinnPhongParams*) material->params;
+		params->ambientFactor = shaderJson["ambientFactor"].toDouble();
+		params->diffuseFactor = shaderJson["diffuseFactor"].toDouble();
+		params->specularFactor = shaderJson["specularFactor"].toDouble();
+		params->smoothness = shaderJson["smoothness"].toDouble();
+		params->normalMapInfluence = shaderJson["normalMapInfluence"].toDouble();
+		params->normalMapStr = shaderJson["normalMapStr"].toDouble();
+		params->specularMapStr = shaderJson["specularMapStr"].toDouble();
+
+		QJsonObject specularColorJson = shaderJson["specularColor"].toObject();
+		params->specularColor.x = specularColorJson["r"].toDouble();
+		params->specularColor.y = specularColorJson["g"].toDouble();
+		params->specularColor.z = specularColorJson["b"].toDouble();
+		params->specularColor.w = specularColorJson["a"].toDouble();
+
+
+	} else if(shaderType == "Gouraud") {
+		Shader shader = obj->scene->standardShaders.gouraudShader;
+		material->SetShader(shader);
+	} else if(shaderType == "PBR") {
+		Shader shader = obj->scene->standardShaders.PBRShader;
+		material->SetShader(shader);
+	}
+
+
+	obj->AddComponent(material);
+}
 
 }
 }

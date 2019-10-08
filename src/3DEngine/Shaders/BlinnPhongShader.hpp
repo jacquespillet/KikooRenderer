@@ -42,6 +42,7 @@ public:
     virtual QJsonObject ToJSON() {
         QJsonObject json;
 
+        json["type"] ="BlinnPhong";
         json["ambientFactor"] =ambientFactor;
         json["diffuseFactor"] =diffuseFactor;
         json["specularFactor"] =specularFactor;
@@ -56,7 +57,7 @@ public:
         specularColorJson["r"] =specularColor.x; 
         specularColorJson["g"] =specularColor.y; 
         specularColorJson["b"] =specularColor.z; 
-        specularColorJson["q"] =specularColor.w; 
+        specularColorJson["a"] =specularColor.w; 
 
         json["specularColor"] = specularColorJson;
 
