@@ -21,8 +21,7 @@ namespace CoreEngine {
 		camera = new CameraScene(this, 1.0, 70 * DEGTORAD, 0.0001, 1000.0, 1.0);
         this->started = false;
     }
-    Object3D* quad;
-    MaterialComponent* mat;
+    
 	void Scene::Start() {
 		GETGL
 

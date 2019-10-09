@@ -72,10 +72,13 @@ HDRRenderer::HDRRenderer(Scene* scene) : Renderer(scene) {
     quad = GetQuad(scene, "plane", glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(1, 1, 1, 1));
     quadMaterial = quad->GetComponent<MaterialComponent>();
     quadMaterial->SetShader(quadShader);
-    
-    // int exposureLocation = ogl->glGetUniformLocation(quadShader.programShaderObject, "exposure"); 
-    // ogl->glUniform1f(exposureLocation, exposure);
     quad->Enable();
+    
+    dummyQuad = GetMiniQuad(scene, "DUmmy", glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
+    MaterialComponent* dummyMaterial = dummyQuad->GetComponent<MaterialComponent>();
+    dummyMaterial->SetShader(quadShader);
+
+    dummyQuad->Enable();
 }
 
 void HDRRenderer::Resize(int w, int h) {
@@ -162,13 +165,10 @@ void HDRRenderer::Render() {
         ogl->glDepthFunc(GL_LESS);
     }
 
-    // scene->ps->Render();
-
     //Render UI
     if(scene->rendersUI) {
         scene->grid->Render();
         scene->axes->Render();
-
         if (scene->transformWidget->visible && scene->selectedObjects.size() > 0 && scene->selectedObjects[0]->visible) {
             scene->transformWidget->Render();
         }
@@ -186,6 +186,10 @@ void HDRRenderer::Render() {
 
         if(light->hasChanged) light->hasChanged = false;
         if(scene->lightObjects[i]->transform->hasChanged) scene->lightObjects[i]->transform->hasChanged = false;
+
+        light->depthFBO->Enable();
+        light->depthFBO->RenderFBOToObject(dummyQuad, false);       
+        light->depthFBO->Disable();
     }
 
     ogl->glViewport(0, 0, quadFBO->width, quadFBO->height);
@@ -200,13 +204,6 @@ void HDRRenderer::Render() {
     } else {	
         quadFBO->RenderFBOToObject(quad, false);
     }
-
-    //USE IT FOR DEBUGGING LIGHT DEPTH FRAMES    
-    // for(int i=0; i<scene->lightObjects.size(); i++) {
-    //     light = (LightComponent*) scene->lightObjects[i]->GetComponent("Light");
-    // } 
-
 }
-
 }
 } 

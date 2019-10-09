@@ -276,6 +276,7 @@ void MaterialComponent::SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 vie
 						}
 
 						if(lightComponent->hasChanged || firstIter) {
+							std::cout << "SETTING LIGHT UNIFORMS " << std::endl;
 							std::string varName = "lights[" + std::to_string(i) + "].type";
 							GLuint loc = ogl->glGetUniformLocation(this->shader.programShaderObject, varName.c_str());
 							ogl->glUniform1i(loc, lightComponent->type);

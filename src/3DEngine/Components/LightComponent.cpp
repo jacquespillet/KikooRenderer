@@ -45,7 +45,7 @@ LightInspector::LightInspector(LightComponent* lightComponent) : ComponentInspec
 		scene->triggerRefresh = true;
 	});
 
-    CustomSlider* intensitySlider = new CustomSlider(0.0f, 200.0, 0.25, "Intensity", 1.0);
+    CustomSlider* intensitySlider = new CustomSlider(0.0f, 2.0, 0.01, "Intensity", 1.0);
     mainLayout->addLayout(intensitySlider);
     QObject::connect(intensitySlider, &CustomSlider::Modified, [this,lightComponent](double val) {
         lightComponent->intensity = val;
@@ -110,10 +110,9 @@ LightComponent::LightComponent(Object3D* object, glm::vec4 color, glm::vec3 atte
 void LightComponent::SetType(int type) {
     this->type = type;
     object3D->scene->glWindow->makeCurrent();
-    //TODO : Mettre les shaders static et compilés au start 
     if(type==0) {
         //Avant dernier arg TRUE pour debug, doit etre FALSE
-        depthFBO = new Framebuffer(1024, 1024, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, false, true);
+        depthFBO = new Framebuffer(SHADOW_WIDTH, SHADOW_HEIGHT, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, true, true);
         lightProjection  = glm::orthoLH(-20.0, 20.0, -20.0, 20.0, 1.0, (double)farClip);
 
         depthPassShader.vertSrc= R"(
@@ -132,7 +131,7 @@ void LightComponent::SetType(int type) {
         layout(location = 0) out vec4 outputColor; 
         void main()
         {   
-            outputColor = vec4(0);
+            outputColor = vec4(1);
         }
         )";
         depthPassShader.name = "quad";
@@ -141,8 +140,6 @@ void LightComponent::SetType(int type) {
         std::cout << "LightComponent:SetType:Compiling directional light depth Pass Shader" << std::endl; 
         depthPassShader.Compile();
         depthPassShader.shouldRecompile = false;
-
-
     } else if(type == 1) {
         depthCubeFBO = new CubeFramebuffer(1024, 1024, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, true, true);
         lightSpaceMatrices.resize(6);
@@ -244,6 +241,7 @@ void LightComponent::SetType(int type) {
     object3D->scene->glWindow->doneCurrent();
     object3D->scene->triggerRefresh = true;
     
+    hasChanged = true;
 }
 
 ComponentInspector* LightComponent::GetInspector() {
@@ -260,12 +258,12 @@ void LightComponent::RenderDepthMap() {
             ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
             ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
 
-            std::cout << "Render pass " << std::endl;
-            glm::mat4 model = object3D->transform->GetWorldModelMatrix();
-            // glm::vec3 lightPos = -20.0 * glm::vec4(glm::column(model, 2));
-            // model = glm::translate(model, lightPos);
+            glm::mat4 model = object3D->transform->GetWorldRotationMatrix();
+            glm::vec3 lightPos = -20.0 * glm::vec4(glm::column(model, 2));
+            model = glm::translate(model, lightPos);
+            // glm::mat4 model = object3D->transform->GetWorldModelMatrix();
             viewMat = glm::inverse(model);
-            lightSpaceMatrix = lightProjection * viewMat;
+            lightSpaceMatrix = lightProjection * viewMat; 
 
             ogl->glCullFace(GL_FRONT);
             for(int i=0; i<object3D->scene->objects3D.size(); i++) {
@@ -273,10 +271,14 @@ void LightComponent::RenderDepthMap() {
                     MaterialComponent* material = object3D->scene->objects3D[i]->GetComponent<MaterialComponent>();
                     if(material != nullptr) {
                         material->shader.shouldRecompile = false;
+                        
                         Shader tmpShader = material->shader;
                         ShaderParams* tmpParams = material->params;
+                        
                         material->SetShader(depthPassShader);
+                        
                         object3D->scene->objects3D[i]->DepthRenderPass(this); 
+                        
                         material->SetShader(tmpShader);
                         material->params = tmpParams;
                     }
@@ -354,7 +356,7 @@ void LightComponent::OnEnable(){}
 void LightComponent::OnUpdate(){}
 void LightComponent::OnRender(){} 
 void LightComponent::OnDestroy(){} 
-void LightComponent::Recompute(){} 
+void LightComponent::Recompute(){}
 
 
 void LightComponent::FromJSON(QJsonObject json, Object3D* obj) {
