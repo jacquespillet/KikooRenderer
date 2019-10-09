@@ -260,9 +260,10 @@ void LightComponent::RenderDepthMap() {
             ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
             ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
 
-            glm::mat4 model = object3D->transform->GetWorldRotationMatrix();
-            glm::vec3 lightPos = -20.0 * glm::vec4(glm::column(model, 2));
-            model = glm::translate(model, lightPos);
+            std::cout << "Render pass " << std::endl;
+            glm::mat4 model = object3D->transform->GetWorldModelMatrix();
+            // glm::vec3 lightPos = -20.0 * glm::vec4(glm::column(model, 2));
+            // model = glm::translate(model, lightPos);
             viewMat = glm::inverse(model);
             lightSpaceMatrix = lightProjection * viewMat;
 
@@ -354,6 +355,30 @@ void LightComponent::OnUpdate(){}
 void LightComponent::OnRender(){} 
 void LightComponent::OnDestroy(){} 
 void LightComponent::Recompute(){} 
+
+
+void LightComponent::FromJSON(QJsonObject json, Object3D* obj) {
+    int type = json["type"].toInt();
+    
+    glm::vec3 attenuation;
+    QJsonObject attenuationJson = json["attenuation"].toObject();
+    attenuation.x = attenuationJson["x"].toDouble();
+    attenuation.y = attenuationJson["y"].toDouble();
+    attenuation.z = attenuationJson["z"].toDouble();
+
+    glm::vec4 color;
+    QJsonObject colorJson = json["color"].toObject();
+    color.x = colorJson["r"].toDouble();
+    color.y = colorJson["g"].toDouble();
+    color.z = colorJson["b"].toDouble();
+    color.w = colorJson["a"].toDouble();
+
+    double fov = colorJson["fov"].toDouble();
+
+    LightComponent* light = new LightComponent(obj, color, attenuation, type);
+
+    obj->AddComponent(light);            
+}
 
 }
 }

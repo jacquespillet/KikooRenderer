@@ -130,5 +130,32 @@ namespace CoreEngine {
         (*_min) =  glm::vec4(this->min, 1.0);
         (*_max) =  glm::vec4(this->max, 1.0);
     }
+
+    void BoundingBoxComponent::FromJSON(QJsonObject json, Object3D* obj) {
+    	BoundingBoxComponent* bb = new BoundingBoxComponent(obj);
+	    obj->AddComponent(bb);
+    } 
+
+    QJsonObject BoundingBoxComponent::ToJSON() {
+        QJsonObject json;
+        json["type"] = "BoundingBox";
+
+        QJsonObject minJson;
+        minJson["x"] = min.x;
+        minJson["y"] = min.y;
+        minJson["z"] = min.z;
+        json["min"] = minJson;
+
+        QJsonObject maxJson;
+        maxJson["x"] = max.x;
+        maxJson["y"] = max.y;
+        maxJson["z"] = max.z;
+        json["max"] = maxJson;
+
+
+
+        return json;
+    }    
+
 }
 }

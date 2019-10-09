@@ -40,35 +40,12 @@ namespace CoreEngine {
 
         bool shouldRefresh = false;
    
-        static void FromJSON(QJsonObject json, Object3D* obj) {
-            
-        } 
+		QJsonObject ToJSON();
+        static void FromJSON(QJsonObject json, Object3D* obj);
     
     private: 
         Object3D* boxObject;
         TransformComponent* transform;
-
-    
-		QJsonObject ToJSON() {
-			QJsonObject json;
-            json["type"] = "BoundingBox";
-
-            QJsonObject minJson;
-            minJson["x"] = min.x;
-            minJson["y"] = min.y;
-            minJson["z"] = min.z;
-            json["min"] = minJson;
-
-            QJsonObject maxJson;
-            maxJson["x"] = max.x;
-            maxJson["y"] = max.y;
-            maxJson["z"] = max.z;
-            json["max"] = maxJson;
-
-
-
-			return json;
-		}
 
     };
     

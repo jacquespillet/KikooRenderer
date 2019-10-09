@@ -93,9 +93,7 @@ class LightComponent : public Component {
 			return json;
 		}
 
-        static void FromJSON(QJsonObject json, Object3D* obj) {
-            
-        }
+        static void FromJSON(QJsonObject json, Object3D* obj);
 };
 }
 }
