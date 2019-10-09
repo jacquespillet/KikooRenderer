@@ -268,17 +268,17 @@ namespace CoreEngine {
 
         vertex->push_back(glm::vec3(0, 0, 0));
         normals->push_back(glm::vec3(0, 0, -1));
-        uv->push_back(glm::vec2(0, 0));
+        uv->push_back(glm::vec2(0.5, 0.5));
         colors->push_back(glm::vec4(255, 255, 255, 255));
 
-        for(uint32_t i=0; i<=numSlices; i++) {
+        for(uint32_t i=1; i<numSlices +1; i++) {
             float inx = ((float)i / (float)numSlices) * TWO_PI;
             float x = std::cos(inx);
             float y = std::sin(inx);
 
             vertex->push_back(glm::vec3(x, y, 0));
             normals->push_back(glm::vec3(0, 0, -1));
-            uv->push_back(glm::vec2(0, 0));
+            uv->push_back(glm::vec2(x, y));
             colors->push_back(glm::vec4(255, 255, 255, 255));
             
             triangles->push_back(0);
@@ -529,7 +529,7 @@ namespace CoreEngine {
 
         //Setup mesh
         MeshFilterComponent* mesh = new MeshFilterComponent(object);
-        mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles, false);
+        mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles, true);
         mesh->meshType = PRIMITIVE_MESH::CIRCLE_MESH;
 
         QJsonObject json;

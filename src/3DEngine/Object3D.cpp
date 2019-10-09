@@ -322,13 +322,11 @@ Object3D* Object3D::FromJSON(QJsonObject json, Scene* scene) {
 	obj->visible = (bool) json["visible"].toInt();
 	obj->depthTest = (bool) json["depthTest"].toInt();
 	obj->isStatic = (bool) json["isStatic"].toInt();
-	std::cout << "0" << std::endl;
 	QJsonArray componentArray = json["components"].toArray();
 	for (int componentIndex = 0; componentIndex < componentArray.size(); ++componentIndex) {
 		QJsonObject componentJson = componentArray[componentIndex].toObject();
 		Component::FromJSON(componentJson, obj);
 	}
-	std::cout << "1" << std::endl;
 
 	// QJsonArray childrenArray = json["childObjects"].toArray();
 	// for (int childrenIndex = 0; childrenIndex < childrenArray.size(); ++childrenIndex) {
