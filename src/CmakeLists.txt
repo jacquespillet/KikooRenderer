@@ -44,6 +44,7 @@ set(MainWindowSrc
 	3DEngine/Shaders/PBRShader.cpp
 	3DEngine/Shaders/UnlitShader.cpp
 	3DEngine/Shaders/SelectedShader.cpp
+	3DEngine/Shaders/AxisHelperShader.cpp
 	
 	3DEngine/SpatialPartitioning/Octree.cpp
 	

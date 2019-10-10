@@ -24,11 +24,16 @@ namespace KikooRenderer {
         QCheckBox* renderAxesCheckbox  = new QCheckBox("Render Axes");
         renderAxesCheckbox->setChecked(true);
         GUI3DPreferencesLayout->addWidget(renderAxesCheckbox);
+        
+        QCheckBox* renderAxesHelperCheckbox  = new QCheckBox("Render Axes Helper");
+        renderAxesHelperCheckbox->setChecked(true);
+        GUI3DPreferencesLayout->addWidget(renderAxesHelperCheckbox);
 
         connect(checkAll, &QCheckBox::stateChanged, this, [this, renderGridCheckbox, renderTransformwidgetCheckbox, renderAxesCheckbox](int state) {
             renderGridCheckbox->setChecked(state > 0);
             renderTransformwidgetCheckbox->setChecked(state > 0);
             renderAxesCheckbox->setChecked(state > 0);
+            renderAxesHelperCheckbox->setChecked(state > 0);
 
             this->mainPrefWindow->mainWindow->view3D->view3DGL->scene->renderGrid = state > 0;
             this->mainPrefWindow->mainWindow->view3D->view3DGL->scene->renderTransformWidget = state > 0;
@@ -52,7 +57,12 @@ namespace KikooRenderer {
             this->mainPrefWindow->mainWindow->view3D->view3DGL->scene->renderAxes = state > 0;
             this->mainPrefWindow->mainWindow->view3D->view3DGL->scene->triggerRefresh = true;
         });
-
+        
+        
+        connect(renderAxesHelperCheckbox, &QCheckBox::stateChanged, this, [this](int state) {
+            this->mainPrefWindow->mainWindow->view3D->view3DGL->scene->renderAxesHelper = state > 0;
+            this->mainPrefWindow->mainWindow->view3D->view3DGL->scene->triggerRefresh = true;
+        });
 
     }
 }

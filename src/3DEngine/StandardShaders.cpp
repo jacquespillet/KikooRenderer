@@ -4,6 +4,7 @@
 #include "Shaders/PBRShader.hpp"
 #include "Shaders/GouraudShader.hpp"
 #include "Shaders/SelectedShader.hpp"
+#include "Shaders/AxisHelperShader.hpp"
 
 namespace KikooRenderer
 {
@@ -15,6 +16,7 @@ ShaderParams* StandardShaders::GetParamsById(int id) {
 	if(id == SHADER_IDS::BLINNPHONG) return new BlinnPhongParams();
 	if(id == SHADER_IDS::PBR) return new PBRParams();
 	if(id == SHADER_IDS::SELECTED) return new SelectedShaderParams();
+	if(id == SHADER_IDS::AXES_HELPER) return new AxesHelperParams();
 }
 
 StandardShaders::StandardShaders() {

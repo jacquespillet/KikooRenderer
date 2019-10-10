@@ -1,5 +1,6 @@
 #include "BaseObjects.hpp"
 #include "Scene.hpp"
+#include "Shaders/AxisHelperShader.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/BoundingComponent.hpp"
 #include "Components/FluidComponent.hpp"
@@ -379,6 +380,75 @@ Object3D* GetAxes(Scene* scene, std::string name) {
     newObject->AddComponent(mesh);
 
     return newObject;
+}
+
+Object3D* GetAxesHelper(Scene* scene) {
+    Object3D* newObject = new Object3D("Axis Helper", scene);
+    std::vector<glm::vec3> vertex;
+    std::vector<glm::vec3> normals;
+    std::vector<glm::vec2> uv;
+    std::vector<glm::vec4> colors;
+    std::vector<int> triangles;
+
+
+    //X axis
+    vertex.push_back(glm::vec3(  0, 0,  0.2)); 
+    vertex.push_back(glm::vec3(  1, 0,  0.2)); 
+    normals.push_back(glm::vec3(0, 0, 1));
+    normals.push_back(glm::vec3(0, 0, 1));
+    uv.push_back(glm::vec2(0, 0));
+    uv.push_back(glm::vec2(0, 0));
+    colors.push_back(glm::vec4(255, 0, 0, 255));
+    colors.push_back(glm::vec4(255, 0, 0, 255));
+    triangles.push_back(vertex.size()-1);
+    triangles.push_back(vertex.size()-2);
+
+    //Y axis
+    vertex.push_back(glm::vec3( 0,  0,  0.2)); 
+    vertex.push_back(glm::vec3( 0,  1,  0.2)); 
+    normals.push_back(glm::vec3(0, 0, 1));
+    normals.push_back(glm::vec3(0, 0, 1));
+    uv.push_back(glm::vec2(0, 0));
+    uv.push_back(glm::vec2(0, 0));
+    colors.push_back(glm::vec4(0, 255, 0, 255));
+    colors.push_back(glm::vec4(0, 255, 0, 255));
+    triangles.push_back(vertex.size()-1);
+    triangles.push_back(vertex.size()-2);
+    
+    //Z axis
+    vertex.push_back(glm::vec3( 0,  0,  0.2)); 
+    vertex.push_back(glm::vec3( 0,  0,  1.2)); 
+    normals.push_back(glm::vec3(0, 0, 1));
+    normals.push_back(glm::vec3(0, 0, 1));
+    uv.push_back(glm::vec2(0, 0));
+    uv.push_back(glm::vec2(0, 0));
+    colors.push_back(glm::vec4(0, 0, 255, 255));
+    colors.push_back(glm::vec4(0, 0, 255, 255));
+    triangles.push_back(vertex.size()-1);
+    triangles.push_back(vertex.size()-2);
+
+    
+    //Setup mesh
+    MeshFilterComponent* mesh = new MeshFilterComponent(newObject);
+    mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles, false);
+    mesh->drawingMode = GL_LINES;
+
+    //Setup transform
+    TransformComponent* transform = new TransformComponent(newObject );
+    transform->position = glm::vec3(2, 2, 2);
+    
+    //Setup material
+    MaterialComponent* material = new MaterialComponent(newObject);
+    material->albedo =glm::vec4(0.6, 0.6, 0.6, 0.6);
+    material->influence = 0.0;
+    Shader shader = GetAxisHelperShader();
+    material->SetShader(shader);
+
+    newObject->AddComponent(material);
+	newObject->transform = transform;
+    newObject->AddComponent(mesh);
+
+    return newObject;    
 }
 
 

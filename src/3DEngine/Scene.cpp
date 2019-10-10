@@ -39,6 +39,10 @@ namespace CoreEngine {
         axes->Start();
         axes->Enable();
 
+        axesHelper = GetAxesHelper(this);
+        axesHelper->Start();
+        axesHelper->Enable();
+
 		transformWidget = new TransformWidget(this);
         transformWidget->Start();
 		transformWidget->Enable();
@@ -46,6 +50,8 @@ namespace CoreEngine {
         skyboxCube = GetCube(this, "Cubemap", glm::vec3(0), glm::vec3(0), glm::vec3(100), glm::vec4(0.1, 0.1, 0.1, 1));
         skyboxCube->Start();
         skyboxCube->Enable();
+
+
 
      
 

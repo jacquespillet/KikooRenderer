@@ -142,6 +142,7 @@ void MaterialComponent::OnStart(){}
 void MaterialComponent::OnEnable(){
 	params = StandardShaders::GetParamsById(shader.GetId());
 	params->shader = &shader;
+	params->scene = object3D->scene;
 	inited = true;
 }
 void MaterialComponent::OnUpdate(){
@@ -252,11 +253,9 @@ void MaterialComponent::SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 vie
 			}
 			
 
+			params->SetUniforms();
 			if(this->shader.isLit) {
-				params->SetUniforms();
-				
 				int numLights = 0;
-
 				for(int i=0; i<scene->lightObjects.size(); i++) {
 					LightComponent* lightComponent = scene->lightObjects[i]->GetComponent<LightComponent>(); 
 					TransformComponent* transformComponent = scene->lightObjects[i]->transform;

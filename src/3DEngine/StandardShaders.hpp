@@ -8,7 +8,7 @@ namespace KikooRenderer
 {
 namespace CoreEngine
 {
-enum SHADER_IDS { UNLIT=0,  GOURAUD = 1, BLINNPHONG = 2, PBR = 3, SELECTED = 4};
+enum SHADER_IDS { UNLIT=0,  GOURAUD = 1, BLINNPHONG = 2, PBR = 3, SELECTED = 4, AXES_HELPER = 5};
 class ShaderParams;
 
 class StandardShaders

@@ -194,9 +194,11 @@ void HDRRenderer::Render() {
     if(scene->rendersUI) {
         if(scene->renderGrid) scene->grid->Render();
         if(scene->renderAxes) scene->axes->Render();
+        if(scene->renderAxesHelper) scene->axesHelper->Render();
         if (scene->renderTransformWidget && scene->transformWidget->visible && scene->selectedObjects.size() > 0 && scene->selectedObjects[0]->visible) {
             scene->transformWidget->Render();
         }
+             
     }
 
     if(useMSAA) alternateFBO->Disable();

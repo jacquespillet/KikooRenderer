@@ -73,6 +73,7 @@ class Scene {
 		//UI Elements
 		bool rendersUI = true;
 		Object3D* axes;
+		Object3D* axesHelper;
 		Object3D* grid;
 		TransformWidget* transformWidget;
 		bool isTransforming = false;
@@ -104,6 +105,7 @@ class Scene {
 
 		bool renderGrid = true;
 		bool renderAxes= true;
+		bool renderAxesHelper= true;
 		bool renderTransformWidget= true;
 
 	protected:
