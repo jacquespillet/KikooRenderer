@@ -6,10 +6,23 @@
 
 namespace KikooRenderer {
 namespace CoreEngine {
-    // //Maybe use it when different types of components ? 
+    // //Maybe use it when different types of bounding components ? 
     // class BoundingComponent : public Component {
 
     // }
+
+    class BoundingBoxComponent;
+
+    class BoundingBoxInspector : public ComponentInspector {
+        Q_OBJECT
+        public:
+            BoundingBoxInspector(BoundingBoxComponent* boundingBoxComponent);
+            BoundingBoxComponent* boundingBoxComponent;
+            Scene* scene;
+
+            QVBoxLayout* mainLayout;
+            void Refresh();
+    };
 
     class BoundingBoxComponent : public Component {
     public:
@@ -24,7 +37,7 @@ namespace CoreEngine {
         void GetWorldBounds(glm::vec3* _min, glm::vec3* _max);
         void GetLocalBounds(glm::vec3* _min, glm::vec3* _max);
         
-        ComponentInspector* GetInspector(){return nullptr;}
+        ComponentInspector* GetInspector();
         
         void Refresh();
 
@@ -39,14 +52,16 @@ namespace CoreEngine {
         Object3D* GetBoxObject();
 
         bool shouldRefresh = false;
-   
+
+        bool isShown = false;
+
 		QJsonObject ToJSON();
         static void FromJSON(QJsonObject json, Object3D* obj);
     
     private: 
         Object3D* boxObject;
         TransformComponent* transform;
-
+		BoundingBoxInspector* boundingBoxInspector;
     };
     
     // class BoundingSphere : public Component {

@@ -114,7 +114,6 @@ namespace CoreEngine {
 
         sceneTree->AddObject(object);
         
-
         return currentName;
     }
 
@@ -132,9 +131,9 @@ namespace CoreEngine {
 
         for(int i=0; i<objects3D.size(); i++) {
             if(objects3D[i] == object) {
-				for (int j = 0; j < object->childObjects.size(); j++) {
-					RemoveObject(object->childObjects[j]);
-				}
+				// for (int j = 0; j < object->childObjects.size(); j++) {
+				// 	RemoveObject(object->childObjects[j]);
+				// }
                 delete objects3D[i];
                 objects3D.erase(objects3D.begin() + i);
                 break;

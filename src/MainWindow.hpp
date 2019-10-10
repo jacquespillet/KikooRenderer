@@ -4,6 +4,7 @@
 #include "View3D/View3D.hpp"
 #include "SceneTree/SceneTree.hpp"
 #include "ObjectDetails/ObjectDetails.hpp"
+#include "Console/ConsoleDock.hpp"
 #include "Renderer/RayTracer.hpp"
 
 #include "AppManagement/PreferencesWindow.hpp"
@@ -20,6 +21,7 @@ class MainWindow : public QMainWindow
         View3D* view3D;
         SceneTree* sceneTree;
 		ObjectDetailsPanel* objectDetails;
+		ConsoleDock* consoleDock;
 
         OfflineRenderer::RayTracer rayTracer;
 

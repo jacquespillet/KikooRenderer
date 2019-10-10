@@ -62,6 +62,8 @@ set(MainWindowSrc
 	3DEngine/CameraControllers/CameraController.cpp
 	
 	SceneTree/SceneTree.cpp
+	SceneTree/TreeItem.cpp
+	SceneTree/SceneTreeView.cpp
 	
 	ObjectDetails/ObjectDetails.cpp
 	ObjectDetails/ObjectParams.cpp
@@ -78,6 +80,8 @@ set(MainWindowSrc
 	
 	FileIO/SceneToFile.cpp
 	
+	Console/ConsoleDock.cpp
+
 	AppManagement/PreferencesWindow.cpp
 	AppManagement/BackgroundPreferences.cpp
 	AppManagement/3DUIPreferences.cpp

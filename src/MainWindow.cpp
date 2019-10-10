@@ -13,6 +13,7 @@ namespace KikooRenderer {
         view3D= new View3D;
         sceneTree= new SceneTree;
 		objectDetails = new ObjectDetailsPanel;
+		consoleDock = new ConsoleDock;
 
 		view3D->view3DGL->scene->objectDetailsPanel = objectDetails;
 		objectDetails->sceneTree = sceneTree;
@@ -27,6 +28,7 @@ namespace KikooRenderer {
         setCentralWidget(view3D);
         addDockWidget(Qt::LeftDockWidgetArea, sceneTree);
         addDockWidget(Qt::RightDockWidgetArea, objectDetails);
+        addDockWidget(Qt::BottomDockWidgetArea, consoleDock);
 
         setDockOptions(QMainWindow::AnimatedDocks);
 

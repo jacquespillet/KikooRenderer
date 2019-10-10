@@ -1,38 +1,12 @@
 #include "SceneTree.hpp"
+#include "SceneTreeView.hpp"
+#include "TreeItem.hpp"
 
 #include "3DEngine/BaseObjects.hpp"
 
 namespace KikooRenderer 
 {
 
-void TreeItem::Refresh() {
-	setText(QString::fromStdString(object3D->name));
-	for (int i = 0; i < rowCount(); i++) {
-		TreeItem* child = (TreeItem*)this->child(i, 0);
-		child->Refresh();
-	}
-}
-
-void TreeItem::Delete() {
-	CoreEngine::Scene* scene = object3D->scene;
-	scene->RemoveObject(object3D);
-
-	for (int i = 0; i < rowCount(); i++) {
-		TreeItem* item =(TreeItem*) child(i, 0);
-		item->Delete();
-	}
-
-	if (QStandardItem* parent = QStandardItem::parent()) {
-		parent->removeRow(row());
-	}
-	else {
-		model()->removeRow(row());
-	}
-
-
-	scene->triggerRefresh = true;
-	scene->transformWidget->Disable();
-}
 
 SceneTree::SceneTree() : QDockWidget("Scene")
 {
@@ -194,23 +168,6 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
     }
 }
 
-
-void SceneTreeView::mousePressEvent(QMouseEvent *event) {
-	QModelIndex index = indexAt(event->pos());
-	if (index.isValid()) {
-		bool selected = selectionModel()->isSelected(index);
-		QTreeView::mousePressEvent(event);
-		
-		TreeItem* item = (TreeItem*)model->itemFromIndex(index);
-		sceneTree->view3D->view3DGL->scene->AddObjectToSelection(true, item->object3D);
-		sceneTree->view3D->view3DGL->scene->triggerRefresh = true;
-	}
-	else {
-		selectionModel()->clearSelection();
-		sceneTree->view3D->view3DGL->scene->ClearSelection();
-		sceneTree->view3D->view3DGL->scene->triggerRefresh = true;
-	}
-}
 
 void SceneTree::keyPressEvent(QKeyEvent* e) {
 	if (e->key() == Qt::Key_Delete) {

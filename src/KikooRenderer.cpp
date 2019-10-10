@@ -4,6 +4,9 @@ using namespace KikooRenderer;
 
 int main(int argc, char *argv[])
 {
+	std::stringstream buffer;
+	std::streambuf * old = std::cout.rdbuf(buffer.rdbuf());
+
 	QApplication app(argc, argv);
 
 	QFile file("C:\\Users\\Jacques\\Documents\\Boulot\\2019\\Qt BP\\src\\Style\\Dark.qss");
@@ -13,6 +16,7 @@ int main(int argc, char *argv[])
 	app.setStyleSheet(styleSheet);
 
 	MainWindow mainWindow;
+	mainWindow.consoleDock->stdOutBuffer = &buffer;
 
 
 

@@ -31,31 +31,6 @@ class SceneTree : public QDockWidget
 		void OnItemChanged(QStandardItem* item);
 };
 
-class TreeItem : public QObject, public QStandardItem  {
-    Q_OBJECT
-    public:
-        TreeItem(QString name) : QStandardItem(name) {
-			setDragEnabled(true);
-			setDropEnabled(true);
-			setEditable(true);
-        }
-		void Refresh();
-		void Delete();
-
-		CoreEngine::Object3D* object3D;
-};
-
-class SceneTreeView : public QTreeView
-{
-public:
-    SceneTreeView() : QTreeView() {}
-    virtual ~SceneTreeView() {}
-	SceneTree* sceneTree;
-	QStandardItemModel* model;
-
-private:
-	virtual void mousePressEvent(QMouseEvent *event);
-};
 
 
 }
