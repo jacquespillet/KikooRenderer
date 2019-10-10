@@ -192,9 +192,9 @@ void HDRRenderer::Render() {
 
     //Render UI
     if(scene->rendersUI) {
-        scene->grid->Render();
-        scene->axes->Render();
-        if (scene->transformWidget->visible && scene->selectedObjects.size() > 0 && scene->selectedObjects[0]->visible) {
+        if(scene->renderGrid) scene->grid->Render();
+        if(scene->renderAxes) scene->axes->Render();
+        if (scene->renderTransformWidget && scene->transformWidget->visible && scene->selectedObjects.size() > 0 && scene->selectedObjects[0]->visible) {
             scene->transformWidget->Render();
         }
     }

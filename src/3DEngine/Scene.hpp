@@ -102,6 +102,10 @@ class Scene {
 
 		SceneTree* sceneTree;
 
+		bool renderGrid = true;
+		bool renderAxes= true;
+		bool renderTransformWidget= true;
+
 	protected:
 		Object3D* GetIntersectObject(int x, int y);
 };

@@ -42,7 +42,7 @@ namespace KikooRenderer
         });
 
 
-        ui3DPreferences = new UI3DPreferences();        
+        ui3DPreferences = new UI3DPreferences(mainPrefWindow);        
         layout->addWidget(ui3DPreferences);
 
         QCheckBox* hdrCheckbox = new QCheckBox("HDR");
