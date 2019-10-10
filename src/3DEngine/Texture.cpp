@@ -17,7 +17,6 @@ namespace CoreEngine
 	Texture::Texture(std::string path, GLuint _texIndex, bool enableFilter) { 
 		GETGL
 		texIndex = _texIndex;
-		ogl->glActiveTexture(texIndex);
 		ogl->glGenTextures(1, &glTex);  
 		ogl->glBindTexture(GL_TEXTURE_2D, glTex);
 
@@ -64,7 +63,6 @@ namespace CoreEngine
 	Texture::Texture(GLuint _texIndex, std::vector<uint8_t> data, int width, int height, int bpp) { 
 		GETGL
 		texIndex = _texIndex;		
-		ogl->glActiveTexture(texIndex);
 		ogl->glGenTextures(1, &glTex);  
 		ogl->glBindTexture(GL_TEXTURE_2D, glTex);
 
@@ -93,13 +91,11 @@ namespace CoreEngine
 	Texture::~Texture() {
 		if(loaded) {
 			GETGL
-			// ogl->glDeleteTextures(1, &glTex);
 		}
 	}
 
 	void Texture::LoadFromFile(std::string path) {
 		GETGL
-		ogl->glActiveTexture(texIndex);
 		ogl->glGenTextures(1, &glTex);  
 		ogl->glBindTexture(GL_TEXTURE_2D, glTex);
 

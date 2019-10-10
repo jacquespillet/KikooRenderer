@@ -17,6 +17,8 @@ Shader GetUnlitShader() {
     std::stringstream fragBuffer;
     fragBuffer << t.rdbuf();
     unlitMeshShader.fragSrc= fragBuffer.str();
+    unlitMeshShader.isLit = false;
+    unlitMeshShader.isDepthPass = false;
 
     return unlitMeshShader;
 }

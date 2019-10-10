@@ -77,8 +77,8 @@ HDRRenderer::HDRRenderer(Scene* scene) : Renderer(scene) {
     dummyQuad = GetMiniQuad(scene, "DUmmy", glm::dvec3(0), glm::dvec3(0), glm::dvec3(1), glm::dvec4(1, 1, 1, 1));
     MaterialComponent* dummyMaterial = dummyQuad->GetComponent<MaterialComponent>();
     dummyMaterial->SetShader(quadShader);
-
     dummyQuad->Enable();
+
 }
 
 void HDRRenderer::Resize(int w, int h) {
@@ -142,6 +142,17 @@ void HDRRenderer::Destroy() {
 
 void HDRRenderer::Render() {
     GETGL   
+    //Render all shadow maps
+    LightComponent* light;
+    TransformComponent* lightTransform;
+    for(int i=0; i<scene->lightObjects.size(); i++) {
+        light = scene->lightObjects[i]->GetComponent<LightComponent>();
+        light->RenderDepthMap();
+    }
+
+    ogl->glViewport(0, 0, quadFBO->width, quadFBO->height);
+
+    
     if(useMSAA) alternateFBO->Enable();
     else quadFBO->Enable();
     
@@ -158,6 +169,20 @@ void HDRRenderer::Render() {
         }
     }
 
+    //Set all previously updated lights to false
+    for(int i=0; i<scene->lightObjects.size(); i++) {
+        if(scene->lightObjects[i]->GetComponent<LightComponent>()->hasChanged) scene->lightObjects[i]->GetComponent<LightComponent>()->hasChanged = false;
+        if(scene->lightObjects[i]->transform->hasChanged) scene->lightObjects[i]->transform->hasChanged = false;
+    }
+
+    for(int i=0; i<scene->objects3D.size(); i++) {
+        MaterialComponent* mat = scene->objects3D[i]->GetComponent<MaterialComponent>();
+        if(mat) {
+            if(mat->firstIter) mat->firstIter = false;
+
+        }
+    }
+    
     //Render skybox
     if(scene->hasSkybox) {
         ogl->glDepthFunc(GL_LEQUAL);        
@@ -177,27 +202,12 @@ void HDRRenderer::Render() {
     if(useMSAA) alternateFBO->Disable();
     else quadFBO->Disable();
 
-    //Render all shadow maps
-    LightComponent* light;
-    TransformComponent* lightTransform;
-    for(int i=0; i<scene->lightObjects.size(); i++) {
-        light = scene->lightObjects[i]->GetComponent<LightComponent>();
-        light->RenderDepthMap();
-
-        if(light->hasChanged) light->hasChanged = false;
-        if(scene->lightObjects[i]->transform->hasChanged) scene->lightObjects[i]->transform->hasChanged = false;
-
-        light->depthFBO->Enable();
-        light->depthFBO->RenderFBOToObject(dummyQuad, false);       
-        light->depthFBO->Disable();
-    }
-
-    ogl->glViewport(0, 0, quadFBO->width, quadFBO->height);
-
+    //If rendered in multisampled framebuffer, blit it into single sample framebuffer
     if(useMSAA){
         alternateFBO->CopyToFramebuffer(quadFBO);
     }
     
+    //If post processes, process, else render the FBO on the quad
     if(postProcessor.numProcesses >0) {
         postProcessor.Run(quadFBO, finalFBO);
         finalFBO->RenderFBOToObject(quad);

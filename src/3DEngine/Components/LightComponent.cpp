@@ -112,7 +112,7 @@ void LightComponent::SetType(int type) {
     object3D->scene->glWindow->makeCurrent();
     if(type==0) {
         //Avant dernier arg TRUE pour debug, doit etre FALSE
-        depthFBO = new Framebuffer(SHADOW_WIDTH, SHADOW_HEIGHT, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, true, true);
+        depthFBO = new Framebuffer(SHADOW_WIDTH, SHADOW_HEIGHT, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, false, true);
         lightProjection  = glm::orthoLH(-20.0, 20.0, -20.0, 20.0, 1.0, (double)farClip);
 
         depthPassShader.vertSrc= R"(
@@ -141,7 +141,7 @@ void LightComponent::SetType(int type) {
         depthPassShader.Compile();
         depthPassShader.shouldRecompile = false;
     } else if(type == 1) {
-        depthCubeFBO = new CubeFramebuffer(1024, 1024, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, true, true);
+        depthCubeFBO = new CubeFramebuffer(1024, 1024, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, false, true);
         lightSpaceMatrices.resize(6);
 
         cubeDepthPassShader.vertSrc= R"(
@@ -206,6 +206,7 @@ void LightComponent::SetType(int type) {
         std::cout << "LightComponent:SetType: Compiling pointlight Depth Pass Shader" << std::endl; 
         cubeDepthPassShader.Compile();
         cubeDepthPassShader.shouldRecompile = false;
+
     } else if(type==2) {
         //Avant dernier arg TRUE pour debug, doit etre FALSE
         depthFBO = new Framebuffer(1024, 1024, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, false, true);
@@ -261,7 +262,7 @@ void LightComponent::RenderDepthMap() {
             glm::mat4 model = object3D->transform->GetWorldRotationMatrix();
             glm::vec3 lightPos = -20.0 * glm::vec4(glm::column(model, 2));
             model = glm::translate(model, lightPos);
-            // glm::mat4 model = object3D->transform->GetWorldModelMatrix();
+            // model = object3D->transform->GetWorldModelMatrix();
             viewMat = glm::inverse(model);
             lightSpaceMatrix = lightProjection * viewMat; 
 

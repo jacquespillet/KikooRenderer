@@ -161,7 +161,7 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
 		if (selectedItem->text() == quadStr) objectToAdd = CoreEngine::GetQuad(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
 		if (selectedItem->text() == emptyStr) objectToAdd = new CoreEngine::Object3D(name.toStdString(), view3D->view3DGL->scene);
 		
-		if (selectedItem->text() == dirLightStr) objectToAdd = CoreEngine::GetDirectionalLight(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(30, 180, 0), glm::vec3(1), glm::vec4(1, 1, 1, 1));
+		if (selectedItem->text() == dirLightStr) objectToAdd = CoreEngine::GetDirectionalLight(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(30, 0, 0), glm::vec3(1), glm::vec4(1, 1, 1, 1));
 		if (selectedItem->text() == pointLightStr) objectToAdd = CoreEngine::GetPointLight(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(1, 1, 1, 1));
 		if (selectedItem->text() == spotLightStr) objectToAdd = CoreEngine::GetSpotLight(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(1, 1, 1, 1), 90);
 		

@@ -233,6 +233,7 @@ void MaterialComponent::SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 vie
 			glm::mat4 mvpMatrix = projectionMatrix * viewMatrix * modelMatrix;
 			ogl->glUseProgram(shader.programShaderObject);
 
+			//General uniform that have to be updated each frame
 			int modelViewProjectionMatrixLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "modelViewProjectionMatrix"); 
 			ogl->glUniformMatrix4fv(modelViewProjectionMatrixLocation, 1, false, glm::value_ptr(mvpMatrix));
 			
@@ -252,20 +253,17 @@ void MaterialComponent::SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 vie
 			
 
 			if(this->shader.isLit) {
-
 				params->SetUniforms();
-
-
+				
 				int numLights = 0;
 
 				for(int i=0; i<scene->lightObjects.size(); i++) {
 					LightComponent* lightComponent = scene->lightObjects[i]->GetComponent<LightComponent>(); 
 					TransformComponent* transformComponent = scene->lightObjects[i]->transform;
-					
 					if(lightComponent != nullptr) {
-						
+						//Only update the light uniforms if something changed OR if it is the first iteration of the material
+						if(transformComponent->hasChanged || lightComponent->hasChanged || firstIter) {
 
-						if(transformComponent->hasChanged || firstIter) {
 							std::string varName = "lights[" + std::to_string(i) + "].position";
 							GLuint loc = ogl->glGetUniformLocation(this->shader.programShaderObject, varName.c_str());
 							ogl->glUniform3fv(loc, 1, glm::value_ptr(glm::vec3(transformComponent->position)));
@@ -273,12 +271,9 @@ void MaterialComponent::SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 vie
 							varName = "lights[" + std::to_string(i) + "].direction";
 							loc = ogl->glGetUniformLocation(this->shader.programShaderObject, varName.c_str());
 							ogl->glUniform3fv(loc, 1, glm::value_ptr(glm::vec3(glm::column(transformComponent->GetModelMatrix(), 2))));
-						}
 
-						if(lightComponent->hasChanged || firstIter) {
-							std::cout << "SETTING LIGHT UNIFORMS " << std::endl;
-							std::string varName = "lights[" + std::to_string(i) + "].type";
-							GLuint loc = ogl->glGetUniformLocation(this->shader.programShaderObject, varName.c_str());
+							varName = "lights[" + std::to_string(i) + "].type";
+							loc = ogl->glGetUniformLocation(this->shader.programShaderObject, varName.c_str());
 							ogl->glUniform1i(loc, lightComponent->type);
 
 
@@ -296,53 +291,41 @@ void MaterialComponent::SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 vie
 								loc = ogl->glGetUniformLocation(this->shader.programShaderObject, varName.c_str());
 								ogl->glUniformMatrix4fv(loc, 1, false,  glm::value_ptr(glm::mat4(lightComponent->lightSpaceMatrix)));
 
-								ogl->glActiveTexture(GL_TEXTURE4);
+								ogl->glActiveTexture(GL_TEXTURE4 + i);
 								ogl->glBindTexture(GL_TEXTURE_2D, lightComponent->depthFBO->depthTexture);
 								varName = "lights[" + std::to_string(i) + "].depthMap";
 								loc = ogl->glGetUniformLocation(this->shader.programShaderObject, varName.c_str());
-								ogl->glUniform1i(loc, 4);
+								ogl->glUniform1i(loc, 4 + i);
 							}else if(lightComponent->type == 1) {
-								ogl->glActiveTexture(GL_TEXTURE5);
+								ogl->glActiveTexture(GL_TEXTURE4 + i);
 								ogl->glBindTexture(GL_TEXTURE_CUBE_MAP, lightComponent->depthCubeFBO->depthCubemap);								
 								varName = "lights[" + std::to_string(i) + "].depthCubeMap";
 								loc = ogl->glGetUniformLocation(this->shader.programShaderObject, varName.c_str());								
-								ogl->glUniform1i(loc, 5);	
+								ogl->glUniform1i(loc, 4 + i);	
 
 								varName = "lights[" + std::to_string(i) + "].farPlane";
 								loc = ogl->glGetUniformLocation(this->shader.programShaderObject, varName.c_str());
 								ogl->glUniform1f(loc, lightComponent->farClip);								
 							}
-						}
+						} else {
+							ogl->glActiveTexture(GL_TEXTURE4 + i);
+							if(lightComponent->type == 0 || lightComponent->type == 2) {			
+								ogl->glBindTexture(GL_TEXTURE_2D, lightComponent->depthFBO->depthTexture);
+							}
 
-						if(lightComponent->type == 0 || lightComponent->type == 2) {			
-							ogl->glActiveTexture(GL_TEXTURE4);
-							ogl->glBindTexture(GL_TEXTURE_2D, lightComponent->depthFBO->depthTexture);
+							if(lightComponent->type == 1) {
+								ogl->glBindTexture(GL_TEXTURE_CUBE_MAP, lightComponent->depthCubeFBO->depthCubemap);								
+							}
 						}
-						if(lightComponent->type == 1) {
-							ogl->glActiveTexture(GL_TEXTURE5);
-							ogl->glBindTexture(GL_TEXTURE_CUBE_MAP, lightComponent->depthCubeFBO->depthCubemap);								
-						}
-
 						numLights++;
 					}
 				}
-
+				
 				int numLightsLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "numLights"); 
 				ogl->glUniform1i(numLightsLocation, numLights);
-
-
-				// 	// if(this->shader.GetId() == SHADER_IDS::PBR) {         
-				// 	// 	GLuint loc = ogl->glGetUniformLocation(this->shader.programShaderObject, "roughness");
-				// 	// 	ogl->glUniform1f(loc, 0.5);
-
-				// 	// 	loc = ogl->glGetUniformLocation(this->shader.programShaderObject, "specularFrac");
-				// 	// 	ogl->glUniform1f(loc, 0.5);
-				// 	// }
-				
 			}
 		}
 	}
-	if(firstIter) firstIter = false;
 }
 
 QJsonObject MaterialComponent::ToJSON() {

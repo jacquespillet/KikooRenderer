@@ -72,11 +72,11 @@ CubeFramebuffer::CubeFramebuffer(int width, int height , int internalColorFormat
     // ogl->glEnable(GL_DEPTH_TEST);
     
     // // now that we actually created the fbo and added all attachments we want to check if it is actually complete now
-    // if (ogl->glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
-    //     std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << width << "  " << height << std::endl;
-    // } else {
-    //     std::cout << "Succeffuly created FBO"<<std::endl;
-    // }
+    if (ogl->glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
+        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << width << "  " << height << std::endl;
+    } else {
+        std::cout << "CubeFramebuffer:Succeffuly created FBO"<<std::endl;
+    }
 
     // ogl->glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
