@@ -9,7 +9,15 @@ int main(int argc, char *argv[])
 
 	QApplication app(argc, argv);
 
-	QFile file("C:\\Users\\Jacques\\Documents\\Boulot\\2019\\Qt BP\\src\\Style\\Dark.qss");
+	// QFile file("resources/Styles/ConsoleStyle/ConsoleStyle.qss");
+	// QFile file("resources/Styles/AMOLED/AMOLED.qss");
+	// QFile file("resources/Styles/Aqua/Aqua.qss");
+	// QFile file("resources/Styles/Dark/QTDark.stylesheet");
+	// QFile file("resources/Styles/ElegantDark/ElegantDark.qss");
+	// QFile file("resources/Styles/MaterialDark/MaterialDark.qss");
+	QFile file("resources/Styles/Orange/darkorange.stylesheet");
+	
+
 	file.open(QFile::ReadOnly);
 	QString styleSheet = file.readAll();
 

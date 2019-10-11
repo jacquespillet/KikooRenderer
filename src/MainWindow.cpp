@@ -70,7 +70,7 @@ namespace KikooRenderer {
             if(fileName.length() > 0)
             {
                 std::string currentProjectFilePath = fileName.toStdString();
-                std::string currentFolderPath = QFileInfo(fileName).absoluteDir().absolutePath().toStdString();
+                currentFolderPath = QFileInfo(fileName).absoluteDir().absolutePath().toStdString();
                 SceneToFile(view3D->view3DGL->scene, fileName.toStdString());
             }
         });

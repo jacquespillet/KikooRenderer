@@ -29,7 +29,7 @@ namespace KikooRenderer {
         renderAxesHelperCheckbox->setChecked(true);
         GUI3DPreferencesLayout->addWidget(renderAxesHelperCheckbox);
 
-        connect(checkAll, &QCheckBox::stateChanged, this, [this, renderGridCheckbox, renderTransformwidgetCheckbox, renderAxesCheckbox](int state) {
+        connect(checkAll, &QCheckBox::stateChanged, this, [this, renderGridCheckbox, renderTransformwidgetCheckbox, renderAxesCheckbox, renderAxesHelperCheckbox](int state) {
             renderGridCheckbox->setChecked(state > 0);
             renderTransformwidgetCheckbox->setChecked(state > 0);
             renderAxesCheckbox->setChecked(state > 0);

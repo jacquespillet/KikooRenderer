@@ -12,8 +12,6 @@ void AxesHelperParams::SetUniforms() {
     
     int projectionMatrix = ogl->glGetUniformLocation(this->shader->programShaderObject, "projectionMatrix"); 
     ogl->glUniformMatrix4fv(projectionMatrix, 1, false, glm::value_ptr(scene->camera->GetProjectionMatrix()));
-
-    std::cout << "HERE " << std::endl;
 }
 
 Shader GetAxisHelperShader() {
