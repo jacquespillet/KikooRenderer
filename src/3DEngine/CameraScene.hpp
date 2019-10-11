@@ -3,7 +3,7 @@
 #include "Util/Common.h"
 #include "Geometry/Ray.hpp"
 #include "Geometry/Planes.hpp"
-
+#include "Object3D.hpp"
 namespace KikooRenderer {
 namespace CoreEngine {
 
@@ -11,7 +11,7 @@ class TransformComponent;
 class Scene;
 class CameraController;
 
-class CameraScene{
+class CameraScene : public Object3D{
     public: 
 		enum ProjectionType {
 			Perspective,
@@ -21,14 +21,12 @@ class CameraScene{
         CameraScene(Scene* scene, float eyeDistance, float fov, float near, float far, float aspect);
         
 		CameraScene();
-        Scene* scene;
         float eyeDistance;
         float fov;
         float nearClip;
         float farClip;
         float aspect;
         glm::mat4 projectionMatrix;
-        TransformComponent* transform;
 
 		ProjectionType projectionType;
 

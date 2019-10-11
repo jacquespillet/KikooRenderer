@@ -17,8 +17,7 @@ public:
     virtual void OnWheelEvent(QWheelEvent *event);
 	virtual	void OnKeyReleaseEvent(QKeyEvent *e);
     virtual void OnUpdate();
-
-    virtual void MoveToPos(glm::vec3 position);
+    virtual void MoveToFocus();
 
 private:
     CameraScene* camera;

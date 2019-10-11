@@ -80,11 +80,11 @@ class TransformComponent : public Component {
 		void StartAnimate(glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale);
 		
 	private:
-		bool isInTransition = false;
+		bool isInAnimation = true;
 		float transitionFactor;
 		Transform initialTransform;
 		Transform targetTransform;
-		float transitionTime = 0.5;
+		float transitionTime = 1;
 		void AnimateToTransform();
 };
 }

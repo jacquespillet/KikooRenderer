@@ -57,9 +57,14 @@ void CameraController::OnUpdate() {
     }
 }
 
-void CameraController::MoveToPos(glm::vec3 position) {
-    
+void CameraController::MoveToFocus() {
+    if(this->camera->scene->selectedObjects.size() > 0) {
+        glm::vec3 objectToCam = glm::normalize(this->camera->transform->position - this->camera->scene->selectedObjects[0]->transform->position);
+        objectToCam *= glm::length(this->camera->scene->selectedObjects[0]->transform->scale) * 1.3;
+        this->camera->transform->StartAnimate(objectToCam, glm::vec3(0), glm::vec3(1));
+    }
 }
+
 
 void CameraController::OnKeyPressEvent(QKeyEvent *e) {
     if(isRightClicked) {
@@ -76,11 +81,6 @@ void CameraController::OnKeyPressEvent(QKeyEvent *e) {
             leftPressed = true;
         }
         camera->scene->triggerRefresh = true;
-    }  
-    if(e->key() == Qt::Key_P) {
-        if(this->camera->scene->selectedObjects.size() > 0) {
-            this->camera->transform->StartAnimate(this->camera->scene->selectedObjects[0]->transform->position, glm::vec3(0), glm::vec3(1));
-        }
     }
 }
 

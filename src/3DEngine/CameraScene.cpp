@@ -1,13 +1,14 @@
 #include "CameraScene.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Scene.hpp"
+
 #include "CameraControllers/CameraController.hpp"
 
 namespace KikooRenderer {
 namespace CoreEngine {
 
-CameraScene::CameraScene(Scene* _scene, float _eyeDistance, float _fov, float _near, float _far, float _aspect) {
-	transform = new TransformComponent(nullptr);
+CameraScene::CameraScene(Scene* _scene, float _eyeDistance, float _fov, float _near, float _far, float _aspect) : Object3D("Camera", _scene) {
+	transform = new TransformComponent(this);
 
     this->scene = _scene;
     this->eyeDistance = _eyeDistance;
@@ -56,6 +57,7 @@ void CameraScene::OnKeyReleaseEvent(QKeyEvent *e){
 }
 
 void CameraScene::OnUpdate(){
+    transform->OnUpdate();
     cameraController->OnUpdate();
 }
 

@@ -1,5 +1,6 @@
 #include "View3D.hpp"
 #include "../3DEngine/TransformWidget.hpp"
+#include "../3DEngine/CameraControllers/CameraController.hpp"
 
 
 namespace KikooRenderer 
@@ -122,18 +123,15 @@ View3D::View3D() : QDockWidget("3D View")
 	fullScreenAct->setCheckable(true);
 	viewportToolbar->addAction(fullScreenAct);
 	connect(fullScreenAct, &QAction::toggled, this, [this, fullScreenAct](){
-        std::cout << "HERE" << std::endl;
-
-        // View3DGL* fs = new View3DGL(view3DGL->scene); 
-        // // fs->scene = view3DGL->scene;        
-        // sceneWindow = new QMainWindow();
-        // sceneWindow->setCentralWidget(fs);
-        // sceneWindow->show();
-
+        //TODO
+            //Duplicate scene with references to objects
     });
 
+    layout->addWidget(viewportToolbar);   
 
-    QIcon snapShotIcon("resources/UI/Widgets/snapShot.png");
+    viewportToolbar->addSeparator();
+
+    QIcon snapShotIcon("resources/UI/Widgets/snapshot.png");
     QAction *snapShotAct = new QAction(snapShotIcon, tr("&snapShot"), this);
 	snapShotAct->setCheckable(true);
 	viewportToolbar->addAction(snapShotAct);
@@ -146,8 +144,17 @@ View3D::View3D() : QDockWidget("3D View")
         }        
     });
 
+    viewportToolbar->addSeparator();
 
-    layout->addWidget(viewportToolbar);    
+    QIcon focusIcon("resources/UI/Widgets/focus.png");
+    QAction *focusAct = new QAction(focusIcon, tr("&focus"), this);
+	focusAct->setCheckable(true);
+	viewportToolbar->addAction(focusAct);
+	connect(focusAct, &QAction::toggled, this, [this](){
+        view3DGL->scene->camera->cameraController->MoveToFocus();
+    });
+
+ 
         
 }
 void View3D::keyPressEvent(QKeyEvent* e) {

@@ -136,6 +136,9 @@ TransformComponent::TransformComponent(Object3D* object) : Component("Transform"
     position = glm::vec3(0, 0, 0);
     rotation = glm::vec3(0, 0, 0);
     scale = glm::vec3(1, 1, 1); 
+	isInAnimation = false;
+
+	std::cout << "HERE "<< std::endl;
 }
 
 void TransformComponent::OnStart(){}
@@ -309,7 +312,7 @@ void TransformComponent::SetWorldZ(float z) {
 	hasChanged = true;
 }
 void TransformComponent::StartAnimate(glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale) {
-	isInTransition = true;
+	isInAnimation = true;
 	transitionFactor = 0;
 	initialTransform.position = this->position;
 	initialTransform.rotation = this->rotation;
@@ -318,13 +321,10 @@ void TransformComponent::StartAnimate(glm::vec3 _position, glm::vec3 _rotation, 
 	targetTransform.position = _position;
 	targetTransform.rotation = _rotation;
 	targetTransform.scale = _scale;
-
-	std::cout << "Started animation to " << glm::to_string(targetTransform.position) << std::endl;
 }
 
 void TransformComponent::AnimateToTransform() {
-	std::cout << object3D->name <<  "wcdwefwefweHERE " << isInTransition <<  std::endl;
-	if(isInTransition) {
+	if(isInAnimation) {
 		transitionFactor += object3D->scene->deltaTime;
 		float t = transitionFactor / transitionTime;
 
@@ -333,8 +333,7 @@ void TransformComponent::AnimateToTransform() {
 		this->position.z = initialTransform.position.z * (1 - t) + targetTransform.position.z * (t);
 		object3D->scene->triggerRefresh = true;
 		if(t >= 1) {
-			std::cout << "OEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE " << std::endl;
-			isInTransition = false;
+			isInAnimation = false;
 			transitionFactor = 0;
 		} 
 	}
