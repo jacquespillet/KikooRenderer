@@ -69,9 +69,23 @@ class TransformComponent : public Component {
 		bool hasChanged = true;
 
 		QJsonObject ToJSON();
-        static void FromJSON(QJsonObject json, Object3D* obj) {
-			
-		}
+        static void FromJSON(QJsonObject json, Object3D* obj);
+
+		struct Transform {
+			glm::vec3 position;
+			glm::vec3 rotation;
+			glm::vec3 scale;
+		};
+
+		void StartAnimate(glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale);
+		
+	private:
+		bool isInTransition = false;
+		float transitionFactor;
+		Transform initialTransform;
+		Transform targetTransform;
+		float transitionTime = 0.5;
+		void AnimateToTransform();
 };
 }
 }

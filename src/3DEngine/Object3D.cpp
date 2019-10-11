@@ -91,6 +91,7 @@ void Object3D::Update() {
 	if(hasToRecompute) {
 		Recompute();
 	}
+	transform->OnUpdate();
 	for(int i=0; i<components.size(); i++) {
 		components[i]->OnUpdate();
 	}

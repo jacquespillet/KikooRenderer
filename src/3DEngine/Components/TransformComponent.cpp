@@ -135,12 +135,14 @@ void TransformInspector::Refresh() {
 TransformComponent::TransformComponent(Object3D* object) : Component("Transform", object) {
     position = glm::vec3(0, 0, 0);
     rotation = glm::vec3(0, 0, 0);
-    scale = glm::vec3(1, 1, 1);   
+    scale = glm::vec3(1, 1, 1); 
 }
 
 void TransformComponent::OnStart(){}
 void TransformComponent::OnEnable(){}
-void TransformComponent::OnUpdate(){}
+void TransformComponent::OnUpdate(){
+	AnimateToTransform();
+}
 void TransformComponent::OnRender(){} 
 void TransformComponent::OnDestroy(){} 
 
@@ -305,6 +307,64 @@ void TransformComponent::SetWorldZ(float z) {
 		this->position.z = (z - parentPos.z) / scaleFac;
 	}
 	hasChanged = true;
+}
+void TransformComponent::StartAnimate(glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale) {
+	isInTransition = true;
+	transitionFactor = 0;
+	initialTransform.position = this->position;
+	initialTransform.rotation = this->rotation;
+	initialTransform.scale = this->scale;
+
+	targetTransform.position = _position;
+	targetTransform.rotation = _rotation;
+	targetTransform.scale = _scale;
+
+	std::cout << "Started animation to " << glm::to_string(targetTransform.position) << std::endl;
+}
+
+void TransformComponent::AnimateToTransform() {
+	std::cout << object3D->name <<  "wcdwefwefweHERE " << isInTransition <<  std::endl;
+	if(isInTransition) {
+		transitionFactor += object3D->scene->deltaTime;
+		float t = transitionFactor / transitionTime;
+
+		this->position.x = initialTransform.position.x * (1 - t) + targetTransform.position.x * (t);
+		this->position.y = initialTransform.position.y * (1 - t) + targetTransform.position.y * (t);
+		this->position.z = initialTransform.position.z * (1 - t) + targetTransform.position.z * (t);
+		object3D->scene->triggerRefresh = true;
+		if(t >= 1) {
+			std::cout << "OEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE " << std::endl;
+			isInTransition = false;
+			transitionFactor = 0;
+		} 
+	}
+}
+
+void TransformComponent::FromJSON(QJsonObject json, Object3D* obj) {
+
+	glm::vec3 position;
+	QJsonObject positionJson = json["position"].toObject();
+	position.x = positionJson["X"].toDouble();
+	position.y = positionJson["Y"].toDouble();
+	position.z = positionJson["Z"].toDouble();
+	
+	glm::vec3 rotation;
+	QJsonObject rotationJson = json["rotation"].toObject();
+	rotation.x = rotationJson["X"].toDouble();
+	rotation.y = rotationJson["Y"].toDouble();
+	rotation.z = rotationJson["Z"].toDouble();
+	
+	glm::vec3 scale;
+	QJsonObject scaleJson = json["scale"].toObject();
+	scale.x = scaleJson["X"].toDouble();
+	scale.y = scaleJson["Y"].toDouble();
+	scale.z = scaleJson["Z"].toDouble();
+
+	TransformComponent* transform = new TransformComponent(obj);
+	transform->position = position;
+	transform->rotation = rotation;
+	transform->scale = scale;
+	obj->AddComponent(transform);
 }
 
 QJsonObject TransformComponent::ToJSON() {

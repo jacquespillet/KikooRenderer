@@ -161,6 +161,10 @@ namespace KikooRenderer {
         scene->OnMouseReleaseEvent(e);
         Refresh();
     }
+    void View3DGL::mouseDoubleClickEvent( QMouseEvent * e ) {
+        scene->OnMouseDoubleClickEvent(e);
+        Refresh();    
+    }
 
     void View3DGL::mouseMoveEvent(QMouseEvent *e) {
         scene->OnMouseMoveEvent(e);
@@ -170,5 +174,6 @@ namespace KikooRenderer {
     void View3DGL::wheelEvent(QWheelEvent *e) {
         scene->OnWheelEvent(e);
         Refresh();
-    }   
+    }
+
 }

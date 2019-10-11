@@ -60,6 +60,7 @@ void CameraScene::OnUpdate(){
 }
 
 void CameraScene::OnKeyPressEvent(QKeyEvent *e){
+    
     cameraController->OnKeyPressEvent(e);
 	if (e->key() == Qt::Key_5) {
 		if (projectionType == ProjectionType::Perspective) projectionType = ProjectionType::Orthographic;

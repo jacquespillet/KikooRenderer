@@ -46,6 +46,7 @@ class Scene {
 		virtual void OnMouseReleaseEvent(QMouseEvent *e);
 		virtual void OnMouseMoveEvent(QMouseEvent *e);
 		virtual void OnWheelEvent(QWheelEvent *event);       
+		virtual void OnMouseDoubleClickEvent( QMouseEvent * e );
 
 		void HandleSelection(int x, int y);
 

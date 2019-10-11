@@ -416,8 +416,8 @@ Object3D* GetAxesHelper(Scene* scene) {
     triangles.push_back(vertex.size()-2);
     
     //Z axis
-    vertex.push_back(glm::vec3( 0,  0,  0.2)); 
-    vertex.push_back(glm::vec3( 0,  0,  1.2)); 
+    vertex.push_back(glm::vec3( 0,  0,  0.2));
+    vertex.push_back(glm::vec3( 0,  0,  1.2));
     normals.push_back(glm::vec3(0, 0, 1));
     normals.push_back(glm::vec3(0, 0, 1));
     uv.push_back(glm::vec2(0, 0));

@@ -45,6 +45,7 @@ class View3DGL: public QOpenGLWidget {
         virtual void mouseReleaseEvent(QMouseEvent *e);
         virtual void mouseMoveEvent(QMouseEvent *e);
         virtual void wheelEvent(QWheelEvent *e);
+        virtual void mouseDoubleClickEvent( QMouseEvent * e );
 
         void Refresh();
         void OnCloseEvent();

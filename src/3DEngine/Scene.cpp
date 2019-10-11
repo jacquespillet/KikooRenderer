@@ -188,6 +188,11 @@ namespace CoreEngine {
         this->camera->OnMousePressEvent(e);
         if(e->button() == Qt::LeftButton) HandleSelection(e->x(), e->y());
     }
+
+    void Scene::OnMouseDoubleClickEvent( QMouseEvent * e ) {
+        
+    }
+
 	void Scene::OnKeyReleaseEvent(QKeyEvent* e) {
         camera->OnKeyReleaseEvent(e);
 		if (e->key() == Qt::Key_Control) {

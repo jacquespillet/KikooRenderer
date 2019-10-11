@@ -77,6 +77,11 @@ void CameraController::OnKeyPressEvent(QKeyEvent *e) {
         }
         camera->scene->triggerRefresh = true;
     }  
+    if(e->key() == Qt::Key_P) {
+        if(this->camera->scene->selectedObjects.size() > 0) {
+            this->camera->transform->StartAnimate(this->camera->scene->selectedObjects[0]->transform->position, glm::vec3(0), glm::vec3(1));
+        }
+    }
 }
 
 void CameraController::OnMousePressEvent(QMouseEvent *e) {
