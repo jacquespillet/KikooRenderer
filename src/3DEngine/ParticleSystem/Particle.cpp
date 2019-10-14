@@ -1,4 +1,5 @@
 #include "Particle.hpp"
+#include "ParticleSystem.hpp"
 #include "../Scene.hpp"
 
 #include "Util/NoiseUtil.hpp"
@@ -6,7 +7,7 @@
 namespace KikooRenderer {
 
 namespace CoreEngine {
-Particle::Particle(Scene* scene, int numRows, glm::vec3 position, glm::vec3 velocity, float gravityEffect, float lifeLength, float rotation, float scale, bool useCurlNoise) {
+Particle::Particle(Scene* scene, int numRows, glm::vec3 position, glm::vec3 velocity, float gravityEffect, float lifeLength, float rotation, float scale, ParticleSystem* ps, bool useCurlNoise) {
     this->scene =scene;
     this->position =position;
     this->velocity =velocity;
@@ -16,6 +17,7 @@ Particle::Particle(Scene* scene, int numRows, glm::vec3 position, glm::vec3 velo
     this->scale =scale;
     this->numRows =numRows;
     this->useCurlNoise = useCurlNoise;
+    this->particleSystem = ps;
 }
 
 bool Particle::Update(glm::vec3 camPos) {
@@ -24,34 +26,30 @@ bool Particle::Update(glm::vec3 camPos) {
     if(!useCurlNoise) {
         velocity.y += gravityEffect * -9.81 * scene->deltaTime;
     } else {
-        // KikooRenderer::Util::NoiseSample sample = KikooRenderer::Util::GetFracNoise3D(position.x,position.y,position.z, 2, 6, 2.0, 0.5);        
-        // glm::vec3 offset = 0.1f * glm::vec3(Util::GetRand(), Util::GetRand(), Util::GetRand());
-        float amplitude = 1;
-
-        glm::vec3 offset = 0.3f * glm::vec3(Util::GetRand() * 2.0 - 1.0, Util::GetRand() * 2.0 - 1.0, Util::GetRand() * 2.0 - 1.0);
+        glm::vec3 offset = particleSystem->GetOffsetMult() * glm::vec3(Util::GetRand() * 2.0 - 1.0, Util::GetRand() * 2.0 - 1.0, Util::GetRand() * 2.0 - 1.0);
         glm::vec3 point = glm::vec3(position.z, position.y, position.x) + offset;
-        KikooRenderer::Util::NoiseSample sampleX =  KikooRenderer::Util::GetFracNoise3D(point.x,point.y,point.z, 0.05, 4);
-        sampleX.value *= amplitude;
-        sampleX.derivative *= amplitude;
+        KikooRenderer::Util::NoiseSample sampleX =  KikooRenderer::Util::GetFracNoise3D(point.x,point.y,point.z, particleSystem->GetFrequencyX(), particleSystem->GetOctavesX());
+        sampleX.value *= particleSystem->GetAmplitude();
+        sampleX.derivative *= particleSystem->GetAmplitude();
 
-        offset = 0.3f * glm::vec3(Util::GetRand() * 2.0 - 1.0, Util::GetRand() * 2.0 - 1.0, Util::GetRand() * 2.0 - 1.0);
+        offset = particleSystem->GetOffsetMult() * glm::vec3(Util::GetRand() * 2.0 - 1.0, Util::GetRand() * 2.0 - 1.0, Util::GetRand() * 2.0 - 1.0);
         point = glm::vec3(position.x + 100.0f, position.z, position.y) + offset;
-        KikooRenderer::Util::NoiseSample sampleY =  KikooRenderer::Util::GetFracNoise3D(point.x,point.y,point.z, 0.05, 4);
-        sampleY.value *= amplitude;
-        sampleY.derivative *= amplitude;
+        KikooRenderer::Util::NoiseSample sampleY =  KikooRenderer::Util::GetFracNoise3D(point.x,point.y,point.z, particleSystem->GetFrequencyY(), particleSystem->GetOctavesY());
+        sampleY.value *= particleSystem->GetAmplitude();
+        sampleY.derivative *= particleSystem->GetAmplitude();
 
-        offset = 0.3f * glm::vec3(Util::GetRand() * 2.0 - 1.0, Util::GetRand() * 2.0 - 1.0, Util::GetRand() * 2.0 - 1.0);
+        offset = particleSystem->GetOffsetMult() * glm::vec3(Util::GetRand() * 2.0 - 1.0, Util::GetRand() * 2.0 - 1.0, Util::GetRand() * 2.0 - 1.0);
         point = glm::vec3(position.y, position.x + 100.0f, position.z) + offset;
-        KikooRenderer::Util::NoiseSample sampleZ =  KikooRenderer::Util::GetFracNoise3D(point.x,point.y,point.z, 0.05, 4);
-        sampleZ.value *= amplitude;
-        sampleZ.derivative *= amplitude;
+        KikooRenderer::Util::NoiseSample sampleZ =  KikooRenderer::Util::GetFracNoise3D(point.x,point.y,point.z, particleSystem->GetFrequencyZ(), particleSystem->GetOctavesZ());
+        sampleZ.value *= particleSystem->GetAmplitude();
+        sampleZ.derivative *= particleSystem->GetAmplitude();
 
         glm::vec3 curl;
         curl.x = sampleZ.derivative.x - sampleY.derivative.y;
         curl.y = sampleX.derivative.x - sampleZ.derivative.y;
         curl.z = sampleY.derivative.x - sampleX.derivative.y;              
         
-        velocity = 4.0f * glm::normalize(curl);
+        velocity = particleSystem->GetSpeedMult() * glm::normalize(curl);
     }
 
     glm::vec3 change(velocity);

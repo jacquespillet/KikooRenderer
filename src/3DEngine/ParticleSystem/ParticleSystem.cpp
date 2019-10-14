@@ -156,7 +156,7 @@ void ParticleSystem::EmitParticle() {
     float finalLifeLength = Util::GenerateValue(lifeLength, lifeError);
     float finalRotation = isRandomRotation ? Util::GetRand() * 360.0f : 0;
 
-    Particle particle(scene, numRows, this->transform->position, velocity, gravityFactor, finalLifeLength, finalRotation, finalScale, useCurlNoise);   
+    Particle particle(scene, numRows, this->transform->position, velocity, gravityFactor, finalLifeLength, finalRotation, finalScale,this, useCurlNoise);   
     particles.push_back(particle); 
 }
 
@@ -240,7 +240,72 @@ QWidget* ParticleSystem::GetMainParameters() {
     
     QCheckBox* curlNoiseCheckbox = new QCheckBox("Use Curl Noise");
     mainLayout->addWidget(curlNoiseCheckbox);
-    QObject::connect( curlNoiseCheckbox, &QCheckBox::stateChanged, [this](int state) {
+
+    QGroupBox* noiseGroupBox = new QGroupBox("Noise Params");
+    QVBoxLayout* noiseMainLayout = new QVBoxLayout();
+    noiseGroupBox->setLayout(noiseMainLayout);
+    noiseGroupBox->setVisible(useCurlNoise);
+
+
+    CustomSlider* frequencyXSlider = new CustomSlider(0, 5, 0.01, "frequency X", frequencyX);
+    noiseMainLayout->addLayout(frequencyXSlider);
+    QObject::connect( frequencyXSlider, &CustomSlider::Modified, [this](double val) {
+        frequencyX = val;
+    });
+
+    CustomSlider* frequencyYSlider = new CustomSlider(0, 5, 0.01, "frequency Y", frequencyY);
+    noiseMainLayout->addLayout(frequencyYSlider);
+    QObject::connect( frequencyYSlider, &CustomSlider::Modified, [this](double val) {
+        frequencyY = val;
+    });
+    
+    CustomSlider* frequencyZSlider = new CustomSlider(0, 5, 0.01, "frequency Z", frequencyZ);
+    noiseMainLayout->addLayout(frequencyZSlider);
+    QObject::connect( frequencyZSlider, &CustomSlider::Modified, [this](double val) {
+        frequencyZ = val;
+    });
+
+  
+    CustomSlider* octavesXSlider = new CustomSlider(0, 8, 1, "octaves X", octavesX);
+    noiseMainLayout->addLayout(octavesXSlider);
+    QObject::connect( octavesXSlider, &CustomSlider::Modified, [this](double val) {
+        octavesX = val;
+    });
+
+    CustomSlider* octavesYSlider = new CustomSlider(0, 8, 1, "octaves Y", octavesY);
+    noiseMainLayout->addLayout(octavesYSlider);
+    QObject::connect( octavesYSlider, &CustomSlider::Modified, [this](double val) {
+        octavesY = val;
+    });
+    
+    CustomSlider* octavesZSlider = new CustomSlider(0, 8, 1, "octaves Z", octavesZ);
+    noiseMainLayout->addLayout(octavesZSlider);
+    QObject::connect( octavesZSlider, &CustomSlider::Modified, [this](double val) {
+        octavesZ = val;
+    });    
+
+    CustomSlider* amplitudeSlider = new CustomSlider(0, 3, 0.01, "amplitude", amplitude);
+    noiseMainLayout->addLayout(amplitudeSlider);
+    QObject::connect( amplitudeSlider, &CustomSlider::Modified, [this](double val) {
+        amplitude = val;
+    });    
+
+    CustomSlider* offsetMultSlider = new CustomSlider(0, 1, 0.001, "offset Multiplier", offsetMult);
+    noiseMainLayout->addLayout(offsetMultSlider);
+    QObject::connect( offsetMultSlider, &CustomSlider::Modified, [this](double val) {
+        offsetMult = val;
+    });   
+
+    CustomSlider* speedMultSlider = new CustomSlider(0, 10, 0.01, "speed Multiplier", speedMult);
+    noiseMainLayout->addLayout(speedMultSlider);
+    QObject::connect( speedMultSlider, &CustomSlider::Modified, [this](double val) {
+        speedMult = val;
+    });   
+
+    mainLayout->addWidget(noiseGroupBox);
+
+    QObject::connect( curlNoiseCheckbox, &QCheckBox::stateChanged, [this, noiseGroupBox](int state) {
+        noiseGroupBox->setVisible(state > 0);
         useCurlNoise = state>0;
     });
 
@@ -252,6 +317,79 @@ std::vector<QWidget*> ParticleSystem::GetInspectorWidgets() {
     res.push_back(this->transform->GetInspector());
     res.push_back(GetMainParameters());
 	return res;
+}
+
+
+float ParticleSystem::GetAmplitude() {
+    return amplitude;
+}
+
+void ParticleSystem::SetAmplitude(float _amplitude) {
+    this->amplitude = _amplitude;
+}
+
+float ParticleSystem::GetFrequencyX() {
+    return frequencyX;
+}
+
+void ParticleSystem::SetFrequencyX(float _frequencyX) {
+    this->frequencyX = _frequencyX;
+}
+
+float ParticleSystem::GetFrequencyY() {
+    return frequencyY;
+}
+
+void ParticleSystem::SetFrequencyY(float _frequencyY) {
+    this->frequencyY = _frequencyY;
+}
+
+float ParticleSystem::GetFrequencyZ() {
+    return frequencyZ;
+}
+
+void ParticleSystem::SetFrequencyZ(float _frequencyZ) {
+    this->frequencyZ = _frequencyZ;
+}
+
+int ParticleSystem::GetOctavesX() {
+    return octavesX;
+}
+
+void ParticleSystem::SetOctavesX(int _octavesX) {
+    this->octavesX = _octavesX;
+}
+
+int ParticleSystem::GetOctavesY() {
+    return octavesY;
+}
+
+void ParticleSystem::SetOctavesY(int _octavesY) {
+    this->octavesY = _octavesY;
+}
+
+int ParticleSystem::GetOctavesZ() {
+    return octavesZ;
+}
+
+void ParticleSystem::SetOctavesZ(int _octavesZ) {
+    this->octavesZ = _octavesZ;
+}
+
+float ParticleSystem::GetOffsetMult() {
+    return offsetMult;
+}
+
+void ParticleSystem::SetOffsetMult(float _offsetMult) {
+    this->offsetMult = _offsetMult;
+}
+
+float ParticleSystem::GetSpeedMult() {
+    return speedMult;
+}
+
+void ParticleSystem::SetSpeedMult(float _speedMult) {
+    this->speedMult = _speedMult;
 }
 
 

@@ -30,6 +30,37 @@ public:
 
     QWidget* GetMainParameters();
 
+
+    
+    float GetAmplitude();
+    void SetAmplitude(float _amplitude);
+    
+    float GetFrequencyX();
+    void SetFrequencyX(float _frequencyX);
+    
+    float GetFrequencyY();
+    void SetFrequencyY(float _frequencyY);
+    
+    float GetFrequencyZ();
+    void SetFrequencyZ(float _frequencyZ);
+    
+    int GetOctavesX();
+    void SetOctavesX(int _octavesX);
+    
+    int GetOctavesY();
+    void SetOctavesY(int _octavesY);
+    
+    int GetOctavesZ();
+    void SetOctavesZ(int _octavesZ);
+    
+    float GetOffsetMult();
+    void SetOffsetMult(float _offsetMult);
+    
+    float GetSpeedMult();
+    void SetSpeedMult(float _speedMult);
+
+
+
     QJsonObject ToJSON() {
         QJsonObject json;
         json["type"] = "ParticleSystem";
@@ -90,7 +121,18 @@ private:
 
     int numRows = 1;
 
+    //Curl noise params
     bool useCurlNoise = false;
+        
+    float amplitude = 1;
+    float frequencyX = 0.05;
+    float frequencyY = 0.05;
+    float frequencyZ = 0.05;
+    int octavesX = 4;
+    int octavesY = 4;
+    int octavesZ = 4;
+    float offsetMult = 0.3;
+    float speedMult = 4.0;
 };
 
 }

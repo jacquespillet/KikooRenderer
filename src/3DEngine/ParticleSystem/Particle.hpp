@@ -5,10 +5,11 @@ namespace KikooRenderer {
 
 namespace CoreEngine {
 class Scene;
+class ParticleSystem;
 class Particle {
 public: 
     Particle(){}
-    Particle(Scene* scene, int numRows, glm::vec3 position, glm::vec3 velocity, float gravityEffect, float lifeLength, float rotation, float scale, bool useCurlNoise=false);
+    Particle(Scene* scene, int numRows, glm::vec3 position, glm::vec3 velocity, float gravityEffect, float lifeLength, float rotation, float scale, ParticleSystem* ps, bool useCurlNoise=false);
 
     bool Update(glm::vec3 camPos);
     
@@ -36,7 +37,9 @@ private:
     float elapsedTime=0;
 
     void UpdateTexCoords();
-    
+
+    ParticleSystem* particleSystem;
+
 
 };
 
