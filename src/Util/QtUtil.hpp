@@ -46,6 +46,29 @@ signals:
 
 };
 
+
+class LayerController: public QWidget
+{
+    Q_OBJECT
+    public:
+        LayerController(uint16_t layerMask = 0xFFFF);
+        virtual void mousePressEvent(QMouseEvent *e);
+        virtual void mouseReleaseEvent(QMouseEvent *e);
+		void SetMask(uint16_t layerMask);
+		
+    protected:
+        bool isClicked = false;
+        std::vector<bool> isChecked;
+        std::vector<QPushButton*> buttons;
+        uint16_t layerMask;
+
+		int numLayers = 8;
+
+	signals:
+		void maskChanged(uint16_t layerMask);
+};
+
+
 class TexturePicker : public QWidget {
 	Q_OBJECT
 public:

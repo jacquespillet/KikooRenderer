@@ -111,8 +111,12 @@ class Scene {
 		bool renderAxesHelper= true;
 		bool renderTransformWidget= true;
 
+		void SetLayerMask(uint16_t _layerMask);
+		uint16_t GetLayerMask();
+
 	protected:
 		Object3D* GetIntersectObject(int x, int y);
+		uint16_t layerMask = 0xFFFF;
 };
 
 }

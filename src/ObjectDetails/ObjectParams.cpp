@@ -48,6 +48,14 @@ namespace KikooRenderer {
 			emit root->InspectorModified();
 		});
 
+		LayerController* layerController = new LayerController(object->GetLayerMask());
+		mainLayout->addWidget(layerController);
+		connect(layerController, &LayerController::maskChanged, this, [this](uint16_t layerMask) {
+			object->SetLayerMask(layerMask);
+			object->scene->triggerRefresh= true;
+		});
+
+
 		setLayout(mainLayout);
 	}
 }

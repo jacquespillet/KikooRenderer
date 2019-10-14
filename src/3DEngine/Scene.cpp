@@ -392,5 +392,14 @@ namespace CoreEngine {
         glWindow->doneCurrent();
     }
 
+    
+    void Scene::SetLayerMask(uint16_t _layerMask) {
+        this->layerMask = _layerMask;
+    }
+
+    uint16_t Scene::GetLayerMask() {
+        return this->layerMask;
+    }
+
 }
 }

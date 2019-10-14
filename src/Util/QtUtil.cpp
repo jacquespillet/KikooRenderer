@@ -1,4 +1,5 @@
 #include "QtUtil.hpp"
+#include <QtWidgets/QButtonGroup>
 
 namespace KikooRenderer {
 
@@ -75,6 +76,79 @@ ColorPicker::ColorPicker(std::string label, int r, int g, int b, int a) : QWidge
 
     setLayout(mainLayout);
 }
+
+
+//LayerController class
+//____________________________________________________________
+//
+LayerController::LayerController(uint16_t layerMask) : QWidget() {
+    QGridLayout* grid = new QGridLayout();
+	QButtonGroup* layersButtonGroup = new QButtonGroup();
+	layersButtonGroup->setExclusive(false);
+
+	int width = numLayers / 2;
+	int height = 2;
+    int inx = 0;
+    isChecked = std::vector<bool>(width * height, true);
+
+    SetMask(layerMask);
+
+	for(int y=0; y<height; y++) {
+		for(int x=0; x<width; x++) {
+			QPushButton* b = new QPushButton();
+            
+            if(isChecked[inx]) {
+                b->setStyleSheet("background-color: gray");
+            } else {
+                b->setStyleSheet("background-color: black");
+            }    
+            grid->addWidget(b, y, x);   
+			layersButtonGroup->addButton(b, inx);
+            buttons.push_back(b);        
+            inx++;
+		}		
+	}
+    
+	connect(layersButtonGroup, static_cast<void (QButtonGroup::*)(int inx)>(&QButtonGroup::buttonClicked), this, [this, &layerMask](int inx) {
+        isChecked[inx] = !isChecked[inx];
+        
+        if(isChecked[inx]) {
+            buttons[inx]->setStyleSheet("background-color: gray");
+        } else {
+            buttons[inx]->setStyleSheet("background-color: black");
+        }
+        
+        layerMask = 0;
+        for(int i=0; i<numLayers; i++) {
+            layerMask |= (isChecked[i] ? 1 : 0) << i;
+        }
+
+        emit maskChanged(layerMask);
+	});
+	
+	grid->setSpacing(0);
+	setLayout(grid);
+}
+
+void LayerController::SetMask(uint16_t _layerMask) {
+    for(int i=0; i<numLayers; i++) {
+        if((_layerMask >> i) & 1 > 0) {
+            isChecked[i] = true;
+        }
+        else{
+            isChecked[i] = false;
+        }
+    } 
+}
+
+void LayerController::mousePressEvent(QMouseEvent *e) {
+    isClicked = true;
+}
+
+void LayerController::mouseReleaseEvent(QMouseEvent *e) {
+    isClicked = false;
+}
+//____________________________________________________________
 
 
 //TexturePicker class

@@ -164,7 +164,7 @@ void HDRRenderer::Render() {
 
     //Main pass
     for(int i=0; i<scene->objects3D.size(); i++) {
-        if(scene->objects3D[i] && scene->objects3D[i]->visible ) {
+        if(scene->objects3D[i] && scene->objects3D[i]->visible && scene->objects3D[i]->MatchesMask(scene->GetLayerMask())) {
             scene->objects3D[i]->Render();
         }
     }

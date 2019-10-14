@@ -71,8 +71,13 @@ class Object3D {
         QJsonObject ToJSON();
         static Object3D* FromJSON(QJsonObject json, Scene* scene);
 
+		void SetLayerMask(uint16_t _layerMask);
+		uint16_t GetLayerMask();
+        bool MatchesMask(uint16_t otherMask);
+
+
     protected:
-        uint16_t layer = 16536;
+        uint16_t layerMask = 1;
 };
 }
 
