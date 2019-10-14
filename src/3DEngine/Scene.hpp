@@ -48,11 +48,13 @@ class Scene {
 		virtual void OnWheelEvent(QWheelEvent *event);       
 		virtual void OnMouseDoubleClickEvent( QMouseEvent * e );
 
-		void HandleSelection(int x, int y);
 
 		Object3D* FindObjectByName(std::string name);
 		std::string AddObject(Object3D* object);
 		void RemoveObject(Object3D* object);
+
+		void GetObjectsInSquare(glm::vec2 topLeft, glm::vec2 bottomRight);
+		void HandleSelection(int x, int y, bool isCtrl);
 		void AddObjectToSelection(bool erasePrevious, Object3D* selectedObject);
 		void ClearSelection();
 		void DeleteSelection();

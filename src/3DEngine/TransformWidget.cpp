@@ -95,15 +95,36 @@ namespace CoreEngine {
 		this->visible = false;
 	}
 
-	void TransformWidget::SetObject(Object3D* object) {
-		currentObject = object;
+	void TransformWidget::AddHandleObject(Object3D* object) {
+		currentObjects.push_back(object);
 		TransformComponent* objectTransform = object->transform;
-		transform->position = objectTransform->GetWorldPosition();
-		visible = true;
+		
+		RecomputePosition();
+		
+		visible = true;		
+	}
+
+	void TransformWidget::RemoveHandleObject(Object3D* object) {
+        for(int i=0; i<currentObjects.size(); i++) {
+            if(currentObjects[i] == object) {
+                delete currentObjects[i];
+                currentObjects.erase(currentObjects.begin() + i);
+                break;
+            }
+        }
+	}
+	
+	void TransformWidget::RecomputePosition() {
+		glm::vec3 averagePos(0);
+		for(int i=0; i<currentObjects.size(); i++) {
+			averagePos += currentObjects[i]->transform->position;
+		}
+		averagePos /= currentObjects.size();
+		transform->position = averagePos;		
 	}
 
 	void TransformWidget::Disable() {
-		currentObject = nullptr;
+		currentObjects.resize(0);
 		visible = false;
 	}
 
@@ -118,21 +139,20 @@ namespace CoreEngine {
 
 	void TransformWidget::OnMouseMoveEvent(QMouseEvent* e) {
 		if (isTransforming) {
-			TransformComponent* objectTransform = currentObject->transform;
-			if(objectTransform != nullptr) {
+			if(currentObjects.size() > 0) {
 				if(transformMode == TransformMode::TRANSLATE) {
-					HandleTranslate(e, objectTransform);
+					HandleTranslate(e);
 				} else if (transformMode == TransformMode::SCALE) {
-					HandleScale(e, objectTransform);
+					HandleScale(e);
 				} else if (transformMode == TransformMode::ROTATE) {
-					HandleRotate(e, objectTransform);
+					HandleRotate(e);
 				}
 				scene->objectDetailsPanel->Refresh();
 			}
 		}
 	}
 
-	void TransformWidget::HandleTranslate(QMouseEvent* e, TransformComponent* objectTransform) {
+	void TransformWidget::HandleTranslate(QMouseEvent* e) {
 		int newX = e->x();
 		int newY = e->y();
 
@@ -149,18 +169,22 @@ namespace CoreEngine {
 			glm::vec4 plane = (dotY > dotZ) ? glm::vec4(0, ysign * 1, 0, std::abs(transform->position.y)) : glm::vec4(0, 0, zsign * 1, std::abs(transform->position.z));
 			double t = -glm::dot(plane, glm::vec4(ray.origin, 1.0)) / glm::dot(plane, glm::vec4(ray.direction, 0.0));
 
+			//Get position of ray on the plane
 			glm::vec3 position = ray.origin + t * ray.direction;
 			if (isFirstFrame) { //First frame of transformation, get offset btw click and origin of transform widget
 				isFirstFrame = false;
-				//Get position of ray on the plane
 				transformOffset = position.x - transform->position.x;
 			}
 			else {
 				//Set transform to x position of intersection
 				double newX = position.x - transformOffset;
-				transform->position.x = newX;
-				double xScaleFactor = objectTransform->GetWorldScale().x;
-				objectTransform->SetWorldX(newX);
+				
+				double difference = newX - transform->position.x; //Difference btw click and previous position
+				transform->position.x += difference;
+
+				for(int i=0; i<currentObjects.size(); i++) {
+					currentObjects[i]->transform->position.x += difference;
+				}
 			}
 		}
 		else if (axis == TransformAxis::Y) {
@@ -178,8 +202,13 @@ namespace CoreEngine {
 			}
 			else {
 				double newY = position.y - transformOffset;
-				transform->position.y = newY;
-				objectTransform->SetWorldY(newY);
+				
+				double difference = newY - transform->position.y; //Difference btw click and previous position
+				transform->position.y += difference;
+
+				for(int i=0; i<currentObjects.size(); i++) {
+					currentObjects[i]->transform->position.y += difference;
+				}
 			}
 		}
 		else if (axis == TransformAxis::Z) {
@@ -197,20 +226,25 @@ namespace CoreEngine {
 			}
 			else {
 				double newZ = position.z - transformOffset;
-				transform->position.z = newZ;
-				objectTransform->SetWorldZ(newZ);
+				
+				double difference = newZ - transform->position.z; //Difference btw click and previous position
+				transform->position.z += difference;
+
+				for(int i=0; i<currentObjects.size(); i++) {
+					currentObjects[i]->transform->position.z += difference;
+				}
 			}
 		}
 	}
 
-	void TransformWidget::HandleRotate(QMouseEvent* e, TransformComponent* objectTransform) {
+	void TransformWidget::HandleRotate(QMouseEvent* e) {
 		int newX = e->x();
 		int newY = e->y();
 		Geometry::Ray ray = scene->camera->GetRay(newX, newY);
 
 		glm::vec3 planeNormal = -glm::column(scene->camera->transform->GetModelMatrix(), 2);
-		glm::vec3 initialPlanePosition = firstRay.origin + (glm::dot(objectTransform->position - firstRay.origin, planeNormal) / glm::dot(firstRay.direction, planeNormal)) * firstRay.direction;
-		glm::vec3 mousePlanePosition   = ray.origin + (glm::dot(objectTransform->position - ray.origin, planeNormal) / glm::dot(ray.direction, planeNormal)) * ray.direction;
+		glm::vec3 initialPlanePosition = firstRay.origin + (glm::dot(transform->position - firstRay.origin, planeNormal) / glm::dot(firstRay.direction, planeNormal)) * firstRay.direction;
+		glm::vec3 mousePlanePosition   = ray.origin + (glm::dot(transform->position - ray.origin, planeNormal) / glm::dot(ray.direction, planeNormal)) * ray.direction;
 
 		if (axis == TransformAxis::X) {
 			glm::vec2 A = glm::normalize(glm::vec2(initialPlanePosition.z, initialPlanePosition.y));
@@ -227,9 +261,10 @@ namespace CoreEngine {
 			{
 				displacement = 360.0f - 57.2957795131 * glm::acos(glm::dot(A, B)); 
 			}			
-			
-			objectTransform->rotation = firstRotation + glm::vec3(1, 0, 0) * displacement; 
-			objectTransform->hasChanged = true;
+			for(int i=0; i<currentObjects.size(); i++) {
+				currentObjects[i]->transform->rotation = firstRotations[i] + glm::vec3(1, 0, 0) * displacement; 
+				currentObjects[i]->transform->hasChanged = true;
+			}
 		}else if (axis == TransformAxis::Y) {
 			glm::vec2 A = glm::normalize(glm::vec2(initialPlanePosition.x, initialPlanePosition.z));
 			
@@ -245,9 +280,11 @@ namespace CoreEngine {
 			{
 				displacement = 360.0f - 57.2957795131 * glm::acos(glm::dot(A, B)); 
 			}			
-			
-			objectTransform->rotation = firstRotation + glm::vec3(0, 1, 0) * displacement; 
-			objectTransform->hasChanged = true;
+	
+			for(int i=0; i<currentObjects.size(); i++) {
+				currentObjects[i]->transform->rotation = firstRotations[i] + glm::vec3(0, 1, 0) * displacement; 
+				currentObjects[i]->transform->hasChanged = true;
+			}
 		} else  if (axis == TransformAxis::Z) {
 			glm::vec2 A = glm::normalize(glm::vec2(initialPlanePosition));
 			
@@ -264,12 +301,14 @@ namespace CoreEngine {
 				displacement = 360.0f - 57.2957795131 * glm::acos(glm::dot(A, B)); 
 			}		
 
-			objectTransform->rotation = firstRotation + glm::vec3(0, 0, 1) * displacement; 
-			objectTransform->hasChanged = true;
+			for(int i=0; i<currentObjects.size(); i++) {
+				currentObjects[i]->transform->rotation = firstRotations[i] + glm::vec3(0, 0, 1) * displacement; 
+				currentObjects[i]->transform->hasChanged = true;
+			}
 		}
 	}
 
-	void TransformWidget::HandleScale(QMouseEvent* e, TransformComponent* objectTransform) {
+	void TransformWidget::HandleScale(QMouseEvent* e) {
 		int newX = e->x();
 		int newY = e->y();
 
@@ -296,8 +335,11 @@ namespace CoreEngine {
 				double newX = position.x;
 				double diff = newX - prevX;
 				prevX = newX;
-				objectTransform->scale.x += diff;
-				objectTransform->hasChanged = true;
+				for(int i=0; i<currentObjects.size(); i++) {
+					currentObjects[i]->transform->scale.x += diff;
+					currentObjects[i]->transform->hasChanged = true;
+				}				
+				
 			}
 		} else if (axis == TransformAxis::Y) {
 			double xsign = transform->position.x > 0 ? -1 : 1;
@@ -316,8 +358,10 @@ namespace CoreEngine {
 				double newY = position.y;
 				double diff = newY - prevY;
 				prevY = newY;
-				objectTransform->scale.y += diff;
-				objectTransform->hasChanged = true;
+				for(int i=0; i<currentObjects.size(); i++) {
+					currentObjects[i]->transform->scale.y += diff;
+					currentObjects[i]->transform->hasChanged = true;
+				}								
 			}
 		} else if (axis == TransformAxis::Z) {
 			double xsign = transform->position.x > 0 ? -1 : 1;
@@ -335,8 +379,10 @@ namespace CoreEngine {
 				double newZ = position.z;
 				double diff = newZ - prevZ;
 				prevZ = newZ;
-				objectTransform->scale.z += diff;
-				objectTransform->hasChanged = true;
+				for(int i=0; i<currentObjects.size(); i++) {
+					currentObjects[i]->transform->scale.z += diff;
+					currentObjects[i]->transform->hasChanged = true;
+				}								
 			}
 		}
 	}
@@ -371,7 +417,9 @@ namespace CoreEngine {
 
 		if (res != nullptr) {
 			firstRay = ray;
-			firstRotation = this->currentObject->transform->rotation;
+			for(int i=0; i<currentObjects.size(); i++) {
+				firstRotations.push_back(this->currentObjects[i]->transform->rotation);
+			}
 			this->StartTransform(res);
 		}
 

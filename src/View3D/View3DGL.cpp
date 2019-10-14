@@ -145,6 +145,7 @@ namespace KikooRenderer {
     void View3DGL::OnkeyPressEvent(QKeyEvent *e) {
         scene->OnKeyPressEvent(e);
         Refresh();
+
     }
 
     void View3DGL::keyReleaseEvent(QKeyEvent *e) {
@@ -155,9 +156,22 @@ namespace KikooRenderer {
     void View3DGL::mousePressEvent(QMouseEvent *e) {
         scene->OnMousePressEvent(e);
         Refresh();
+
+        if(e->button() ==  Qt::LeftButton && !scene->transformWidget->isTransforming) {
+            origin = e->pos();
+            rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
+            rubberBand->show();
+            rubberBand->setGeometry(QRect(origin, QSize()));
+            isRubberBand=true;
+        }
     }
 
     void View3DGL::mouseReleaseEvent(QMouseEvent *e) {
+        if(isRubberBand) {
+            rubberBand->hide();
+            isRubberBand=false;
+        }
+
         scene->OnMouseReleaseEvent(e);
         Refresh();
     }
@@ -167,6 +181,11 @@ namespace KikooRenderer {
     }
 
     void View3DGL::mouseMoveEvent(QMouseEvent *e) {
+        if(isRubberBand) {
+            rubberBand->setGeometry(QRect(origin, e->pos()).normalized());
+            scene->GetObjectsInSquare(glm::vec2(origin.x(), origin.y()), glm::vec2(e->pos().x(), e->pos().y()) );
+        }
+
         scene->OnMouseMoveEvent(e);
         Refresh();
     }

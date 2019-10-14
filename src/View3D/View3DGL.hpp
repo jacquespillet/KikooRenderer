@@ -50,6 +50,10 @@ class View3DGL: public QOpenGLWidget {
         void Refresh();
         void OnCloseEvent();
 
+        bool isRubberBand = false;
+        QRubberBand* rubberBand;
+        QPoint origin;
+
 };
 
 }

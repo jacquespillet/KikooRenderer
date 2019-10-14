@@ -36,6 +36,7 @@ namespace CoreEngine {
 
         void GetWorldBounds(glm::vec3* _min, glm::vec3* _max);
         void GetLocalBounds(glm::vec3* _min, glm::vec3* _max);
+        void GetNDCBounds(glm::vec2& _min, glm::vec2& _max, glm::mat4 mvp);
         
         ComponentInspector* GetInspector();
         

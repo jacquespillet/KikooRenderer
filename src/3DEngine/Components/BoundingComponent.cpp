@@ -160,6 +160,21 @@ void BoundingBoxComponent::GetWorldBounds(glm::vec3* _min, glm::vec3* _max) {
     (*_max) = wmax;
 }
 
+void BoundingBoxComponent::GetNDCBounds(glm::vec2& min, glm::vec2& max, glm::mat4 mvpMat) {
+    min = glm::vec2(999999999, 9999999999);
+    max = glm::vec2(-99999999999, -9999999999);
+    for (int i = 0; i < positions.size(); i++) {
+        glm::vec4 sPos = mvpMat * glm::vec4(positions[i], 1);
+        sPos /= sPos.w;
+
+        if (sPos.x < min.x) min.x = sPos.x;
+        if (sPos.y < min.y) min.y = sPos.y;
+
+        if (sPos.x > max.x) max.x = sPos.x;
+        if (sPos.y > max.y) max.y = sPos.y;
+    }
+}
+
 void BoundingBoxComponent::GetLocalBounds(glm::vec3* _min, glm::vec3* _max) {
     (*_min) =  glm::vec4(this->min, 1.0);
     (*_max) =  glm::vec4(this->max, 1.0);

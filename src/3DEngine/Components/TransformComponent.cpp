@@ -59,21 +59,21 @@ TransformInspector::TransformInspector(TransformComponent* transformComponent) :
 	connect(xPositionSpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, transformComponent](double value) {
 		transformComponent->position.x = value; 
 		transformComponent->hasChanged = true;
-		scene->transformWidget->transform->position = transformComponent->GetWorldPosition();
+		scene->transformWidget->RecomputePosition();
 		scene->triggerRefresh = true;
     });
 	
 	connect(yPositionSpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, transformComponent](double value) {
 		transformComponent->position.y = value; 
 		transformComponent->hasChanged = true;
-		scene->transformWidget->transform->position = transformComponent->GetWorldPosition();
+		scene->transformWidget->RecomputePosition();
 		scene->triggerRefresh = true;
     });
 	
 	connect(zPositionSpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, transformComponent](double value) {
 		transformComponent->position.z = value; 
 		transformComponent->hasChanged = true;
-		scene->transformWidget->transform->position = transformComponent->GetWorldPosition();
+		scene->transformWidget->RecomputePosition();
 		scene->triggerRefresh = true;
     });
 

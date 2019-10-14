@@ -5,6 +5,7 @@
 #include "Framebuffer.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/LightComponent.hpp"
+#include "Components/BoundingComponent.hpp"
 
 #include "WaterTiles/WaveTile/WaveTile.hpp"
 
@@ -186,7 +187,7 @@ namespace CoreEngine {
 
     void Scene::OnMousePressEvent(QMouseEvent *e) {
         this->camera->OnMousePressEvent(e);
-        if(e->button() == Qt::LeftButton) HandleSelection(e->x(), e->y());
+        if(e->button() == Qt::LeftButton) HandleSelection(e->x(), e->y(), (e->modifiers() & Qt::ControlModifier));
     }
 
     void Scene::OnMouseDoubleClickEvent( QMouseEvent * e ) {
@@ -245,19 +246,59 @@ namespace CoreEngine {
         this->triggerRefresh = true;
     }
 
-    void Scene::HandleSelection(int x, int y) {
+    void Scene::GetObjectsInSquare(glm::vec2 topLeft, glm::vec2 bottomRight) {
+        struct Box2D {
+            int x;
+            int y;
+            int width;
+            int height;
+        };
+
+        Box2D a;
+        a.width = (bottomRight.x > topLeft.x) ? (bottomRight.x - topLeft.x) : (topLeft.x - bottomRight.x);
+        a.height = (bottomRight.y > topLeft.y ) ?  (bottomRight.y - topLeft.y) : (topLeft.y - bottomRight.y);
+        a.x =   (bottomRight.x + topLeft.x) * 0.5;
+        a.y =   (bottomRight.y + topLeft.y) * 0.5;
+        glm::mat4 viewProj = camera->GetProjectionMatrix() * camera->GetViewMatrix();
+        for(int i=0; i< objects3D.size(); i++) {
+            if(std::find(selectedObjects.begin(), selectedObjects.end(), objects3D[i]) == selectedObjects.end()) {
+                BoundingBoxComponent* bb = objects3D[i]->GetComponent<BoundingBoxComponent>(); 
+                glm::mat4 mvp = viewProj *  objects3D[i]->transform->GetModelMatrix();
+                glm::vec2 min, max;
+                bb->GetNDCBounds(min, max, mvp);
+                
+                min.x = ((min.x + 1.0) * 0.5)  * windowWidth;
+                max.x = ((max.x + 1.0) * 0.5)  * windowWidth;
+
+                min.y = (1.0 - ((min.y + 1.0) * 0.5)) * windowHeight;
+                max.y = (1.0 - ((max.y + 1.0) * 0.5)) * windowHeight;
+                
+                Box2D b;
+                b.width = (max.x - min.x);  
+                b.height = (min.y - max.y );
+                b.x =   (max.x + min.x) * 0.5;
+                b.y =   (max.y + min.y) * 0.5;
+
+                bool intersects = (std::abs(a.x - b.x) * 2 < (a.width + b.width)) && (std::abs(a.y - b.y) * 2 < (a.height + b.height));
+                if(intersects) {
+                    AddObjectToSelection(false, objects3D[i]); 
+                }
+            }
+        }
+    }
+
+    void Scene::HandleSelection(int x, int y, bool isCtrl) {
         Object3D* intersectedObject = GetIntersectObject(x, y);
         if(intersectedObject != nullptr) {
 			std::cout <<"Scene:HandleSelection:" << intersectedObject->name << std::endl;
-			AddObjectToSelection(true, intersectedObject);
+			AddObjectToSelection(!isCtrl, intersectedObject);
         } else if(!transformWidget->visible) { 
             ClearSelection();
 		}
     }
 
 	void Scene::AddObjectToSelection(bool erasePrevious, Object3D* intersectedObject) {
-		
-		if(erasePrevious) selectedObjects.resize(0);
+        if(erasePrevious) ClearSelection();
 	
 		intersectedObject->isSelected = !intersectedObject->isSelected;
 
@@ -270,9 +311,8 @@ namespace CoreEngine {
 		else {
 			selectedObjects.push_back(intersectedObject);
 		}
-		TransformComponent* objectTransform = intersectedObject->transform;
-		transformWidget->SetObject(intersectedObject);
 
+        transformWidget->AddHandleObject(intersectedObject);
 		objectDetailsPanel->SetObject(intersectedObject);
 	}
 

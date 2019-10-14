@@ -17,7 +17,8 @@ public:
 	Object3D* scaleObject;
 	Object3D* rotateObject;
 
-	Object3D* currentObject;
+	// Object3D* currentObject;
+	std::vector<Object3D*> currentObjects;
 	
 	bool isTransforming = false;
 	bool isFirstFrame = false;
@@ -25,7 +26,6 @@ public:
 	TransformAxis axis;
 	TransformMode transformMode;
 
-	void SetObject(Object3D* object);
 	void Disable();
 
 	void StartTransform(Object3D* object);
@@ -37,16 +37,21 @@ public:
 
 	void SetTransformMode(TransformMode transformMode);
 
-	void HandleTranslate(QMouseEvent* e, TransformComponent* objectTransform);
-	void HandleRotate(QMouseEvent* e, TransformComponent* objectTransform);
-	void HandleScale(QMouseEvent* e, TransformComponent* objectTransform);
+	void HandleTranslate(QMouseEvent* e);
+	void HandleRotate(QMouseEvent* e);
+	void HandleScale(QMouseEvent* e);
+
+	void RecomputePosition();
+
+	void AddHandleObject(Object3D* object);
+	void RemoveHandleObject(Object3D* object);
 
 	double prevX = 0;
 	double prevY = 0;
 	double prevZ = 0;
 
 	Geometry::Ray firstRay;
-	glm::vec3 firstRotation;
+	std::vector<glm::vec3> firstRotations;
 }; 
 
 }
