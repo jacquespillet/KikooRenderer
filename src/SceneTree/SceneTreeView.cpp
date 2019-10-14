@@ -3,6 +3,7 @@
 #include "SceneTreeView.hpp"
 #include "TreeItem.hpp"
 #include "SceneTree.hpp"
+#include "3DEngine/CameraControllers/CameraController.hpp"
 
 namespace KikooRenderer 
 {
@@ -14,7 +15,7 @@ void SceneTreeView::mousePressEvent(QMouseEvent *event) {
 		QTreeView::mousePressEvent(event);
 		
 		TreeItem* item = (TreeItem*)model->itemFromIndex(index);
-		sceneTree->view3D->view3DGL->scene->AddObjectToSelection(true, item->object3D);
+		sceneTree->view3D->view3DGL->scene->AddObjectToSelection(!(event->modifiers() & Qt::ControlModifier), item->object3D);
 		sceneTree->view3D->view3DGL->scene->triggerRefresh = true;
 	}
 	else {
@@ -22,6 +23,10 @@ void SceneTreeView::mousePressEvent(QMouseEvent *event) {
 		sceneTree->view3D->view3DGL->scene->ClearSelection();
 		sceneTree->view3D->view3DGL->scene->triggerRefresh = true;
 	}
+}
+
+void SceneTreeView::mouseDoubleClickEvent(QMouseEvent *event) {
+	sceneTree->view3D->view3DGL->scene->camera->cameraController->MoveToFocus();
 }
 
 }

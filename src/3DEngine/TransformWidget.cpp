@@ -96,12 +96,14 @@ namespace CoreEngine {
 	}
 
 	void TransformWidget::AddHandleObject(Object3D* object) {
-		currentObjects.push_back(object);
-		TransformComponent* objectTransform = object->transform;
-		
-		RecomputePosition();
-		
-		visible = true;		
+		if(std::find(currentObjects.begin(), currentObjects.end(), object) == currentObjects.end()) {
+			currentObjects.push_back(object);
+			TransformComponent* objectTransform = object->transform;
+			
+			RecomputePosition();
+			
+			visible = true;		
+		}
 	}
 
 	void TransformWidget::RemoveHandleObject(Object3D* object) {
@@ -112,6 +114,7 @@ namespace CoreEngine {
                 break;
             }
         }
+		RecomputePosition();
 	}
 	
 	void TransformWidget::RecomputePosition() {

@@ -16,6 +16,7 @@ public:
 
 private:
 	virtual void mousePressEvent(QMouseEvent *event);
+	virtual void mouseDoubleClickEvent(QMouseEvent *event);
 };
 
 }

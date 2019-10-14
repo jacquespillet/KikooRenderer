@@ -289,17 +289,19 @@ namespace CoreEngine {
 
     void Scene::HandleSelection(int x, int y, bool isCtrl) {
         Object3D* intersectedObject = GetIntersectObject(x, y);
-        if(intersectedObject != nullptr) {
-			std::cout <<"Scene:HandleSelection:" << intersectedObject->name << std::endl;
+        if(intersectedObject == transformWidget) { //Intersected transform widget --> transform
+            std::cout << "TRANSFORM " << std::endl;
+        }
+        else if( intersectedObject != nullptr) { //Intersected object --> add it to selection
 			AddObjectToSelection(!isCtrl, intersectedObject);
-        } else if(!transformWidget->visible) { 
-            ClearSelection();
-		}
+        } else { //Intersected nothing --> Clear selection
+            ClearSelection(); 
+		} 
     }
 
 	void Scene::AddObjectToSelection(bool erasePrevious, Object3D* intersectedObject) {
         if(erasePrevious) ClearSelection();
-	
+
 		intersectedObject->isSelected = !intersectedObject->isSelected;
 
         //Check if it was in the selectedObjects array. If yes, remove it. If no, add it to selection
@@ -314,6 +316,7 @@ namespace CoreEngine {
 
         transformWidget->AddHandleObject(intersectedObject);
 		objectDetailsPanel->SetObject(intersectedObject);
+
 	}
 
 	void Scene::ClearSelection() {
@@ -339,9 +342,9 @@ namespace CoreEngine {
 		Object3D* intersectedTransformWidget = nullptr;
 		if(transformWidget->visible) intersectedTransformWidget = transformWidget->Intersects(ray, distance);
 		
-		if (intersectedTransformWidget == nullptr) {
-			transformWidget->Disable();
+        if(intersectedTransformWidget != nullptr) return transformWidget;
 
+		if (intersectedTransformWidget == nullptr) {
 			for(int i=0; i<objects3D.size(); i++) {
 				double distance;
 				Object3D* intersectedObject = objects3D[i]->Intersects(ray, distance);
