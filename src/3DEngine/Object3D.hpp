@@ -70,6 +70,9 @@ class Object3D {
 
         QJsonObject ToJSON();
         static Object3D* FromJSON(QJsonObject json, Scene* scene);
+
+    protected:
+        uint16_t layer = 16536;
 };
 }
 

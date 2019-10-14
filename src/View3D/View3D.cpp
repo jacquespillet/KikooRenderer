@@ -154,6 +154,43 @@ View3D::View3D() : QDockWidget("3D View")
         view3DGL->scene->camera->cameraController->MoveToFocus();
     });
 
+
+    //TODO LAYERS WIDGET
+	// QWidget* layersWidget = new QWidget();
+	// QGridLayout* grid = new QGridLayout();
+	// QButtonGroup* layersButtonGroup = new QButtonGroup();
+	// layersButtonGroup->setExclusive(false);
+
+	// int width = 4;
+	// int height = 2;
+	// for(int y=0; y<height; y++) {
+	// 	for(int x=0; x<width; x++) {
+	// 		QPushButton* b = new QPushButton();
+	// 		b->setCheckable(true);
+	// 		b->setChecked(true);
+	// 		b->setAutoExclusive(false);
+	// 		grid->addWidget(b, y, x);   
+	// 		layersButtonGroup->addButton(b);
+	// 	}		
+	// }
+
+	// connect(layersButtonGroup, static_cast<void (QButtonGroup::*)(QAbstractButton * button)>(&QButtonGroup::buttonClicked), this, [this](QAbstractButton * button) {
+	// 	std::cout << button->isChecked() << std::endl;
+	// 	bool res = !button->isChecked();
+	// 	button->setChecked(res);
+	// 	std::cout << button->isChecked() << std::endl;
+		
+	// 	// if(button->isChecked()) {
+	// 	// 	std::cout << "HERE " << std::endl;
+	// 	// 	button->setStyleSheet("background-color: green");
+	// 	// } else {
+	// 	// 	std::cout << "HERE 1" << std::endl;
+	// 	// 	button->setStyleSheet("background-color: red");
+	// 	// }
+	// });
+	
+	// grid->setSpacing(0);
+	// layersWidget->setLayout(grid);
  
         
 }
