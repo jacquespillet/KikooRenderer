@@ -66,7 +66,7 @@ class Object3D {
         virtual std::vector<QWidget*> GetInspectorWidgets();
 
 
-        Object3D* Intersects(Geometry::Ray ray, double& distance);
+        virtual Object3D* Intersects(Geometry::Ray ray, double& distance);
 
         QJsonObject ToJSON();
         static Object3D* FromJSON(QJsonObject json, Scene* scene);
@@ -75,9 +75,14 @@ class Object3D {
 		uint16_t GetLayerMask();
         bool MatchesMask(uint16_t otherMask);
 
+        void ToggleEditing();
+
 
     protected:
         uint16_t layerMask = 1;
+
+        bool isEdit = false;
+        std::vector<Object3D*> editingObjects;        
 };
 }
 

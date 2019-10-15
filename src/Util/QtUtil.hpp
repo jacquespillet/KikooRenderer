@@ -160,4 +160,23 @@ signals:
 	void Modified(std::vector<glm::vec3> value);	
 };
 
+
+
+class DoubleArrayInspector : public QWidget {
+	Q_OBJECT
+public:
+	DoubleArrayInspector(std::string label, std::vector<double> values, double defaultVec=double(0));
+	void SetSize(int size);
+	void Setvalue(std::vector<double> values);
+	std::vector<double> GetValue();
+	double At();
+private:
+	QSpinBox* sizeSpinBox;
+	std::vector<double> numbers;
+	double defaultVec;
+signals: 
+	void Modified(std::vector<double> value);	
+};
+
+
 }

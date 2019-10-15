@@ -13,6 +13,9 @@
 #include "WaterTiles/WaterTile_1/WaterTile_1.hpp"
 #include "WaterTiles/WaterTile_2/WaterTile_2.hpp"
 #include "WaterTiles/Wavetile/WaveTile.hpp"
+#include "Curves/CatmutRollSpline.hpp"
+#include "Curves/NURBS.hpp"
+#include "Curves/NonUniformBSpline.hpp"
 
 namespace KikooRenderer {
 
@@ -702,249 +705,20 @@ Object3D* GetBezierCurve(Scene* scene, std::string name,glm::vec3 _position, glm
     return newObject;
 }
 
-Object3D* GetCatmutRollSpline(Scene* scene, std::string name,glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, std::vector<glm::vec3> points) {
-    Object3D* newObject = new Object3D(name, scene);
-    
-    std::vector<glm::vec3> vertex;
-    std::vector<glm::vec3> normals;
-    std::vector<glm::vec2> uv;
-    std::vector<glm::vec4> colors;
-    std::vector<int> triangles;
-
-    double offset = 0.01;
-    int totalPoints = (points.size()-3) * (1.0 / offset);
-
-    int inx =0;
-    for(int i=1; i<points.size()-2; i++) {
-        for(double t=0; t<1; t+=offset) {
-            inx++;
-
-            if(inx < totalPoints) {
-                triangles.push_back(inx-1);
-                triangles.push_back(inx);
-            }
-
-            glm::mat4 basis = glm::mat4(0);
-            basis[0][0] = 1; basis[1][0] = -3; basis[2][0] =  3; basis[3][0] = -1; 
-            basis[0][1] = 4; basis[1][1] =  0; basis[2][1] = -6; basis[3][1] =  3; 
-            basis[0][2] = 1; basis[1][2] =  3; basis[2][2] =  3; basis[3][2] = -3; 
-            basis[0][3] = 0; basis[1][3] =  0; basis[2][3] =  0; basis[3][3] =  1;
-            basis *= (1.0 / 6.0);
-
-            glm::mat4 geometry = glm::mat4(0);
-            geometry[0] = glm::vec4(points[i-1], 1);
-            geometry[1] = glm::vec4(points[i], 1);
-            geometry[2] = glm::vec4(points[i+1], 1);
-            geometry[3] = glm::vec4(points[i+2], 1);
-
-            glm::vec4 tVec = glm::vec4(1, t, t*t, t*t*t);
-
-            glm::vec3 H = geometry * basis * tVec;
-
-            vertex.push_back(H); 
-            normals.push_back(glm::vec3(0, 0, 1));
-            uv.push_back(glm::vec2(0, 0));
-            colors.push_back(_color);
-        }
-    }
-
-    //Setup mesh
-    MeshFilterComponent* mesh = new MeshFilterComponent(newObject);
-    mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles);
-    mesh->drawingMode = GL_LINES;
-    mesh->primitiveSize = 10;
-
-    //Setup transform
-    TransformComponent* transform = new TransformComponent(newObject );
-    
-    //Setup material
-    MaterialComponent* material = new MaterialComponent(newObject);
-    material->albedo = _color;
-    Shader shader = scene->standardShaders.unlitMeshShader;
-    material->SetShader(shader);
-
-    newObject->AddComponent(material);
-	newObject->transform = transform;
-    newObject->AddComponent(mesh);
-
-    return newObject;
+Object3D* GetCatmutRollSpline(Scene* scene, std::string name,glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color) {
+    CatmutRollSpline* spline = new CatmutRollSpline(name, scene);
+    return spline;
 }
 
-double CoxDeBoor(double i, double k, double u, std::vector<double> knotVector) {
-    int knotIndex = (int)i+2;
-    if(k==0) {
-        if(u >= knotVector[knotIndex-2] && u <= knotVector[knotIndex-1]) {
-            return 1.0;
-        } else {
-            return 0.0; 
-        }
-    } else {
-        double firstTerm = 0;
-        {
-            double first = (u - knotVector[knotIndex-2]);
-            double numerator = CoxDeBoor(i, k-1, u, knotVector);
-            double denominator = knotVector[knotIndex+k-2] - knotVector[knotIndex-2];
-            if(denominator == 0) denominator = 1.0;
-            firstTerm = (denominator == 0) ? 0 : first * (numerator / denominator);
-        }
-
-        double secondTerm = 0;
-        {
-            double first = (knotVector[knotIndex+k-1] - u);
-            double numerator = CoxDeBoor(i+ 1.0, k-1.0, u, knotVector);
-            double denominator = knotVector[knotIndex+k-1] - knotVector[knotIndex-1];
-            if(denominator == 0) denominator = 1.0;
-            secondTerm = (denominator == 0) ? 0 : first * (numerator / denominator);
-        }
-
-        return firstTerm + secondTerm;
-    }
-}
-
-Object3D* GetNonUniformBSpline(Scene* scene, std::string name,glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, std::vector<glm::vec3> points) {
-    Object3D* newObject = new Object3D(name, scene);
-    std::vector<glm::vec3> vertex;
-    std::vector<glm::vec3> normals;
-    std::vector<glm::vec2> uv;
-    std::vector<glm::vec4> colors;
-    std::vector<int> triangles;
-
-    double offset = 0.01;
-    int totalPoints = (points.size()-3) * (1.0 / offset);
-
-    std::vector<double> knotVector;
-    knotVector.push_back(0.0);
-    knotVector.push_back(0.0);
-    knotVector.push_back(0.0);
-    knotVector.push_back(0.0);
-    knotVector.push_back(1.0);
-    knotVector.push_back(2.0);
-    knotVector.push_back(3.0);
-    knotVector.push_back(4.0);
-    knotVector.push_back(5.0);
-    knotVector.push_back(5.0);
-    knotVector.push_back(5.0);
-    knotVector.push_back(5.0);
-
-    int inx =0;
-    double globalU = 0.0;
-    for(int i=1; i<=points.size()-2; i++) {
-        for(double u=0; u<1; u+=offset, globalU+=offset) {
-            glm::vec3 H = glm::vec3(0);
-            for(int k=0; k<=3; k++) {
-                double N = CoxDeBoor((double)i+k-1, 3.0, globalU, knotVector);
-                H +=  N * points[i+k-1];
-            }
-
-            vertex.push_back(H); 
-            normals.push_back(glm::vec3(0, 0, 1));
-            uv.push_back(glm::vec2(0, 0));
-            colors.push_back(_color);
-            inx++;
-            if(inx < totalPoints) {
-                triangles.push_back(inx-1);
-                triangles.push_back(inx);
-            }
-        }
-    }
-
-    //Setup mesh
-    MeshFilterComponent* mesh = new MeshFilterComponent(newObject);
-    mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles);
-    mesh->drawingMode = GL_LINES;
-    mesh->primitiveSize = 10;
-
-    //Setup transform
-    TransformComponent* transform = new TransformComponent(newObject );
-    
-    //Setup material
-    MaterialComponent* material = new MaterialComponent(newObject);
-    material->albedo = _color;
-    Shader shader = scene->standardShaders.unlitMeshShader;
-    material->SetShader(shader);
-
-
-    newObject->AddComponent(material);
-	newObject->transform = transform;
-	newObject->AddComponent(mesh);
-
-    return newObject;
+Object3D* GetNonUniformBSpline(Scene* scene, std::string name,glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color) {
+    NonUniformBSpline* spline = new NonUniformBSpline(name, scene);
+    return spline;
 }
 
 
-Object3D* GetNURBS(Scene* scene, std::string name,glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, std::vector<glm::vec4> points) {
-    Object3D* newObject = new Object3D(name, scene);
-    std::vector<glm::vec3> vertex;
-    std::vector<glm::vec3> normals;
-    std::vector<glm::vec2> uv;
-    std::vector<glm::vec4> colors;
-    std::vector<int> triangles;
-
-    double offset = 0.01;
-    int totalPoints = (points.size()-3) * (1.0 / offset);
-
-    std::vector<double> knotVector;
-    knotVector.push_back(0.0);
-    knotVector.push_back(0.0);
-    knotVector.push_back(0.0);
-    knotVector.push_back(0.0);
-    knotVector.push_back(1.0);
-    knotVector.push_back(2.0);
-    knotVector.push_back(3.0);
-    knotVector.push_back(4.0);
-    knotVector.push_back(5.0);
-    knotVector.push_back(5.0);
-    knotVector.push_back(5.0);
-    knotVector.push_back(5.0);
-
-    int inx =0;
-    double globalU = 0.0;
-    for(int i=1; i<=points.size()-2; i++) {
-        for(double u=0; u<1; u+=offset, globalU+=offset) {
-            glm::vec4 H = glm::vec4(0);
-            for(int k=0; k<=3; k++) {
-                double N = CoxDeBoor((double)i+k-1, 3.0, globalU, knotVector);
-                double numerator =(N * points[i+k-1].w); 
-                double denominator = 0;
-                for(int l=0; l<=3; l++) {
-                    denominator += CoxDeBoor((double)i+l-1, 3.0, globalU, knotVector) *  points[i+l-1].w;
-                }
-                
-                H +=  N * points[i+k-1];
-            }
-
-            vertex.push_back(glm::vec3(H) / H.w); 
-            normals.push_back(glm::vec3(0, 0, 1));
-            uv.push_back(glm::vec2(0, 0));
-            colors.push_back(_color);
-            inx++;
-            if(inx < totalPoints) {
-                triangles.push_back(inx-1);
-                triangles.push_back(inx);
-            }
-        }
-    }
-
-    //Setup mesh
-    MeshFilterComponent* mesh = new MeshFilterComponent(newObject);
-    mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles);
-    mesh->drawingMode = GL_LINES;
-    mesh->primitiveSize = 10;
-
-    //Setup transform
-    TransformComponent* transform = new TransformComponent(newObject );
-    
-    //Setup material
-    MaterialComponent* material = new MaterialComponent(newObject);
-    material->albedo = _color;
-    Shader shader = scene->standardShaders.unlitMeshShader;
-    material->SetShader(shader);
-
-    newObject->AddComponent(material);
-	newObject->transform = transform;
-    newObject->AddComponent(mesh);
-
-    return newObject;
+Object3D* GetNURBS(Scene* scene, std::string name,glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color) {
+    NonUniformBSpline* NURBS = new NonUniformBSpline(name, scene);
+    return NURBS;
 }
 
 

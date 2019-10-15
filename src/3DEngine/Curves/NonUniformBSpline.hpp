@@ -11,9 +11,9 @@ namespace CoreEngine {
 class MaterialComponent;
 class MeshFilterComponent;
 
-class CatmutRollSpline : public Object3D {
+class NonUniformBSpline : public Object3D {
 public: 
-    CatmutRollSpline(std::string name, Scene* scene);
+    NonUniformBSpline(std::string name, Scene* scene);
 
     void Start() override;
     void Enable() override;
@@ -23,7 +23,6 @@ public:
     void Destroy() override;
     void Recompute() override;
     void WindowResize(int w, int h) override;
-    Object3D* Intersects(Geometry::Ray ray, double& _distance) override;
     
     void ComputePositions();
 
@@ -32,7 +31,7 @@ public:
 
     QJsonObject ToJSON() {
         QJsonObject json;
-        json["type"] = "CatmutRollSpline";
+        json["type"] = "NonUniformBSpline";
         // json["numWaves"] = (int)(waves.size());
 
         // QJsonArray wavesArray;
@@ -48,10 +47,11 @@ public:
     }
 
 protected:
+    double CoxDeBoor(double i, double k, double u, std::vector<double> knotVector);
+
     Object3D* line;
     MaterialComponent* material;
     MeshFilterComponent* mesh;
-
 
     double offset = 0.01;
     
@@ -62,6 +62,7 @@ protected:
     std::vector<int> triangles;
 
     std::vector<glm::vec3> points;
+    std::vector<double> knotVector;
 };
 
 }

@@ -354,5 +354,9 @@ bool Object3D::MatchesMask(uint16_t otherMask) {
 	return matches;
 }
 
+void Object3D::ToggleEditing() {
+	this->isEdit = !this->isEdit;
+}
+
 }
 }

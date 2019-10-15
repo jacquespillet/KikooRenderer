@@ -78,6 +78,10 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
 	QString waterTile3Str = "Texture Distortion";
 	QString waterTile4Str = "Gerstner Wave";
 
+	QString CatmutRollStr = "Catmut Roll";
+	QString NonUniformBSplineStr = "Non Uniform B Spline";
+	QString NURBSStr = "NURBS";
+
 
 	QPoint menuPos;
 	if(!fromMainWindow) menuPos = tree->mapToGlobal(pos);
@@ -118,6 +122,12 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
     addWaterTilesMenu->addAction(waterTile4Str);
     addObjectMenu->addMenu(addWaterTilesMenu);
 
+	QMenu* addCurveMenu = new QMenu("Curves");
+    addCurveMenu->addAction(CatmutRollStr);
+    addCurveMenu->addAction(NonUniformBSplineStr);
+    addCurveMenu->addAction(NURBSStr);
+    addObjectMenu->addMenu(addCurveMenu);
+
 	myMenu.addMenu(addObjectMenu);
     QAction* selectedItem = myMenu.exec(menuPos);
 
@@ -150,6 +160,11 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
 		if (selectedItem->text() == waterTile2Str) objectToAdd = CoreEngine::GetWaterTile_2(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
 		if (selectedItem->text() == waterTile3Str) objectToAdd = CoreEngine::GetWaterTile_3(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
 		if (selectedItem->text() == waterTile4Str) objectToAdd = CoreEngine::GetWaterTile_4(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
+
+		if (selectedItem->text() == CatmutRollStr) objectToAdd = CoreEngine::GetCatmutRollSpline(view3D->view3DGL->scene, name.toStdString(),glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0));
+		if (selectedItem->text() == NonUniformBSplineStr) objectToAdd = CoreEngine::GetNonUniformBSpline(view3D->view3DGL->scene, name.toStdString(),glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0));
+		if (selectedItem->text() == NURBSStr) objectToAdd = CoreEngine::GetNURBS(view3D->view3DGL->scene, name.toStdString(),glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0));
+
 
 		// if (selectedIndexes.size() > 0) {
 		// 	TreeItem* parentItem = (TreeItem*)model->itemFromIndex(selectedIndexes[0]);

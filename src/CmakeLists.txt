@@ -63,6 +63,8 @@ set(MainWindowSrc
 	3DEngine/CameraControllers/CameraController.cpp
 
 	3DEngine/Curves/CatmutRollSpline.cpp
+	3DEngine/Curves/NonUniformBSpline.cpp
+	3DEngine/Curves/NURBS.cpp
 	
 	SceneTree/SceneTree.cpp
 	SceneTree/TreeItem.cpp

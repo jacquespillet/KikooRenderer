@@ -464,6 +464,68 @@ glm::vec3 Vector3ArrayInspector::At() {
 }
 //____________________________________________________________
 
+//Double Array Inspector class
+//
+//____________________________________________________________
+DoubleArrayInspector::DoubleArrayInspector(std::string label, std::vector<double> values, double defaultVec) {
+	this->numbers = values;
+    this->defaultVec = defaultVec;
+
+    QVBoxLayout* mainLayout = new QVBoxLayout();
+
+	//Label & Vector size
+	QLabel* xLabel = new QLabel(QString::fromStdString(label)); sizeSpinBox = new QSpinBox(); 
+	sizeSpinBox->setRange(-500, 500);  sizeSpinBox->setValue(numbers.size());  
+    mainLayout->addWidget(xLabel); 
+    mainLayout->addWidget(sizeSpinBox);
+
+    //Layout for vector
+    QVBoxLayout* vectorsLayout = new QVBoxLayout();
+    mainLayout->addLayout(vectorsLayout);
+
+    //Add all numbers
+    for(int i=0; i<numbers.size(); i++) {
+        QDoubleSpinBox* dsb = new QDoubleSpinBox();
+        dsb->setValue(numbers[i]);
+        vectorsLayout->addWidget(dsb);
+    }    
+
+    connect(sizeSpinBox, static_cast<void (QSpinBox::*)(int value)>(&QSpinBox::valueChanged), this, [this, vectorsLayout, mainLayout](int size) {
+        EmptyLayout(vectorsLayout);
+        numbers.resize(size);
+        for(int i=0; i<size; i++) {
+            QDoubleSpinBox* dsb = new QDoubleSpinBox();
+            dsb->setValue(numbers[i]);
+            vectorsLayout->addWidget(dsb);
+
+            connect(dsb, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, i](double value) {
+                numbers[i] = value;
+                emit Modified(numbers);
+            });
+        }
+        emit Modified(numbers);
+    });
+    
+    setLayout(mainLayout);
+}
+
+void DoubleArrayInspector::SetSize(int size) {
+
+}
+
+void DoubleArrayInspector::Setvalue(std::vector<double> values) {
+
+}
+
+std::vector<double> DoubleArrayInspector::GetValue() {
+    std::vector<double> res;
+    return res;
+}
+
+double DoubleArrayInspector::At() {
+    return 0;
+}
+//____________________________________________________________
 
 
 void EmptyLayout(QLayout* layout)  {

@@ -52,15 +52,9 @@ namespace CoreEngine {
         skyboxCube->Start();
         skyboxCube->Enable();
 
-        std::vector<glm::vec3> points;
-        points.push_back(glm::vec3(1, 2, 0));
-        points.push_back(glm::vec3(2, 0, 0));
-        points.push_back(glm::vec3(3, -1, 0));
-        points.push_back(glm::vec3(5, -2, 0));
-
         // Object3D* GetHermiteCurve(Scene* scene, std::string name,glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, glm::vec3 point1, glm::vec3 point2, glm::vec3 tan1, glm::vec3 tan2);
         // Object3D* GetBezierCurve(Scene* scene, std::string name,glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, glm::vec3 point0, glm::vec3 point1, glm::vec3 point2, glm::vec3 point3);
-        CatmutRollSpline* curve = new CatmutRollSpline("Spline", this);
+        // CatmutRollSpline* curve = new CatmutRollSpline("Spline", this);
         // Object3D* curve = GetNURBS(this, "curve",glm::dvec3(0, 1, 0), glm::dvec3(0), glm::dvec3(1), glm::vec4(1, 1, 1, 1), points);
         // Object3D* curve = GetNonUniformBSpline(this, "curve",glm::dvec3(0, 1, 0), glm::dvec3(0), glm::dvec3(1), glm::vec4(1, 1, 1, 1), points);
 
@@ -68,7 +62,7 @@ namespace CoreEngine {
         //Add Custom inspector
         //add cubes to each point for transforming
 
-        AddObject(curve);                
+        // AddObject(curve);                
 
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
@@ -194,6 +188,12 @@ namespace CoreEngine {
 			transformWidget->SetTransformMode(TransformWidget::TransformMode::ROTATE);
 		}
 
+        if(e->key() == Qt::Key_Tab) {
+            for(int i=0; i<selectedObjects.size(); i++) {
+                selectedObjects[i]->ToggleEditing();
+            }
+        }
+
         if (e->key() == Qt::Key_Delete) {
             DeleteSelection();
         }   
@@ -276,26 +276,28 @@ namespace CoreEngine {
         glm::mat4 viewProj = camera->GetProjectionMatrix() * camera->GetViewMatrix();
         for(int i=0; i< objects3D.size(); i++) {
             if(std::find(selectedObjects.begin(), selectedObjects.end(), objects3D[i]) == selectedObjects.end()) {
-                BoundingBoxComponent* bb = objects3D[i]->GetComponent<BoundingBoxComponent>(); 
-                glm::mat4 mvp = viewProj *  objects3D[i]->transform->GetModelMatrix();
-                glm::vec2 min, max;
-                bb->GetNDCBounds(min, max, mvp);
-                
-                min.x = ((min.x + 1.0) * 0.5)  * windowWidth;
-                max.x = ((max.x + 1.0) * 0.5)  * windowWidth;
+                BoundingBoxComponent* bb = objects3D[i]->GetComponent<BoundingBoxComponent>();
+                if(bb != nullptr) {
+                    glm::mat4 mvp = viewProj *  objects3D[i]->transform->GetModelMatrix();
+                    glm::vec2 min, max;
+                    bb->GetNDCBounds(min, max, mvp);
+                    
+                    min.x = ((min.x + 1.0) * 0.5)  * windowWidth;
+                    max.x = ((max.x + 1.0) * 0.5)  * windowWidth;
 
-                min.y = (1.0 - ((min.y + 1.0) * 0.5)) * windowHeight;
-                max.y = (1.0 - ((max.y + 1.0) * 0.5)) * windowHeight;
-                
-                Box2D b;
-                b.width = (max.x - min.x);  
-                b.height = (min.y - max.y );
-                b.x =   (max.x + min.x) * 0.5;
-                b.y =   (max.y + min.y) * 0.5;
+                    min.y = (1.0 - ((min.y + 1.0) * 0.5)) * windowHeight;
+                    max.y = (1.0 - ((max.y + 1.0) * 0.5)) * windowHeight;
+                    
+                    Box2D b;
+                    b.width = (max.x - min.x);  
+                    b.height = (min.y - max.y );
+                    b.x =   (max.x + min.x) * 0.5;
+                    b.y =   (max.y + min.y) * 0.5;
 
-                bool intersects = (std::abs(a.x - b.x) * 2 < (a.width + b.width)) && (std::abs(a.y - b.y) * 2 < (a.height + b.height));
-                if(intersects) {
-                    AddObjectToSelection(false, objects3D[i]); 
+                    bool intersects = (std::abs(a.x - b.x) * 2 < (a.width + b.width)) && (std::abs(a.y - b.y) * 2 < (a.height + b.height));
+                    if(intersects) {
+                        AddObjectToSelection(false, objects3D[i]); 
+                    }
                 }
             }
         }
@@ -355,7 +357,6 @@ namespace CoreEngine {
 		double distance;
 		Object3D* intersectedTransformWidget = nullptr;
 		if(transformWidget->visible) intersectedTransformWidget = transformWidget->Intersects(ray, distance);
-		
         if(intersectedTransformWidget != nullptr) return transformWidget;
 
 		if (intersectedTransformWidget == nullptr) {

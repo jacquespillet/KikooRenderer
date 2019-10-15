@@ -14,6 +14,7 @@ CatmutRollSpline::CatmutRollSpline(std::string name, Scene* scene) : Object3D(na
     points.push_back(glm::vec3(2, 0, 0));
     points.push_back(glm::vec3(3, -1, 0));
     points.push_back(glm::vec3(5, -2, 0));
+    points.push_back(glm::vec3(6, 1, 0));
 
     line = new Object3D(name, scene);
     mesh = new MeshFilterComponent(line);
@@ -23,6 +24,7 @@ CatmutRollSpline::CatmutRollSpline(std::string name, Scene* scene) : Object3D(na
 
     //Setup transform
     TransformComponent* transform = new TransformComponent(line );
+    this->transform = transform;
     
     //Setup material
     material->albedo = glm::vec4(1);
@@ -33,8 +35,6 @@ CatmutRollSpline::CatmutRollSpline(std::string name, Scene* scene) : Object3D(na
 	line->transform = transform;
     line->AddComponent(mesh);
     
-    line->Start();
-    line->Enable();
 }
 
 void CatmutRollSpline::WindowResize(int w, int h) {
@@ -42,17 +42,50 @@ void CatmutRollSpline::WindowResize(int w, int h) {
 
 
 void CatmutRollSpline::Start() {
+    line->Start();
 	started = true;
 }
 
 void CatmutRollSpline::Enable() {
+    line->Enable();
 	enabled = true;
 }
 
-void CatmutRollSpline::Update() {}
+void CatmutRollSpline::Update() {
+    // if(isEdit) {
+    //     for(int i=0; i<editingObjects.size(); i++) {
+    //         if(editingObjects[i]->transform->hasChanged) {
+    //             points[i] = editingObjects[i]->transform->position;
+    //             ComputePositions();
+    //         }
+    //     }
+    // }
+}
+
+Object3D* CatmutRollSpline::Intersects(Geometry::Ray ray, double& _distance) {
+    // if(isEdit) {
+    //     if(editingObjects.size() > 0) {
+    //         return editingObjects[0];
+    //     }
+    // } else {
+    //     // if(rayInteresects) return this;
+    // }
+    _distance = 1000000;
+    return nullptr;
+}
 
 void CatmutRollSpline::ComputePositions() {
     int totalPoints = (points.size()-3) * (1.0 / offset);
+
+    // for(int i=0; i<points.size(); i++) {
+    //     Object3D* vert = GetCube(scene, "points_" + std::to_string(i), points[i], glm::vec3(0, 0, 0), glm::vec3(0.2), glm::vec4(0.0, 0.0, 0.0, 1.0));
+    //     vert->Start();
+    //     vert->Enable();
+        
+    //     editingObjects.push_back(vert);
+    // }
+
+    std::cout << points.size() << std::endl;
 
     int inx =0;
     for(int i=1; i<points.size()-2; i++) {
@@ -91,7 +124,6 @@ void CatmutRollSpline::ComputePositions() {
     //Setup mesh
     mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles);
     mesh->drawingMode = GL_LINES;
-    mesh->primitiveSize = 10;
 }
 
 std::vector<QWidget*> CatmutRollSpline::GetInspectorWidgets() {
@@ -101,13 +133,18 @@ std::vector<QWidget*> CatmutRollSpline::GetInspectorWidgets() {
     QGroupBox* mainGroupbox = new QGroupBox("Catmut Roll Inspector");
     QVBoxLayout* mainLayout = new QVBoxLayout();
     
-    Vector3ArrayInspector* wavesInspector = new Vector3ArrayInspector("Control points", points, glm::vec3(0, 0, 0)); 
-    QObject::connect(wavesInspector, &Vector3ArrayInspector::Modified, [this](std::vector<glm::vec3> vectors) {
-        points = vectors;
+    Vector3ArrayInspector* pointsInspector = new Vector3ArrayInspector("Control points", points, glm::vec3(0, 0, 0)); 
+    QObject::connect(pointsInspector, &Vector3ArrayInspector::Modified, [this](std::vector<glm::vec3> vectors) {
+        points = std::vector<glm::vec3>(vectors);
         ComputePositions();
+
+        line->scene->glWindow->makeCurrent();
+        mesh->RebuildBuffers();
+        line->scene->glWindow->doneCurrent();
+        
         line->scene->triggerRefresh = true;
     });    
-    mainLayout->addWidget(wavesInspector);
+    mainLayout->addWidget(pointsInspector);
 
     mainGroupbox->setLayout(mainLayout);
     res.push_back(mainGroupbox);
@@ -118,22 +155,11 @@ std::vector<QWidget*> CatmutRollSpline::GetInspectorWidgets() {
 
 void CatmutRollSpline::Render(glm::mat4* overrideViewMatrixp) {
     GETGL
-    // ogl->glUseProgram(waterShader.programShaderObject);
-    // ogl->glUniform1f(ogl->glGetUniformLocation(waterShader.programShaderObject, "time"), scene->elapsedTime);
-    
-    // glm::mat4 viewProjection = scene->camera->GetProjectionMatrix() * scene->camera->GetViewMatrix();
-    // int viewProjectionMatLoc = ogl->glGetUniformLocation(waterShader.programShaderObject, "viewProjectionMatrix"); 
-    // ogl->glUniformMatrix4fv(viewProjectionMatLoc, 1, false, glm::value_ptr(viewProjection));
-
-    // for(int i=0; i<waves.size(); i++) {
-    //     std::string name = "waves[" + std::to_string(i) + "]";
-    //     ogl->glUniform4fv(ogl->glGetUniformLocation(waterShader.programShaderObject, name.c_str()), 1, glm::value_ptr(waves[i]));
+    // if(isEdit) {
+    //     for(int i=0; i<editingObjects.size(); i++) {
+    //         editingObjects[i]->Render();
+    //     }
     // }
-
-    // // ogl->glUniform4fv(ogl->glGetUniformLocation(waterShader.programShaderObject, "waves[0]"), 1, glm::value_ptr(glm::vec4(1, 0, 0.75, 6)));
-    
-    // ogl->glUniform1i(ogl->glGetUniformLocation(waterShader.programShaderObject, "numWaves"), waves.size());
-
     line->Render();
 }
 
