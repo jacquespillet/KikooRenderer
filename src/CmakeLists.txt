@@ -61,6 +61,8 @@ set(MainWindowSrc
 	3DEngine/WaterTiles/WaveTile/WaveTileShader.cpp
 
 	3DEngine/CameraControllers/CameraController.cpp
+
+	3DEngine/Curves/CatmutRollSpline.cpp
 	
 	SceneTree/SceneTree.cpp
 	SceneTree/TreeItem.cpp
@@ -91,7 +93,7 @@ set(MainWindowSrc
 	Renderer/RayTracer.cpp
 	Renderer/Camera.cpp
 	Renderer/Material.cpp
-	Renderer/Shapes.cpp	
+	Renderer/Shapes.cpp
 	)
 
 add_executable(MainWindow ${MainWindowSrc})

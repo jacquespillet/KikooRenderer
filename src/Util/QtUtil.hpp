@@ -110,6 +110,22 @@ signals:
 	void Modified(glm::vec4 value);	
 };
 
+class Vector3Inspector : public QWidget {
+	Q_OBJECT
+public:
+	Vector3Inspector(std::string label, glm::vec3 value);
+	void Setvalue(glm::vec3 value);
+	void Setvalue(float x, float y, float z, float w);
+	glm::vec3 GetValue();
+private:
+	QDoubleSpinBox* xSpinBox;
+	QDoubleSpinBox* ySpinBox;
+	QDoubleSpinBox* zSpinBox;
+	QDoubleSpinBox* wSpinBox;
+	glm::vec3 vector;
+signals: 
+	void Modified(glm::vec3 value);	
+};
 
 class Vector4ArrayInspector : public QWidget {
 	Q_OBJECT
@@ -127,5 +143,21 @@ signals:
 	void Modified(std::vector<glm::vec4> value);	
 };
 
+
+class Vector3ArrayInspector : public QWidget {
+	Q_OBJECT
+public:
+	Vector3ArrayInspector(std::string label, std::vector<glm::vec3> values, glm::vec3 defaultVec=glm::vec3(0));
+	void SetSize(int size);
+	void Setvalue(std::vector<glm::vec3> values);
+	std::vector<glm::vec3> GetValue();
+	glm::vec3 At();
+private:
+	QSpinBox* sizeSpinBox;
+	std::vector<glm::vec3> vectors;
+	glm::vec3 defaultVec;
+signals: 
+	void Modified(std::vector<glm::vec3> value);	
+};
 
 }

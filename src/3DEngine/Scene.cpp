@@ -7,7 +7,7 @@
 #include "Components/LightComponent.hpp"
 #include "Components/BoundingComponent.hpp"
 
-#include "WaterTiles/WaveTile/WaveTile.hpp"
+#include "Curves/CatmutRollSpline.hpp"
 
 
 #include <QtGui/QOpenGLFunctions>
@@ -52,9 +52,23 @@ namespace CoreEngine {
         skyboxCube->Start();
         skyboxCube->Enable();
 
+        std::vector<glm::vec3> points;
+        points.push_back(glm::vec3(1, 2, 0));
+        points.push_back(glm::vec3(2, 0, 0));
+        points.push_back(glm::vec3(3, -1, 0));
+        points.push_back(glm::vec3(5, -2, 0));
 
+        // Object3D* GetHermiteCurve(Scene* scene, std::string name,glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, glm::vec3 point1, glm::vec3 point2, glm::vec3 tan1, glm::vec3 tan2);
+        // Object3D* GetBezierCurve(Scene* scene, std::string name,glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, glm::vec3 point0, glm::vec3 point1, glm::vec3 point2, glm::vec3 point3);
+        CatmutRollSpline* curve = new CatmutRollSpline("Spline", this);
+        // Object3D* curve = GetNURBS(this, "curve",glm::dvec3(0, 1, 0), glm::dvec3(0), glm::dvec3(1), glm::vec4(1, 1, 1, 1), points);
+        // Object3D* curve = GetNonUniformBSpline(this, "curve",glm::dvec3(0, 1, 0), glm::dvec3(0), glm::dvec3(1), glm::vec4(1, 1, 1, 1), points);
 
-     
+        //Create derived object for each curve
+        //Add Custom inspector
+        //add cubes to each point for transforming
+
+        AddObject(curve);                
 
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {

@@ -704,6 +704,7 @@ Object3D* GetBezierCurve(Scene* scene, std::string name,glm::vec3 _position, glm
 
 Object3D* GetCatmutRollSpline(Scene* scene, std::string name,glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, std::vector<glm::vec3> points) {
     Object3D* newObject = new Object3D(name, scene);
+    
     std::vector<glm::vec3> vertex;
     std::vector<glm::vec3> normals;
     std::vector<glm::vec2> uv;
@@ -723,12 +724,6 @@ Object3D* GetCatmutRollSpline(Scene* scene, std::string name,glm::vec3 _position
                 triangles.push_back(inx);
             }
 
-            // glm::mat4 basis = glm::mat4(0);
-            // basis[0][0] = 0; basis[1][0] = -1; basis[2][0] =  2; basis[3][0] = -1; 
-            // basis[0][1] = 2; basis[1][1] =  0; basis[2][1] = -5; basis[3][1] =  3; 
-            // basis[0][2] = 0; basis[1][2] =  1; basis[2][2] =  4; basis[3][2] = -3; 
-            // basis[0][3] = 0; basis[1][3] =  0; basis[2][3] = -1; basis[3][3] =  1;
-            // basis *= 0.5;
             glm::mat4 basis = glm::mat4(0);
             basis[0][0] = 1; basis[1][0] = -3; basis[2][0] =  3; basis[3][0] = -1; 
             basis[0][1] = 4; basis[1][1] =  0; basis[2][1] = -6; basis[3][1] =  3; 
