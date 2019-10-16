@@ -137,8 +137,6 @@ TransformComponent::TransformComponent(Object3D* object) : Component("Transform"
     rotation = glm::vec3(0, 0, 0);
     scale = glm::vec3(1, 1, 1); 
 	isInAnimation = false;
-
-	std::cout << "HERE "<< std::endl;
 }
 
 void TransformComponent::OnStart(){}

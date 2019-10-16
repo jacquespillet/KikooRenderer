@@ -77,11 +77,16 @@ class Object3D {
 
         void ToggleEditing();
 
+        void SetIsVertex(bool isVertex);
+        bool GetIsVertex();
 
+        std::vector<Object3D*> GetEditionObjects();
+        
     protected:
         uint16_t layerMask = 1;
 
         bool isEdit = false;
+        bool isVertex = false;
         std::vector<Object3D*> editingObjects;        
 };
 }

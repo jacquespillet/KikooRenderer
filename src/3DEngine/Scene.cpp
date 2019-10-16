@@ -188,9 +188,15 @@ namespace CoreEngine {
 			transformWidget->SetTransformMode(TransformWidget::TransformMode::ROTATE);
 		}
 
-        if(e->key() == Qt::Key_Tab) {
+        if(e->key() == Qt::Key_E) {
+            isEditMode = !isEditMode;
             for(int i=0; i<selectedObjects.size(); i++) {
                 selectedObjects[i]->ToggleEditing();
+                if(isEditMode) {
+                    editedObject = selectedObjects[i];
+                } else {
+                    editedObject = nullptr;
+                }
             }
         }
 
@@ -306,7 +312,6 @@ namespace CoreEngine {
     void Scene::HandleSelection(int x, int y, bool isCtrl) {
         Object3D* intersectedObject = GetIntersectObject(x, y);
         if(intersectedObject == transformWidget) { //Intersected transform widget --> transform
-            std::cout << "TRANSFORM " << std::endl;
         }
         else if( intersectedObject != nullptr) { //Intersected object --> add it to selection
 			AddObjectToSelection(!isCtrl, intersectedObject);
@@ -316,29 +321,34 @@ namespace CoreEngine {
     }
 
 	void Scene::AddObjectToSelection(bool erasePrevious, Object3D* intersectedObject) {
-        if(erasePrevious) ClearSelection();
+        if(isEditMode && intersectedObject->GetIsVertex()) {
+            transformWidget->Disable();
+            transformWidget->AddHandleObject(intersectedObject);
+        } else {
+            if(erasePrevious) ClearSelection();
+            intersectedObject->isSelected = true;
 
-		intersectedObject->isSelected = !intersectedObject->isSelected;
-
-        //Check if it was in the selectedObjects array. If yes, remove it. If no, add it to selection
-		std::vector<Object3D*>::iterator it = std::find(selectedObjects.begin(), selectedObjects.end(), intersectedObject);
-		int objectInx = std::distance(selectedObjects.begin(), it);
-		if (it != selectedObjects.end()) {
-			selectedObjects.erase(selectedObjects.begin() + objectInx);
-		}
-		else {
-			selectedObjects.push_back(intersectedObject);
-		}
-
-        transformWidget->AddHandleObject(intersectedObject);
-		objectDetailsPanel->SetObject(intersectedObject);
-
+            std::vector<Object3D*>::iterator it = std::find(selectedObjects.begin(), selectedObjects.end(), intersectedObject);
+            if (it == selectedObjects.end()) {
+                selectedObjects.push_back(intersectedObject);
+                transformWidget->AddHandleObject(intersectedObject);
+                objectDetailsPanel->SetObject(intersectedObject);
+            }
+        }
 	}
 
 	void Scene::ClearSelection() {
-		selectedObjects.resize(0);
-		transformWidget->Disable();
-		objectDetailsPanel->Clear();
+        if(isEditMode) {
+            transformWidget->Disable();
+            objectDetailsPanel->Clear();
+            
+            transformWidget->AddHandleObject(editedObject);
+            objectDetailsPanel->SetObject(editedObject);
+        } else {
+            selectedObjects.resize(0);
+            transformWidget->Disable();
+            objectDetailsPanel->Clear();
+        }
 	}
 
     void Scene::DeleteSelection() {
@@ -360,17 +370,31 @@ namespace CoreEngine {
         if(intersectedTransformWidget != nullptr) return transformWidget;
 
 		if (intersectedTransformWidget == nullptr) {
-			for(int i=0; i<objects3D.size(); i++) {
-				double distance;
-				Object3D* intersectedObject = objects3D[i]->Intersects(ray, distance);
+            if(isEditMode) {
+                for(int i=0; i<editedObject->GetEditionObjects().size(); i++) {
+                    double distance;
+                    Object3D* intersectedObject = editedObject->GetEditionObjects()[i]->Intersects(ray, distance);
 
-				if(intersectedObject != nullptr) {
-					if(distance < minDistance) {
-						minDistance = distance;
-						closest = intersectedObject;
-					}
-				}
-			}
+                    if(intersectedObject != nullptr) {
+                        if(distance < minDistance) {
+                            minDistance = distance;
+                            closest = intersectedObject;
+                        }
+                    }
+                }
+            } else {
+                for(int i=0; i<objects3D.size(); i++) {
+                    double distance;
+                    Object3D* intersectedObject = objects3D[i]->Intersects(ray, distance);
+
+                    if(intersectedObject != nullptr) {
+                        if(distance < minDistance) {
+                            minDistance = distance;
+                            closest = intersectedObject;
+                        }
+                    }
+                }
+            }
 		}
         return closest;
     }

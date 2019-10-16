@@ -187,6 +187,7 @@ namespace CoreEngine {
 
 				for(int i=0; i<currentObjects.size(); i++) {
 					currentObjects[i]->transform->position.x += difference;
+					currentObjects[i]->transform->hasChanged = true;
 				}
 			}
 		}
@@ -211,6 +212,7 @@ namespace CoreEngine {
 
 				for(int i=0; i<currentObjects.size(); i++) {
 					currentObjects[i]->transform->position.y += difference;
+					currentObjects[i]->transform->hasChanged = true;
 				}
 			}
 		}
@@ -235,6 +237,7 @@ namespace CoreEngine {
 
 				for(int i=0; i<currentObjects.size(); i++) {
 					currentObjects[i]->transform->position.z += difference;
+					currentObjects[i]->transform->hasChanged = true;
 				}
 			}
 		}

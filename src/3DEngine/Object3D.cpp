@@ -354,8 +354,20 @@ bool Object3D::MatchesMask(uint16_t otherMask) {
 	return matches;
 }
 
+void Object3D::SetIsVertex(bool isVertex) {
+	this->isVertex = isVertex;
+}
+
+bool Object3D::GetIsVertex() {
+	return isVertex;
+}
+
 void Object3D::ToggleEditing() {
 	this->isEdit = !this->isEdit;
+}
+
+std::vector<Object3D*> Object3D::GetEditionObjects() {
+	return editingObjects;
 }
 
 }

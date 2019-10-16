@@ -117,6 +117,9 @@ class Scene {
 	protected:
 		Object3D* GetIntersectObject(int x, int y);
 		uint16_t layerMask = 0xFFFF;
+
+		bool isEditMode = false;
+		Object3D* editedObject;
 };
 
 }

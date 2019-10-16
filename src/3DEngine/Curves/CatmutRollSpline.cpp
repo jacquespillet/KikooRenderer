@@ -52,41 +52,65 @@ void CatmutRollSpline::Enable() {
 }
 
 void CatmutRollSpline::Update() {
-    // if(isEdit) {
-    //     for(int i=0; i<editingObjects.size(); i++) {
-    //         if(editingObjects[i]->transform->hasChanged) {
-    //             points[i] = editingObjects[i]->transform->position;
-    //             ComputePositions();
-    //         }
-    //     }
-    // }
+    if(isEdit) {
+        for(int i=0; i<editingObjects.size(); i++) {
+            if(editingObjects[i]->transform->hasChanged) {
+                std::cout << "HERE "<< std::endl;
+                points[i] = editingObjects[i]->transform->GetWorldPosition();
+                ComputePositions();
+                editingObjects[i]->transform->hasChanged = false;
+
+                line->scene->glWindow->makeCurrent();
+                mesh->RebuildBuffers();
+                line->scene->glWindow->doneCurrent();
+                
+                line->scene->triggerRefresh = true;
+            }
+        }
+    }
 }
 
 Object3D* CatmutRollSpline::Intersects(Geometry::Ray ray, double& _distance) {
-    // if(isEdit) {
-    //     if(editingObjects.size() > 0) {
-    //         return editingObjects[0];
-    //     }
-    // } else {
-    //     // if(rayInteresects) return this;
-    // }
-    _distance = 1000000;
-    return nullptr;
+    _distance = 100000;
+    double minDistance = 100000;
+    Object3D* closest = nullptr;
+    if(isEdit) {
+        if(editingObjects.size() > 0) {
+			for(int i=0; i<editingObjects.size(); i++) {
+				double distance;
+				Object3D* intersectedObject = editingObjects[i]->Intersects(ray, distance);
+
+				if(intersectedObject != nullptr) {
+					if(distance < minDistance) {
+						minDistance = distance;
+						closest = intersectedObject;
+					}
+				}
+			}     
+        }
+    }
+    _distance = minDistance;
+    return closest;
 }
 
 void CatmutRollSpline::ComputePositions() {
     int totalPoints = (points.size()-3) * (1.0 / offset);
+    for(int i=0; i<points.size(); i++) {
+        if(i < editingObjects.size()) {
+            editingObjects[i]->transform->position = points[i];
+        } else {
+            Object3D* vert = GetCube(scene, "points_" + std::to_string(i), points[i], glm::vec3(0, 0, 0), glm::vec3(0.05), glm::vec4(0.0, 0.0, 0.0, 1.0));
+            vert->SetIsVertex(true);
+            vert->Start();
+            vert->Enable();
+            editingObjects.push_back(vert);
+        }
+    }
 
-    // for(int i=0; i<points.size(); i++) {
-    //     Object3D* vert = GetCube(scene, "points_" + std::to_string(i), points[i], glm::vec3(0, 0, 0), glm::vec3(0.2), glm::vec4(0.0, 0.0, 0.0, 1.0));
-    //     vert->Start();
-    //     vert->Enable();
-        
-    //     editingObjects.push_back(vert);
-    // }
-
-    std::cout << points.size() << std::endl;
-
+    vertex.resize(0);
+    normals.resize(0);
+    uv.resize(0);
+    colors.resize(0);
     int inx =0;
     for(int i=1; i<points.size()-2; i++) {
         for(double t=0; t<1; t+=offset) {
@@ -136,9 +160,8 @@ std::vector<QWidget*> CatmutRollSpline::GetInspectorWidgets() {
     Vector3ArrayInspector* pointsInspector = new Vector3ArrayInspector("Control points", points, glm::vec3(0, 0, 0)); 
     QObject::connect(pointsInspector, &Vector3ArrayInspector::Modified, [this](std::vector<glm::vec3> vectors) {
         points = std::vector<glm::vec3>(vectors);
-        ComputePositions();
-
         line->scene->glWindow->makeCurrent();
+        ComputePositions();
         mesh->RebuildBuffers();
         line->scene->glWindow->doneCurrent();
         
@@ -155,11 +178,11 @@ std::vector<QWidget*> CatmutRollSpline::GetInspectorWidgets() {
 
 void CatmutRollSpline::Render(glm::mat4* overrideViewMatrixp) {
     GETGL
-    // if(isEdit) {
-    //     for(int i=0; i<editingObjects.size(); i++) {
-    //         editingObjects[i]->Render();
-    //     }
-    // }
+    if(isEdit) {
+        for(int i=0; i<editingObjects.size(); i++) {
+            editingObjects[i]->Render();
+        }
+    }
     line->Render();
 }
 
