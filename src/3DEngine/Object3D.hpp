@@ -58,6 +58,7 @@ class Object3D {
         virtual void Start();
         virtual void Enable();
         virtual void Render(glm::mat4* overrideViewMatrix = nullptr);
+        virtual void LateRender();
         virtual void DepthRenderPass(LightComponent* light);
         virtual void Update();
         virtual void Destroy();

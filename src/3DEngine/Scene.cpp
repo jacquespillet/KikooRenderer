@@ -240,9 +240,9 @@ namespace CoreEngine {
 
         this->windowWidth = w;
         this->windowHeight = h;
-        float aspectRatio = w/h;
+        float aspectRatio = (float)w/(float)h;
 
-        this->camera->aspect = aspectRatio;
+        this->camera->SetAspect(aspectRatio);
         this->camera->UpdateProjectionMatrix();
         renderer->Resize(w, h);
         for(int i=0; i<objects3D.size(); i++) {

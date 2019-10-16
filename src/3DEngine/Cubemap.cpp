@@ -51,5 +51,47 @@ void Cubemap::Use() {
     ogl->glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 }
 
+//Accessors
+unsigned int Cubemap::GetTextureID() {
+    return textureID;
+}
+
+void  Cubemap::SetTextureID(unsigned int value) {
+    this->textureID = value;
+}
+
+GLint Cubemap::GetTexIndex() {
+    return texIndex;
+}
+
+void  Cubemap::SetTexIndex(GLint value) {
+    this->texIndex = value;
+}
+
+int Cubemap::GetWidth() {
+    return width;
+}
+
+void Cubemap::SetWidth(int value) {
+    this->width = value;
+}
+
+int Cubemap::GetHeight() {
+    return height;
+}
+
+void Cubemap::SetHeight(int value) {
+    this->height = value;
+}
+
+bool Cubemap::GetLoaded() {
+    return loaded;
+}
+
+void  Cubemap::SetLoaded(bool value) {
+    this->loaded = value;
+}
+
+
 }
 }

@@ -21,14 +21,7 @@ class CameraScene : public Object3D{
         CameraScene(Scene* scene, float eyeDistance, float fov, float near, float far, float aspect);
         
 		CameraScene();
-        float eyeDistance;
-        float fov;
-        float nearClip;
-        float farClip;
-        float aspect;
-        glm::mat4 projectionMatrix;
 
-		ProjectionType projectionType;
 
 
         glm::mat4 GetProjectionMatrix();
@@ -50,6 +43,37 @@ class CameraScene : public Object3D{
         Geometry::Ray GetRay(double x, double y);
 		Geometry::Planes GetPlanes();
 
+        //Accessors
+        float GetEyeDistance();
+        void  SetEyeDistance(float value);
+        float GetFov();
+        void  SetFov(float value);
+        float GetNearClip();
+        void  SetNearClip(float value);
+        float GetFarClip();
+        void  SetFarClip(float value);
+        float GetAspect();
+        void  SetAspect(float value);
+        void  SetProjectionMatrix(glm::mat4 value);
+        void  SetViewMatrix(glm::mat4 value);
+        glm::mat4 GetPreviousViewMatrix();
+        void  SetPreviousViewMatrix(glm::mat4 value);
+        CameraController* GetCameraController();
+        void  SetCameraController(CameraController* value);
+        float GetOrthoFOV();
+        void  SetOrthoFOV(float value);
+        float GetSpeedFactor();
+        void  SetSpeedFactor(float value);
+
+    protected:
+        float eyeDistance;
+        float fov;
+        float nearClip;
+        float farClip;
+        float aspect;
+        glm::mat4 projectionMatrix;
+
+		ProjectionType projectionType;
         glm::mat4 viewMatrix;
         glm::mat4 previousViewMatrix;
 

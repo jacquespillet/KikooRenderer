@@ -19,12 +19,6 @@ public:
 	void Disable();
 	void Destroy();
 	void Clear();
-	unsigned int cubemap;
-	unsigned int depthCubemap;
-	GLint defaultFBO;
-
-	int width, height;
-	int colorFormat;
 
 	//Directly renders the object to the target object
 	void RenderOnObect(std::vector<Object3D*>& objectsToRender, Object3D* target);
@@ -41,9 +35,33 @@ public:
 	Cubemap* GetColorTexture();
 	Cubemap* GetDepthTexture();
 
+	unsigned int GetFbo();
+	void SetFbo(unsigned int value);
+	unsigned int GetRbo();
+	void SetRbo(unsigned int value);
+	unsigned int GetCubemap();
+	void SetCubemap(unsigned int value);
+	unsigned int GetDepthCubemap();
+	void SetDepthCubemap(unsigned int value);
+	GLint GetDefaultFBO();
+	void SetDefaultFBO(GLint value);
+	int GetHeight();
+	void SetHeight(int value);
+	int GetWidth();
+	void SetWidth(int value);
+	int GetColorFormat();
+	void SetColorFormat(int value);
+
 private:
 	unsigned int fbo;
 	unsigned int rbo;
+
+	unsigned int cubemap;
+	unsigned int depthCubemap;
+	GLint defaultFBO;
+
+	int width, height;
+	int colorFormat;
 };
 }
 }

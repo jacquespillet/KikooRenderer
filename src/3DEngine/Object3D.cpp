@@ -177,6 +177,10 @@ void Object3D::Render(glm::mat4* overrideViewMatrix) {
 	ogl->glCullFace(GL_BACK);
 }
 
+void Object3D::LateRender() {
+
+}
+
 
 void Object3D::DepthRenderPass(LightComponent* light) {
 	GETGL

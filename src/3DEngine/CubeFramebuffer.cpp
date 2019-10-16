@@ -138,6 +138,72 @@ Cubemap* CubeFramebuffer::GetDepthTexture() {
     return nullptr;
 }
 
+//Accessors
+unsigned int CubeFramebuffer::GetFbo() {
+    return fbo;
+}
+
+void CubeFramebuffer::SetFbo(unsigned int value) {
+    fbo = value;
+}
+
+unsigned int CubeFramebuffer::GetRbo() {
+    return rbo;
+}
+
+void CubeFramebuffer::SetRbo(unsigned int value) {
+    rbo = value;
+}
+
+unsigned int CubeFramebuffer::GetCubemap() {
+    return cubemap;
+}
+
+void CubeFramebuffer::SetCubemap(unsigned int value) {
+    cubemap = value;
+}
+
+unsigned int CubeFramebuffer::GetDepthCubemap() {
+    return depthCubemap;
+}
+
+void CubeFramebuffer::SetDepthCubemap(unsigned int value) {
+    depthCubemap = value;
+}
+
+GLint CubeFramebuffer::GetDefaultFBO() {
+    return defaultFBO;
+}
+
+void CubeFramebuffer::SetDefaultFBO(GLint value) {
+    defaultFBO = value;
+}
+
+int CubeFramebuffer::GetHeight() {
+    return height;
+}
+
+void CubeFramebuffer::SetHeight(int value) {
+    height = value;
+}
+
+int CubeFramebuffer::GetWidth() {
+    return width;
+}
+
+void CubeFramebuffer::SetWidth(int value) {
+    width = value;
+}
+
+int CubeFramebuffer::GetColorFormat() {
+    return colorFormat;
+}
+
+void CubeFramebuffer::SetColorFormat(int value) {
+    colorFormat = value;
+}
+
+
 
 
 }

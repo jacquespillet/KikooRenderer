@@ -153,12 +153,12 @@ void CameraController::OnWheelEvent(QWheelEvent *e) {
         this->camera->transform->position.x += glm::column(transform, 2).x * speedFactor * 0.1;
         this->camera->transform->position.y += glm::column(transform, 2).y * speedFactor * 0.1;
         this->camera->transform->position.z += glm::column(transform, 2).z * speedFactor * 0.1;
-        this->camera->orthoFOV -= 0.5;
+        this->camera->SetOrthoFOV(0.5);
     } else if(point.y() < 0) {
         this->camera->transform->position.x -= glm::column(transform, 2).x * speedFactor * 0.1;
         this->camera->transform->position.y -= glm::column(transform, 2).y * speedFactor * 0.1;
         this->camera->transform->position.z -= glm::column(transform, 2).z * speedFactor * 0.1;
-        this->camera->orthoFOV += 0.5;
+        this->camera->SetOrthoFOV(0.5);
     }
 }
 

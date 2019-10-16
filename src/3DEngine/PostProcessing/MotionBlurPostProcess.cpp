@@ -98,8 +98,8 @@ namespace CoreEngine {
         ogl->glUniform1i(ogl->glGetUniformLocation(material->shader.programShaderObject, "depthTexture"), 1);
 
         glm::mat4 projectionMatrix = glm::mat4(scene->camera->GetProjectionMatrix());
-        glm::mat4 viewProjectionMat = projectionMatrix * scene->camera->viewMatrix;
-        glm::mat4 previousViewProjectionMat = projectionMatrix * scene->camera->previousViewMatrix;
+        glm::mat4 viewProjectionMat = projectionMatrix * scene->camera->GetViewMatrix();
+        glm::mat4 previousViewProjectionMat = projectionMatrix * scene->camera->GetPreviousViewMatrix();
 
         ogl->glUniformMatrix4fv(ogl->glGetUniformLocation(material->shader.programShaderObject, "inverseViewProjection"), 1, false, glm::value_ptr(glm::inverse(viewProjectionMat)));
         ogl->glUniformMatrix4fv(ogl->glGetUniformLocation(material->shader.programShaderObject, "previousViewProjection"), 1, false, glm::value_ptr(previousViewProjectionMat));

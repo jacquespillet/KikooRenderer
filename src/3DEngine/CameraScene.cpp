@@ -165,5 +165,89 @@ Geometry::Planes CameraScene::GetPlanes()
 	return planes;
 }
 
+
+//Accessors
+float CameraScene::GetEyeDistance() {
+    return eyeDistance;
+}
+
+void  CameraScene::SetEyeDistance(float value) {
+    this->eyeDistance = value;
+}
+
+float CameraScene::GetFov() {
+    return fov;
+}
+
+void  CameraScene::SetFov(float value) {
+    this->fov = value;
+}
+
+float CameraScene::GetNearClip() {
+    return nearClip;
+}
+
+void  CameraScene::SetNearClip(float value) {
+    this->nearClip = value;
+}
+
+float CameraScene::GetFarClip() {
+    return farClip;
+}
+
+void  CameraScene::SetFarClip(float value) {
+    this->farClip = value;
+}
+
+float CameraScene::GetAspect() {
+    return aspect;
+}
+
+void  CameraScene::SetAspect(float value) {
+    this->aspect = value;
+}
+
+
+void  CameraScene::SetProjectionMatrix(glm::mat4 value) {
+    this->projectionMatrix = value;
+}
+
+void  CameraScene::SetViewMatrix(glm::mat4 value) {
+    this->viewMatrix = value;
+}
+
+glm::mat4 CameraScene::GetPreviousViewMatrix() {
+    return previousViewMatrix;
+}
+
+void  CameraScene::SetPreviousViewMatrix(glm::mat4 value) {
+    this->previousViewMatrix = value;
+}
+
+CameraController* CameraScene::GetCameraController() {
+    return cameraController;
+}
+
+void  CameraScene::SetCameraController(CameraController* value) {
+    this->cameraController = value;
+}
+
+float CameraScene::GetOrthoFOV() {
+    return orthoFOV;
+}
+
+void  CameraScene::SetOrthoFOV(float value) {
+    this->orthoFOV = value;
+}
+
+float CameraScene::GetSpeedFactor() {
+    return speedFactor;
+}
+
+void  CameraScene::SetSpeedFactor(float value) {
+    this->speedFactor = value;
+}
+
+
 }
 }

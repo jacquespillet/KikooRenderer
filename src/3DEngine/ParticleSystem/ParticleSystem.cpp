@@ -59,6 +59,10 @@ void ParticleSystem::Enable() {
 }
 
 void ParticleSystem::Render(glm::mat4* overrideViewMatrix) {
+
+}
+
+void ParticleSystem::LateRender() {
     GETGL
     ogl->glDepthMask(false);
     ogl->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);    

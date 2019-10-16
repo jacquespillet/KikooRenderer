@@ -202,6 +202,13 @@ void HDRRenderer::Render() {
         }
              
     }
+    
+    //Late render of objects
+    for(int i=0; i<scene->objects3D.size(); i++) {
+        if(scene->objects3D[i] && scene->objects3D[i]->visible && scene->objects3D[i]->MatchesMask(scene->GetLayerMask())) {
+            scene->objects3D[i]->LateRender();
+        }
+    }    
 
     if(useMSAA) alternateFBO->Disable();
     else quadFBO->Disable();

@@ -69,7 +69,7 @@ View3D::View3D() : QDockWidget("3D View")
 	frontAct->setCheckable(true);
 	viewportToolbar->addAction(frontAct);
 	connect(frontAct,  &QAction::toggled, this, [this, frontAct](){
-	
+        view3DGL->scene->camera->transform->StartAnimate(glm::vec3(0, 0, -5), glm::vec3(0), glm::vec3(1));
     });
 
 
@@ -79,7 +79,7 @@ View3D::View3D() : QDockWidget("3D View")
 	backAct->setCheckable(true);
 	viewportToolbar->addAction(backAct);
 	connect(backAct, &QAction::toggled, this, [this, backAct](){
-	
+        view3DGL->scene->camera->transform->StartAnimate(glm::vec3(0, 0, 5), glm::vec3(0, 180, 0), glm::vec3(1));
     });
 
 	
@@ -88,7 +88,7 @@ View3D::View3D() : QDockWidget("3D View")
 	leftAct->setCheckable(true);
 	viewportToolbar->addAction(leftAct);
 	connect(leftAct, &QAction::toggled, this, [this, leftAct](){
-	
+	    view3DGL->scene->camera->transform->StartAnimate(glm::vec3(-5, 0, 0), glm::vec3(0, 90, 0), glm::vec3(1));
     });
 	
     QIcon rightIcon("resources/UI/Widgets/rightView.png");
@@ -96,7 +96,7 @@ View3D::View3D() : QDockWidget("3D View")
 	rightAct->setCheckable(true);
 	viewportToolbar->addAction(rightAct);
 	connect(rightAct, &QAction::toggled, this, [this, rightAct](){
-        
+        view3DGL->scene->camera->transform->StartAnimate(glm::vec3(5, 0, 0), glm::vec3(0,-90, 0), glm::vec3(1));
     });
 	
     QIcon topIcon("resources/UI/Widgets/topView.png");
@@ -104,7 +104,7 @@ View3D::View3D() : QDockWidget("3D View")
 	topAct->setCheckable(true);
 	viewportToolbar->addAction(topAct);
 	connect(topAct, &QAction::toggled, this, [this, topAct](){
-	
+        view3DGL->scene->camera->transform->StartAnimate(glm::vec3(0, 5, 0), glm::vec3(90, 0, 0), glm::vec3(1));
     });
 
 	
@@ -113,6 +113,7 @@ View3D::View3D() : QDockWidget("3D View")
 	bottomAct->setCheckable(true);
 	viewportToolbar->addAction(bottomAct);
 	connect(bottomAct, &QAction::toggled, this, [this, bottomAct](){
+        view3DGL->scene->camera->transform->StartAnimate(glm::vec3(0, -5, 0), glm::vec3(-90, 0, 0), glm::vec3(1));
     });
 
     viewportToolbar->addSeparator();
@@ -151,7 +152,7 @@ View3D::View3D() : QDockWidget("3D View")
 	focusAct->setCheckable(true);
 	viewportToolbar->addAction(focusAct);
 	connect(focusAct, &QAction::toggled, this, [this](){
-        view3DGL->scene->camera->cameraController->MoveToFocus();
+        view3DGL->scene->camera->GetCameraController()->MoveToFocus();
     });
 
     LayerController* layerController = new LayerController(view3DGL->scene->GetLayerMask());

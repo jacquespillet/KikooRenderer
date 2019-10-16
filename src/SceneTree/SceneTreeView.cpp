@@ -26,7 +26,7 @@ void SceneTreeView::mousePressEvent(QMouseEvent *event) {
 }
 
 void SceneTreeView::mouseDoubleClickEvent(QMouseEvent *event) {
-	sceneTree->view3D->view3DGL->scene->camera->cameraController->MoveToFocus();
+	sceneTree->view3D->view3DGL->scene->camera->GetCameraController()->MoveToFocus();
 }
 
 }

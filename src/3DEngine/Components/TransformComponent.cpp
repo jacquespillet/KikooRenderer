@@ -329,6 +329,17 @@ void TransformComponent::AnimateToTransform() {
 		this->position.x = initialTransform.position.x * (1 - t) + targetTransform.position.x * (t);
 		this->position.y = initialTransform.position.y * (1 - t) + targetTransform.position.y * (t);
 		this->position.z = initialTransform.position.z * (1 - t) + targetTransform.position.z * (t);
+
+		
+		this->rotation.x = initialTransform.rotation.x * (1 - t) + targetTransform.rotation.x * (t);
+		this->rotation.y = initialTransform.rotation.y * (1 - t) + targetTransform.rotation.y * (t);
+		this->rotation.z = initialTransform.rotation.z * (1 - t) + targetTransform.rotation.z * (t);
+
+
+		this->scale.x = initialTransform.scale.x * (1 - t) + targetTransform.scale.x * (t);
+		this->scale.y = initialTransform.scale.y * (1 - t) + targetTransform.scale.y * (t);
+		this->scale.z = initialTransform.scale.z * (1 - t) + targetTransform.scale.z * (t);
+
 		object3D->scene->triggerRefresh = true;
 		if(t >= 1) {
 			isInAnimation = false;

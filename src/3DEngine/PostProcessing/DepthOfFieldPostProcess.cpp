@@ -123,8 +123,8 @@ namespace CoreEngine {
         ogl->glUniform1f(ogl->glGetUniformLocation(material->shader.programShaderObject, "focusRange"), focusRange);
         ogl->glUniform1f(ogl->glGetUniformLocation(material->shader.programShaderObject, "bokehRadius"), bokehRadius);
         
-        ogl->glUniform1f(ogl->glGetUniformLocation(material->shader.programShaderObject, "nearClippingPlane"), scene->camera->nearClip);
-        ogl->glUniform1f(ogl->glGetUniformLocation(material->shader.programShaderObject, "farClippingPlane"), scene->camera->farClip);
+        ogl->glUniform1f(ogl->glGetUniformLocation(material->shader.programShaderObject, "nearClippingPlane"), scene->camera->GetNearClip());
+        ogl->glUniform1f(ogl->glGetUniformLocation(material->shader.programShaderObject, "farClippingPlane"), scene->camera->GetFarClip());
         
 
         //Attach framebufferInTexture as a albedo texture
