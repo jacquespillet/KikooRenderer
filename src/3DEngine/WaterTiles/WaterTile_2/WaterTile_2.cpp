@@ -192,6 +192,8 @@ void WaterTile_2::Render(glm::mat4* overrideViewMatrixp) {
 
     }
     quad->Render();
+    
+    if(quamaterial->firstIter) quamaterial->firstIter = false;
 }
 
 void WaterTile_2::DepthRenderPass(LightComponent* light) {

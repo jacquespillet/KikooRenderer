@@ -196,8 +196,16 @@ void main()
     vec3 fragToCam = cameraPos - fragPos;
 
     vec4 finalAlbedo   = (hasAlbedoTex==1) ? albedo * texture(albedoTexture, fragUv) : albedo;
-    vec3 finalNormal   = (hasNormalTex==1) ? normalMapInfluence * normalize(texture(normalTexture, fragUv)).xyz : normalize(fragNormal);
+    vec3 finalNormal   = (hasNormalTex==1) ? normalize(texture(normalTexture, fragUv)).xyz : normalize(fragNormal);
+    vec3 fragBitangent = -normalize(cross(fragNormal, fragTangent.xyz) * fragTangent.w); 
+    mat3 theMatrix;
+    theMatrix[0] = normalize(fragTangent.xyz);
+    theMatrix[1] = normalize(fragBitangent);
+    theMatrix[2] = normalize(fragNormal);
+    theMatrix = inverse(theMatrix);
+    finalNormal = theMatrix * finalNormal; 
     
+
     float finalSpecularFactor = (hasSpecularTex==1) ? texture(specularTexture, fragUv).x : specularFactor;
     
     vec4 finalSpecularColor = specularColor;
@@ -206,17 +214,16 @@ void main()
         vec3 R = vec3(0, 0, 0);
         if(finalAlbedo.a < 1) {
             float ratio = 1.00 / 1.52;
-            R = refract(I, normalize(fragNormal), ratio);
+            R = refract(I, normalize(finalNormal), ratio);
         } else {
-            R = reflect(I, normalize(fragNormal));
+            R = reflect(I, normalize(finalNormal));
         }
         finalSpecularColor = vec4(texture(cubemapTexture, R).rgb, 1.0);
     }
 
     vec4 finalColor = vec4(0, 0, 0, 1);
-    finalColor.rgb += ambientFactor * finalAlbedo.rgb;
+    // finalColor.rgb += ambientFactor * finalAlbedo.rgb;
 
-    vec3 fragBitangent = normalize(cross(fragNormal, fragTangent.xyz) * fragTangent.w); 
 
     for(int i=0; i<numLights; i++) {
         float attenuation = 1;
@@ -235,13 +242,7 @@ void main()
             attenuation     = numerator / (lights[i].attenuation.x * (lightDist * lightDist));
         }
         
-        vec3 toLight = -lightDirection;
-
-        //Redefinition of vectors in tangent space
-        if(hasNormalTex == 1) {
-            toLight     = normalize(vec3(dot(fragTangent.xyz, toLight),dot(fragBitangent, toLight), dot(fragNormal, toLight)));
-            fragToCam   = normalize(vec3(dot(fragTangent.xyz, fragToCam), dot(fragBitangent, fragToCam), dot(fragNormal, fragToCam)));
-        }
+        vec3 toLight = -lightDirection;    
 
         vec4 diffuse = diffuseFactor * finalAlbedo * lights[i].color * max(dot(finalNormal.xyz, toLight), 0);
 
@@ -261,6 +262,7 @@ void main()
                 shadow = DirectionalShadowCalculation(fragPosLightSpace, i);
             }
         }
+
         finalColor.rgb += (1.0 - shadow) *  attenuation * (diffuse + specular).rgb;            
     }
     outputColor = finalColor;

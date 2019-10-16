@@ -59,9 +59,7 @@ void CameraController::OnUpdate() {
 
 void CameraController::MoveToFocus() {
     if(this->camera->scene->selectedObjects.size() > 0) {
-        glm::vec3 objectToCam = glm::normalize(this->camera->transform->position - this->camera->scene->transformWidget->transform->position);
-        objectToCam *= glm::length(this->camera->scene->transformWidget->transform->scale) * 1.3;
-        this->camera->transform->StartAnimate(objectToCam, glm::vec3(0), glm::vec3(1));
+        this->camera->transform->StartAnimate(this->camera->scene->transformWidget->transform->position, glm::vec3(0), glm::vec3(1));
     }
 }
 

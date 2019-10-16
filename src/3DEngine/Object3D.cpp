@@ -158,7 +158,6 @@ void Object3D::Render(glm::mat4* overrideViewMatrix) {
 			mMatrix[0][2] = vMatrix[2][0]; mMatrix[1][2] = vMatrix[2][1]; mMatrix[2][2] = vMatrix[2][2];
 			mMatrix = glm::rotate(mMatrix, (float)transform->rotation.z * (float)DEGTORAD, glm::vec3(0.0f, 0.0f, 1.0f));
 			mMatrix = glm::scale(mMatrix, glm::vec3(transform->scale));
-		
 		}
 		
 		MaterialComponent* material = (this->GetComponent<MaterialComponent>());

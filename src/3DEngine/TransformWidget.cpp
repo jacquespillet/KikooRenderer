@@ -91,7 +91,7 @@ namespace CoreEngine {
 			zCircle->depthTest = false;
 			rotateObject->AddObject(zCircle);
 		}
-
+		this->transform->scale = 6 * glm::vec3(scene->camera->GetScreenScale(this->transform->position));
 		this->visible = false;
 	}
 
@@ -130,6 +130,13 @@ namespace CoreEngine {
 		currentObjects.resize(0);
 		visible = false;
 	}
+
+	
+	void TransformWidget::Update() {
+		if(currentObjects.size() > 0) {
+			this->transform->scale = 6 * glm::vec3(scene->camera->GetScreenScale(this->transform->position));
+		}
+	}	
 
 	void TransformWidget::StartTransform(Object3D* object) {
 		visible = true;

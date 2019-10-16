@@ -165,6 +165,13 @@ Geometry::Planes CameraScene::GetPlanes()
 	return planes;
 }
 
+float CameraScene::GetScreenScale(glm::vec3 objPos)
+{
+    glm::vec3 campos = glm::vec3(transform->GetModelMatrix() * glm::vec4(0, 0, 0, 1)); 
+    float dist = glm::length(campos - objPos); 
+    return dist * tan(fov / 2 * DEGTORAD); 
+}
+
 
 //Accessors
 float CameraScene::GetEyeDistance() {

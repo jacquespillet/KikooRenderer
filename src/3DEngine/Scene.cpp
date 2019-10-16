@@ -92,6 +92,7 @@ namespace CoreEngine {
         if(hasSkybox) {
             skyboxCube->Update();
         }        
+        transformWidget->Update();
         elapsedTime += deltaTime;
     }
 
