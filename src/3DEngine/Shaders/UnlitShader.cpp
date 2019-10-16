@@ -1,4 +1,5 @@
 #include "UnlitShader.hpp"
+#include "3DEngine/Scene.hpp"
 
 namespace KikooRenderer
 {
@@ -19,6 +20,11 @@ Shader GetUnlitShader() {
     unlitMeshShader.fragSrc= fragBuffer.str();
     unlitMeshShader.isLit = false;
     unlitMeshShader.isDepthPass = false;
+
+
+    unlitMeshShader.SetId(SHADER_IDS::UNLIT);
+    unlitMeshShader.name = "Unlit";
+    std::cout << "StandardShaders:Compile: Compiling unlitMeshShader" << std::endl; 
 
     return unlitMeshShader;
 }

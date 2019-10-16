@@ -35,7 +35,13 @@ void PostProcessor::Destroy() {
     }
 }
 
- void PostProcessor::Run(Framebuffer*& framebufferIn, Framebuffer*& framebufferOut) {
+void PostProcessor::OnResize(int w, int h) {
+    for (int i = 0; i < processes.size(); i++) {
+        processes[i]->OnResize(w, h);
+    }
+}
+
+void PostProcessor::Run(Framebuffer*& framebufferIn, Framebuffer*& framebufferOut) {
     //0 : Read in, writes 1
     //1 : Reads 1, writes 0
     //2 : Reads 0, writes 1

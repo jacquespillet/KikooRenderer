@@ -1,4 +1,5 @@
 #include "WaveTileShader.hpp"
+#include "3DEngine/StandardShaders.hpp"
 
 namespace KikooRenderer {
 
@@ -129,7 +130,7 @@ Shader GetWaveTileShader() {
     waveTileShader.name = "water tile Shader 1";
     waveTileShader.isLit = true;
     waveTileShader.isDepthPass = false;
-    waveTileShader.SetId(4);
+    waveTileShader.SetId(SHADER_IDS::OTHER);
     waveTileShader.Compile();
     waveTileShader.shouldRecompile = false;
 

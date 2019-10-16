@@ -17,6 +17,12 @@ void GetGouraudShader(Shader* gouraudShader) {
     std::stringstream fragBuffer;
     fragBuffer << t.rdbuf();
     gouraudShader->fragSrc= fragBuffer.str();
+    
+
+    gouraudShader->SetId(SHADER_IDS::GOURAUD);
+    gouraudShader->name = "Gouraud";
+    std::cout << "In vector " << &gouraudShader << std::endl;
+    std::cout << "StandardShaders:Compile: Compiling gouraudShader" << std::endl; 
 }
 
 }

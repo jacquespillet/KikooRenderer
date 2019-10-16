@@ -1,4 +1,5 @@
 #include "waterTileShader_2.hpp"
+#include "3DEngine/StandardShaders.hpp"
 
 namespace KikooRenderer {
 
@@ -174,7 +175,7 @@ Shader GetDirectionalFlowShader() {
     directionalFlowShader.name = "water tile Shader 2";
     directionalFlowShader.isLit = true;
     directionalFlowShader.isDepthPass = false;
-    directionalFlowShader.SetId(4);
+    directionalFlowShader.SetId(SHADER_IDS::OTHER);
     directionalFlowShader.Compile(); 
     directionalFlowShader.shouldRecompile = false;
     

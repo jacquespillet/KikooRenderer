@@ -1,5 +1,6 @@
 #include "SelectedShader.hpp"
 
+#include "3DEngine/Scene.hpp"
 namespace KikooRenderer
 {
 namespace CoreEngine
@@ -33,6 +34,11 @@ Shader GetSelectedShader() {
     }
     )";
 
+    selectedShader.SetId(SHADER_IDS::SELECTED);
+    selectedShader.name = "Selected";
+    std::cout << "StandardShaders:Compile: Compiling selectedShader" << std::endl; 
+    selectedShader.shouldRecompile = false;
+    
     return selectedShader;
 }
 }

@@ -159,6 +159,12 @@ namespace CoreEngine {
         thresholdFramebuffer = new Framebuffer(scene->windowWidth, scene->windowHeight,  GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, false);
         alternateFramebuffer = new Framebuffer(scene->windowWidth, scene->windowHeight,  GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, false);
     }
+
+    void BloomPostProcess::OnResize(int w, int h) {
+        thresholdFramebuffer = new Framebuffer(w, h,  GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, false);
+        alternateFramebuffer = new Framebuffer(w, h,  GL_RGBA16F, GL_RGBA, GL_FLOAT, true, true, false);        
+    }
+
     void BloomPostProcess::Run(Framebuffer* framebufferIn, Framebuffer* framebufferOut) {
         GETGL       
 

@@ -19,6 +19,8 @@ public:
 
     int numProcesses=0;
 
+    void OnResize(int w, int h);
+
 private:
     std::vector<PostProcess*> processes;
     Framebuffer* internalFBO0;

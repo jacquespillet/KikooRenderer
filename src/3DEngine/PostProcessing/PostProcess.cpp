@@ -52,6 +52,9 @@ namespace CoreEngine {
         
         quad->Enable();        
     }
+    
+    void PostProcess::OnResize(int w, int h) {}
+
     void PostProcess::Run(Framebuffer* framebufferIn, Framebuffer* framebufferOut) {
         GETGL
         framebufferOut->Enable();
@@ -67,5 +70,7 @@ namespace CoreEngine {
         quad->Render();
         framebufferOut->Disable();
     }
+
+
 }
 }

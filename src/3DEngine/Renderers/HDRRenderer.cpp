@@ -87,6 +87,8 @@ void HDRRenderer::Resize(int w, int h) {
     delete finalFBO;
 
     SetFramebuffers();
+
+    postProcessor.OnResize(w, h);
 }
 
 void HDRRenderer::AddPostEffect(PostProcess* postProcess) {

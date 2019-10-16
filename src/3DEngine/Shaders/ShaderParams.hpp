@@ -1,8 +1,6 @@
 #pragma once
 
 #include "Util/Common.h"
-#include "../Scene.hpp"
-#include "../Shader.hpp"
 
 namespace KikooRenderer
 {
@@ -10,6 +8,8 @@ namespace CoreEngine
 {
     
 class Shader;
+class Scene;
+
 class ShaderParams : public QVBoxLayout {
 Q_OBJECT
 public:

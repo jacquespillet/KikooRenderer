@@ -35,7 +35,8 @@ NURBS::NURBS(std::string name, Scene* scene) : Object3D(name, scene) {
 
     //Setup transform
     TransformComponent* transform = new TransformComponent(line );
-    
+    this->transform = transform;
+
     //Setup material
     material->albedo = glm::vec4(1);
     Shader shader = scene->standardShaders.unlitMeshShader;
@@ -45,8 +46,6 @@ NURBS::NURBS(std::string name, Scene* scene) : Object3D(name, scene) {
 	line->transform = transform;
     line->AddComponent(mesh);
     
-    line->Start();
-    line->Enable();
 }
 
 void NURBS::WindowResize(int w, int h) {
@@ -54,14 +53,55 @@ void NURBS::WindowResize(int w, int h) {
 
 
 void NURBS::Start() {
+    line->Start();
 	started = true;
 }
 
 void NURBS::Enable() {
+    line->Enable();
 	enabled = true;
 }
 
-void NURBS::Update() {}
+void NURBS::Update() {
+    if(isEdit) {
+        for(int i=0; i<editingObjects.size(); i++) {
+            if(editingObjects[i]->transform->hasChanged) {
+                points[i] = editingObjects[i]->transform->GetWorldPosition();
+                ComputePositions();
+                editingObjects[i]->transform->hasChanged = false;
+
+                line->scene->glWindow->makeCurrent();
+                mesh->RebuildBuffers();
+                line->scene->glWindow->doneCurrent();
+                
+                line->scene->triggerRefresh = true;
+            }
+        }
+    }    
+}
+
+Object3D* NURBS::Intersects(Geometry::Ray ray, double& _distance) {
+    _distance = 100000;
+    double minDistance = 100000;
+    Object3D* closest = nullptr;
+    if(isEdit) {
+        if(editingObjects.size() > 0) {
+			for(int i=0; i<editingObjects.size(); i++) {
+				double distance;
+				Object3D* intersectedObject = editingObjects[i]->Intersects(ray, distance);
+
+				if(intersectedObject != nullptr) {
+					if(distance < minDistance) {
+						minDistance = distance;
+						closest = intersectedObject;
+					}
+				}
+			}     
+        }
+    }
+    _distance = minDistance;
+    return closest;
+}
 
 double NURBS::CoxDeBoor(double i, double k, double u, std::vector<double> knotVector) {
     int knotIndex = (int)i+2;
@@ -95,7 +135,24 @@ double NURBS::CoxDeBoor(double i, double k, double u, std::vector<double> knotVe
 }
 
 void NURBS::ComputePositions() {
+    for(int i=0; i<points.size(); i++) {
+        if(i < editingObjects.size()) {
+            editingObjects[i]->transform->position = points[i];
+        } else {
+            Object3D* vert = GetCube(scene, "points_" + std::to_string(i), points[i], glm::vec3(0, 0, 0), glm::vec3(0.05), glm::vec4(0.0, 0.0, 0.0, 1.0));
+            vert->SetIsVertex(true);
+            vert->Start();
+            vert->Enable();
+            editingObjects.push_back(vert);
+        }
+    }    
+
+
     int totalPoints = (points.size()-3) * (1.0 / offset);
+    vertex.resize(0);
+    normals.resize(0);
+    uv.resize(0);
+    colors.resize(0);
 
     int inx =0;
     double globalU = 0.0;
@@ -132,13 +189,30 @@ std::vector<QWidget*> NURBS::GetInspectorWidgets() {
     QGroupBox* mainGroupbox = new QGroupBox("Catmut Roll Inspector");
     QVBoxLayout* mainLayout = new QVBoxLayout();
     
-    Vector3ArrayInspector* wavesInspector = new Vector3ArrayInspector("Control points", points, glm::vec3(0, 0, 0)); 
-    QObject::connect(wavesInspector, &Vector3ArrayInspector::Modified, [this](std::vector<glm::vec3> vectors) {
-        points = vectors;
+    Vector3ArrayInspector* pointsInspector = new Vector3ArrayInspector("Control points", points, glm::vec3(0, 0, 0)); 
+    QObject::connect(pointsInspector, &Vector3ArrayInspector::Modified, [this](std::vector<glm::vec3> vectors) {
+        points = std::vector<glm::vec3>(vectors);
+        line->scene->glWindow->makeCurrent();
         ComputePositions();
-        line->scene->triggerRefresh = true;
-    });    
-    mainLayout->addWidget(wavesInspector);
+        mesh->RebuildBuffers();
+        line->scene->glWindow->doneCurrent();
+        
+        line->scene->triggerRefresh = true;        
+    });
+    mainLayout->addWidget(pointsInspector);
+
+
+    DoubleArrayInspector* knotsInspector = new DoubleArrayInspector("Knots", knotVector, 0); 
+    QObject::connect(knotsInspector, &DoubleArrayInspector::Modified, [this](std::vector<double> values) {
+        knotVector = std::vector<double>(values);
+        line->scene->glWindow->makeCurrent();
+        ComputePositions();
+        mesh->RebuildBuffers();
+        line->scene->glWindow->doneCurrent();
+        
+        line->scene->triggerRefresh = true;        
+    });
+    mainLayout->addWidget(knotsInspector);
 
     mainGroupbox->setLayout(mainLayout);
     res.push_back(mainGroupbox);
@@ -148,23 +222,11 @@ std::vector<QWidget*> NURBS::GetInspectorWidgets() {
 
 
 void NURBS::Render(glm::mat4* overrideViewMatrixp) {
-    GETGL
-    // ogl->glUseProgram(waterShader.programShaderObject);
-    // ogl->glUniform1f(ogl->glGetUniformLocation(waterShader.programShaderObject, "time"), scene->elapsedTime);
-    
-    // glm::mat4 viewProjection = scene->camera->GetProjectionMatrix() * scene->camera->GetViewMatrix();
-    // int viewProjectionMatLoc = ogl->glGetUniformLocation(waterShader.programShaderObject, "viewProjectionMatrix"); 
-    // ogl->glUniformMatrix4fv(viewProjectionMatLoc, 1, false, glm::value_ptr(viewProjection));
-
-    // for(int i=0; i<waves.size(); i++) {
-    //     std::string name = "waves[" + std::to_string(i) + "]";
-    //     ogl->glUniform4fv(ogl->glGetUniformLocation(waterShader.programShaderObject, name.c_str()), 1, glm::value_ptr(waves[i]));
-    // }
-
-    // // ogl->glUniform4fv(ogl->glGetUniformLocation(waterShader.programShaderObject, "waves[0]"), 1, glm::value_ptr(glm::vec4(1, 0, 0.75, 6)));
-    
-    // ogl->glUniform1i(ogl->glGetUniformLocation(waterShader.programShaderObject, "numWaves"), waves.size());
-
+    if(isEdit) {
+        for(int i=0; i<editingObjects.size(); i++) {
+            editingObjects[i]->Render();
+        }
+    }    
     line->Render();
 }
 

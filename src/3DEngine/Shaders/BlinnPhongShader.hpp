@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Util/Common.h"
-#include "../Shader.hpp"
+#include "3DEngine/Shader.hpp"
+#include "3DEngine/Texture.hpp"
 #include "ShaderParams.hpp"
 
 namespace KikooRenderer

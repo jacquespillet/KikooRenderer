@@ -1,4 +1,11 @@
 #include "AxisHelperShader.hpp"
+#include "3DEngine/Scene.hpp"
+
+
+#include <QtGui/QOpenGLFunctions>
+#include <QOpenGLFunctions_3_3_Core>
+#define GLV QOpenGLFunctions_3_3_Core
+#define GETGL GLV* ogl = QOpenGLContext::currentContext()->versionFunctions<GLV>(); if(ogl==NULL){std::cout << "could not get opengl context";}
 
 namespace KikooRenderer
 {

@@ -149,10 +149,10 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
 		if (selectedItem->text() == pointLightStr) objectToAdd = CoreEngine::GetPointLight(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(1, 1, 1, 1));
 		if (selectedItem->text() == spotLightStr) objectToAdd = CoreEngine::GetSpotLight(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(1, 1, 1, 1), 90);
 		
-		if (selectedItem->text() == rabbitStr) objectToAdd = CoreEngine::ObjectFromModelFile(view3D->view3DGL->scene, name.toStdString(), "C:/Users/Jacques/Documents/Boulot/2019/Qt BP/resources/OBJ/bunny/bunny.obj");
-		if (selectedItem->text() == buddhaStr) objectToAdd = CoreEngine::ObjectFromModelFile(view3D->view3DGL->scene, name.toStdString(), "C:/Users/Jacques/Documents/Boulot/2019/Qt BP/resources/OBJ/buddha/untitled.obj");
-		if (selectedItem->text() == dragonStr) objectToAdd = CoreEngine::ObjectFromModelFile(view3D->view3DGL->scene, name.toStdString(), "C:/Users/Jacques/Documents/Boulot/2019/Qt BP/resources/OBJ/dragon/dragon.obj");
-		if (selectedItem->text() == teapotStr) objectToAdd = CoreEngine::ObjectFromModelFile(view3D->view3DGL->scene, name.toStdString(), "C:/Users/Jacques/Documents/Boulot/2019/Qt BP/resources/OBJ/teapot/teapot.obj");
+		if (selectedItem->text() == rabbitStr) objectToAdd = CoreEngine::ObjectFromModelFile(view3D->view3DGL->scene, name.toStdString(), "resources/Models/bunny/bunny.obj");
+		if (selectedItem->text() == buddhaStr) objectToAdd = CoreEngine::ObjectFromModelFile(view3D->view3DGL->scene, name.toStdString(), "resources/Models/buddha/buddha.obj");
+		if (selectedItem->text() == dragonStr) objectToAdd = CoreEngine::ObjectFromModelFile(view3D->view3DGL->scene, name.toStdString(), "resources/Models/dragon/dragon.obj");
+		if (selectedItem->text() == teapotStr) objectToAdd = CoreEngine::ObjectFromModelFile(view3D->view3DGL->scene, name.toStdString(), "resources/Models/teapot/teapot.obj");
 		
 		if (selectedItem->text() == particleSystemStr) objectToAdd = CoreEngine::GetParticleSystem(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
 		

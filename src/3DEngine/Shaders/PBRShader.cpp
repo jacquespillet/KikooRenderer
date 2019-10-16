@@ -1,5 +1,7 @@
 #include "PBRShader.hpp"
 
+#include "3DEngine/Scene.hpp"
+
 namespace KikooRenderer
 {
 namespace CoreEngine
@@ -18,6 +20,11 @@ Shader GetPBRShader() {
     fragBuffer << t.rdbuf();
     PBRShader.fragSrc= fragBuffer.str();
     
+    
+    PBRShader.SetId(SHADER_IDS::PBR);
+    PBRShader.name = "PBR";
+    std::cout << "StandardShaders:Compile: Compiling PBRShader" << std::endl; 
+
     return PBRShader;
 }
 }

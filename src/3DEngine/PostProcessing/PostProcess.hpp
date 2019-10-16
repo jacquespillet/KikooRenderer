@@ -10,6 +10,7 @@ class PostProcess {
 public:
     PostProcess(Scene* scene);
     virtual void Run(Framebuffer* famebufferIn, Framebuffer* famebufferOut);
+    virtual void OnResize(int w, int h);
 
     Shader shader;
 	Object3D* quad;

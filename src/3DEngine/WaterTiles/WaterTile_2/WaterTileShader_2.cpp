@@ -1,4 +1,5 @@
 #include "waterTileShader_2.hpp"
+#include "3DEngine/StandardShaders.hpp"
 
 namespace KikooRenderer {
 
@@ -136,7 +137,7 @@ Shader GetWaterTile_2Shader() {
     waterTileShader.name = "water tile Shader 2";
     waterTileShader.isLit = true;
     waterTileShader.isDepthPass = false;
-    waterTileShader.SetId(4);
+    waterTileShader.SetId(SHADER_IDS::OTHER);
     waterTileShader.Compile(); 
     waterTileShader.shouldRecompile = false;
 

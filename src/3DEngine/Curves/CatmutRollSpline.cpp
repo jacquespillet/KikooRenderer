@@ -88,6 +88,8 @@ Object3D* CatmutRollSpline::Intersects(Geometry::Ray ray, double& _distance) {
 				}
 			}     
         }
+    } else {
+        //INtersects with BB component
     }
     _distance = minDistance;
     return closest;
@@ -177,7 +179,6 @@ std::vector<QWidget*> CatmutRollSpline::GetInspectorWidgets() {
 
 
 void CatmutRollSpline::Render(glm::mat4* overrideViewMatrixp) {
-    GETGL
     if(isEdit) {
         for(int i=0; i<editingObjects.size(); i++) {
             editingObjects[i]->Render();

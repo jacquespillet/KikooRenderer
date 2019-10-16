@@ -11,6 +11,7 @@ class BloomPostProcess: public PostProcess  {
 public:
     BloomPostProcess(Scene* scene);
     virtual void Run(Framebuffer* famebufferIn, Framebuffer* famebufferOut);
+    virtual void OnResize(int w, int h);
 
     Framebuffer* thresholdFramebuffer;
     Framebuffer* alternateFramebuffer;

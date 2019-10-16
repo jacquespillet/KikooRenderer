@@ -23,6 +23,7 @@ public:
     void Destroy() override;
     void Recompute() override;
     void WindowResize(int w, int h) override;
+    Object3D* Intersects(Geometry::Ray ray, double& _distance) override;
     
     void ComputePositions();
 
