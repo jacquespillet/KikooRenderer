@@ -200,13 +200,20 @@ void MaterialComponent::SetCubemap(std::vector<std::string> _cubemapFilenames) {
 	this->cubemapfilenames = _cubemapFilenames;
 	cubemap = Cubemap(cubemapfilenames);
 
+	// ogl->glActiveTexture(GL_TEXTURE3);
+	// cubemap.Use();
+	// int cubemapLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "cubemapTexture");
+	// ogl->glUniform1i(cubemapLocation, 3);
+
+	// int hasCubemapLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "hasCubemap");
+	// ogl->glUniform1i(hasCubemapLocation, 1);
+	int hasCubemapLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "hasCubemap");
+	ogl->glUniform1i(hasCubemapLocation, 1);
+	
 	ogl->glActiveTexture(GL_TEXTURE3);
 	cubemap.Use();
 	int cubemapLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "cubemapTexture");
-	ogl->glUniform1i(cubemapLocation, 3);
-
-	int hasCubemapLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "hasCubemap");
-	ogl->glUniform1i(hasCubemapLocation, 1);
+	ogl->glUniform1i(cubemapLocation, 3);		
 }
 
 void MaterialComponent::SetAlbedoTex(Texture tex) {
@@ -247,9 +254,16 @@ void MaterialComponent::SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 vie
 			if(albedoTex.loaded) albedoTex.Use();
 
 			if (cubemap.GetLoaded()) {
+
+				int hasCubemapLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "hasCubemap");
+				ogl->glUniform1i(hasCubemapLocation, 1);
+
 				ogl->glCullFace(GL_FRONT);
 				ogl->glActiveTexture(GL_TEXTURE3);
-				cubemap.Use();
+				cubemap.Use();				
+				
+				int cubemapLocation = ogl->glGetUniformLocation(this->shader.programShaderObject, "cubemapTexture");
+				ogl->glUniform1i(cubemapLocation, 3);	
 			}
 			
 
