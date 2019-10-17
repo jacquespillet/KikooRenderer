@@ -24,7 +24,8 @@ void main()
     vec4 finalPosition = modelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
     gl_Position = vec4(finalPosition.x, finalPosition.y, finalPosition.z, finalPosition.w);
     fragPos = (modelMatrix * vec4(position.x, position.y, position.z, 1.0f)).xyz;
-    fragNormal = (flipNormals > 0) ? -mat3(transpose(inverse(modelMatrix))) * normal  : mat3(transpose(inverse(modelMatrix))) * normal;
+    // fragNormal = (flipNormals > 0) ? -mat3(transpose(inverse(modelMatrix))) * normal  : mat3(transpose(inverse(modelMatrix))) * normal;
+    fragNormal = (flipNormals > 0) ? -normal  : normal;
     fragUv = uv;
     fragTangent = tangent;
 }

@@ -196,14 +196,21 @@ void main()
     vec3 fragToCam = cameraPos - fragPos;
 
     vec4 finalAlbedo   = (hasAlbedoTex==1) ? albedo * texture(albedoTexture, fragUv) : albedo;
-    vec3 finalNormal   = (hasNormalTex==1) ? normalize(texture(normalTexture, fragUv)).xyz : normalize(fragNormal);
-    vec3 fragBitangent = -normalize(cross(fragNormal, fragTangent.xyz) * fragTangent.w); 
-    mat3 theMatrix;
-    theMatrix[0] = normalize(fragTangent.xyz);
-    theMatrix[1] = normalize(fragBitangent);
-    theMatrix[2] = normalize(fragNormal);
-    theMatrix = inverse(theMatrix);
-    finalNormal = theMatrix * finalNormal; 
+    
+    vec3 finalNormal   = vec3(0);
+    if(hasNormalTex==1) {
+        finalNormal = (texture(normalTexture, fragUv).xyz - 0.5) * 2.0;
+        vec3 fragBitangent = normalize(cross(fragNormal, fragTangent.xyz) * fragTangent.w); 
+        mat4 theMatrix;
+        theMatrix[0] = vec4(normalize(fragTangent.xyz), 1);
+        theMatrix[1] = -vec4(normalize(fragBitangent), 1);
+        theMatrix[2] = vec4(normalize(fragNormal), 1);
+        theMatrix[3] = vec4(0, 0, 0, 1);
+        theMatrix = inverse(theMatrix);
+        finalNormal = (inverse(transpose(modelMatrix)) * theMatrix * vec4(finalNormal.xyz, 0)).xyz;
+    } else {
+        finalNormal = (inverse(transpose(modelMatrix)) * normalize(vec4(fragNormal.xyz, 0))).xyz;
+    }
     
 
     float finalSpecularFactor = (hasSpecularTex==1) ? texture(specularTexture, fragUv).x : specularFactor;
@@ -222,8 +229,7 @@ void main()
     }
 
     vec4 finalColor = vec4(0, 0, 0, 1);
-    // finalColor.rgb += ambientFactor * finalAlbedo.rgb;
-
+    finalColor.rgb += ambientFactor * finalAlbedo.rgb;
 
     for(int i=0; i<numLights; i++) {
         float attenuation = 1;
@@ -247,7 +253,6 @@ void main()
         vec4 diffuse = diffuseFactor * finalAlbedo * lights[i].color * max(dot(finalNormal.xyz, toLight), 0);
 
         vec3 halfwayVec = normalize(toLight + fragToCam);
-        // Specular factor * specular color * lightColor * specularity of fragment
         vec4 specular = finalSpecularFactor * finalSpecularColor * lights[i].color * pow(max(dot(finalNormal.xyz, halfwayVec),0), smoothness);
 
         float shadow = 0;
@@ -262,7 +267,6 @@ void main()
                 shadow = DirectionalShadowCalculation(fragPosLightSpace, i);
             }
         }
-
         finalColor.rgb += (1.0 - shadow) *  attenuation * (diffuse + specular).rgb;            
     }
     outputColor = finalColor;
