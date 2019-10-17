@@ -26,6 +26,7 @@ CustomSlider::CustomSlider(float min, float max, float step, std::string label, 
     spinBox->setMinimum(min);
     spinBox->setMaximum(max);
     spinBox->setSingleStep(step);
+    spinBox->setDecimals(5);
     spinBox->setValue(initialValue);
 
     // connect(spinBox, SIGNAL(valueChanged(double)), this, SLOT(OnSpinBoxChanged(double)));

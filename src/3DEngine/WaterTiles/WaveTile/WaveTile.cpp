@@ -78,6 +78,7 @@ void WaveTile::Render(glm::mat4* overrideViewMatrixp) {
     
     ogl->glUniform1i(ogl->glGetUniformLocation(waterShader.programShaderObject, "numWaves"), waves.size());
 
+    if(quamaterial->firstIter) quamaterial->firstIter = false;
     quad->Render();
 }
 

@@ -31,6 +31,7 @@ public:
 	void StartTransform(Object3D* object);
 
 	Object3D* Intersects(Geometry::Ray ray, double& _distance);
+	void Update() override;
 
 	void OnMouseMoveEvent(QMouseEvent* e);
 	void OnMouseReleaseEvent(QMouseEvent* e);

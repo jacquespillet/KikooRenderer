@@ -34,6 +34,7 @@ LightInspector::LightInspector(LightComponent* lightComponent) : ComponentInspec
 	connect(lightTypeList, static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged), this, [this,lightComponent](int index) {
         lightComponent->hasChanged = true;    
         lightComponent->SetType(index);
+        scene->triggerRefresh = true;
     });
 
     
@@ -62,13 +63,87 @@ LightInspector::LightInspector(LightComponent* lightComponent) : ComponentInspec
         scene->triggerRefresh = true;
     });
 
-    CustomSlider* biasSlider = new CustomSlider(0.0, 0.1, 0.0001, "Bias", 0.005);
+    CustomSlider* biasSlider = new CustomSlider(0.0, 0.01, 0.00001, "Bias", lightComponent->GetBias());
     mainLayout->addLayout(biasSlider);
     QObject::connect(biasSlider, &CustomSlider::Modified, [this,lightComponent](double val) {
-        lightComponent->bias = val;
+        lightComponent->SetBias(val);
         lightComponent->hasChanged = true;
         scene->triggerRefresh = true;
     });    
+
+    CustomSlider* numSamplesSlider = new CustomSlider(0, 64, 1, "numSamples", lightComponent->GetNumSamples());
+    mainLayout->addLayout(numSamplesSlider);
+    QObject::connect(numSamplesSlider, &CustomSlider::Modified, [this,lightComponent](double val) {
+        lightComponent->SetNumSamples(val);
+        lightComponent->hasChanged = true;
+        scene->triggerRefresh = true;
+    });
+
+    CustomSlider* poissonDiskFactorSlider = new CustomSlider(100, 2000, 20, "Poisson Factor", lightComponent->GetPoissonDiskFactor());
+    mainLayout->addLayout(poissonDiskFactorSlider);
+    QObject::connect(poissonDiskFactorSlider, &CustomSlider::Modified, [this,lightComponent](double val) {
+        lightComponent->SetPoissonDiskFactor(val);
+        lightComponent->hasChanged = true;
+        scene->triggerRefresh = true;
+    });
+
+    QHBoxLayout* shadowTypeLayout = new QHBoxLayout();
+	QComboBox* shadowTypeList = new QComboBox();
+	QLabel* shadowTypeLabel = new QLabel("Shadow Type");
+    shadowTypeList->addItem("PCF");
+    shadowTypeList->addItem("Poisson Disk");
+	shadowTypeList->setCurrentIndex(lightComponent->GetShadowType());
+	
+    shadowTypeLayout->addWidget(shadowTypeLabel);
+	shadowTypeLayout->addWidget(shadowTypeList);
+	
+    mainLayout->addLayout(shadowTypeLayout);
+
+	connect(shadowTypeList, static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged), this, [this,lightComponent](int index) {
+        lightComponent->hasChanged = true;    
+        lightComponent->SetShadowType(index);
+        scene->triggerRefresh = true;
+    });
+
+
+    QHBoxLayout* mapSizeLayout = new QHBoxLayout();
+	QComboBox* mapSizeList = new QComboBox();
+	QLabel* mapSizeLabel = new QLabel("Shadow Map Size");
+    mapSizeList->addItem("512x512");
+    mapSizeList->addItem("1024x1024");
+    mapSizeList->addItem("2048x2048");
+    mapSizeList->addItem("4096x4096");
+	mapSizeList->setCurrentIndex(0);
+	
+    mapSizeLayout->addWidget(mapSizeLabel);
+	mapSizeLayout->addWidget(mapSizeList);
+	
+    mainLayout->addLayout(mapSizeLayout);
+
+	connect(mapSizeList, static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged), this, [this,lightComponent](int index) {
+        lightComponent->hasChanged = true;
+        int size;
+        switch (index)
+        {
+        case 0:
+            size = 512;
+            break;
+        case 1:
+            size = 1024;
+            break;
+        case 2:
+            size = 2048;
+            break;            
+        case 3:
+            size = 4096;
+            break;            
+        default:
+            break;
+        }    
+        lightComponent->SetMapSize(size);
+        scene->triggerRefresh = true;
+    });    
+
 
     QCheckBox* castShadowCheckbox = new QCheckBox("Cast Shadow");
     castShadowCheckbox->setChecked(lightComponent->castShadow);
@@ -82,19 +157,6 @@ LightInspector::LightInspector(LightComponent* lightComponent) : ComponentInspec
         lightComponent->hasChanged = true;
         scene->triggerRefresh = true;
     });
-
-    //Directional specific
-        //Variance
-        //PCF
-        //Poisson Disk Sampling
-
-    //Point Specific
-        //Variance
-        //PCF
-
-    //Perspective Specific
-        //Variance
-        //PCF
     
 	setLayout(mainLayout);
 }
@@ -112,7 +174,7 @@ void LightComponent::SetType(int type) {
     object3D->scene->glWindow->makeCurrent();
     if(type==0) {
         //Avant dernier arg TRUE pour debug, doit etre FALSE
-        depthFBO = new Framebuffer(SHADOW_WIDTH, SHADOW_HEIGHT, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, false, true);
+        depthFBO = new Framebuffer(shadowRes, shadowRes, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, false, true);
         lightProjection  = glm::orthoLH(-20.0, 20.0, -20.0, 20.0, 1.0, (double)farClip);
 
         depthPassShader.vertSrc= R"(
@@ -141,7 +203,7 @@ void LightComponent::SetType(int type) {
         depthPassShader.Compile();
         depthPassShader.shouldRecompile = false;
     } else if(type == 1) {
-        depthCubeFBO = new CubeFramebuffer(1024, 1024, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, false, true);
+        depthCubeFBO = new CubeFramebuffer(shadowRes, shadowRes, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, false, true);
         lightSpaceMatrices.resize(6);
 
         cubeDepthPassShader.vertSrc= R"(
@@ -209,7 +271,7 @@ void LightComponent::SetType(int type) {
 
     } else if(type==2) {
         //Avant dernier arg TRUE pour debug, doit etre FALSE
-        depthFBO = new Framebuffer(1024, 1024, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, false, true);
+        depthFBO = new Framebuffer(shadowRes, shadowRes, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, false, true);
         lightProjection  = glm::perspectiveLH(80.0f, 1.0f, 0.01f, farClip);
         // lightProjection  = glm::perspectiveLH((float)(DEGTORAD * fov), 1.0f, 0.01f, 100.0f);
 
@@ -245,6 +307,20 @@ void LightComponent::SetType(int type) {
     hasChanged = true;
 }
 
+
+void LightComponent::SetMapSize(int val) {
+    shadowRes = val;
+    object3D->scene->glWindow->makeCurrent();
+    if(type==0) {
+        depthFBO = new Framebuffer(val, val, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, false, true);
+    } else if(type == 1) {
+        depthCubeFBO = new CubeFramebuffer(val, val, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, false, true);
+    } else if(type==2) {
+        depthFBO = new Framebuffer(val, val, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, false, true);        
+    }
+    object3D->scene->glWindow->doneCurrent();
+}
+
 ComponentInspector* LightComponent::GetInspector() {
 	lightInspector = new LightInspector(this);
 	return lightInspector;
@@ -253,7 +329,7 @@ ComponentInspector* LightComponent::GetInspector() {
 void LightComponent::RenderDepthMap() {
     GETGL
     if(castShadow) {
-        ogl->glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+        ogl->glViewport(0, 0, shadowRes, shadowRes);
         if(type==0) {
             depthFBO->Enable(); 
             ogl->glClearColor(0.2, 0.2, 0.2, 1.0);
@@ -381,6 +457,39 @@ void LightComponent::FromJSON(QJsonObject json, Object3D* obj) {
     LightComponent* light = new LightComponent(obj, color, attenuation, type);
 
     obj->AddComponent(light);            
+}
+
+
+int LightComponent::GetShadowType() {
+    return shadowType;
+}
+
+void LightComponent::SetShadowType(int value) {
+    this->shadowType = value;
+}
+
+int LightComponent::GetNumSamples() {
+    return numSamples;
+}
+
+void LightComponent::SetNumSamples(int value) {
+    this->numSamples = value;
+}
+
+float LightComponent::GetBias() {
+    return bias;
+}
+
+void LightComponent::SetBias(float value) {
+    this->bias = value;
+}
+
+
+int LightComponent::GetPoissonDiskFactor() {
+    return poissonDiskFactor;
+}
+void LightComponent::SetPoissonDiskFactor(int value) {
+    this->poissonDiskFactor = value;
 }
 
 }

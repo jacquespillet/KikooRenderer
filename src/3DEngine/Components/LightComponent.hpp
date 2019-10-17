@@ -46,9 +46,8 @@ class LightComponent : public Component {
 
         bool castShadow=true;
         
-        const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+        int shadowRes = 1024;
         float farClip = 100;
-        float bias;
 
         //Directional Shadow Map
         Shader depthPassShader;
@@ -68,6 +67,8 @@ class LightComponent : public Component {
         void SetShaderUniforms();
 
         void SetType(int type);
+
+        void SetMapSize(int val);
 
 		QJsonObject ToJSON() {
 			QJsonObject json;
@@ -94,6 +95,22 @@ class LightComponent : public Component {
 		}
 
         static void FromJSON(QJsonObject json, Object3D* obj);
+
+        //Accessors
+        int GetShadowType();
+        void SetShadowType(int value);
+        int GetNumSamples();
+        void SetNumSamples(int value);
+        float GetBias();
+        void SetBias(float value);
+        int GetPoissonDiskFactor();
+        void SetPoissonDiskFactor(int value);
+
+    protected:
+        int shadowType = 0;
+        int numSamples = 9;
+        float bias = 0.005;
+        int poissonDiskFactor = 700;
 };
 }
 }

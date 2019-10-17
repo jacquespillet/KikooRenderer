@@ -180,7 +180,9 @@ void WaterTile_1::Render(glm::mat4* overrideViewMatrixp) {
     ogl->glUniform1f(ogl->glGetUniformLocation(waterShader.programShaderObject, "blueness"), blueness);
 
     quad->Render();
-    ogl->glBindTexture(GL_TEXTURE_2D, 0);
+    ogl->glBindTexture(GL_TEXTURE_2D, 0); 
+
+    if(quamaterial->firstIter) quamaterial->firstIter = false;
 }
 
 void WaterTile_1::DepthRenderPass(LightComponent* light) {

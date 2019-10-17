@@ -43,6 +43,8 @@ class CameraScene : public Object3D{
         Geometry::Ray GetRay(double x, double y);
 		Geometry::Planes GetPlanes();
 
+        float GetScreenScale(glm::vec3 objPos);
+
         //Accessors
         float GetEyeDistance();
         void  SetEyeDistance(float value);

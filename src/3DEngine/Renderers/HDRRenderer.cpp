@@ -65,6 +65,7 @@ HDRRenderer::HDRRenderer(Scene* scene) : Renderer(scene) {
     }
     )";
     quadShader.name = "quad";
+    quadShader.isLit = false;
     quadShader.Compile();
 
     exposure = 1.0;
@@ -179,9 +180,10 @@ void HDRRenderer::Render() {
 
     for(int i=0; i<scene->objects3D.size(); i++) {
         MaterialComponent* mat = scene->objects3D[i]->GetComponent<MaterialComponent>();
-        if(mat) {
-            if(mat->firstIter) mat->firstIter = false;
-
+        if(mat != nullptr) {
+            if(mat->firstIter) {
+                mat->firstIter = false;
+            } 
         }
     }
     
