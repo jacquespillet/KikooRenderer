@@ -9,6 +9,8 @@
 #include "Cubemap.hpp"
 #include "Renderers/HDRRenderer.hpp"
 
+#include "PhysicsEngines/Physics.hpp"
+
 namespace KikooRenderer {
 class ObjectDetailsPanel;
 class SceneTree;
@@ -120,6 +122,8 @@ class Scene {
 
 		bool isEditMode = false;
 		Object3D* editedObject;
+
+		Physics::Bullet::Simulation simulation;
 };
 
 }

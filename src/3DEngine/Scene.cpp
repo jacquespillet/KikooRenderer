@@ -9,7 +9,6 @@
 
 #include "Curves/CatmutRollSpline.hpp"
 
-
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLFunctions_3_3_Core>
 #define GLV QOpenGLFunctions_3_3_Core
@@ -18,12 +17,13 @@
 namespace KikooRenderer {
 
 namespace CoreEngine {
-    Scene::Scene(){
+    Scene::Scene() {
 		camera = new CameraScene(this, 1.0, 70 * DEGTORAD, 0.0001, 1000.0, 1.0);
         this->started = false;
     }
     
 	void Scene::Start() {
+
 		GETGL
 
         this->started = true;
@@ -50,24 +50,15 @@ namespace CoreEngine {
 
         skyboxCube = GetCube(this, "Cubemap", glm::vec3(0), glm::vec3(0), glm::vec3(100), glm::vec4(0.1, 0.1, 0.1, 1));
         skyboxCube->Start();
-        skyboxCube->Enable();
-
-        // Object3D* GetHermiteCurve(Scene* scene, std::string name,glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, glm::vec3 point1, glm::vec3 point2, glm::vec3 tan1, glm::vec3 tan2);
-        // Object3D* GetBezierCurve(Scene* scene, std::string name,glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, glm::vec3 point0, glm::vec3 point1, glm::vec3 point2, glm::vec3 point3);
-        // CatmutRollSpline* curve = new CatmutRollSpline("Spline", this);
-        // Object3D* curve = GetNURBS(this, "curve",glm::dvec3(0, 1, 0), glm::dvec3(0), glm::dvec3(1), glm::vec4(1, 1, 1, 1), points);
-        // Object3D* curve = GetNonUniformBSpline(this, "curve",glm::dvec3(0, 1, 0), glm::dvec3(0), glm::dvec3(1), glm::vec4(1, 1, 1, 1), points);
-
-        //Create derived object for each curve
-        //Add Custom inspector
-        //add cubes to each point for transforming
-
-        // AddObject(curve);                
+        skyboxCube->Enable();          
 
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
             objects3D[i]->Start();
         }
+
+        simulation.SetScene(this);
+        simulation.Init();
     }
 
     void Scene::Enable() {
@@ -83,12 +74,14 @@ namespace CoreEngine {
     }
 
     void Scene::OnUpdate() {
-        camera->OnUpdate();
+        simulation.Simulate();
+
         for(int i=0; i<objects3D.size(); i++) {
             if(!objects3D[i]->started) objects3D[i]->Start(); 
             if(!objects3D[i]->enabled) objects3D[i]->Enable();
             objects3D[i]->Update();
         }
+        camera->OnUpdate();
         if(hasSkybox) {
             skyboxCube->Update();
         }        
@@ -129,7 +122,7 @@ namespace CoreEngine {
 		}
 
         sceneTree->AddObject(object);
-        
+        simulation.AddObject(object);
         return currentName;
     }
 
@@ -161,6 +154,7 @@ namespace CoreEngine {
     //Disable
 
     void Scene::OnDestroy() { 
+        simulation.Destroy();
         std::cout << "Scene:OnDestroy: Destroying scene" << std::endl;
         for(int i=0; i<objects3D.size(); i++) {
             objects3D[i]->Destroy();
