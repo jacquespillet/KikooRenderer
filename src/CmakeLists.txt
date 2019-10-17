@@ -112,7 +112,10 @@ target_link_libraries(MainWindow debug Qt5Guid optimized Qt5Gui)
 target_link_libraries(MainWindow debug Qt5Chartsd optimized Qt5Charts)
 target_link_libraries(MainWindow debug Qt53DLogicd optimized Qt53DLogic)
 target_link_libraries(MainWindow debug Qt53DAnimationd optimized Qt53DAnimation)
+
 target_link_libraries(MainWindow assimp-vc140-mt)
+
+target_link_libraries(MainWindow BulletDynamics)
 
 install(TARGETS MainWindow
 		RUNTIME DESTINATION bin

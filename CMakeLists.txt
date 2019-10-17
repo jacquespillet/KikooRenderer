@@ -31,6 +31,13 @@ include_directories(${GLM_INC_DIR})
 set(STBI_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/STB_image)
 include_directories(${STBI_INC_DIR})
 
+
+#Bullets
+set(BULLET_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/bullet/include)
+set(BULLET_LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/bullet/lib)
+include_directories(${BULLET_INC_DIR})
+link_directories(${BULLET_LIB_DIR})
+
 #assimp
 set(ASSIMP_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/assimp-4.1.0/build/install/include)
 set(ASSIMP_LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/assimp-4.1.0/build/install/lib)
