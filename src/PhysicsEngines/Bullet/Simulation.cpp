@@ -80,7 +80,12 @@ void Simulation::Simulate() {
     {
         btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[j];
         btRigidBody* body = btRigidBody::upcast(obj);
-        btTransform trans;
+        
+		// btVector3 inertia;
+		// body->getCollisionShape()->calculateLocalInertia( mass, inertia );
+		// body->setMassProps(mass, inertia);	
+
+		btTransform trans;
         if (body && body->getMotionState())
         {
             body->getMotionState()->getWorldTransform(trans);

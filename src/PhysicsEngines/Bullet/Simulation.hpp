@@ -26,6 +26,8 @@ public:
     void Destroy();
 
     void AddObject(CoreEngine::Object3D* object3D);
+    
+    btDiscreteDynamicsWorld* dynamicsWorld;
 protected:
     void GetSceneData();
     void SetSceneData();
@@ -37,7 +39,6 @@ protected:
     btCollisionDispatcher* dispatcher;
     btBroadphaseInterface* overlappingPairCache;
     btSequentialImpulseConstraintSolver* solver;
-    btDiscreteDynamicsWorld* dynamicsWorld;
 
     std::vector<CoreEngine::Object3D*> objects;
 	btAlignedObjectArray<btCollisionShape*> collisionShapes;    

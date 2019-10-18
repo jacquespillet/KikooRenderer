@@ -6,37 +6,48 @@
 namespace KikooRenderer {
 namespace CoreEngine {
 
-BulletPhysicsObjectInspector::BulletPhysicsObjectInspector(BulletPhysicsObjectComponent* _bulletPhysicsObjectComponent) : ComponentInspector("Bullet Physics Object", bulletPhysicsObjectComponent)  {
-	std::cout << "HERE "<< std::endl;
-    // setLocale(QLocale("C")); //For . as , in float spin boxes
-	std::cout << "HERE 1"<< std::endl;
+BulletPhysicsObjectInspector::BulletPhysicsObjectInspector(BulletPhysicsObjectComponent* _bulletPhysicsObjectComponent) : ComponentInspector("Bullet Physics Object", _bulletPhysicsObjectComponent)  {
+    setLocale(QLocale("a")); //For . as , in float spin boxes
 
-	// this->bulletPhysicsObjectComponent = _bulletPhysicsObjectComponent;
-	// Object3D* object = bulletPhysicsObjectComponent->object3D;
-	// scene = object->scene;
+	this->bulletPhysicsObjectComponent = _bulletPhysicsObjectComponent;
+	Object3D* object = bulletPhysicsObjectComponent->object3D;
+	scene = object->scene;
 
 	QVBoxLayout* mainLayout = new QVBoxLayout();
-	std::cout << "HERE 2"<< std::endl;
 
 	
-    // CustomSlider* massSlider = new CustomSlider(0.0f, 3.0f, 0.01, "Mass", bulletPhysicsObjectComponent->mass);
-    // mainLayout->addLayout(massSlider);
-    // QObject::connect(massSlider, &CustomSlider::Modified, [this](double val) {
-    //     bulletPhysicsObjectComponent->mass = val;
+    CustomSlider* massSlider = new CustomSlider(0.0f, 3.0f, 0.01, "Mass", bulletPhysicsObjectComponent->mass);
+    mainLayout->addLayout(massSlider);
+    QObject::connect(massSlider, &CustomSlider::Modified, [this](double val) {
+        bulletPhysicsObjectComponent->mass = val;
 
-    //     btScalar btmass(bulletPhysicsObjectComponent->mass);
-    //     bool isDynamic = (btmass != 0.f);
-    //     btVector3 localInertia(0, 0, 0);
-    //     // if (isDynamic)
-    //     //     colShape->calculateLocalInertia(btmass, localInertia);
+		//Remove the rigid body from the dynamics world
+		
+		bulletPhysicsObjectComponent->object3D->scene->simulation.dynamicsWorld->removeRigidBody(bulletPhysicsObjectComponent->rigidBody);
+		btVector3 inertia;
+		bulletPhysicsObjectComponent->rigidBody->getCollisionShape()->calculateLocalInertia( mass, inertia );
+		bulletPhysicsObjectComponent->rigidBody->setMassProps(mass, inertia);
+		
+		// //Add the rigid body to the dynamics world
+		bulletPhysicsObjectComponent->object3D->scene->simulation.dynamicsWorld->addRigidBody( bulletPhysicsObjectComponent->rigidBody );
+
+
+        // btScalar btmass(bulletPhysicsObjectComponent->mass);
+        // bool isDynamic = (btmass != 0.f);
+        // btVector3 localInertia(0, 0, 0);
+        // if (isDynamic)
+        //     bulletPhysicsObjectComponent->colShape->calculateLocalInertia(btmass, localInertia);
         
-    //     bulletPhysicsObjectComponent->rigidBody->setMassProps(btmass, localInertia);
-    //     scene->triggerRefresh = true;
-    // });
+        // bulletPhysicsObjectComponent->rigidBody->setMassProps(btmass, localInertia);
+
+
+
+		
+        scene->triggerRefresh = true;
+    });
 
     
 	setLayout(mainLayout);
-	std::cout << "HERE 3"<< std::endl;
 }
 
 BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object) : Component("Bullet", object) {
@@ -69,9 +80,7 @@ void BulletPhysicsObjectComponent::Recompute() {
 
 
 ComponentInspector* BulletPhysicsObjectComponent::GetInspector() {
-    std::cout <<"HERE0"<<std::endl;
 	bulletPhysicsObjectInspector = new BulletPhysicsObjectInspector(this);
-    std::cout <<"HERE1"<<std::endl;
 	return bulletPhysicsObjectInspector;
 }
 

@@ -128,7 +128,6 @@ std::vector<QWidget*> Object3D::GetInspectorWidgets() {
 	std::vector<QWidget*> res;
 	res.push_back(this->transform->GetInspector());
 	for(int i=0; i<this->components.size(); i++) {
-		std::cout << this->components[i]->name << std::endl;
 		res.push_back(this->components[i]->GetInspector());
 	}
 
