@@ -5,7 +5,7 @@ using namespace KikooRenderer;
 int main(int argc, char *argv[])
 {
 	std::stringstream buffer;
-	std::streambuf * old = std::cout.rdbuf(buffer.rdbuf());
+	// std::streambuf * old = std::cout.rdbuf(buffer.rdbuf());
 
 	QApplication app(argc, argv);
 

@@ -2,6 +2,7 @@
 #include "3DEngine/Scene.hpp"
 #include "3DEngine/Object3D.hpp"
 
+#include "Components/BulletComponent.hpp"
 
 namespace KikooRenderer {
 namespace Physics {
@@ -35,55 +36,18 @@ void Simulation::Init() {
 }
 
 void Simulation::AddObject(CoreEngine::Object3D* object3D) {
-
-}
-
-void Simulation::GetSceneData() {
-    //Loop through all objects in the scene
-    //Get transform
-    //Get Bounding component
-    //Get Mesh filter
-    //Set all needed data in them
-
-    {
-		btCollisionShape* groundShape = new btBoxShape(btVector3(btScalar(50.), btScalar(50.), btScalar(50.)));
-
-		collisionShapes.push_back(groundShape);
-
-		btTransform groundTransform;
-		groundTransform.setIdentity();
-		groundTransform.setOrigin(btVector3(0, -56, 0));
-
-		btScalar mass(0.);
-
-		//rigidbody is dynamic if and only if mass is non zero, otherwise static
-		bool isDynamic = (mass != 0.f);
-
-		btVector3 localInertia(0, 0, 0);
-		if (isDynamic)
-			groundShape->calculateLocalInertia(mass, localInertia);
-
-		//using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
-		btDefaultMotionState* myMotionState = new btDefaultMotionState(groundTransform);
-		btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, groundShape, localInertia);
-		btRigidBody* body = new btRigidBody(rbInfo);
-
-		//add the body to the dynamics world
-		dynamicsWorld->addRigidBody(body);
-	}
-
-	{
-		//create a dynamic rigidbody
-
-		//btCollisionShape* colShape = new btBoxShape(btVector3(1,1,1));
-		btCollisionShape* colShape = new btSphereShape(btScalar(1.));
+	CoreEngine::BulletPhysicsObjectComponent* physicsObjectComponent = object3D->GetComponent<CoreEngine::BulletPhysicsObjectComponent>();
+	if(physicsObjectComponent != nullptr) {
+		btCollisionShape* colShape = physicsObjectComponent->colShape;
+		// btCollisionShape* colShape = new btBoxShape(btVector3(1,1,1));
+		// btCollisionShape* colShape = new btSphereShape(btScalar(1.));
 		collisionShapes.push_back(colShape);
 
 		/// Create Dynamic Objects
 		btTransform startTransform;
 		startTransform.setIdentity();
 
-		btScalar mass(1.f);
+		btScalar mass(physicsObjectComponent->mass);
 
 		//rigidbody is dynamic if and only if mass is non zero, otherwise static
 		bool isDynamic = (mass != 0.f);
@@ -92,15 +56,20 @@ void Simulation::GetSceneData() {
 		if (isDynamic)
 			colShape->calculateLocalInertia(mass, localInertia);
 
-		startTransform.setOrigin(btVector3(2, 10, 0));
+		startTransform.setOrigin(btVector3(object3D->transform->position.x, object3D->transform->position.y, object3D->transform->position.z));
 
 		//using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
 		btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
 		btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, colShape, localInertia);
-		btRigidBody* body = new btRigidBody(rbInfo);
+		physicsObjectComponent->rigidBody = new btRigidBody(rbInfo);
 
-		dynamicsWorld->addRigidBody(body);
-	}    
+
+		dynamicsWorld->addRigidBody(physicsObjectComponent->rigidBody);
+		objects.push_back(object3D);	
+	}
+}
+
+void Simulation::GetSceneData() {	  
 }
 
 void Simulation::Simulate() {
@@ -120,10 +89,12 @@ void Simulation::Simulate() {
         {
             trans = obj->getWorldTransform();
         }
-        printf("world pos object %d = %f,%f,%f\n", j, float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
+		objects[j]->transform->position.x = trans.getOrigin().getX(); 
+		objects[j]->transform->position.y = trans.getOrigin().getY(); 
+		objects[j]->transform->position.z = trans.getOrigin().getZ(); 
     }
 
-    
+	scene->triggerRefresh = true;
 }
 
 void Simulation::SetSceneData() {

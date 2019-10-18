@@ -39,6 +39,7 @@ protected:
     btSequentialImpulseConstraintSolver* solver;
     btDiscreteDynamicsWorld* dynamicsWorld;
 
+    std::vector<CoreEngine::Object3D*> objects;
 	btAlignedObjectArray<btCollisionShape*> collisionShapes;    
 };
 }

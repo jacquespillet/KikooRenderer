@@ -17,6 +17,8 @@
 #include "Curves/NURBS.hpp"
 #include "Curves/NonUniformBSpline.hpp"
 
+#include "PhysicsEngines/Physics.hpp"
+
 namespace KikooRenderer {
 
 namespace CoreEngine {
@@ -45,11 +47,19 @@ Object3D* GetCube(Scene* scene, std::string name, glm::vec3 _position, glm::vec3
 
     BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
 
+    BulletPhysicsObjectComponent* bulletPhysicsObjectComponent = new BulletPhysicsObjectComponent(newObject);
+    bulletPhysicsObjectComponent->mass = 0;
+    bulletPhysicsObjectComponent->type = BulletPhysicsObjectComponent::RIGID_BODY_TYPE::DYNAMIC;
+    bulletPhysicsObjectComponent->transform = transform;
+    bulletPhysicsObjectComponent->mesh = mesh;
+    bulletPhysicsObjectComponent->colShape =  new btBoxShape(btVector3(1,1,1));
+
 
     newObject->AddComponent(material);
 	newObject->transform = transform;
     newObject->AddComponent(mesh);
     newObject->AddComponent(boundingBox);
+    newObject->AddComponent(bulletPhysicsObjectComponent);
 
     return newObject;
 }

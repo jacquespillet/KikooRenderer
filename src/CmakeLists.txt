@@ -74,6 +74,7 @@ set(MainWindowSrc
 	ObjectDetails/ObjectParams.cpp
 
 	PhysicsEngines/Bullet/Simulation.cpp
+	PhysicsEngines/Bullet/Components/BulletComponent.cpp
 	
 	Geometry/Util.cpp	
 	Geometry/Ray.cpp	

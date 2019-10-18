@@ -12,9 +12,13 @@ namespace KikooRenderer {
 namespace CoreEngine {
 
 ComponentInspector::ComponentInspector(std::string name, Component* component) : QGroupBox(QString::fromStdString(name)) {
+	std::cout << "0" << std::endl;
 	this->component = component;
+	std::cout << "1" << std::endl;
 	Object3D* object = component->object3D;
+	std::cout << "2" << std::endl;
 	scene = object->scene;
+	std::cout << "3" << std::endl;
 }
 
 
