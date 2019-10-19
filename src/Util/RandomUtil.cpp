@@ -41,5 +41,10 @@ glm::vec3 GenerateRandomUnitVectorWithinCone(glm::vec3 coneDirection, float angl
     }
     return glm::vec3(direction);
 }
+
+glm::vec4 GetRandomColor() {
+    return glm::vec4(GetRand(), GetRand(), GetRand(), 1);
+}
+
 }
 }

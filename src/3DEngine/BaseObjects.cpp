@@ -48,11 +48,11 @@ Object3D* GetCube(Scene* scene, std::string name, glm::vec3 _position, glm::vec3
     BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
 
     BulletPhysicsObjectComponent* bulletPhysicsObjectComponent = new BulletPhysicsObjectComponent(newObject);
-    bulletPhysicsObjectComponent->mass = 0;
+    bulletPhysicsObjectComponent->mass = 1;
     bulletPhysicsObjectComponent->type = BulletPhysicsObjectComponent::RIGID_BODY_TYPE::DYNAMIC;
     bulletPhysicsObjectComponent->transform = transform;
     bulletPhysicsObjectComponent->mesh = mesh;
-    bulletPhysicsObjectComponent->colShape =  new btBoxShape(btVector3(1,1,1));
+    bulletPhysicsObjectComponent->colShape =  new btBoxShape(btVector3(0.5,0.5,0.5));
 
 
     newObject->AddComponent(material);
@@ -107,8 +107,7 @@ Object3D* GetQuad(Scene* scene, std::string name, glm::vec3 _position, glm::vec3
     material->albedo = _color;
     Shader shader = scene->standardShaders.unlitMeshShader;
     material->SetShader(shader);
-
-
+ 
     BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
 
     newObject->AddComponent(material);
@@ -559,26 +558,58 @@ Object3D* GetTerrain(Scene* scene, std::string name,glm::vec3 _position, glm::ve
     //
     ///Vertices
     //
-    int numAdded=0;
-    for(float y=0, yInx=0; yInx<subdivisionsY; y+=yOffset, yInx++) {
-        for(float x=0, xInx=0; xInx<subdivisionsX; x+= xOffset, xInx++) {
-            vertex.push_back(glm::vec3(x, 0, y));
-            normals.push_back(glm::vec3(0, 1, 0));
-            uv.push_back(glm::vec2(0, 0));
-            colors.push_back(glm::vec4(255, 255, 255, 255));  
+    // int numAdded=0;
+    // for(float y=-width/2, yInx=0; yInx<subdivisionsY; y+=yOffset, yInx++) {
+    //     for(float x=-height/2, xInx=0; xInx<subdivisionsX; x+= xOffset, xInx++) {
+    //         vertex.push_back(glm::vec3(x, 0, y));
+    //         normals.push_back(glm::vec3(0, 1, 0));
+    //         uv.push_back(glm::vec2(0, 0));
+    //         colors.push_back(glm::vec4(255, 255, 255, 255));  
 
-            if(xInx < subdivisionsX-1 && yInx < subdivisionsY-1) {
-                triangles.push_back(numAdded);
-                triangles.push_back(numAdded + subdivisionsX + 1);
-                triangles.push_back(numAdded + subdivisionsX);
+    //         if(xInx < subdivisionsX-1 && yInx < subdivisionsY-1) {
+    //             triangles.push_back(numAdded);
+    //             triangles.push_back(numAdded + subdivisionsX + 1);
+    //             triangles.push_back(numAdded + subdivisionsX);
                 
-                triangles.push_back(numAdded);
-                triangles.push_back(numAdded + 1);
-                triangles.push_back(numAdded + subdivisionsX + 1);
-            }
-            numAdded++;
-        }
-    }
+    //             triangles.push_back(numAdded);
+    //             triangles.push_back(numAdded + 1);
+    //             triangles.push_back(numAdded + subdivisionsX + 1);
+    //         }
+    //         numAdded++;
+    //     }
+    // }
+    
+    //bottom left
+    vertex.push_back(glm::vec3(-width/2, 0, -height/2));
+    normals.push_back(glm::vec3(0, 1, 0));
+    uv.push_back(glm::vec2(0, 0));
+    colors.push_back(glm::vec4(255, 255, 255, 255));      
+
+    //top left
+    vertex.push_back(glm::vec3(-width/2, 0, height/2));
+    normals.push_back(glm::vec3(0, 1, 0));
+    uv.push_back(glm::vec2(0, 0));
+    colors.push_back(glm::vec4(255, 255, 255, 255));      
+
+    //top right
+    vertex.push_back(glm::vec3(width/2, 0, height/2));
+    normals.push_back(glm::vec3(0, 1, 0));
+    uv.push_back(glm::vec2(0, 0));
+    colors.push_back(glm::vec4(255, 255, 255, 255));      
+    
+    //bottom right
+    vertex.push_back(glm::vec3(width/2, 0, -height/2));
+    normals.push_back(glm::vec3(0, 1, 0));
+    uv.push_back(glm::vec2(0, 0));
+    colors.push_back(glm::vec4(255, 255, 255, 255));
+    
+    triangles.push_back(0);
+    triangles.push_back(3);
+    triangles.push_back(1);
+    
+    triangles.push_back(3);
+    triangles.push_back(2);
+    triangles.push_back(1);      
     
     //Setup mesh
     MeshFilterComponent* mesh = new MeshFilterComponent(newObject);
@@ -603,6 +634,14 @@ Object3D* GetTerrain(Scene* scene, std::string name,glm::vec3 _position, glm::ve
     BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
 
 
+    BulletPhysicsObjectComponent* bulletPhysicsObjectComponent = new BulletPhysicsObjectComponent(newObject);
+    bulletPhysicsObjectComponent->mass = 0;
+    bulletPhysicsObjectComponent->type = BulletPhysicsObjectComponent::RIGID_BODY_TYPE::DYNAMIC;
+    bulletPhysicsObjectComponent->transform = transform;
+    bulletPhysicsObjectComponent->mesh = mesh;
+    bulletPhysicsObjectComponent->colShape =  new btBoxShape(btVector3(width / 2,0.00001, height / 2));
+
+    newObject->AddComponent(bulletPhysicsObjectComponent);
     newObject->AddComponent(material);
 	newObject->transform = transform;
     newObject->AddComponent(boundingBox);

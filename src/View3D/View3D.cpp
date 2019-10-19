@@ -162,6 +162,25 @@ View3D::View3D() : QDockWidget("3D View")
         view3DGL->scene->triggerRefresh= true;
     });
 
+    viewportToolbar->addSeparator();
+
+    QIcon ButtonIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+    QPushButton* playButton = new QPushButton();
+    playButton->setIcon(ButtonIcon);
+    viewportToolbar->addWidget(playButton);
+
+	connect(playButton, &QPushButton::clicked, this, [this, playButton]() {
+		view3DGL->scene->PlayPause();
+		if(view3DGL->scene->IsPlaying()) {
+			QIcon ButtonIcon(style()->standardIcon(QStyle::SP_MediaPause));
+			playButton->setIcon(ButtonIcon);
+		} else {
+			QIcon ButtonIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+			playButton->setIcon(ButtonIcon);
+		}
+	});
+
+
     void SetLayerMask(uint16_t _layerMask);
     uint16_t GetLayerMask();	
         

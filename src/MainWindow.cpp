@@ -32,9 +32,9 @@ namespace KikooRenderer {
 
         setDockOptions(QMainWindow::AnimatedDocks);
 
-        show();
-	    // showMaximized();
-        // ExpandToFitScreen();
+        // show();
+	    showMaximized();
+        ExpandToFitScreen();
     }
 
     void MainWindow::ExpandToFitScreen() {

@@ -31,7 +31,6 @@ void Simulation::Init() {
 	solver = new btSequentialImpulseConstraintSolver;
 
 	dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration); 
-    
     GetSceneData();
 }
 
@@ -39,8 +38,6 @@ void Simulation::AddObject(CoreEngine::Object3D* object3D) {
 	CoreEngine::BulletPhysicsObjectComponent* physicsObjectComponent = object3D->GetComponent<CoreEngine::BulletPhysicsObjectComponent>();
 	if(physicsObjectComponent != nullptr) {
 		btCollisionShape* colShape = physicsObjectComponent->colShape;
-		// btCollisionShape* colShape = new btBoxShape(btVector3(1,1,1));
-		// btCollisionShape* colShape = new btSphereShape(btScalar(1.));
 		collisionShapes.push_back(colShape);
 
 		/// Create Dynamic Objects
@@ -51,12 +48,14 @@ void Simulation::AddObject(CoreEngine::Object3D* object3D) {
 
 		//rigidbody is dynamic if and only if mass is non zero, otherwise static
 		bool isDynamic = (mass != 0.f);
-
 		btVector3 localInertia(0, 0, 0);
 		if (isDynamic)
-			colShape->calculateLocalInertia(mass, localInertia);
+			physicsObjectComponent->colShape->calculateLocalInertia(mass, localInertia);
 
 		startTransform.setOrigin(btVector3(object3D->transform->position.x, object3D->transform->position.y, object3D->transform->position.z));
+		btQuaternion rotation;
+		rotation.setEulerZYX (object3D->transform->rotation.z * DEGTORAD, object3D->transform->rotation.y * DEGTORAD, object3D->transform->rotation.x * DEGTORAD);
+		startTransform.setRotation(rotation);
 
 		//using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
 		btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
@@ -69,7 +68,7 @@ void Simulation::AddObject(CoreEngine::Object3D* object3D) {
 	}
 }
 
-void Simulation::GetSceneData() {	  
+void Simulation::GetSceneData() {	 
 }
 
 void Simulation::Simulate() {
@@ -80,11 +79,7 @@ void Simulation::Simulate() {
     {
         btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[j];
         btRigidBody* body = btRigidBody::upcast(obj);
-        
-		// btVector3 inertia;
-		// body->getCollisionShape()->calculateLocalInertia( mass, inertia );
-		// body->setMassProps(mass, inertia);	
-
+		
 		btTransform trans;
         if (body && body->getMotionState())
         {
@@ -94,9 +89,18 @@ void Simulation::Simulate() {
         {
             trans = obj->getWorldTransform();
         }
+		// std::cout << body->getMass() << " " <<trans.getOrigin().getY() <<  std::endl;
+		
 		objects[j]->transform->position.x = trans.getOrigin().getX(); 
 		objects[j]->transform->position.y = trans.getOrigin().getY(); 
 		objects[j]->transform->position.z = trans.getOrigin().getZ(); 
+
+		btQuaternion rotation = trans.getRotation();
+		btScalar rotX, rotY, rotZ;
+		rotation.getEulerZYX (rotZ, rotY, rotX);
+		objects[j]->transform->rotation.z = rotZ * RADTODEG;
+		objects[j]->transform->rotation.y = rotY* RADTODEG;
+		objects[j]->transform->rotation.x = rotX* RADTODEG;
     }
 
 	scene->triggerRefresh = true;

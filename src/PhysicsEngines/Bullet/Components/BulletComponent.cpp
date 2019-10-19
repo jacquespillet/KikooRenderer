@@ -19,17 +19,20 @@ BulletPhysicsObjectInspector::BulletPhysicsObjectInspector(BulletPhysicsObjectCo
     CustomSlider* massSlider = new CustomSlider(0.0f, 3.0f, 0.01, "Mass", bulletPhysicsObjectComponent->mass);
     mainLayout->addLayout(massSlider);
     QObject::connect(massSlider, &CustomSlider::Modified, [this](double val) {
-        bulletPhysicsObjectComponent->mass = val;
+        // bulletPhysicsObjectComponent->mass = val;
 
-		//Remove the rigid body from the dynamics world
+		// //Remove the rigid body from the dynamics world
 		
-		bulletPhysicsObjectComponent->object3D->scene->simulation.dynamicsWorld->removeRigidBody(bulletPhysicsObjectComponent->rigidBody);
-		btVector3 inertia;
-		bulletPhysicsObjectComponent->rigidBody->getCollisionShape()->calculateLocalInertia( mass, inertia );
-		bulletPhysicsObjectComponent->rigidBody->setMassProps(mass, inertia);
+		// std::cout << "Size before removal " << bulletPhysicsObjectComponent->object3D->scene->GetSimulation().dynamicsWorld->getCollisionObjectArray().size() << std::endl;
+		// bulletPhysicsObjectComponent->object3D->scene->GetSimulation().dynamicsWorld->removeRigidBody(bulletPhysicsObjectComponent->rigidBody);
+		// std::cout << "Size after removal " << bulletPhysicsObjectComponent->object3D->scene->GetSimulation().dynamicsWorld->getCollisionObjectArray().size() << std::endl;
+		// btVector3 inertia;
+		// bulletPhysicsObjectComponent->rigidBody->getCollisionShape()->calculateLocalInertia( bulletPhysicsObjectComponent->mass, inertia );
+		// bulletPhysicsObjectComponent->rigidBody->setMassProps(bulletPhysicsObjectComponent->mass, inertia);
 		
-		// //Add the rigid body to the dynamics world
-		bulletPhysicsObjectComponent->object3D->scene->simulation.dynamicsWorld->addRigidBody( bulletPhysicsObjectComponent->rigidBody );
+		// // //Add the rigid body to the dynamics world
+		// bulletPhysicsObjectComponent->object3D->scene->GetSimulation().dynamicsWorld->addRigidBody( bulletPhysicsObjectComponent->rigidBody );
+		// std::cout << "Size after adding " << bulletPhysicsObjectComponent->object3D->scene->GetSimulation().dynamicsWorld->getCollisionObjectArray().size() << std::endl;
 
 
         // btScalar btmass(bulletPhysicsObjectComponent->mass);

@@ -11,5 +11,7 @@ namespace Util {
     glm::vec3 GenerateRandomUnitVector();
 
     glm::vec3 GenerateRandomUnitVectorWithinCone(glm::vec3 coneDirection, float angle);
+
+    glm::vec4 GetRandomColor();
 }
 }

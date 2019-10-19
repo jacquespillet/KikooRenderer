@@ -116,7 +116,15 @@ class Scene {
 		void SetLayerMask(uint16_t _layerMask);
 		uint16_t GetLayerMask();
 
+		Physics::Bullet::Simulation GetSimulation();
+
+		void PlayPause();
+		bool IsPlaying();
+
 	protected:
+		bool isPlaying = false;
+		float animationFrametime;
+
 		Object3D* GetIntersectObject(int x, int y);
 		uint16_t layerMask = 0xFFFF;
 

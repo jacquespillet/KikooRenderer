@@ -9,13 +9,14 @@
 
 #include "Curves/CatmutRollSpline.hpp"
 
+#include "Util/RandomUtil.hpp"
+
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLFunctions_3_3_Core>
 #define GLV QOpenGLFunctions_3_3_Core
 #define GETGL GLV* ogl = QOpenGLContext::currentContext()->versionFunctions<GLV>(); if(ogl==NULL){std::cout << "could not get opengl context";}
 
 namespace KikooRenderer {
-
 namespace CoreEngine {
     Scene::Scene() {
 		camera = new CameraScene(this, 1.0, 70 * DEGTORAD, 0.0001, 1000.0, 1.0);
@@ -51,14 +52,31 @@ namespace CoreEngine {
         skyboxCube = GetCube(this, "Cubemap", glm::vec3(0), glm::vec3(0), glm::vec3(100), glm::vec4(0.1, 0.1, 0.1, 1));
         skyboxCube->Start();
         skyboxCube->Enable();          
+        
+
+        simulation.SetScene(this);
+        simulation.Init();
+
+        Object3D* plane = GetTerrain(this, "terrain ", glm::vec3(0, 0, 0), glm::vec3(0), glm::vec3(1), KikooRenderer::Util::GetRandomColor(), 10, 10, 2, 2);
+        AddObject(plane);
+
+        int i=0; 
+        for(float x = 0; x<5; x++) {
+            for(float y = 0; y<5; y++) {
+                for(float z = 0; z<5; z++) {
+                    Object3D* cube = GetCube(this, "Cube " + i, glm::vec3(x - 2.5, y + 5, z), glm::vec3(KikooRenderer::Util::GetRand() * 10 - 5, KikooRenderer::Util::GetRand() * 10 - 5, KikooRenderer::Util::GetRand() * 10 - 5), glm::vec3(1), KikooRenderer::Util::GetRandomColor());
+                    AddObject(cube);
+                    i++;
+                }
+            }
+        }
 
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
             objects3D[i]->Start();
         }
 
-        simulation.SetScene(this);
-        simulation.Init();
+
     }
 
     void Scene::Enable() {
@@ -74,9 +92,12 @@ namespace CoreEngine {
     }
 
     void Scene::OnUpdate() {
-        simulation.Simulate();
+        if(isPlaying) {
+            animationFrametime+= deltaTime;
+            simulation.Simulate();
+        }
 
-        for(int i=0; i<objects3D.size(); i++) {
+        for (int i=0; i<objects3D.size(); i++) {
             if(!objects3D[i]->started) objects3D[i]->Start(); 
             if(!objects3D[i]->enabled) objects3D[i]->Enable();
             objects3D[i]->Update();
@@ -394,6 +415,10 @@ namespace CoreEngine {
         return closest;
     }
 
+    Physics::Bullet::Simulation Scene::GetSimulation() {
+        return simulation;
+    }
+
     // Called from preferences, has no GL context
     void Scene::SetSkybox(std::vector<std::string> filenames) {
         glWindow->makeCurrent();
@@ -435,5 +460,13 @@ namespace CoreEngine {
         return this->layerMask;
     }
 
+
+    void Scene::PlayPause() {
+        this->isPlaying = !this->isPlaying;
+    }
+
+    bool Scene::IsPlaying() {
+        return isPlaying;
+    }
 }
 }
