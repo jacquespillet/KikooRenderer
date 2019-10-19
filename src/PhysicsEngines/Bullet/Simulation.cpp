@@ -37,38 +37,13 @@ void Simulation::Init() {
 void Simulation::AddObject(CoreEngine::Object3D* object3D) {
 	CoreEngine::BulletPhysicsObjectComponent* physicsObjectComponent = object3D->GetComponent<CoreEngine::BulletPhysicsObjectComponent>();
 	if(physicsObjectComponent != nullptr) {
-		btCollisionShape* colShape = physicsObjectComponent->colShape;
-		collisionShapes.push_back(colShape);
-
-		/// Create Dynamic Objects
-		btTransform startTransform;
-		startTransform.setIdentity();
-
-		btScalar mass(physicsObjectComponent->mass);
-
-		//rigidbody is dynamic if and only if mass is non zero, otherwise static
-		bool isDynamic = (mass != 0.f);
-		btVector3 localInertia(0, 0, 0);
-		if (isDynamic)
-			physicsObjectComponent->colShape->calculateLocalInertia(mass, localInertia);
-
-		startTransform.setOrigin(btVector3(object3D->transform->position.x, object3D->transform->position.y, object3D->transform->position.z));
-		btQuaternion rotation;
-		rotation.setEulerZYX (object3D->transform->rotation.z * DEGTORAD, object3D->transform->rotation.y * DEGTORAD, object3D->transform->rotation.x * DEGTORAD);
-		startTransform.setRotation(rotation);
-
-		//using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
-		btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
-		btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, colShape, localInertia);
-		physicsObjectComponent->rigidBody = new btRigidBody(rbInfo);
-
-
+		collisionShapes.push_back(physicsObjectComponent->colShape);
 		dynamicsWorld->addRigidBody(physicsObjectComponent->rigidBody);
 		objects.push_back(object3D);	
 	}
 }
 
-void Simulation::GetSceneData() {	 
+void Simulation::GetSceneData() {
 }
 
 void Simulation::Simulate() {
@@ -89,11 +64,11 @@ void Simulation::Simulate() {
         {
             trans = obj->getWorldTransform();
         }
-		// std::cout << body->getMass() << " " <<trans.getOrigin().getY() <<  std::endl;
-		
-		objects[j]->transform->position.x = trans.getOrigin().getX(); 
-		objects[j]->transform->position.y = trans.getOrigin().getY(); 
-		objects[j]->transform->position.z = trans.getOrigin().getZ(); 
+
+
+		objects[j]->transform->position.x = trans.getOrigin().getX();
+		objects[j]->transform->position.y = trans.getOrigin().getY();
+		objects[j]->transform->position.z = trans.getOrigin().getZ();
 
 		btQuaternion rotation = trans.getRotation();
 		btScalar rotX, rotY, rotZ;
@@ -107,10 +82,6 @@ void Simulation::Simulate() {
 }
 
 void Simulation::SetSceneData() {
-    //Loop through all physical objects in the scene
-    //read position, rotation, scale, vertices
-    //Set them back
-    //Rebuild buffers if needed (Soft bodies)
 }
 
 

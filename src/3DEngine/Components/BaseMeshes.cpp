@@ -313,31 +313,32 @@ namespace CoreEngine {
     }
     
     void GetConeBuffers(std::vector<glm::vec3>* vertex, std::vector<glm::vec3>* normals, std::vector<glm::vec2>* uv, std::vector<glm::vec4>* colors, std::vector<int>* triangles) {
-
+        
         uint32_t numSlices = 32;
+        float length = 1;
+        float radius = 0.25;
 
         //Circle center
-        vertex->push_back(glm::vec3(0, 0, 0));
-        normals->push_back(glm::vec3(0, 0, -1));
+        vertex->push_back(glm::vec3(0, 0, -length * 0.5));
+        normals->push_back(glm::vec3(0, 0, 0));
         uv->push_back(glm::vec2(0, 0));
         colors->push_back(glm::vec4(255, 255, 255, 255));
 
         //Peak of the cone
-        vertex->push_back(glm::vec3(0, 0, 1));
+        vertex->push_back(glm::vec3(0, 0, length * 0.5));
         normals->push_back(glm::vec3(0, 0, -1));
-        uv->push_back(glm::vec2(0, 0));
+        uv->push_back(glm::vec2(0, 1));
         colors->push_back(glm::vec4(255, 255, 255, 255));
 
 
-        float radius = 0.25 ;
         for(uint32_t i=0; i<=numSlices; i++) {
             float inx = ((float)i / (float)numSlices) * TWO_PI;
             float x = radius * std::cos(inx);
             float y = radius * std::sin(inx);
 
-            vertex->push_back(glm::vec3(x, y, 0));
+            vertex->push_back(glm::vec3(x, y, -length * 0.5));
             normals->push_back(glm::vec3(0, 0, -1));
-            uv->push_back(glm::vec2(0, 0));
+            uv->push_back(glm::vec2((float)i/(float)numSlices, 0));
             colors->push_back(glm::vec4(255, 255, 255, 255));
             
             triangles->push_back(i);

@@ -1,6 +1,7 @@
 #include "BulletComponent.hpp"
 #include "3DEngine/Object3D.hpp"
 #include "3DEngine/Scene.hpp"
+#include "3DEngine/Components/BoundingComponent.hpp"
 
 
 namespace KikooRenderer {
@@ -53,7 +54,57 @@ BulletPhysicsObjectInspector::BulletPhysicsObjectInspector(BulletPhysicsObjectCo
 	setLayout(mainLayout);
 }
 
-BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object) : Component("Bullet", object) {
+BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object, double _mass, RIGID_BODY_SHAPE _shape) : Component("Bullet", object) {
+	this->mass = _mass;
+	this->bb = object->GetComponent<BoundingBoxComponent>();
+	this->shape = _shape;
+
+	glm::vec3 min, max;
+	bb->GetLocalBounds(&min, &max);
+	min *= object->transform->scale;
+	max *= object->transform->scale;
+
+	if(_shape == RIGID_BODY_SHAPE::BOX) {
+		float sizeX = std::max(max.x - min.x, 0.00001f);
+		float sizeY = std::max(max.y - min.y, 0.00001f);
+		float sizeZ = std::max(max.z - min.z, 0.00001f);
+		
+		colShape =  new btBoxShape(btVector3(sizeX * 0.5,sizeY * 0.5,sizeZ * 0.5));
+	} else if (_shape == RIGID_BODY_SHAPE::CONE) {
+		colShape =  new btConeShapeZ(0.25, 1);
+	} else if(_shape == RIGID_BODY_SHAPE::SPHERE) {
+		colShape =  new btSphereShape(btScalar(object->transform->scale.x));
+	}
+	
+	/// Create Dynamic Objects
+	btTransform startTransform;
+	startTransform.setIdentity();
+
+	btScalar mass(mass);
+
+	//rigidbody is dynamic if and only if mass is non zero, otherwise static
+	bool isDynamic = (mass != 0.f);
+	btVector3 localInertia(0, 0, 0);
+	if (isDynamic)
+		colShape->calculateLocalInertia(mass, localInertia);
+
+	startTransform.setOrigin(btVector3(object3D->transform->position.x, object3D->transform->position.y, object3D->transform->position.z));
+	btQuaternion rotation;
+	rotation.setEulerZYX (object3D->transform->rotation.z * DEGTORAD, object3D->transform->rotation.y * DEGTORAD, object3D->transform->rotation.x * DEGTORAD);
+	startTransform.setRotation(rotation);
+
+	//using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
+	btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
+	btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, colShape, localInertia);
+	rigidBody = new btRigidBody(rbInfo);
+
+	if (_shape == RIGID_BODY_SHAPE::CONE || _shape == RIGID_BODY_SHAPE::SPHERE) {
+		rigidBody->setFriction(1.f);
+		rigidBody->setRollingFriction(.01);
+		rigidBody->setSpinningFriction(0.01);
+		rigidBody->setAnisotropicFriction(colShape->getAnisotropicRollingFrictionDirection(), btCollisionObject::CF_ANISOTROPIC_ROLLING_FRICTION);
+	}
+
 
 }
 

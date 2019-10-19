@@ -15,7 +15,7 @@ public:
     //Factors for each light component
     float ambientFactor = 0.6;
     float diffuseFactor = 0.6;
-    float specularFactor = 0.6;
+    float specularFactor = 0.15;
     int smoothness = 8;
 
     //Scales the normals of the normal map

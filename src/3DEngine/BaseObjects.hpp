@@ -7,7 +7,7 @@ namespace KikooRenderer {
 
 namespace CoreEngine {
 
-    Object3D* GetCube(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color);
+    Object3D* GetCube(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, bool physics = false);
     
     Object3D* GetWireFrameBox(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color);
 

@@ -24,7 +24,7 @@ namespace KikooRenderer {
 namespace CoreEngine {
 
 
-Object3D* GetCube(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color) {
+Object3D* GetCube(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, bool physics) {
      //Start each Object3D in scene
     Object3D* newObject = new Object3D(name, scene);
    
@@ -42,24 +42,18 @@ Object3D* GetCube(Scene* scene, std::string name, glm::vec3 _position, glm::vec3
     MaterialComponent* material = new MaterialComponent(newObject);
     material->albedo = _color;
 
-    Shader shader = scene->standardShaders.unlitMeshShader;
+    Shader shader = scene->standardShaders.blinnPhongShader;
     material->SetShader(shader);
 
     BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
 
-    BulletPhysicsObjectComponent* bulletPhysicsObjectComponent = new BulletPhysicsObjectComponent(newObject);
-    bulletPhysicsObjectComponent->mass = 1;
-    bulletPhysicsObjectComponent->type = BulletPhysicsObjectComponent::RIGID_BODY_TYPE::DYNAMIC;
-    bulletPhysicsObjectComponent->transform = transform;
-    bulletPhysicsObjectComponent->mesh = mesh;
-    bulletPhysicsObjectComponent->colShape =  new btBoxShape(btVector3(0.5,0.5,0.5));
 
 
     newObject->AddComponent(material);
 	newObject->transform = transform;
     newObject->AddComponent(mesh);
     newObject->AddComponent(boundingBox);
-    newObject->AddComponent(bulletPhysicsObjectComponent);
+
 
     return newObject;
 }
@@ -229,7 +223,7 @@ Object3D* GetSphere(Scene* scene, std::string name, glm::vec3 _position, glm::ve
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
     material->albedo = _color;
-    Shader shader = scene->standardShaders.unlitMeshShader;
+    Shader shader = scene->standardShaders.blinnPhongShader;
     material->SetShader(shader);
 
     BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
@@ -480,7 +474,7 @@ Object3D* GetCone(Scene* scene, std::string name, glm::vec3 _position, glm::vec3
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
     material->albedo = _color;
-    Shader shader = scene->standardShaders.unlitMeshShader;
+    Shader shader = scene->standardShaders.blinnPhongShader;
     material->SetShader(shader);
 
     BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
@@ -634,14 +628,7 @@ Object3D* GetTerrain(Scene* scene, std::string name,glm::vec3 _position, glm::ve
     BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
 
 
-    BulletPhysicsObjectComponent* bulletPhysicsObjectComponent = new BulletPhysicsObjectComponent(newObject);
-    bulletPhysicsObjectComponent->mass = 0;
-    bulletPhysicsObjectComponent->type = BulletPhysicsObjectComponent::RIGID_BODY_TYPE::DYNAMIC;
-    bulletPhysicsObjectComponent->transform = transform;
-    bulletPhysicsObjectComponent->mesh = mesh;
-    bulletPhysicsObjectComponent->colShape =  new btBoxShape(btVector3(width / 2,0.00001, height / 2));
 
-    newObject->AddComponent(bulletPhysicsObjectComponent);
     newObject->AddComponent(material);
 	newObject->transform = transform;
     newObject->AddComponent(boundingBox);

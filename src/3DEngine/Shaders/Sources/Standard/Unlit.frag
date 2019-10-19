@@ -19,5 +19,6 @@
             // outputColor = vec4(texture(cubeTexCoords).xyz, 1);
         } else {
             outputColor = (hasAlbedoTex==1) ? texture(albedoTexture, fragmentUv) : fragmentColor;
+            // outputColor = vec4(fragmentUv.xy, 0, 1);
         }
     }

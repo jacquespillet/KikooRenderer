@@ -11,8 +11,10 @@ class Object3D;
 class Scene;
 class MeshFilterComponent;
 class TransformComponent;
+class BoundingBoxComponent;
 class BulletPhysicsObjectComponent;
 
+enum RIGID_BODY_SHAPE {BOX, CONE, SPHERE};
 class BulletPhysicsObjectInspector : public ComponentInspector {
 	Q_OBJECT
 public:
@@ -38,7 +40,7 @@ class BulletPhysicsObjectComponent : public Component {
     public: 
         enum RIGID_BODY_TYPE {DYNAMIC, STATIC, KINEMATIC};
 
-        BulletPhysicsObjectComponent(Object3D* object);
+        BulletPhysicsObjectComponent(Object3D* object, double mass, RIGID_BODY_SHAPE shape);
         void OnStart();
         void OnEnable();
         void OnUpdate();
@@ -56,8 +58,11 @@ class BulletPhysicsObjectComponent : public Component {
     
         double mass = 0;
         RIGID_BODY_TYPE type;
+        RIGID_BODY_SHAPE shape;
         TransformComponent* transform;
         MeshFilterComponent* mesh;
+        BoundingBoxComponent* bb;
+
         btCollisionShape* colShape;
         btRigidBody* rigidBody;
     protected:
