@@ -56,21 +56,22 @@ namespace CoreEngine {
 
         simulation.SetScene(this);
         simulation.Init();
+        
+        for(int x=-5; x<5; x++) {
+            Object3D* box = GetCube(this, "terrain 2", glm::vec3(x * 2, -x, 0), glm::vec3(0, 0, 0), glm::vec3(2, 1, 10), KikooRenderer::Util::GetRandomColor());
+            box->Enable();
+            box->Start();
+            BulletPhysicsObjectComponent* physicsbox = new BulletPhysicsObjectComponent(box, 0, RIGID_BODY_SHAPE::BOX, BODY_TYPE::RIGID);
+            box->AddComponent(physicsbox);
+            AddObject(box);
 
-        Object3D* plane = GetTerrain(this, "terrain 2", glm::vec3(0, 1.5, 0), glm::vec3(0, 0, 0), glm::vec3(1), KikooRenderer::Util::GetRandomColor(), 10, 10, 40, 40);
-        plane->Enable();
-        plane->Start();
-        BulletPhysicsObjectComponent* physicsPlane = new BulletPhysicsObjectComponent(plane, 1, RIGID_BODY_SHAPE::BOX, BODY_TYPE::SOFT);
-        plane->AddComponent(physicsPlane);
-        AddObject(plane);
+        }
 
-        // Object3D* sphere = GetCone(this, "terrain 2", glm::vec3(0, 1, 0), glm::vec3(0, 0, 0), glm::vec3(1), KikooRenderer::Util::GetRandomColor());
-        Object3D* sphere = GetSphere(this, "terrain 2", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1), KikooRenderer::Util::GetRandomColor());
-        // Object3D* sphere =  CoreEngine::ObjectFromModelFile(this, "Bunny", "resources/Models/bunny/untitled.obj");
-        // Object3D* sphere = GetTerrain(this, "terrain 2", glm::vec3(0, 4, 0), glm::vec3(90, 0, 0), glm::vec3(1), KikooRenderer::Util::GetRandomColor(), 5, 5, 8, 8);
+
+        Object3D* sphere = GetSphere(this, "terrain 2", glm::vec3(-4, 10, 0), glm::vec3(0, 0, 0), glm::vec3(3), KikooRenderer::Util::GetRandomColor());
         sphere->Enable();
         sphere->Start();
-        BulletPhysicsObjectComponent* physicssphere = new BulletPhysicsObjectComponent(sphere, 0, RIGID_BODY_SHAPE::SPHERE, BODY_TYPE::RIGID);
+        BulletPhysicsObjectComponent* physicssphere = new BulletPhysicsObjectComponent(sphere, 1, RIGID_BODY_SHAPE::SPHERE, BODY_TYPE::SOFT);
         sphere->AddComponent(physicssphere);
         AddObject(sphere);
 

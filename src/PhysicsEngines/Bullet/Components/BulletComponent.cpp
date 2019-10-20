@@ -138,23 +138,31 @@ BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object, dou
 		// softBody->m_cfg.kDF = 0.5;
 
 		softBody->getCollisionShape()->setMargin(0.2);	
-		softBody->m_cfg.piterations = 20;
-		softBody->m_cfg.citerations = 20;
-		softBody->m_cfg.diterations = 20;
+		softBody->m_cfg.piterations = 200;
+		softBody->m_cfg.citerations = 200;
+		softBody->m_cfg.diterations = 200;
 		
 		//Material settings
-		softBody->m_materials[0]->m_kLST = 0.5;  // Linear stiffness coefficient [0,1]
-		softBody->m_materials[0]->m_kAST = 0.5;  // Area/Angular stiffness coefficient [0,1]
-		softBody->m_materials[0]->m_kVST = 0.5;  // Volume stiffness coefficient [0,1]
+		softBody->m_materials[0]->m_kLST = 0.01;  // Linear stiffness coefficient [0,1]
+		softBody->m_materials[0]->m_kAST = 0.01;  // Area/Angular stiffness coefficient [0,1]
+		softBody->m_materials[0]->m_kVST = 0.01;  // Volume stiffness coefficient [0,1]
 
 
 		softBody->randomizeConstraints();		
 		softBody->m_cfg.collisions |= btSoftBody::fCollision::VF_SS;
 		
 		//SAVE POSE
-		// softBody->m_cfg.kMT = 0.05;
-		// softBody->setPose(false, true);
+		softBody->m_cfg.kMT = 0.05;
+		softBody->setPose(false, true);
+
+		softBody->m_cfg.kDF = 0.5;
+		softBody->m_cfg.kDP = 0.001;  // fun factor...
+		softBody->m_cfg.kPR = 2000;		
+		// softBody->m_cfg.kVC = 20;
+
 		
+		softBody->setTotalMass(30);
+
 		//OTHER PARAMS
 		// softBody->m_cfg.kPR = 0.01;
 		// softBody->m_cfg.kLF = 0;
@@ -162,7 +170,6 @@ BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object, dou
 		// softBody->m_cfg.kVC = 1;
 		// softBody->m_cfg.kDF = 0.5;
 		// softBody->m_cfg.kCHR = 1;
-		// softBody->m_cfg.maxvolume = 10;
 
 		//General settings
 		// btScalar kVCF;              // Velocities correction factor (Baumgarte)
