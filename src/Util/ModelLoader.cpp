@@ -135,7 +135,7 @@ void LoadModel(std::string filename, std::vector<glm::vec3>* vertex, std::vector
 
     for(unsigned int j = 0; j < scene->mNumMeshes; j++) {
         aiMesh *mesh = scene->mMeshes[j]; 
-
+        std::cout << "NUM VERTICES " << mesh->mNumVertices << std::endl;
         for(unsigned int i = 0; i < mesh->mNumVertices; i++)
         {
             glm::vec3 pos; 

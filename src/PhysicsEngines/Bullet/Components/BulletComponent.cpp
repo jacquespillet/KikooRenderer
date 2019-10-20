@@ -69,9 +69,9 @@ BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object, dou
 			min *= object->transform->scale;
 			max *= object->transform->scale;
 
-			float sizeX = std::max(max.x - min.x, 0.1f);
-			float sizeY = std::max(max.y - min.y, 0.1f);
-			float sizeZ = std::max(max.z - min.z, 0.1f);
+			float sizeX = std::max(max.x - min.x, 0.25f);
+			float sizeY = std::max(max.y - min.y, 0.25f);
+			float sizeZ = std::max(max.z - min.z, 0.25f);
 			
 			colShape =  new btBoxShape(btVector3(sizeX * 0.5,sizeY * 0.5,sizeZ * 0.5));
 		} else if (_shape == RIGID_BODY_SHAPE::CONE) {
@@ -102,12 +102,12 @@ BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object, dou
 		btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, colShape, localInertia);
 		rigidBody = new btRigidBody(rbInfo);
 		
-		if (_shape == RIGID_BODY_SHAPE::CONE || _shape == RIGID_BODY_SHAPE::SPHERE) {
+		// if (_shape == RIGID_BODY_SHAPE::CONE || _shape == RIGID_BODY_SHAPE::SPHERE) {
 			rigidBody->setFriction(1.f);
 			rigidBody->setRollingFriction(.01);
 			rigidBody->setSpinningFriction(0.01);
 			rigidBody->setAnisotropicFriction(colShape->getAnisotropicRollingFrictionDirection(), btCollisionObject::CF_ANISOTROPIC_ROLLING_FRICTION);
-		}
+		// }
 	} else if(_bodyType == BODY_TYPE::SOFT) {
 		std::vector<btScalar> vertices(mesh->vertices.size() * 3);
 		glm::mat4 modelMatrix = transform->GetModelMatrix();
@@ -129,13 +129,41 @@ BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object, dou
 			mesh->GetTriangles().size() / 3
 		);
 
-		softBody->getCollisionShape()->setMargin(0.15);	
+		//SOFT BODY TEST SHOULD WORK
+		// btSoftBody::Material* pm = psb->appendMaterial();
+		// pm->m_kLST = 0.5;
+		// pm->m_flags -= btSoftBody::fMaterial::DebugDraw;
+		softBody->generateBendingConstraints(2, softBody->m_materials[0]);
+		// softBody->m_cfg.piterations = 2;
+		// softBody->m_cfg.kDF = 0.5;
+
+		softBody->getCollisionShape()->setMargin(0.2);	
+		softBody->m_cfg.piterations = 20;
+		softBody->m_cfg.citerations = 20;
+		softBody->m_cfg.diterations = 20;
 		
 		//Material settings
-		softBody->m_materials[0]->m_kLST = 0.1;  // Linear stiffness coefficient [0,1]
-		softBody->m_materials[0]->m_kAST = 0.1;  // Area/Angular stiffness coefficient [0,1]
-		softBody->m_materials[0]->m_kVST = 0.1;  // Volume stiffness coefficient [0,1]
+		softBody->m_materials[0]->m_kLST = 0.5;  // Linear stiffness coefficient [0,1]
+		softBody->m_materials[0]->m_kAST = 0.5;  // Area/Angular stiffness coefficient [0,1]
+		softBody->m_materials[0]->m_kVST = 0.5;  // Volume stiffness coefficient [0,1]
+
+
+		softBody->randomizeConstraints();		
+		softBody->m_cfg.collisions |= btSoftBody::fCollision::VF_SS;
 		
+		//SAVE POSE
+		// softBody->m_cfg.kMT = 0.05;
+		// softBody->setPose(false, true);
+		
+		//OTHER PARAMS
+		// softBody->m_cfg.kPR = 0.01;
+		// softBody->m_cfg.kLF = 0;
+		// softBody->m_cfg.kDG = 0;
+		// softBody->m_cfg.kVC = 1;
+		// softBody->m_cfg.kDF = 0.5;
+		// softBody->m_cfg.kCHR = 1;
+		// softBody->m_cfg.maxvolume = 10;
+
 		//General settings
 		// btScalar kVCF;              // Velocities correction factor (Baumgarte)
 		// btScalar kDP;               // Damping coefficient [0,1]
@@ -163,11 +191,7 @@ BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object, dou
 		// int citerations;            // Cluster solver iterations
 		// int collisions;             // Collisions flags
 		// softBody->m_cfg.kLF = 0.05;
-		// softBody->m_cfg.kPR = 1;
-		softBody->m_cfg.collisions |= btSoftBody::fCollision::VF_SS;
 
-		softBody->generateBendingConstraints(2, softBody->m_materials[0]);
-		softBody->setTotalMass(150);
 
 		for(int i=0; i<staticNodeIndices.size(); i++) {
 			softBody->setMass(staticNodeIndices[i], 0);
