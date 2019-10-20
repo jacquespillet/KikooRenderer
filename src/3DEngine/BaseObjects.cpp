@@ -552,59 +552,27 @@ Object3D* GetTerrain(Scene* scene, std::string name,glm::vec3 _position, glm::ve
     //
     ///Vertices
     //
-    // int numAdded=0;
-    // for(float y=-width/2, yInx=0; yInx<subdivisionsY; y+=yOffset, yInx++) {
-    //     for(float x=-height/2, xInx=0; xInx<subdivisionsX; x+= xOffset, xInx++) {
-    //         vertex.push_back(glm::vec3(x, 0, y));
-    //         normals.push_back(glm::vec3(0, 1, 0));
-    //         uv.push_back(glm::vec2(0, 0));
-    //         colors.push_back(glm::vec4(255, 255, 255, 255));  
+    int numAdded=0;
+    for(float y=-width/2, yInx=0; yInx<subdivisionsY; y+=yOffset, yInx++) {
+        for(float x=-height/2, xInx=0; xInx<subdivisionsX; x+= xOffset, xInx++) {
+            vertex.push_back(glm::vec3(x, 0, y));
+            normals.push_back(glm::vec3(0, 1, 0));
+            uv.push_back(glm::vec2(0, 0));
+            colors.push_back(glm::vec4(255, 255, 255, 255));  
 
-    //         if(xInx < subdivisionsX-1 && yInx < subdivisionsY-1) {
-    //             triangles.push_back(numAdded);
-    //             triangles.push_back(numAdded + subdivisionsX + 1);
-    //             triangles.push_back(numAdded + subdivisionsX);
+            if(xInx < subdivisionsX-1 && yInx < subdivisionsY-1) {
+                triangles.push_back(numAdded);
+                triangles.push_back(numAdded + subdivisionsX + 1);
+                triangles.push_back(numAdded + subdivisionsX);
                 
-    //             triangles.push_back(numAdded);
-    //             triangles.push_back(numAdded + 1);
-    //             triangles.push_back(numAdded + subdivisionsX + 1);
-    //         }
-    //         numAdded++;
-    //     }
-    // }
-    
-    //bottom left
-    vertex.push_back(glm::vec3(-width/2, 0, -height/2));
-    normals.push_back(glm::vec3(0, 1, 0));
-    uv.push_back(glm::vec2(0, 0));
-    colors.push_back(glm::vec4(255, 255, 255, 255));      
+                triangles.push_back(numAdded);
+                triangles.push_back(numAdded + 1);
+                triangles.push_back(numAdded + subdivisionsX + 1);
+            }
+            numAdded++;
+        }
+    }
 
-    //top left
-    vertex.push_back(glm::vec3(-width/2, 0, height/2));
-    normals.push_back(glm::vec3(0, 1, 0));
-    uv.push_back(glm::vec2(0, 0));
-    colors.push_back(glm::vec4(255, 255, 255, 255));      
-
-    //top right
-    vertex.push_back(glm::vec3(width/2, 0, height/2));
-    normals.push_back(glm::vec3(0, 1, 0));
-    uv.push_back(glm::vec2(0, 0));
-    colors.push_back(glm::vec4(255, 255, 255, 255));      
-    
-    //bottom right
-    vertex.push_back(glm::vec3(width/2, 0, -height/2));
-    normals.push_back(glm::vec3(0, 1, 0));
-    uv.push_back(glm::vec2(0, 0));
-    colors.push_back(glm::vec4(255, 255, 255, 255));
-    
-    triangles.push_back(0);
-    triangles.push_back(3);
-    triangles.push_back(1);
-    
-    triangles.push_back(3);
-    triangles.push_back(2);
-    triangles.push_back(1);      
-    
     //Setup mesh
     MeshFilterComponent* mesh = new MeshFilterComponent(newObject);
     // mesh->drawingMode = GL_TRIANGLE_FAN;
@@ -621,7 +589,7 @@ Object3D* GetTerrain(Scene* scene, std::string name,glm::vec3 _position, glm::ve
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
     material->albedo = _color;
-    Shader shader = scene->standardShaders.unlitMeshShader;
+    Shader shader = scene->standardShaders.blinnPhongShader;
     material->SetShader(shader);
 
 

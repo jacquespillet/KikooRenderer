@@ -61,7 +61,7 @@ namespace KikooRenderer {
             //
             //Set GL states
             //
-            ogl->glEnable(GL_CULL_FACE);  
+            // ogl->glEnable(GL_CULL_FACE);  
             ogl->glCullFace(GL_BACK);
             
             ogl->glEnable(GL_STENCIL_TEST);    

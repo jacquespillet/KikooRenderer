@@ -86,6 +86,8 @@ class MeshFilterComponent : public Component {
         QJsonObject ToJSON();
         static void FromJSON(QJsonObject json, Object3D* obj);
 
+        std::vector<int> GetTriangles();
+
         
     private: 
         void InitBuffers();

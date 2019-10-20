@@ -4,6 +4,11 @@
 
 
 #include <btBulletDynamicsCommon.h>
+#include <BulletSoftBody/btSoftRigidDynamicsWorld.h>
+#include <BulletSoftBody/btDefaultSoftBodySolver.h>
+#include <BulletSoftBody/btSoftBodyHelpers.h>
+#include <BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h>
+
 #include <btBulletCollisionCommon.h>
 #include <LinearMath/btVector3.h>
 #include <LinearMath/btAlignedObjectArray.h>
@@ -27,7 +32,8 @@ public:
 
     void AddObject(CoreEngine::Object3D* object3D);
     
-    btDiscreteDynamicsWorld* dynamicsWorld;
+    // btDiscreteDynamicsWorld* dynamicsWorld;
+    btSoftRigidDynamicsWorld * dynamicsWorld;
 protected:
     void GetSceneData();
     void SetSceneData();
@@ -35,12 +41,15 @@ protected:
     CoreEngine::Scene* scene;
 
 
-    btDefaultCollisionConfiguration* collisionConfiguration;
+    btSoftBodyRigidBodyCollisionConfiguration* collisionConfiguration;
+    // btDefaultCollisionConfiguration* collisionConfiguration;
     btCollisionDispatcher* dispatcher;
     btBroadphaseInterface* overlappingPairCache;
     btSequentialImpulseConstraintSolver* solver;
+    btSoftBodySolver* softBodySolver;
 
     std::vector<CoreEngine::Object3D*> objects;
+    std::vector<CoreEngine::Object3D*> softBodies;
 	btAlignedObjectArray<btCollisionShape*> collisionShapes;    
 };
 }

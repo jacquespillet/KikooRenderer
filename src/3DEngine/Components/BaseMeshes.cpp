@@ -223,7 +223,7 @@ namespace CoreEngine {
 
     void GetSphereBuffers(std::vector<glm::vec3>* vertex, std::vector<glm::vec3>* normals, std::vector<glm::vec2>* uv, std::vector<glm::vec4>* colors, std::vector<int>* triangles) {
         
-        uint32_t numSlices =64;
+        uint32_t numSlices =32;
         float radius = 1.0;
 
         for(int x=0, inx = 0; x<=numSlices; x++) {

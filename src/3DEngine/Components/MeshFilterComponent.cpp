@@ -61,7 +61,6 @@ MeshFilterInspector::MeshFilterInspector(MeshFilterComponent* meshFilterComponen
 	modelPicker->setVisible((meshFilterComponent->meshType == PRIMITIVE_MESH::MODEL_MESH));
 	connect(modelPicker, &TexturePicker::FileModified, this, [this, meshFilterComponent, object](QString value) {
 		meshFilterComponent->modelpath = value.toStdString();
-
 		std::vector<glm::vec3> vertex;
 		std::vector<glm::vec3> normals;
 		std::vector<glm::vec2> uv;
@@ -357,6 +356,10 @@ void MeshFilterComponent::SetInstanceAttributes(std::vector<InstanceAttribute> i
 	ogl->glBindVertexArray(0);
 	ogl->glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+}
+
+std::vector<int> MeshFilterComponent::GetTriangles() {
+	return triangles;
 }
 
 

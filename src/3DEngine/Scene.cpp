@@ -52,51 +52,31 @@ namespace CoreEngine {
         skyboxCube = GetCube(this, "Cubemap", glm::vec3(0), glm::vec3(0), glm::vec3(100), glm::vec4(0.1, 0.1, 0.1, 1));
         skyboxCube->Start();
         skyboxCube->Enable();          
-        
+          
 
         simulation.SetScene(this);
         simulation.Init();
 
-        // Object3D* plane = GetTerrain(this, "terrain ", glm::vec3(0, 0, 0), glm::vec3(0, 0, 20), glm::vec3(1), KikooRenderer::Util::GetRandomColor(), 10, 10, 2, 2);
-        // plane->Enable();
-        // plane->Start();
-        // BulletPhysicsObjectComponent* physicsPlane1 = new BulletPhysicsObjectComponent(plane, 0, RIGID_BODY_SHAPE::BOX);
-        // plane->AddComponent(physicsPlane1);
-        // AddObject(plane);
+        int res = 16;
+        std::vector<int> staticPoints;
+        staticPoints.push_back(0);
+        staticPoints.push_back(res-1);
+        staticPoints.push_back(res * res - 1); 
+        staticPoints.push_back((res * res - 1)-(res - 1));
 
-        // Object3D* plane2 = GetTerrain(this, "terrain 2", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1), KikooRenderer::Util::GetRandomColor(), 15, 15, 2, 2);
-        // plane2->Enable();
-        // plane2->Start();
-        // BulletPhysicsObjectComponent* physicsPlane2 = new BulletPhysicsObjectComponent(plane2, 0, RIGID_BODY_SHAPE::BOX);
-        // plane2->AddComponent(physicsPlane2);
-        // AddObject(plane2);
+        Object3D* terrain0 = GetTerrain(this, "terrain 1", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(1), KikooRenderer::Util::GetRandomColor(), 10, 10, res, res);
+        terrain0->Enable();
+        terrain0->Start();
+        BulletPhysicsObjectComponent* physicssphere0 = new BulletPhysicsObjectComponent(terrain0, 150, RIGID_BODY_SHAPE::BOX, BODY_TYPE::SOFT, staticPoints);
+        terrain0->AddComponent(physicssphere0);
+        AddObject(terrain0); 
 
-
-        // int i=0; 
-        // for(float x = 0; x<5; x++) {
-        //     for(float y = 0; y<5; y++) {
-        //         for(float z = 0; z<5; z++) {
-        //             float rand = KikooRenderer::Util::GetRand();
-        //             if(rand < 0.5) {
-        //                 Object3D* cone = GetCone(this, "Cube " + i,glm::vec3(x - 2.5, y + 5, z), glm::vec3(KikooRenderer::Util::GetRand() * 10 - 5, KikooRenderer::Util::GetRand() * 10 - 5, KikooRenderer::Util::GetRand() * 10 - 5), glm::vec3(1), KikooRenderer::Util::GetRandomColor());
-        //                 cone->Enable();
-        //                 cone->Start();
-        //                 BulletPhysicsObjectComponent* conePhysics = new BulletPhysicsObjectComponent(cone, 1, RIGID_BODY_SHAPE::CONE);
-        //                 cone->AddComponent(conePhysics);
-        //                 AddObject(cone);
-        //                 i++;
-        //             } else {
-        //                 Object3D* sphere = GetSphere(this, "Sphere " + i,glm::vec3(x - 2.5, y + 5, z), glm::vec3(KikooRenderer::Util::GetRand() * 10 - 5, KikooRenderer::Util::GetRand() * 10 - 5, KikooRenderer::Util::GetRand() * 10 - 5), glm::vec3(0.2), KikooRenderer::Util::GetRandomColor());
-        //                 sphere->Enable();
-        //                 sphere->Start();
-        //                 BulletPhysicsObjectComponent* conePhysics = new BulletPhysicsObjectComponent(sphere, 1, RIGID_BODY_SHAPE::SPHERE);
-        //                 sphere->AddComponent(conePhysics);
-        //                 AddObject(sphere);
-        //                 i++;
-        //             }
-        //         }
-        //     }
-        // }
+        Object3D* sphere = GetSphere(this, "terrain 2", glm::vec3(0, 5, 0), glm::vec3(0, 0, 0), glm::vec3(1), KikooRenderer::Util::GetRandomColor());
+        sphere->Enable();
+        sphere->Start();
+        BulletPhysicsObjectComponent* physicssphere1 = new BulletPhysicsObjectComponent(sphere, 1, RIGID_BODY_SHAPE::BOX, BODY_TYPE::RIGID);
+        sphere->AddComponent(physicssphere1);
+        AddObject(sphere);        
 
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
