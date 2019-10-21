@@ -8,6 +8,7 @@
 #include <BulletSoftBody/btDefaultSoftBodySolver.h>
 #include <BulletSoftBody/btSoftBodyHelpers.h>
 #include <BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h>
+#include <BulletSoftBody/btDeformableBodySolver.h>
 
 #include <btBulletCollisionCommon.h>
 #include <LinearMath/btVector3.h>
@@ -20,6 +21,7 @@ namespace CoreEngine{
 }
 namespace Physics {
 namespace Bullet {
+enum WORLD_TYPE {RIGID, SOFT, DEFORMABLE};
 
 class Simulation {
 public:
@@ -32,21 +34,24 @@ public:
 
     void AddObject(CoreEngine::Object3D* object3D);
     
-    // btDiscreteDynamicsWorld* dynamicsWorld;
-    btSoftRigidDynamicsWorld * dynamicsWorld;
+    btDiscreteDynamicsWorld* dynamicsWorld;
+
+    WORLD_TYPE worldType;
 protected:
     void GetSceneData();
     void SetSceneData();
 
     CoreEngine::Scene* scene;
 
-
-    btSoftBodyRigidBodyCollisionConfiguration* collisionConfiguration;
-    // btDefaultCollisionConfiguration* collisionConfiguration;
+    btDefaultCollisionConfiguration* collisionConfiguration;
+    
     btCollisionDispatcher* dispatcher;
     btBroadphaseInterface* overlappingPairCache;
+
     btSequentialImpulseConstraintSolver* solver;
     btSoftBodySolver* softBodySolver;
+    btDeformableBodySolver* deformableBodySolver;
+    btDeformableMultiBodyConstraintSolver* deformableConstraintSolver;
 
     std::vector<CoreEngine::Object3D*> objects;
     std::vector<CoreEngine::Object3D*> softBodies;

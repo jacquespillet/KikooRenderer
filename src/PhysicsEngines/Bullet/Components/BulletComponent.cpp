@@ -122,65 +122,68 @@ BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object, dou
 			vertices[j+1] = (btScalar)(finalPos.y);
 			vertices[j+2] = (btScalar)(finalPos.z);
 		}		
+		btSoftRigidDynamicsWorld* world = (btSoftRigidDynamicsWorld*)object3D->scene->GetSimulation().dynamicsWorld; 
 
-		softBody = btSoftBodyHelpers::CreateFromTriMesh (object3D->scene->GetSimulation().dynamicsWorld->getWorldInfo(),
+		softBody = btSoftBodyHelpers::CreateFromTriMesh (world->getWorldInfo(),
 			&vertices[0], 
 			&mesh->GetTriangles()[0], 
 			mesh->GetTriangles().size() / 3
 		);
 
-		//SOFT BODY TEST SHOULD WORK
-		// btSoftBody::Material* pm = psb->appendMaterial();
-		// pm->m_kLST = 0.5;
-		// pm->m_flags -= btSoftBody::fMaterial::DebugDraw;
 		softBody->generateBendingConstraints(2, softBody->m_materials[0]);
-		// softBody->m_cfg.piterations = 2;
-		// softBody->m_cfg.kDF = 0.5;
 
 		softBody->getCollisionShape()->setMargin(0.2);	
 		softBody->m_cfg.piterations = 200;
 		softBody->m_cfg.citerations = 200;
 		softBody->m_cfg.diterations = 200;
+		// softBody->m_cfg.viterations = 200;
 		
-		//Material settings
-		softBody->m_materials[0]->m_kLST = 0.01;  // Linear stiffness coefficient [0,1]
-		softBody->m_materials[0]->m_kAST = 0.01;  // Area/Angular stiffness coefficient [0,1]
-		softBody->m_materials[0]->m_kVST = 0.01;  // Volume stiffness coefficient [0,1]
+		//MATERIAL SETTINGS
+		{
+			// softBody->m_materials[0]->m_kLST = 0.01;  // Linear stiffness coefficient [0,1]
+			// softBody->m_materials[0]->m_kAST = 0.01;  // Area/Angular stiffness coefficient [0,1]
+			// softBody->m_materials[0]->m_kVST = 0.01;  // Volume stiffness coefficient [0,1]
+		}
+		
+		//SAVE POSE
+		{
+			// softBody->m_cfg.kMT = 0.05;
+			// softBody->setPose(false, true);
+		}
 
+		//DEFORMATION
+		{
+			// softBody->m_cfg.kDF = 0.5;
+			// softBody->m_cfg.kDP = 0.001;  // fun factor...
+			// softBody->m_cfg.kPR = 2000;		
+			// softBody->m_cfg.kVC = 20;
+		}
 
+		//WIND
+		{
+			// softBody->m_cfg.aeromodel = btSoftBody::eAeroModel::V_TwoSided;
+			// softBody->setTotalMass(0.0001);
+			// softBody->addForce(btVector3(0, 0.01, 0), 0);
+		}
+
+		//OTHER PARAMS
+		{
+			// softBody->m_cfg.kPR = 0.01;
+			// softBody->m_cfg.kLF = 0;
+			// softBody->m_cfg.kDG = 0;
+			// softBody->m_cfg.kVC = 1;
+			// softBody->m_cfg.kDF = 0.5;
+			// softBody->m_cfg.kCHR = 1;
+			// btScalar kVCF;
+		}
+		
 		softBody->randomizeConstraints();		
 		softBody->m_cfg.collisions |= btSoftBody::fCollision::VF_SS;
 		
-		//SAVE POSE
-		softBody->m_cfg.kMT = 0.05;
-		softBody->setPose(false, true);
+		softBody->setTotalMass(mass);
 
-		softBody->m_cfg.kDF = 0.5;
-		softBody->m_cfg.kDP = 0.001;  // fun factor...
-		softBody->m_cfg.kPR = 2000;		
-		// softBody->m_cfg.kVC = 20;
 
-		
-		softBody->setTotalMass(30);
-
-		//OTHER PARAMS
-		// softBody->m_cfg.kPR = 0.01;
-		// softBody->m_cfg.kLF = 0;
-		// softBody->m_cfg.kDG = 0;
-		// softBody->m_cfg.kVC = 1;
-		// softBody->m_cfg.kDF = 0.5;
-		// softBody->m_cfg.kCHR = 1;
-
-		//General settings
-		// btScalar kVCF;              // Velocities correction factor (Baumgarte)
-		// btScalar kDP;               // Damping coefficient [0,1]
-		// btScalar kDG;               // Drag coefficient [0,+inf]
-		// btScalar kLF;               // Lift coefficient [0,+inf]
-		// btScalar kPR;               // Pressure coefficient [-inf,+inf]
-		// btScalar kVC;               // Volume conversation coefficient [0,+inf]
-		// btScalar kDF;               // Dynamic friction coefficient [0,1]
-		// btScalar kMT;               // Pose matching coefficient [0,1]
-		// btScalar kCHR;              // Rigid contacts hardness [0,1]
+		//Other possible settings
 		// btScalar kKHR;              // Kinetic contacts hardness [0,1]
 		// btScalar kSHR;              // Soft contacts hardness [0,1]
 		// btScalar kAHR;              // Anchors hardness [0,1]
@@ -192,17 +195,125 @@ BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object, dou
 		// btScalar kSS_SPLT_CL;       // Soft vs rigid impulse split [0,1] (cluster only)
 		// btScalar maxvolume;         // Maximum volume ratio for pose
 		// btScalar timescale;         // Time scale
-		// int viterations;            // Velocities solver iterations
-		// int piterations;            // Positions solver iterations
-		// int diterations;            // Drift solver iterations
-		// int citerations;            // Cluster solver iterations
-		// int collisions;             // Collisions flags
-		// softBody->m_cfg.kLF = 0.05;
 
 
 		for(int i=0; i<staticNodeIndices.size(); i++) {
 			softBody->setMass(staticNodeIndices[i], 0);
 		}
+	} else if(_bodyType == BODY_TYPE::DEFORMABLE) {
+		std::vector<btScalar> vertices(mesh->vertices.size() * 3);
+		glm::mat4 modelMatrix = transform->GetModelMatrix();
+		transform->position = glm::vec3(0);
+		transform->rotation = glm::vec3(0);
+		transform->scale = glm::vec3(1);
+
+		for(int i=0; i<mesh->vertices.size(); i++) {
+			int j=i*3;
+			glm::vec4 finalPos = modelMatrix * glm::vec4(mesh->vertices[i].position, 1);
+			vertices[j]   =  (btScalar)(finalPos.x);
+			vertices[j+1] = (btScalar)(finalPos.y);
+			vertices[j+2] = (btScalar)(finalPos.z);
+		}		
+		btDeformableMultiBodyDynamicsWorld* world = (btDeformableMultiBodyDynamicsWorld*)object3D->scene->GetSimulation().dynamicsWorld; 
+		if(world != nullptr) {
+			softBody = btSoftBodyHelpers::CreateFromTriMesh (world->getWorldInfo(),
+				&vertices[0], 
+				&mesh->GetTriangles()[0], 
+				mesh->GetTriangles().size() / 3
+			);
+
+			softBody->getCollisionShape()->setMargin(0.1);
+			softBody->generateBendingConstraints(2);
+			softBody->setTotalMass(1);
+			softBody->m_cfg.kKHR = 1; // collision hardness with kinematic objects
+			softBody->m_cfg.kCHR = 1; // collision hardness with rigid body
+			softBody->m_cfg.kDF = 0.1;
+			softBody->m_cfg.collisions = btSoftBody::fCollision::SDF_RD;
+			softBody->m_cfg.collisions |= btSoftBody::fCollision::VF_DD;
+			// world->addSoftBody(softBody);
+			
+			//elastic stiffness & damping stiffness
+			btDeformableMassSpringForce* mass_spring2 = new btDeformableMassSpringForce(10,10, false);
+			world->addForce(softBody, mass_spring2);
+			// m_forces.push_back(mass_spring2);
+			
+			btVector3 gravity = btVector3(0, -10, 0);
+			btDeformableGravityForce* gravity_force2 =  new btDeformableGravityForce(gravity);
+			world->addForce(softBody, gravity_force2);
+			// m_forces.push_back(gravity_force2);			
+
+			// softBody->generateBendingConstraints(2, softBody->m_materials[0]);
+
+			// softBody->getCollisionShape()->setMargin(0.2);	
+			// softBody->m_cfg.piterations = 2;
+			// softBody->m_cfg.citerations = 2;
+			// softBody->m_cfg.diterations = 2;
+			// // softBody->m_cfg.viterations = 200;
+			
+			// //MATERIAL SETTINGS
+			// {
+			// 	// softBody->m_materials[0]->m_kLST = 0.01;  // Linear stiffness coefficient [0,1]
+			// 	// softBody->m_materials[0]->m_kAST = 0.01;  // Area/Angular stiffness coefficient [0,1]
+			// 	// softBody->m_materials[0]->m_kVST = 0.01;  // Volume stiffness coefficient [0,1]
+			// }
+			
+			// //SAVE POSE
+			// {
+				// softBody->m_cfg.kMT = 1;
+				// softBody->setPose(false, true);
+			// }
+
+			// //DEFORMATION
+			// {
+			// 	// softBody->m_cfg.kDF = 0.5;
+			// 	// softBody->m_cfg.kDP = 0.001;  // fun factor...
+			// 	// softBody->m_cfg.kPR = 2000;	 //Pressure coefficient [-inf,+inf]	
+			// 	// softBody->m_cfg.kVC = 20;
+			// }
+
+			// //WIND
+			// {
+			// 	// softBody->m_cfg.aeromodel = btSoftBody::eAeroModel::V_TwoSided;
+			// 	// softBody->setTotalMass(0.0001);
+			// 	// softBody->addForce(btVector3(0, 0.01, 0), 0);
+			// }
+
+			// //CONTACT HARDNESS
+			// {
+			// 	softBody->m_cfg.kCHR = 1;              // Rigid contacts hardness [0,1]
+			// 	softBody->m_cfg.kKHR = 1;              // Kinetic contacts hardness [0,1]
+			// 	softBody->m_cfg.kSHR = 1;              // Soft contacts hardness [0,1]
+			// 	softBody->m_cfg.kAHR = 1;              // Anchors hardness [0,1]
+			// 	softBody->m_cfg.kSRHR_CL = 1;          // Soft vs rigid hardness [0,1] (cluster only)
+			// 	softBody->m_cfg.kSKHR_CL = 1;          // Soft vs kinetic hardness [0,1] (cluster only)
+			// 	softBody->m_cfg.kSSHR_CL = 1;          // Soft vs soft hardness [0,1] (cluster only)
+			// }
+
+			// //OTHER PARAMS
+			// {
+			// 	// softBody->m_cfg.kLF = 0;  // Lift coefficient [0,+inf]
+			// 	// softBody->m_cfg.kDG = 0;  // Drag coefficient [0,+inf]
+			// 	// btScalar kVCF;
+			// }
+			
+			// softBody->randomizeConstraints();		
+			// softBody->m_cfg.collisions |= btSoftBody::fCollision::VF_SS;
+			
+			// softBody->setTotalMass(150);
+
+			// //Other possible settings
+			// // btScalar kSR_SPLT_CL;       // Soft vs rigid impulse split [0,1] (cluster only)
+			// // btScalar kSK_SPLT_CL;       // Soft vs rigid impulse split [0,1] (cluster only)
+			// // btScalar kSS_SPLT_CL;       // Soft vs rigid impulse split [0,1] (cluster only)
+			// // btScalar maxvolume;         // Maximum volume ratio for pose
+			// // btScalar timescale;         // Time scale
+
+
+			
+			btDeformableGravityForce* gravity_force =  new btDeformableGravityForce(btVector3(0, -10, 0));
+			world->addForce(softBody, gravity_force);
+		}
+
 	}
 }
 

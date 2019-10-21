@@ -26,7 +26,7 @@ namespace CoreEngine {
 	void Scene::Start() {
 
 		GETGL
-
+    std::cout << "0" << std::endl;
         this->started = true;
         standardShaders.Compile();
 
@@ -51,30 +51,30 @@ namespace CoreEngine {
 
         skyboxCube = GetCube(this, "Cubemap", glm::vec3(0), glm::vec3(0), glm::vec3(100), glm::vec4(0.1, 0.1, 0.1, 1));
         skyboxCube->Start();
-        skyboxCube->Enable();          
+        skyboxCube->Enable();
           
 
         simulation.SetScene(this);
+        simulation.worldType = KikooRenderer::Physics::Bullet::WORLD_TYPE::DEFORMABLE;
         simulation.Init();
         
-        for(int x=-5; x<5; x++) {
-            Object3D* box = GetCube(this, "terrain 2", glm::vec3(x * 2, -x, 0), glm::vec3(0, 0, 0), glm::vec3(2, 1, 10), KikooRenderer::Util::GetRandomColor());
-            box->Enable();
-            box->Start();
-            BulletPhysicsObjectComponent* physicsbox = new BulletPhysicsObjectComponent(box, 0, RIGID_BODY_SHAPE::BOX, BODY_TYPE::RIGID);
-            box->AddComponent(physicsbox);
-            AddObject(box);
+        Object3D* terrain = GetCube(this, "terrain", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(30, 3, 30), KikooRenderer::Util::GetRandomColor());
+        terrain->Enable();  
+        terrain->Start();
+        BulletPhysicsObjectComponent* physicsterrain = new BulletPhysicsObjectComponent(terrain, 0, RIGID_BODY_SHAPE::BOX, BODY_TYPE::RIGID);
+        terrain->AddComponent(physicsterrain);
+        AddObject(terrain);
+  
 
-        }
-
-
-        Object3D* sphere = GetSphere(this, "terrain 2", glm::vec3(-4, 10, 0), glm::vec3(0, 0, 0), glm::vec3(3), KikooRenderer::Util::GetRandomColor());
+        // Object3D* sphere = CoreEngine::ObjectFromModelFile(this, "Bunny", "resources/Models/bunny/untitled.obj");
+        Object3D* sphere = GetSphere(this, "terrain", glm::vec3(0, 5, 0), glm::vec3(0, 0, 0), glm::vec3(2), KikooRenderer::Util::GetRandomColor());
+        // Object3D* sphere = GetTerrain(this, "terrain", glm::vec3(10, 5, 0), glm::vec3(0, 0, 0), glm::vec3(1), KikooRenderer::Util::GetRandomColor(), 5, 10, 5, 10);
+        // sphere->transform->position.y = 10;
         sphere->Enable();
         sphere->Start();
-        BulletPhysicsObjectComponent* physicssphere = new BulletPhysicsObjectComponent(sphere, 1, RIGID_BODY_SHAPE::SPHERE, BODY_TYPE::SOFT);
+        BulletPhysicsObjectComponent* physicssphere = new BulletPhysicsObjectComponent(sphere, 1, RIGID_BODY_SHAPE::SPHERE, BODY_TYPE::DEFORMABLE);
         sphere->AddComponent(physicssphere);
         AddObject(sphere);
-
   
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
