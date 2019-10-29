@@ -34,7 +34,7 @@ public:
 	void ClearWidgets();
 
 	QSize sizeHint() const {
-		return QSize(width(), 0);
+		return QSize(width(), height());
 	}
 
 
@@ -63,7 +63,8 @@ public:
 
 
 	void Refresh();
-
+protected:
+		QScrollArea *scroll;
 signals: 
 	void InspectorModified();
 };

@@ -31,6 +31,7 @@ set(MainWindowSrc
 	3DEngine/CameraScene.cpp
 	3DEngine/Util.cpp
 	3DEngine/BaseObjects.cpp
+	3DEngine/DrawImmediate.cpp
 	3DEngine/Framebuffer.cpp
 	3DEngine/CubeFramebuffer.cpp
 	3DEngine/TransformWidget.cpp
@@ -93,6 +94,7 @@ set(MainWindowSrc
 	AppManagement/PreferencesWindow.cpp
 	AppManagement/BackgroundPreferences.cpp
 	AppManagement/3DUIPreferences.cpp
+	AppManagement/PhysicsPreferences.cpp
 	AppManagement/PostProcessingPreferences.cpp
 
 	Renderer/RayTracer.cpp

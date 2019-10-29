@@ -173,9 +173,11 @@ void HDRRenderer::Render() {
     }
 
     //Set all previously updated lights to false
-    for(int i=0; i<scene->lightObjects.size(); i++) {
-        if(scene->lightObjects[i]->GetComponent<LightComponent>()->hasChanged) scene->lightObjects[i]->GetComponent<LightComponent>()->hasChanged = false;
-        if(scene->lightObjects[i]->transform->hasChanged) scene->lightObjects[i]->transform->hasChanged = false;
+    for(int i=0; i<scene->objects3D.size(); i++) {
+        if(scene->objects3D[i]->GetComponent<LightComponent>() != nullptr) {
+            if(scene->objects3D[i]->GetComponent<LightComponent>()->hasChanged) scene->objects3D[i]->GetComponent<LightComponent>()->hasChanged = false;
+        }
+        if(scene->objects3D[i]->transform->hasChanged) scene->objects3D[i]->transform->hasChanged = false;
     }
 
     for(int i=0; i<scene->objects3D.size(); i++) {

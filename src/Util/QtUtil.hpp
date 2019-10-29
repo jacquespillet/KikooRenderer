@@ -8,6 +8,7 @@ void EmptyLayout(QLayout* layout);
 class CustomSlider : public QHBoxLayout {
 	Q_OBJECT
 public:
+ 	QLabel* labelWidget;
 	QSlider* slider;
 	QDoubleSpinBox* spinBox;
 	float step;

@@ -180,6 +180,19 @@ View3D::View3D() : QDockWidget("3D View")
 		}
 	});
 
+    QIcon stopButtonIcon(style()->standardIcon(QStyle::SP_MediaStop));
+    QPushButton* stopButton = new QPushButton();
+    stopButton->setIcon(stopButtonIcon);
+    viewportToolbar->addWidget(stopButton);
+
+	connect(stopButton, &QPushButton::clicked, this, [this, stopButton]() {
+		view3DGL->scene->Stop();
+		if(view3DGL->scene->IsPlaying()) {
+			QIcon ButtonIcon(style()->standardIcon(QStyle::SP_MediaPause));
+			stopButton->setIcon(ButtonIcon);
+		}
+	});    
+
 
     void SetLayerMask(uint16_t _layerMask);
     uint16_t GetLayerMask();	

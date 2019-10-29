@@ -221,9 +221,7 @@ namespace CoreEngine {
         triangles->push_back(index + 0);
      }
 
-    void GetSphereBuffers(std::vector<glm::vec3>* vertex, std::vector<glm::vec3>* normals, std::vector<glm::vec2>* uv, std::vector<glm::vec4>* colors, std::vector<int>* triangles) {
-        
-        uint32_t numSlices =32;
+    void GetSphereBuffers(std::vector<glm::vec3>* vertex, std::vector<glm::vec3>* normals, std::vector<glm::vec2>* uv, std::vector<glm::vec4>* colors, std::vector<int>* triangles, int numSlices) {
         float radius = 1.0;
 
         for(int x=0, inx = 0; x<=numSlices; x++) {
@@ -260,7 +258,48 @@ namespace CoreEngine {
 
             }        
         }
+    }
+    
+    void GetCapsuleBuffers(std::vector<glm::vec3>* vertex, std::vector<glm::vec3>* normals, std::vector<glm::vec2>* uv, std::vector<glm::vec4>* colors, std::vector<int>* triangles, float height) {
+        float radius = 1.0;
+        int numSlices = 12;
+        float halfExtents = height * 0.5;
 
+        for(int x=0, inx = 0; x<=numSlices; x++) {
+            for(int y=0; y<=numSlices; y++, inx++) {
+                float xAngle = ((float)x / (float)numSlices) * PI;
+                float yAngle = ((float)y / (float)numSlices) * TWO_PI;
+                
+                float posx = radius * std::sin(xAngle) * std::cos(yAngle);
+                float posz = radius * std::sin(xAngle) * std::sin(yAngle);
+                float posy = radius * std::cos(xAngle);
+                posy = posy <= 0 ? posy -= halfExtents : posy += halfExtents; 
+
+                vertex->push_back(glm::vec3(posx, posy, posz));
+                normals->push_back(glm::vec3(posx, posy, posz));
+                uv->push_back(glm::vec2((float)x / (float) numSlices, (float)y / (float) numSlices));
+                colors->push_back(glm::vec4(255, 255, 255, 255));
+
+                if(y < numSlices && x < numSlices) {
+                    triangles->push_back(inx + 1);
+                    triangles->push_back(inx);
+                    triangles->push_back(inx + numSlices+1);
+
+                    triangles->push_back(inx + numSlices + 1);
+                    triangles->push_back(inx);
+                    triangles->push_back(inx + numSlices);
+                } else if(x < numSlices){ // If last of the row
+                    triangles->push_back(inx + 1);
+                    triangles->push_back(inx);
+                    triangles->push_back(inx - numSlices);
+
+                    triangles->push_back(inx + 1);
+                    triangles->push_back(inx);
+                    triangles->push_back(inx + numSlices);
+                }
+
+            }        
+        }
     }
 
     void GetCircleBuffers(std::vector<glm::vec3>* vertex, std::vector<glm::vec3>* normals, std::vector<glm::vec2>* uv, std::vector<glm::vec4>* colors, std::vector<int>* triangles) {
@@ -498,14 +537,14 @@ namespace CoreEngine {
         return mesh;
     }
 
-    MeshFilterComponent* GetSphereMesh(glm::vec3 size, glm::vec4 color, Object3D* object){
+    MeshFilterComponent* GetSphereMesh(glm::vec3 size, glm::vec4 color, Object3D* object, int numSlices){
         std::vector<glm::vec3> vertex;
         std::vector<glm::vec3> normals;
         std::vector<glm::vec2> uv;
         std::vector<glm::vec4> colors;
         std::vector<int> triangles;
 
-        GetSphereBuffers(&vertex, &normals, &uv, &colors, &triangles);
+        GetSphereBuffers(&vertex, &normals, &uv, &colors, &triangles, numSlices);
 
         //Setup mesh
         MeshFilterComponent* mesh = new MeshFilterComponent(object);
@@ -518,7 +557,29 @@ namespace CoreEngine {
         mesh->jsonObj = json;
         return mesh;
     }
-        
+
+    MeshFilterComponent* GetCapsuleMesh(glm::vec3 size, glm::vec4 color, Object3D* object, float height) {
+        std::vector<glm::vec3> vertex;
+        std::vector<glm::vec3> normals;
+        std::vector<glm::vec2> uv;
+        std::vector<glm::vec4> colors;
+        std::vector<int> triangles;
+
+        GetCapsuleBuffers(&vertex, &normals, &uv, &colors, &triangles, height);
+
+        //Setup mesh
+        MeshFilterComponent* mesh = new MeshFilterComponent(object);
+        mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles, false);
+        mesh->meshType = PRIMITIVE_MESH::CAPSULE_MESH;
+
+        QJsonObject json;
+        json["Type"] = QString("Primitive");
+        json["Primitive"] = QString("Sphere");
+        mesh->jsonObj = json;
+        return mesh;        
+    }
+
+
     MeshFilterComponent* GetCircleMesh(glm::vec3 size, glm::vec4 color, Object3D* object){
         std::vector<glm::vec3> vertex;
         std::vector<glm::vec3> normals;

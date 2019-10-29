@@ -32,6 +32,12 @@ std::string MeshFilterInspector::GetByPrimitiveMesh(PRIMITIVE_MESH type) {
 		case QUAD_MESH:
 			return "Quad";
 			break;                                    
+		case CAPSULE_MESH:
+			return "Capsule";
+			break;                                    
+		case CYLINDER_MESH:
+			return "Cylinder";
+			break;                                    
 		default:
 			return "";
 			break;
@@ -392,7 +398,7 @@ void MeshFilterComponent::FromJSON(QJsonObject json, Object3D* obj) {
 	mesh->numInstances = json["numInstances"].toInt();
 
 	mesh->meshType = (PRIMITIVE_MESH) json["meshType"].toInt();
-	enum PRIMITIVE_MESH {MODEL_MESH=0, CUBE_MESH=1, SPHERE_MESH=2, CIRCLE_MESH=3, CONE_MESH=4, QUAD_MESH=5, MESH_PRIMITIVE_ENUM_SIZE=6};
+	enum PRIMITIVE_MESH {MODEL_MESH=0, CUBE_MESH=1, SPHERE_MESH=2, CIRCLE_MESH=3, CONE_MESH=4, QUAD_MESH=5, CAPSULE_MESH, CYLINDER_MESH, MESH_PRIMITIVE_ENUM_SIZE=8};
 	if(mesh->meshType == PRIMITIVE_MESH::MODEL_MESH) {
 		Util::FileIO::LoadModel(mesh->modelpath, &vertex, &normals, &uv, &colors, &triangles);
 	} else if(mesh->meshType == PRIMITIVE_MESH::CUBE_MESH) {

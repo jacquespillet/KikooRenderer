@@ -8,6 +8,7 @@
 #include "ObjectDetails/ObjectDetails.hpp"
 #include "Cubemap.hpp"
 #include "Renderers/HDRRenderer.hpp"
+#include "DrawImmediate.hpp"
 
 #include "PhysicsEngines/Physics.hpp"
 
@@ -36,6 +37,8 @@ class Scene {
 
 		StandardShaders standardShaders;
 		CameraScene* camera;
+
+		DrawImmediate drawImmediate;
 
 		bool test = false;
 
@@ -116,9 +119,10 @@ class Scene {
 		void SetLayerMask(uint16_t _layerMask);
 		uint16_t GetLayerMask();
 
-		Physics::Bullet::Simulation GetSimulation();
-
+		Physics::Bullet::Simulation* GetSimulation();
+  
 		void PlayPause();
+		void Stop();
 		bool IsPlaying();
 
 	protected:

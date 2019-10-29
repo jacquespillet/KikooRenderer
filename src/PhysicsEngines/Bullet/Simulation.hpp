@@ -33,7 +33,10 @@ public:
     void Destroy();
 
     void AddObject(CoreEngine::Object3D* object3D);
+    void RemoveObject(CoreEngine::Object3D* object3D);
     
+    void SetWorld(WORLD_TYPE worldType);
+
     btDiscreteDynamicsWorld* dynamicsWorld;
 
     WORLD_TYPE worldType;

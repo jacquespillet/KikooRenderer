@@ -15,9 +15,9 @@ class View3DRoot: public QWidget
             setMinimumWidth(250);
         }
 
-        QSize sizeHint() const {
-            return QSize(500, 0);
-        }
+        // QSize sizeHint() const {
+        //     return QSize(500, 0);
+        // }
 
     protected:
         void resizeEvent(QResizeEvent* event) {}

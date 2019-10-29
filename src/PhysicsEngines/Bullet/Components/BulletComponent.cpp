@@ -7,48 +7,182 @@
 namespace KikooRenderer {
 namespace CoreEngine {
 
+/*
+** ___________________________________________________________________________
+** /!\ These parameters cannot be changed if the simulation is already running
+** 	   --> They must be set before pressing play
+** ___________________________________________________________________________
+*/
+
 BulletPhysicsObjectInspector::BulletPhysicsObjectInspector(BulletPhysicsObjectComponent* _bulletPhysicsObjectComponent) : ComponentInspector("Bullet Physics Object", _bulletPhysicsObjectComponent)  {
-    setLocale(QLocale("a")); //For . as , in float spin boxes
+    setLocale(QLocale("a")); 
 
 	this->bulletPhysicsObjectComponent = _bulletPhysicsObjectComponent;
 	Object3D* object = bulletPhysicsObjectComponent->object3D;
 	scene = object->scene;
-
 	QVBoxLayout* mainLayout = new QVBoxLayout();
 
 	
-    CustomSlider* massSlider = new CustomSlider(0.0f, 3.0f, 0.01, "Mass", bulletPhysicsObjectComponent->mass);
+	///1.__________________________________________________________________________________________________________
+	//Shape size inspectors
+	glm::vec3 min, max;
+	bulletPhysicsObjectComponent->bb->GetLocalBounds(&min, &max);
+	min *= bulletPhysicsObjectComponent->object3D->transform->scale;
+	max *= bulletPhysicsObjectComponent->object3D->transform->scale;
+
+	float sizeX = max.x - min.x;
+	float sizeY = max.y - min.y;
+	float sizeZ = max.z - min.z;	
+	Vector3Inspector* boxSizeInspector = new Vector3Inspector("Box Collider Size", glm::vec3(sizeX, sizeY, sizeZ));
+	connect(boxSizeInspector, &Vector3Inspector::Modified, this, [this](glm::vec3 vector) {
+		bulletPhysicsObjectComponent->colShape =  new btBoxShape(btVector3(vector.x * 0.5,vector.y * 0.5,vector.z * 0.5));
+		bulletPhysicsObjectComponent->rigidBody->setCollisionShape(bulletPhysicsObjectComponent->colShape);
+        scene->triggerRefresh = true;
+	});
+	boxSizeInspector->setVisible(RIGID_BODY_SHAPE::BOX == bulletPhysicsObjectComponent->shape);
+
+	float coneRadiusScale = (bulletPhysicsObjectComponent->object3D->transform->scale.x + bulletPhysicsObjectComponent->object3D->transform->scale.y+ bulletPhysicsObjectComponent->object3D->transform->scale.z) * 0.3333333;
+	Vector3Inspector* coneSizeInspector = new Vector3Inspector("Cone Collider Size", glm::vec3(1));
+	connect(coneSizeInspector, &Vector3Inspector::Modified, this, [this](glm::vec3 vector) {
+		float coneRadiusScale = (vector.x + vector.y) * 0.5;
+		bulletPhysicsObjectComponent->colShape =  new btConeShapeZ(0.25 * coneRadiusScale, 1 * vector.z);
+		bulletPhysicsObjectComponent->rigidBody->setCollisionShape(bulletPhysicsObjectComponent->colShape);
+        scene->triggerRefresh = true;
+	});
+	coneSizeInspector->setVisible(RIGID_BODY_SHAPE::CONE == bulletPhysicsObjectComponent->shape);
+
+	float sphereRadiusScale = (bulletPhysicsObjectComponent->object3D->transform->scale.x + bulletPhysicsObjectComponent->object3D->transform->scale.y+ bulletPhysicsObjectComponent->object3D->transform->scale.z) * 0.3333333;
+	CustomSlider* sphereRadiusSlider = new CustomSlider(0.0f, 10.0f, 0.01, "Sphere Radius", sphereRadiusScale);
+    QObject::connect(sphereRadiusSlider, &CustomSlider::Modified, [this](double val) {
+		bulletPhysicsObjectComponent->colShape =  new btSphereShape(btScalar(val));
+		bulletPhysicsObjectComponent->rigidBody->setCollisionShape(bulletPhysicsObjectComponent->colShape);
+        scene->triggerRefresh = true;
+	});
+	sphereRadiusSlider->SetVisible(RIGID_BODY_SHAPE::SPHERE == bulletPhysicsObjectComponent->shape);
+	///__________________________________________________________________________________________________________
+
+
+	///2.__________________________________________________________________________________________________________
+	//Set the SHAPE (W/ REALTIME WIREFRAME VISUALIZATION)
+	QHBoxLayout* shapeLayout = new QHBoxLayout();
+	QComboBox* shapeList = new QComboBox();
+	QLabel* shapeLabel = new QLabel("Collider Shape");
+	shapeList->addItem("Box");
+	shapeList->addItem("Cone");
+	shapeList->addItem("Sphere");
+	shapeList->addItem("Capsule");
+	shapeList->addItem("Cylinder");
+	shapeList->addItem("Mesh");
+	shapeList->addItem("HeightField");
+
+	shapeList->setCurrentIndex(bulletPhysicsObjectComponent->shape);
+
+	shapeLayout->addWidget(shapeLabel);
+	shapeLayout->addWidget(shapeList);
+	mainLayout->addLayout(shapeLayout);
+
+	connect(shapeList, static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged), this, [this, boxSizeInspector, coneSizeInspector, sphereRadiusSlider](int index) {
+		if(RIGID_BODY_SHAPE::BOX == (RIGID_BODY_SHAPE) index) {
+			glm::vec3 min, max;
+			bulletPhysicsObjectComponent->bb->GetLocalBounds(&min, &max);
+			min *= bulletPhysicsObjectComponent->object3D->transform->scale;
+			max *= bulletPhysicsObjectComponent->object3D->transform->scale;
+
+			float sizeX = max.x - min.x;
+			float sizeY = max.y - min.y;
+			float sizeZ = max.z - min.z;
+			
+			bulletPhysicsObjectComponent->colShape =  new btBoxShape(btVector3(sizeX * 0.5,sizeY * 0.5,sizeZ * 0.5));
+			boxSizeInspector->Setvalue(sizeX, sizeY, sizeZ, 1);
+			
+			bulletPhysicsObjectComponent->rigidBody->setCollisionShape(bulletPhysicsObjectComponent->colShape);
+			bulletPhysicsObjectComponent->shape = (RIGID_BODY_SHAPE)index;
+
+			boxSizeInspector->setVisible(true);			
+			coneSizeInspector->setVisible(false);	
+			sphereRadiusSlider->SetVisible(false);	
+		} else if(RIGID_BODY_SHAPE::CONE == (RIGID_BODY_SHAPE) index) {
+			float radiusScale = (bulletPhysicsObjectComponent->object3D->transform->scale.x + bulletPhysicsObjectComponent->object3D->transform->scale.y) * 0.5;
+
+			bulletPhysicsObjectComponent->colShape =  new btConeShapeZ(0.25 * radiusScale, 1 * bulletPhysicsObjectComponent->object3D->transform->scale.z);
+
+			bulletPhysicsObjectComponent->rigidBody->setCollisionShape(bulletPhysicsObjectComponent->colShape);
+			bulletPhysicsObjectComponent->shape = (RIGID_BODY_SHAPE)index;
+			
+			boxSizeInspector->setVisible(false);			
+			coneSizeInspector->setVisible(true);	
+			sphereRadiusSlider->SetVisible(false);	
+		} else if(RIGID_BODY_SHAPE::SPHERE == (RIGID_BODY_SHAPE) index) {
+			float radiusScale = (bulletPhysicsObjectComponent->object3D->transform->scale.x + bulletPhysicsObjectComponent->object3D->transform->scale.y+ bulletPhysicsObjectComponent->object3D->transform->scale.z) * 0.3333333;
+			bulletPhysicsObjectComponent->colShape =  new btSphereShape(btScalar(radiusScale));
+			bulletPhysicsObjectComponent->rigidBody->setCollisionShape(bulletPhysicsObjectComponent->colShape);
+			bulletPhysicsObjectComponent->shape = (RIGID_BODY_SHAPE)index;
+
+			boxSizeInspector->setVisible(false);			
+			coneSizeInspector->setVisible(false);	
+			sphereRadiusSlider->SetVisible(true);	
+		} 
+		// else if(RIGID_BODY_SHAPE::CAPSULE == (RIGID_BODY_SHAPE) index) {
+		// 	//https://pybullet.org/Bullet/BulletFull/classbtCapsuleShape.html#a42bb2763d366916f5e54531b6ae2e963
+		// } else if(RIGID_BODY_SHAPE::CYLINDER == (RIGID_BODY_SHAPE) index) {
+		// 	//https://pybullet.org/Bullet/BulletFull/classbtCylinderShape.html#a168602b231f1a308281a65fdb8d4f93d
+		// } else if(RIGID_BODY_SHAPE::MESH == (RIGID_BODY_SHAPE) index) {
+		// 	//https://pybullet.org/Bullet/phpBB3/viewtopic.php?t=4513	
+		// } else if(RIGID_BODY_SHAPE::HEIGHTFIELD == (RIGID_BODY_SHAPE) index) {
+		// 	//https://pybullet.org/Bullet/BulletFull/classbtHeightfieldTerrainShape.html
+		// }
+        scene->triggerRefresh = true;
+	});
+	///__________________________________________________________________________________________________________
+	
+	///3.__________________________________________________________________________________________________________
+	///Enable / Disable visualisation of the bounding box
+	QCheckBox* rigidBodyVisibleCheckBox = new QCheckBox("Show Bounds");
+    mainLayout->addWidget(rigidBodyVisibleCheckBox);
+	connect(rigidBodyVisibleCheckBox, &QCheckBox::stateChanged, this, [this](int state ) {
+		bulletPhysicsObjectComponent->showBounds = state > 0;
+        scene->triggerRefresh = true;
+	});
+
+	shapeLayout->addWidget(boxSizeInspector);
+	shapeLayout->addWidget(coneSizeInspector);
+	shapeLayout->addLayout(sphereRadiusSlider);
+	///__________________________________________________________________________________________________________
+
+	///4.__________________________________________________________________________________________________________
+    ///Sets the mass of the physical object
+	CustomSlider* massSlider = new CustomSlider(0.0f, 3.0f, 0.01, "Mass", bulletPhysicsObjectComponent->mass);
     mainLayout->addLayout(massSlider);
     QObject::connect(massSlider, &CustomSlider::Modified, [this](double val) {
-        // bulletPhysicsObjectComponent->mass = val;
+        bulletPhysicsObjectComponent->mass = val;
 
-		// //Remove the rigid body from the dynamics world
+		bulletPhysicsObjectComponent->object3D->scene->GetSimulation()->RemoveObject(bulletPhysicsObjectComponent->object3D);
+
+		btVector3 inertia;
+		bulletPhysicsObjectComponent->rigidBody->getCollisionShape()->calculateLocalInertia( bulletPhysicsObjectComponent->mass, inertia );
+		bulletPhysicsObjectComponent->rigidBody->setMassProps(bulletPhysicsObjectComponent->mass, inertia);
 		
-		// std::cout << "Size before removal " << bulletPhysicsObjectComponent->object3D->scene->GetSimulation().dynamicsWorld->getCollisionObjectArray().size() << std::endl;
-		// bulletPhysicsObjectComponent->object3D->scene->GetSimulation().dynamicsWorld->removeRigidBody(bulletPhysicsObjectComponent->rigidBody);
-		// std::cout << "Size after removal " << bulletPhysicsObjectComponent->object3D->scene->GetSimulation().dynamicsWorld->getCollisionObjectArray().size() << std::endl;
-		// btVector3 inertia;
-		// bulletPhysicsObjectComponent->rigidBody->getCollisionShape()->calculateLocalInertia( bulletPhysicsObjectComponent->mass, inertia );
-		// bulletPhysicsObjectComponent->rigidBody->setMassProps(bulletPhysicsObjectComponent->mass, inertia);
-		
-		// // //Add the rigid body to the dynamics world
-		// bulletPhysicsObjectComponent->object3D->scene->GetSimulation().dynamicsWorld->addRigidBody( bulletPhysicsObjectComponent->rigidBody );
-		// std::cout << "Size after adding " << bulletPhysicsObjectComponent->object3D->scene->GetSimulation().dynamicsWorld->getCollisionObjectArray().size() << std::endl;
+		bulletPhysicsObjectComponent->object3D->scene->GetSimulation()->AddObject(bulletPhysicsObjectComponent->object3D);
 
-
-        // btScalar btmass(bulletPhysicsObjectComponent->mass);
-        // bool isDynamic = (btmass != 0.f);
-        // btVector3 localInertia(0, 0, 0);
-        // if (isDynamic)
-        //     bulletPhysicsObjectComponent->colShape->calculateLocalInertia(btmass, localInertia);
-        
-        // bulletPhysicsObjectComponent->rigidBody->setMassProps(btmass, localInertia);
-
-
-
-		
         scene->triggerRefresh = true;
     });
+	///__________________________________________________________________________________________________________
+	
+	//Set the margin
+	
+	//Set all theses guys
+	// Friction
+	// RollingFriction
+	// SpinningFriction
+	// AnisotropicFriction
+
+	//If soft or deformable
+		//Material settings
+		//Deformation settings
+		//Pose Saving settings
+		//Wind settings
+		//Contact hardness settings
+
 
     
 	setLayout(mainLayout);
@@ -102,12 +236,10 @@ BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object, dou
 		btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, colShape, localInertia);
 		rigidBody = new btRigidBody(rbInfo);
 		
-		// if (_shape == RIGID_BODY_SHAPE::CONE || _shape == RIGID_BODY_SHAPE::SPHERE) {
-			rigidBody->setFriction(1.f);
-			rigidBody->setRollingFriction(.01);
-			rigidBody->setSpinningFriction(0.01);
-			rigidBody->setAnisotropicFriction(colShape->getAnisotropicRollingFrictionDirection(), btCollisionObject::CF_ANISOTROPIC_ROLLING_FRICTION);
-		// }
+		rigidBody->setFriction(1.f);
+		rigidBody->setRollingFriction(0.01);
+		rigidBody->setSpinningFriction(0.01);
+		rigidBody->setAnisotropicFriction(colShape->getAnisotropicRollingFrictionDirection(), btCollisionObject::CF_ANISOTROPIC_ROLLING_FRICTION);
 	} else if(_bodyType == BODY_TYPE::SOFT) {
 		std::vector<btScalar> vertices(mesh->vertices.size() * 3);
 		glm::mat4 modelMatrix = transform->GetModelMatrix();
@@ -122,7 +254,7 @@ BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object, dou
 			vertices[j+1] = (btScalar)(finalPos.y);
 			vertices[j+2] = (btScalar)(finalPos.z);
 		}		
-		btSoftRigidDynamicsWorld* world = (btSoftRigidDynamicsWorld*)object3D->scene->GetSimulation().dynamicsWorld; 
+		btSoftRigidDynamicsWorld* world = (btSoftRigidDynamicsWorld*)object3D->scene->GetSimulation()->dynamicsWorld; 
 
 		softBody = btSoftBodyHelpers::CreateFromTriMesh (world->getWorldInfo(),
 			&vertices[0], 
@@ -147,8 +279,8 @@ BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object, dou
 		
 		//SAVE POSE
 		{
-			// softBody->m_cfg.kMT = 0.05;
-			// softBody->setPose(false, true);
+			softBody->m_cfg.kMT = 0.2;
+			softBody->setPose(true, true);
 		}
 
 		//DEFORMATION
@@ -214,7 +346,7 @@ BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object, dou
 			vertices[j+1] = (btScalar)(finalPos.y);
 			vertices[j+2] = (btScalar)(finalPos.z);
 		}		
-		btDeformableMultiBodyDynamicsWorld* world = (btDeformableMultiBodyDynamicsWorld*)object3D->scene->GetSimulation().dynamicsWorld; 
+		btDeformableMultiBodyDynamicsWorld* world = (btDeformableMultiBodyDynamicsWorld*)object3D->scene->GetSimulation()->dynamicsWorld; 
 		if(world != nullptr) {
 			softBody = btSoftBodyHelpers::CreateFromTriMesh (world->getWorldInfo(),
 				&vertices[0], 
@@ -233,7 +365,7 @@ BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object, dou
 			// world->addSoftBody(softBody);
 			
 			//elastic stiffness & damping stiffness
-			btDeformableMassSpringForce* mass_spring2 = new btDeformableMassSpringForce(10,10, false);
+			btDeformableMassSpringForce* mass_spring2 = new btDeformableMassSpringForce(0.1,0.1, false);
 			world->addForce(softBody, mass_spring2);
 			// m_forces.push_back(mass_spring2);
 			
@@ -315,6 +447,7 @@ BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object, dou
 		}
 
 	}
+	
 }
 
 void BulletPhysicsObjectComponent::OnStart() {
@@ -326,11 +459,30 @@ void BulletPhysicsObjectComponent::OnEnable() {
 }
 
 void BulletPhysicsObjectComponent::OnUpdate() {
-
+	if(object3D->transform->hasChanged) {
+		//UPDATE THE BODY POSITION
+	}
 }
 
 void BulletPhysicsObjectComponent::OnRender() {
+	if(showBounds) {
+		if(shape == RIGID_BODY_SHAPE::BOX) {
+			glm::vec3 position = object3D->transform->position;
+			glm::vec3 rotation = object3D->transform->rotation;
+			btBoxShape* boxShape = (btBoxShape*) colShape;
+			btVector3 halfSize = boxShape->getHalfExtentsWithMargin ();
+			glm::vec3 scale    =  glm::vec3(halfSize.x() * 2, halfSize.y() * 2, halfSize.z() * 2);
 
+			object3D->scene->drawImmediate.DrawWireBox(position, rotation, scale, glm::vec4(1, 0, 0, 1));
+		} else if(shape == RIGID_BODY_SHAPE::SPHERE) {
+			glm::vec3 position = object3D->transform->position;
+			glm::vec3 rotation = object3D->transform->rotation;
+			btSphereShape* sphereShape = (btSphereShape*) colShape;
+			float radius = sphereShape->getRadius() * 2;
+			glm::vec3 scale    =  glm::vec3(radius);
+			object3D->scene->drawImmediate.DrawWireSphere(position, rotation, scale, glm::vec4(1, 0, 0, 1));
+		}
+	}
 }
 
 void BulletPhysicsObjectComponent::OnDestroy() {

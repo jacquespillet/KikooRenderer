@@ -17,6 +17,22 @@ void Simulation::SetScene(CoreEngine::Scene* _scene) {
     this->scene = _scene;
 }
 
+void Simulation::SetWorld(WORLD_TYPE _worldType) {
+	Destroy();
+	worldType = _worldType;
+	Init();
+	for(int i=0; i<scene->objects3D.size(); i++) {
+		CoreEngine::BulletPhysicsObjectComponent* physicsComponent = scene->objects3D[i]->GetComponent<CoreEngine::BulletPhysicsObjectComponent>();
+		if(physicsComponent != nullptr) {
+			if(worldType == WORLD_TYPE::RIGID && (physicsComponent->bodyType == CoreEngine::BODY_TYPE::SOFT || physicsComponent->bodyType == CoreEngine::BODY_TYPE::DEFORMABLE)) {
+				//DONT ADD IT IF NOT COMPATIBLE WITH CURRENT WORLD
+			} else {
+				AddObject(scene->objects3D[i]);
+			}
+		}
+	}
+}
+
 void Simulation::Init() {
 	if(worldType == WORLD_TYPE::RIGID) {
 		// default setup for memory, collision setup. Advanced users can create their own configuration.
@@ -95,8 +111,6 @@ void Simulation::Init() {
 		world->setGravity(gravity);		
 
 	}
-
-
     GetSceneData();
 }
 
@@ -137,6 +151,27 @@ void Simulation::AddObject(CoreEngine::Object3D* object3D) {
 	}
 }
 
+void Simulation::RemoveObject(CoreEngine::Object3D* object3D) {
+	CoreEngine::BulletPhysicsObjectComponent* physicsObjectComponent = object3D->GetComponent<CoreEngine::BulletPhysicsObjectComponent>();
+	dynamicsWorld->removeRigidBody(physicsObjectComponent->rigidBody);
+
+	for(int i=0; i<objects.size(); i++) {
+		if(objects[i] == object3D) {
+			objects.erase(objects.begin() + i);
+			break;
+		}
+	}
+
+	for(int i=0; i<softBodies.size(); i++) {
+		if(softBodies[i] == object3D) {
+			softBodies.erase(softBodies.begin() + i);
+			break;
+		}
+	}
+
+	collisionShapes.remove (physicsObjectComponent->colShape);
+}
+
 void Simulation::GetSceneData() {
 }
 
@@ -144,7 +179,6 @@ void Simulation::Simulate() {
     dynamicsWorld->stepSimulation(1.f / 60.f, 10);
 
     //print positions of all objects
-	// std::cout << dynamicsWorld->getNumCollisionObjects() << std::endl;
     for (int j = dynamicsWorld->getNumCollisionObjects() - 1; j >= 0; j--)
     {
         btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[j];
@@ -228,6 +262,9 @@ void Simulation::SetSceneData() {
 
 
 void Simulation::Destroy() {
+	objects.clear();
+    softBodies.clear();
+	
 	for (int i = dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i--)
 	{
 		btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[i];
@@ -264,7 +301,10 @@ void Simulation::Destroy() {
 
 	delete softBodySolver;
 
-	//next line is optional: it will be cleared by the destructor when the array goes out of scope
+	delete deformableBodySolver;
+	
+	delete deformableConstraintSolver;
+
 	collisionShapes.clear();
 }
 

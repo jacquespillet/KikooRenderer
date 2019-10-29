@@ -104,7 +104,8 @@ void BoundingBoxComponent::Refresh() {
     
     
     glm::vec3 position = (max + min) * 0.5;
-    boxObject = GetWireFrameBox(object3D->scene, "BoundingBox", position, glm::vec3(0), glm::vec3(1), glm::vec4(0, 1, 0, 1));
+    glm::vec3 size = max - min;
+    boxObject = GetWireFrameBox(object3D->scene, "BoundingBox", position, glm::vec3(0), glm::vec3(size), glm::vec4(0, 1, 0, 1));
     boxObject->Start();
     boxObject->Enable();
 }
@@ -126,6 +127,8 @@ void BoundingBoxComponent::OnRender() {
     if(isShown) {
         boxObject->transform->position = object3D->transform->position;
         boxObject->transform->rotation = object3D->transform->rotation;
+        // boxObject->transform->scale = object3D->transform->scale;
+        // std::cout << glm::to_string(boxObject->transform->scale) << std::endl;
         boxObject->Render();
     }
 }

@@ -27,10 +27,17 @@ namespace KikooRenderer
 	*/
 	ObjectDetailsPanel::ObjectDetailsPanel() : QDockWidget("Object Details")
 	{
+		scroll = new QScrollArea();
+		scroll->setObjectName(QStringLiteral("MapInfoScrollArea"));
+		scroll->setWidgetResizable(true);
+		scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+		scroll->setFrameStyle(QFrame::NoFrame);
+		setWidget(scroll);
+
 		setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea | Qt::TopDockWidgetArea | Qt::BottomDockWidgetArea);
 		rootWidget = new ObjectDetailRoot();
 		rootWidget->dockWidget = this;
-		setWidget(rootWidget);
+		scroll->setWidget(rootWidget);
 	}
 
 	/*
@@ -54,6 +61,7 @@ namespace KikooRenderer
 				rootWidget->mainLayout->addWidget(widgets[i]);
 			}
 		}
+		resize(rootWidget->sizeHint());
 	}
 
 	void ObjectDetailsPanel::Refresh() {

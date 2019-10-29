@@ -1,6 +1,7 @@
 #include "PreferencesWindow.hpp"
 #include "3DEngine/Renderers/Renderer.hpp"
 #include "PostProcessingPreferences.hpp"
+#include "PhysicsPreferences.hpp"
 
 namespace KikooRenderer 
 {
@@ -12,6 +13,7 @@ namespace KikooRenderer
         tabWidget = new QTabWidget;
         tabWidget->addTab(new RenderPreferences(this), tr("General"));
         tabWidget->addTab(new PostProcessingPreferences(this), tr("Post Processing"));
+        tabWidget->addTab(new PhysicsPreferences(this), tr("Physics"));
         
         setCentralWidget(tabWidget);
 

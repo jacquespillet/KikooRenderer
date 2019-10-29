@@ -1,6 +1,9 @@
 #include "ObjectParams.hpp"
 #include "ObjectDetails.hpp"
 
+#include "3DEngine/Components/Components.h"
+#include "PhysicsEngines/Physics.hpp"
+
 namespace KikooRenderer {
 	/*
 	Creates the first box for general object information
@@ -55,6 +58,39 @@ namespace KikooRenderer {
 			object->scene->triggerRefresh= true;
 		});
 
+		QPushButton* addComponentButton = new QPushButton("Add Component");
+		mainLayout->addWidget(addComponentButton);
+		connect(addComponentButton,  &QPushButton::clicked, this, [this](){
+			QMenu* addObjectMenu = new QMenu("Add Object");
+			QString physicsStr = "Physics (Bullet)";
+			QString bbStr = "Bounding Box";
+
+			addObjectMenu->addAction(physicsStr);
+			addObjectMenu->addAction(bbStr);
+			
+			QAction* selectedItem = addObjectMenu->exec(QCursor::pos());
+			if (selectedItem)
+			{
+				if (selectedItem->text() == physicsStr) {
+					CoreEngine::BulletPhysicsObjectComponent* bulletComponent = new CoreEngine::BulletPhysicsObjectComponent(object, 1, CoreEngine::RIGID_BODY_SHAPE::BOX, CoreEngine::BODY_TYPE::RIGID);
+					object->AddComponent(bulletComponent);	
+					object->scene->GetSimulation()->AddObject(object);
+					root->dockWidget->SetObject(object);
+					// root->ClearWidgets();
+					// ObjectDetails* objectDetails = new ObjectDetails(object, root);
+					// root->mainLayout->addWidget(objectDetails);
+
+					
+					// std::vector<QWidget*> widgets = object->GetInspectorWidgets();
+					// for(int i=0; i<widgets.size(); i++) {
+					// 	if(widgets[i] != nullptr) {
+					// 		root->mainLayout->addWidget(widgets[i]);
+					// 	}
+					// }
+				}
+			}	
+		});
+		
 
 		setLayout(mainLayout);
 	}

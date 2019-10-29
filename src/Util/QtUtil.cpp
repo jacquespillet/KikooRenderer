@@ -19,7 +19,7 @@ CustomSlider::CustomSlider(float min, float max, float step, std::string label, 
     slider->setValue(initialValue/ step);
     connect(slider, SIGNAL(valueChanged(int)), this, SLOT(OnSliderChanged(int)));
     addWidget(slider);
-    QLabel* labelWidget = new QLabel(QString::fromStdString(label));
+    labelWidget = new QLabel(QString::fromStdString(label));
     addWidget(labelWidget);
 
     spinBox = new QDoubleSpinBox();
@@ -39,6 +39,7 @@ int CustomSlider::GetValue() {
 }
 
 void CustomSlider::SetVisible(bool visible) {
+    labelWidget->setVisible(visible);
     slider->setVisible(visible);
     spinBox->setVisible(visible);
 }

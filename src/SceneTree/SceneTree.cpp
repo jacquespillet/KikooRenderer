@@ -60,6 +60,7 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
     QString sphereStr = "Sphere";
     QString circleStr = "Circle";
     QString quadStr = "Quad";
+    QString capsuleStr = "Capsule";
 	QString emptyStr = "Empty";
 
 	QString dirLightStr = "Directional Light";
@@ -143,6 +144,7 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
 		if (selectedItem->text() == sphereStr) objectToAdd = CoreEngine::GetSphere(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
 		if (selectedItem->text() == circleStr) objectToAdd = CoreEngine::GetCircle(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
 		if (selectedItem->text() == quadStr) objectToAdd = CoreEngine::GetQuad(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
+		if (selectedItem->text() == capsuleStr) objectToAdd = CoreEngine::GetCapsule(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
 		if (selectedItem->text() == emptyStr) objectToAdd = new CoreEngine::Object3D(name.toStdString(), view3D->view3DGL->scene);
 		
 		if (selectedItem->text() == dirLightStr) objectToAdd = CoreEngine::GetDirectionalLight(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(30, 0, 0), glm::vec3(1), glm::vec4(1, 1, 1, 1));

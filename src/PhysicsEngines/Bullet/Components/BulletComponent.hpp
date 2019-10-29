@@ -15,7 +15,7 @@ class TransformComponent;
 class BoundingBoxComponent;
 class BulletPhysicsObjectComponent;
 
-enum RIGID_BODY_SHAPE {BOX, CONE, SPHERE};
+enum RIGID_BODY_SHAPE {BOX, CONE, SPHERE, CAPSULE, CYLINDER, MESH, HEIGHTFIELD};
 enum BODY_TYPE {RIGID, SOFT, DEFORMABLE};
 class BulletPhysicsObjectInspector : public ComponentInspector {
 	Q_OBJECT
@@ -56,6 +56,8 @@ class BulletPhysicsObjectComponent : public Component {
 
 		QJsonObject ToJSON();
         static void FromJSON(QJsonObject json, Object3D* obj);		
+
+        bool showBounds = false;
 	
     
         double mass = 0;
