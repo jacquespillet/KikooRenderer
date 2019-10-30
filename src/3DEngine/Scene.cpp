@@ -57,13 +57,21 @@ namespace CoreEngine {
         simulation.worldType = KikooRenderer::Physics::Bullet::WORLD_TYPE::RIGID;
         simulation.Init();
         
-        // Object3D* terrain = GetCube(this, "terrain", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(30, 3, 30), KikooRenderer::Util::GetRandomColor());
-        // terrain->Enable();  
-        // terrain->Start();
-        // BulletPhysicsObjectComponent* physicsterrain = new BulletPhysicsObjectComponent(terrain, 0, RIGID_BODY_SHAPE::BOX, BODY_TYPE::RIGID);
-        // terrain->AddComponent(physicsterrain);
-        // AddObject(terrain);
-  
+        Object3D* terrain = GetCube(this, "terrain", glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(10, 1, 10), KikooRenderer::Util::GetRandomColor());
+        terrain->Enable();  
+        terrain->Start();
+        BulletPhysicsObjectComponent* physicsterrain = new BulletPhysicsObjectComponent(terrain, 0, RIGID_BODY_SHAPE::BOX, BODY_TYPE::RIGID);
+        terrain->AddComponent(physicsterrain);
+        AddObject(terrain);
+        simulation.AddObject(terrain);
+          
+        Object3D* cone = GetCone(this, "cone", glm::vec3(0, 5, 0), glm::vec3(-90, 0, 0), glm::vec3(1), KikooRenderer::Util::GetRandomColor());
+        cone->Enable();  
+        cone->Start();
+        BulletPhysicsObjectComponent* physicsCone = new BulletPhysicsObjectComponent(cone, 1, RIGID_BODY_SHAPE::CONE, BODY_TYPE::RIGID);
+        cone->AddComponent(physicsCone);
+        AddObject(cone);
+        simulation.AddObject(cone);
 
         // Object3D* sphere = CoreEngine::ObjectFromModelFile(this, "Bunny", "resources/Models/bunny/untitled.obj");
         // // Object3D* sphere = GetSphere(this, "terrain", glm::vec3(0, 5, 0), glm::vec3(0, 0, 0), glm::vec3(2), KikooRenderer::Util::GetRandomColor());

@@ -72,7 +72,7 @@ namespace KikooRenderer {
 			if (selectedItem)
 			{
 				if (selectedItem->text() == physicsStr) {
-					CoreEngine::BulletPhysicsObjectComponent* bulletComponent = new CoreEngine::BulletPhysicsObjectComponent(object, 1, CoreEngine::RIGID_BODY_SHAPE::BOX, CoreEngine::BODY_TYPE::RIGID);
+					CoreEngine::BulletPhysicsObjectComponent* bulletComponent = new CoreEngine::BulletPhysicsObjectComponent(object, 1, CoreEngine::RIGID_BODY_SHAPE::CONE, CoreEngine::BODY_TYPE::RIGID);
 					object->AddComponent(bulletComponent);	
 					object->scene->GetSimulation()->AddObject(object);
 					root->dockWidget->SetObject(object);

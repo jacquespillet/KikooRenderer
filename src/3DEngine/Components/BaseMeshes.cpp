@@ -359,7 +359,7 @@ namespace CoreEngine {
 
         //Circle center
         vertex->push_back(glm::vec3(0, 0, -length * 0.5));
-        normals->push_back(glm::vec3(0, 0, 0));
+        normals->push_back(glm::vec3(0, 0, -1));
         uv->push_back(glm::vec2(0, 0));
         colors->push_back(glm::vec4(255, 255, 255, 255));
 

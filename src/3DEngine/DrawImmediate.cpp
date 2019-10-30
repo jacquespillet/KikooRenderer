@@ -28,8 +28,7 @@ void DrawImmediate::Init() {
     wireframeSphere->Enable();
     wireframeSphere->Start(); 
     
-    // wireframeCapsule =  GetCapsule(scene, "DrawWireCube", glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(1));
-    wireframeCapsule =  GetWireSphere(scene, "DrawWireCube", glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(1));
+    wireframeCapsule =  GetWireCapsule(scene, "DrawWireCube", glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(1));
     wireframeCapsule->Enable();
     wireframeCapsule->Start();    
     

@@ -21,7 +21,9 @@ namespace CoreEngine {
 
     Object3D* GetWireSphere(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color);
 
-    Object3D* GetCapsule(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, float height=4);
+    Object3D* GetCapsule(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, float height=2);
+    
+    Object3D* GetWireCapsule(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, float height=2);
     
     Object3D* GetCone(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, bool isScreenSize=false);
 

@@ -265,6 +265,35 @@ Object3D* GetCapsule(Scene* scene, std::string name, glm::vec3 _position, glm::v
     return newObject;
 }
 
+Object3D* GetWireCapsule(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, float height) {
+    //Start each Object3D in scene
+    Object3D* newObject = new Object3D(name, scene);
+    
+    MeshFilterComponent* mesh = GetCapsuleMesh(glm::vec3(1), _color, newObject);
+	mesh->drawingMode = GL_LINES;
+
+    //Setup transform
+    TransformComponent* transform = new TransformComponent(newObject );
+    transform->position = _position;
+    transform->rotation = _rotation;
+    transform->scale = _scale;
+    
+    
+    //Setup material
+    MaterialComponent* material = new MaterialComponent(newObject);
+    material->albedo = _color;
+    Shader shader = scene->standardShaders.blinnPhongShader;
+    material->SetShader(shader);
+
+    BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
+
+    newObject->AddComponent(material);
+    newObject->AddComponent(mesh);
+	newObject->transform = transform;
+    newObject->AddComponent(boundingBox);
+
+    return newObject;
+}
 
 Object3D* GetWireSphere(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color) {
     //Start each Object3D in scene
