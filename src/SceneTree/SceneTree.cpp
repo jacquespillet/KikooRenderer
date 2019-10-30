@@ -62,6 +62,7 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
     QString quadStr = "Quad";
     QString capsuleStr = "Capsule";
     QString coneStr = "Cone";
+    QString cylinderStr = "Cylinder";
 	QString emptyStr = "Empty";
 
 	QString dirLightStr = "Directional Light";
@@ -98,6 +99,7 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
     addObjectMenu->addAction(quadStr);
     addObjectMenu->addAction(capsuleStr);
     addObjectMenu->addAction(coneStr);
+    addObjectMenu->addAction(cylinderStr);
     addObjectMenu->addAction(emptyStr);
 
 	addObjectMenu->addSeparator();
@@ -149,6 +151,7 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
 		if (selectedItem->text() == quadStr) objectToAdd = CoreEngine::GetQuad(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
 		if (selectedItem->text() == capsuleStr) objectToAdd = CoreEngine::GetCapsule(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
 		if (selectedItem->text() == coneStr) objectToAdd = CoreEngine::GetCone(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
+		if (selectedItem->text() == cylinderStr) objectToAdd = CoreEngine::GetCylinder(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
 		if (selectedItem->text() == emptyStr) objectToAdd = new CoreEngine::Object3D(name.toStdString(), view3D->view3DGL->scene);
 		
 		if (selectedItem->text() == dirLightStr) objectToAdd = CoreEngine::GetDirectionalLight(view3D->view3DGL->scene, name.toStdString(), glm::vec3(0), glm::vec3(30, 0, 0), glm::vec3(1), glm::vec4(1, 1, 1, 1));

@@ -260,11 +260,9 @@ namespace CoreEngine {
         }
     }
     
-    void GetCapsuleBuffers(std::vector<glm::vec3>* vertex, std::vector<glm::vec3>* normals, std::vector<glm::vec2>* uv, std::vector<glm::vec4>* colors, std::vector<int>* triangles, float height) {
-        float radius = 1.0;
+    void GetCapsuleBuffers(std::vector<glm::vec3>* vertex, std::vector<glm::vec3>* normals, std::vector<glm::vec2>* uv, std::vector<glm::vec4>* colors, std::vector<int>* triangles, float height, float radius) {
         int numSlices = 12;
-        float halfExtents = height * 0.5;
-
+        float halfExtents = (height - (radius * 2.0)) * 0.5;
         for(int x=0, inx = 0; x<=numSlices; x++) {
             for(int y=0; y<=numSlices; y++, inx++) {
                 float xAngle = ((float)x / (float)numSlices) * PI;
@@ -300,6 +298,93 @@ namespace CoreEngine {
 
             }        
         }
+    }
+ 
+    
+    void GetCylinderBuffers(std::vector<glm::vec3>* vertex, std::vector<glm::vec3>* normals, std::vector<glm::vec2>* uv, std::vector<glm::vec4>* colors, std::vector<int>* triangles, float height, float radius) {
+        int numSlices = 12;
+        //0 : Top center
+        //1 - 12 : top circle
+        //13 : bottom center
+        //14 - 25 : bottom circle
+        
+        //1. Top  circle
+        //_____________________________________________________
+        vertex->push_back(glm::vec3(0, 1, 0));
+        normals->push_back(glm::vec3(0, 1, 0));
+        uv->push_back(glm::vec2(0.5, 0.5));
+        colors->push_back(glm::vec4(255, 255, 255, 255));
+
+
+        for(uint32_t i=1; i<numSlices +1; i++) {
+            float inx = ((float)i / (float)numSlices) * TWO_PI;
+            float x = std::cos(inx);
+            float y = std::sin(inx);
+
+            vertex->push_back(glm::vec3(x, 1, y));
+            normals->push_back(glm::vec3(x, 1, y));
+            uv->push_back(glm::vec2(x, y));
+            colors->push_back(glm::vec4(255, 255, 255, 255));
+            
+            triangles->push_back(0);
+            triangles->push_back(i-1);
+            triangles->push_back(i);
+        }
+        
+        triangles->push_back(numSlices);
+        triangles->push_back(1);
+        triangles->push_back(0);
+        //_____________________________________________________
+        
+        //2. Bottom  circle
+        //_____________________________________________________
+        vertex->push_back(glm::vec3(0, -1, 0));
+        normals->push_back(glm::vec3(0, -1, 0));
+        uv->push_back(glm::vec2(0.5, 0.5));
+        colors->push_back(glm::vec4(255, 255, 255, 255));
+        int topCenterInx = vertex->size() -1;
+
+        for(uint32_t i=1; i<numSlices +1; i++) {
+            float inx = ((float)i / (float)numSlices) * TWO_PI;
+            float x = std::cos(inx);
+            float y = std::sin(inx);
+
+            vertex->push_back(glm::vec3(x, -1, y));
+            normals->push_back(glm::vec3(x, -1, y));
+            uv->push_back(glm::vec2(x, y));
+            colors->push_back(glm::vec4(255, 255, 255, 255));
+            
+            triangles->push_back(topCenterInx);
+            triangles->push_back(topCenterInx + i-1);
+            triangles->push_back(topCenterInx + i);
+        }
+        
+        triangles->push_back(topCenterInx + numSlices);
+        triangles->push_back(topCenterInx + 1);
+        triangles->push_back(topCenterInx);
+        //_____________________________________________________
+
+
+        //3. Sides
+        //_____________________________________________________
+        for(int i=1; i<numSlices+1; i++) {
+            triangles->push_back(i+1);
+            triangles->push_back(i);
+            triangles->push_back(topCenterInx + i);
+
+            triangles->push_back(i + 1);
+            triangles->push_back(topCenterInx + i);
+            triangles->push_back(topCenterInx + i + 1);
+        }
+        
+        triangles->push_back(1);
+        triangles->push_back(numSlices * 2 + 1);
+        triangles->push_back(numSlices);
+
+        triangles->push_back(1);
+        triangles->push_back(numSlices * 2 + 1);
+        triangles->push_back(numSlices + 2);
+        //_____________________________________________________
     }
 
     void GetCircleBuffers(std::vector<glm::vec3>* vertex, std::vector<glm::vec3>* normals, std::vector<glm::vec2>* uv, std::vector<glm::vec4>* colors, std::vector<int>* triangles) {
@@ -578,6 +663,28 @@ namespace CoreEngine {
         mesh->jsonObj = json;
         return mesh;        
     }
+
+
+    MeshFilterComponent* GetCylinderMesh(glm::vec3 size, glm::vec4 color, Object3D* object, float height, float radius) {
+        std::vector<glm::vec3> vertex;
+        std::vector<glm::vec3> normals;
+        std::vector<glm::vec2> uv;
+        std::vector<glm::vec4> colors;
+        std::vector<int> triangles;
+
+        GetCylinderBuffers(&vertex, &normals, &uv, &colors, &triangles, height);
+
+        //Setup mesh
+        MeshFilterComponent* mesh = new MeshFilterComponent(object);
+        mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles, false);
+        mesh->meshType = PRIMITIVE_MESH::CAPSULE_MESH;
+
+        QJsonObject json;
+        json["Type"] = QString("Primitive");
+        json["Primitive"] = QString("Sphere");
+        mesh->jsonObj = json;
+        return mesh;        
+    }    
 
 
     MeshFilterComponent* GetCircleMesh(glm::vec3 size, glm::vec4 color, Object3D* object){

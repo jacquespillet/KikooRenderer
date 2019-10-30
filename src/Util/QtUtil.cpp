@@ -312,15 +312,21 @@ Vector3Inspector::Vector3Inspector(std::string label, glm::vec3 value) {
 
     connect(xSpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, mainLayout](double value) {
         vector.x = value;
+        vector.y = ySpinBox->value();
+        vector.z = zSpinBox->value();
         emit Modified(vector);
     });
 
     connect(ySpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, mainLayout](double value) {
+        vector.x = xSpinBox->value();
         vector.y = value;
+        vector.z = zSpinBox->value();
         emit Modified(vector);
     });
     
     connect(zSpinBox, static_cast<void (QDoubleSpinBox::*)(double value)>(&QDoubleSpinBox::valueChanged), this, [this, mainLayout](double value) {
+        vector.x = xSpinBox->value();
+        vector.y = ySpinBox->value();
         vector.z = value;
         emit Modified(vector);
     });

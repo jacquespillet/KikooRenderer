@@ -33,7 +33,7 @@ class DrawImmediate
 		
 		void DrawWireBox(glm::vec3 position, glm::vec3 rotation, glm::vec3 size, glm::vec4(color));        
 		void DrawWireSphere(glm::vec3 position, glm::vec3 rotation, glm::vec3 size, glm::vec4(color));        
-		void DrawWireCapsule(glm::vec3 position, glm::vec3 rotation, glm::vec3 size, glm::vec4(color));        
+		void DrawWireCapsule(glm::vec3 position, glm::vec3 rotation, glm::vec3 size, float height, float radius, glm::vec4(color));        
 		void DrawWireCone(glm::vec3 position, glm::vec3 rotation, glm::vec3 size, glm::vec4(color));        
 		void DrawWireCylinder(glm::vec3 position, glm::vec3 rotation, glm::vec3 size, glm::vec4(color));        
 };

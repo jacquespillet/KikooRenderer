@@ -240,7 +240,7 @@ Object3D* GetCapsule(Scene* scene, std::string name, glm::vec3 _position, glm::v
     //Start each Object3D in scene
     Object3D* newObject = new Object3D(name, scene);
     
-    MeshFilterComponent* mesh = GetCapsuleMesh(glm::vec3(1), _color, newObject);
+    MeshFilterComponent* mesh = GetCapsuleMesh(glm::vec3(1), _color, newObject, height);
 
     //Setup transform
     TransformComponent* transform = new TransformComponent(newObject );
@@ -269,7 +269,7 @@ Object3D* GetWireCapsule(Scene* scene, std::string name, glm::vec3 _position, gl
     //Start each Object3D in scene
     Object3D* newObject = new Object3D(name, scene);
     
-    MeshFilterComponent* mesh = GetCapsuleMesh(glm::vec3(1), _color, newObject);
+    MeshFilterComponent* mesh = GetCapsuleMesh(glm::vec3(1), _color, newObject, height);
 	mesh->drawingMode = GL_LINES;
 
     //Setup transform
@@ -393,6 +393,67 @@ Object3D* GetGrid(Scene* scene, std::string name) {
 
     return newObject;
 }
+
+Object3D* GetCylinder(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, float height, float radius) {
+    //Start each Object3D in scene
+    Object3D* newObject = new Object3D(name, scene);
+    
+    MeshFilterComponent* mesh = GetCylinderMesh(glm::vec3(1), _color, newObject, height, radius);
+
+    //Setup transform
+    TransformComponent* transform = new TransformComponent(newObject );
+    transform->position = _position;
+    transform->rotation = _rotation;
+    transform->scale = _scale;
+    
+    
+    //Setup material
+    MaterialComponent* material = new MaterialComponent(newObject);
+    material->albedo = _color;
+    Shader shader = scene->standardShaders.blinnPhongShader;
+    material->SetShader(shader);
+
+    BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
+
+    newObject->AddComponent(material);
+    newObject->AddComponent(mesh);
+	newObject->transform = transform;
+    newObject->AddComponent(boundingBox);
+
+    return newObject;
+}
+
+
+Object3D* GetWireCylinder(Scene* scene, std::string name, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale, glm::vec4 _color, float height, float radius) {
+    //Start each Object3D in scene
+    Object3D* newObject = new Object3D(name, scene);
+    
+    MeshFilterComponent* mesh = GetCylinderMesh(glm::vec3(1), _color, newObject, 12);
+	mesh->drawingMode = GL_LINES;
+
+    //Setup transform
+    TransformComponent* transform = new TransformComponent(newObject );
+    transform->position = _position;
+    transform->rotation = _rotation;
+    transform->scale = _scale;
+    
+    
+    //Setup material
+    MaterialComponent* material = new MaterialComponent(newObject);
+    material->albedo = _color;
+    Shader shader = scene->standardShaders.blinnPhongShader;
+    material->SetShader(shader);
+
+    BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);
+
+    newObject->AddComponent(material);
+    newObject->AddComponent(mesh);
+	newObject->transform = transform;
+    newObject->AddComponent(boundingBox);
+
+    return newObject;
+}
+
 
 
 Object3D* GetAxes(Scene* scene, std::string name) {

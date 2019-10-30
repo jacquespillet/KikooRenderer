@@ -3,6 +3,8 @@
 #include "BaseObjects.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/MaterialComponent.hpp"
+#include "Components/MeshFilterComponent.hpp"
+#include "Components/BaseMeshes.hpp"
 
 namespace KikooRenderer
 {
@@ -36,8 +38,7 @@ void DrawImmediate::Init() {
     wireframeCone->Enable();
     wireframeCone->Start(); 
     
-    // wireframeCylinder =  GetCylinder(scene, "DrawWireCube", glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(1));
-    wireframeCylinder =  GetWireSphere(scene, "DrawWireCube", glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(1));
+    wireframeCylinder =  GetWireCylinder(scene, "DrawWireCube", glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(1));
     wireframeCylinder->Enable();
     wireframeCylinder->Start();     
 }
@@ -65,11 +66,22 @@ void DrawImmediate::DrawWireSphere(glm::vec3 position, glm::vec3 rotation, glm::
 
     wireframeSphere->Render();
 }
-void DrawImmediate::DrawWireCapsule(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, glm::vec4(color)) {
+void DrawImmediate::DrawWireCapsule(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, float height, float radius, glm::vec4(color)) {
     wireframeCapsule->transform->position = position;
     wireframeCapsule->transform->rotation = rotation;
     wireframeCapsule->transform->scale = scale;
-    wireframeCapsule->GetComponent<MaterialComponent>()->albedo = color;
+
+    std::vector<glm::vec3> vertex;
+    std::vector<glm::vec3> normals;
+    std::vector<glm::vec2> uv;
+    std::vector<glm::vec4> colors;
+    std::vector<int> triangles;
+    GetCapsuleBuffers(&vertex, &normals, &uv, &colors, &triangles, height, radius);
+
+    wireframeCapsule->GetComponent<MeshFilterComponent>()->LoadFromBuffers(vertex, normals, uv, colors, triangles, true);
+    wireframeCapsule->GetComponent<MeshFilterComponent>()->RebuildBuffers();
+  
+   wireframeCapsule->GetComponent<MaterialComponent>()->albedo = color;
 
     wireframeCapsule->Render();
 }        
@@ -85,6 +97,8 @@ void DrawImmediate::DrawWireCylinder(glm::vec3 position, glm::vec3 rotation, glm
     wireframeCylinder->transform->position = position;
     wireframeCylinder->transform->rotation = rotation;
     wireframeCylinder->transform->scale = scale;
+
+
     wireframeCylinder->GetComponent<MaterialComponent>()->albedo = color;
 
     wireframeCylinder->Render();

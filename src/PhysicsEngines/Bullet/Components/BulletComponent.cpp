@@ -28,101 +28,130 @@ BulletPhysicsObjectInspector::BulletPhysicsObjectInspector(BulletPhysicsObjectCo
 	
 	//////1.1__________________________________________________________________________________________________________
 	/////Box
-	glm::vec3 min, max;
-	bulletPhysicsObjectComponent->bb->GetLocalBounds(&min, &max);
-	min *= bulletPhysicsObjectComponent->object3D->transform->scale;
-	max *= bulletPhysicsObjectComponent->object3D->transform->scale;
+	Vector3Inspector* boxSizeInspector;
+	{
+		glm::vec3 min, max;
+		bulletPhysicsObjectComponent->bb->GetLocalBounds(&min, &max);
+		min *= bulletPhysicsObjectComponent->object3D->transform->scale;
+		max *= bulletPhysicsObjectComponent->object3D->transform->scale;
 
-	float sizeX = max.x - min.x;
-	float sizeY = max.y - min.y;
-	float sizeZ = max.z - min.z;	
-	Vector3Inspector* boxSizeInspector = new Vector3Inspector("Box Collider Size", glm::vec3(sizeX, sizeY, sizeZ));
-	connect(boxSizeInspector, &Vector3Inspector::Modified, this, [this](glm::vec3 vector) {
-		bulletPhysicsObjectComponent->colShape =  new btBoxShape(btVector3(vector.x * 0.5,vector.y * 0.5,vector.z * 0.5));
-		bulletPhysicsObjectComponent->rigidBody->setCollisionShape(bulletPhysicsObjectComponent->colShape);
-        scene->triggerRefresh = true;
-	});
-	boxSizeInspector->setVisible(RIGID_BODY_SHAPE::BOX == bulletPhysicsObjectComponent->shape);
+		float sizeX = max.x - min.x;
+		float sizeY = max.y - min.y;
+		float sizeZ = max.z - min.z;	
+		boxSizeInspector = new Vector3Inspector("Box Collider Size", glm::vec3(sizeX, sizeY, sizeZ));
+		connect(boxSizeInspector, &Vector3Inspector::Modified, this, [this](glm::vec3 vector) {
+			bulletPhysicsObjectComponent->colShape =  new btBoxShape(btVector3(vector.x * 0.5,vector.y * 0.5,vector.z * 0.5));
+			bulletPhysicsObjectComponent->rigidBody->setCollisionShape(bulletPhysicsObjectComponent->colShape);
+			scene->triggerRefresh = true;
+		});
+		boxSizeInspector->setVisible(RIGID_BODY_SHAPE::BOX == bulletPhysicsObjectComponent->shape);
+	}
 
 	//////1.2__________________________________________________________________________________________________________
 	/////Cone
 	QWidget* coneShapeSizeWidget = new QWidget();
-	QHBoxLayout* coneShapeSizeLayout = new QHBoxLayout();
-	coneShapeSizeWidget->setLayout(coneShapeSizeLayout);
-	
-	float coneRadiusScale = (bulletPhysicsObjectComponent->object3D->transform->scale.x + bulletPhysicsObjectComponent->object3D->transform->scale.y+ bulletPhysicsObjectComponent->object3D->transform->scale.z) * 0.3333333;
-	CustomSlider* coneRadiusSlider = new CustomSlider(0.0f, 10.0f, 0.01, "cone Radius", coneRadiusScale * 0.25);
-    QObject::connect(coneRadiusSlider, &CustomSlider::Modified, [this](double val) {
-		btConeShapeZ* coneShape = (btConeShapeZ*) bulletPhysicsObjectComponent->colShape;
-		float height = coneShape->getHeight();
+	{
+		QHBoxLayout* coneShapeSizeLayout = new QHBoxLayout();
+		coneShapeSizeWidget->setLayout(coneShapeSizeLayout);
 		
-		bulletPhysicsObjectComponent->colShape =  new btConeShapeZ(btScalar(val), height);		
-		bulletPhysicsObjectComponent->rigidBody->setCollisionShape(bulletPhysicsObjectComponent->colShape);
-        scene->triggerRefresh = true;
-	});	
-	coneShapeSizeLayout->addLayout(coneRadiusSlider);
+		float coneRadiusScale = (bulletPhysicsObjectComponent->object3D->transform->scale.x + bulletPhysicsObjectComponent->object3D->transform->scale.y+ bulletPhysicsObjectComponent->object3D->transform->scale.z) * 0.3333333;
+		CustomSlider* coneRadiusSlider = new CustomSlider(0.0f, 10.0f, 0.01, "cone Radius", coneRadiusScale * 0.25);
+		QObject::connect(coneRadiusSlider, &CustomSlider::Modified, [this](double val) {
+			btConeShapeZ* coneShape = (btConeShapeZ*) bulletPhysicsObjectComponent->colShape;
+			float height = coneShape->getHeight();
+			
+			bulletPhysicsObjectComponent->colShape =  new btConeShapeZ(btScalar(val), height);		
+			bulletPhysicsObjectComponent->rigidBody->setCollisionShape(bulletPhysicsObjectComponent->colShape);
+			scene->triggerRefresh = true;
+		});	
+		coneShapeSizeLayout->addLayout(coneRadiusSlider);
 
-	float coneHeightScale = (bulletPhysicsObjectComponent->object3D->transform->scale.x + bulletPhysicsObjectComponent->object3D->transform->scale.y+ bulletPhysicsObjectComponent->object3D->transform->scale.z) * 0.3333333;
-	CustomSlider* coneHeightSlider = new CustomSlider(0.0f, 10.0f, 0.01, "cone Height", coneHeightScale);
-    QObject::connect(coneHeightSlider, &CustomSlider::Modified, [this](double val) {
-		btConeShapeZ* coneShape = (btConeShapeZ*) bulletPhysicsObjectComponent->colShape;
-		float radius = coneShape->getRadius();
-		
-		bulletPhysicsObjectComponent->colShape =  new btConeShapeZ(radius, btScalar(val));		
-		bulletPhysicsObjectComponent->rigidBody->setCollisionShape(bulletPhysicsObjectComponent->colShape);
-        scene->triggerRefresh = true;
-	});	
-	coneShapeSizeLayout->addLayout(coneHeightSlider);
-	coneShapeSizeWidget->setVisible(RIGID_BODY_SHAPE::CONE == bulletPhysicsObjectComponent->shape);	
+		float coneHeightScale = (bulletPhysicsObjectComponent->object3D->transform->scale.x + bulletPhysicsObjectComponent->object3D->transform->scale.y+ bulletPhysicsObjectComponent->object3D->transform->scale.z) * 0.3333333;
+		CustomSlider* coneHeightSlider = new CustomSlider(0.0f, 10.0f, 0.01, "cone Height", coneHeightScale);
+		QObject::connect(coneHeightSlider, &CustomSlider::Modified, [this](double val) {
+			btConeShapeZ* coneShape = (btConeShapeZ*) bulletPhysicsObjectComponent->colShape;
+			float radius = coneShape->getRadius();
+			
+			bulletPhysicsObjectComponent->colShape =  new btConeShapeZ(radius, btScalar(val));		
+			bulletPhysicsObjectComponent->rigidBody->setCollisionShape(bulletPhysicsObjectComponent->colShape);
+			scene->triggerRefresh = true;
+		});	
+		coneShapeSizeLayout->addLayout(coneHeightSlider);
+		coneShapeSizeWidget->setVisible(RIGID_BODY_SHAPE::CONE == bulletPhysicsObjectComponent->shape);	
+	}
 
 	//////1.3__________________________________________________________________________________________________________
 	/////Sphere
-	float sphereRadiusScale = (bulletPhysicsObjectComponent->object3D->transform->scale.x + bulletPhysicsObjectComponent->object3D->transform->scale.y+ bulletPhysicsObjectComponent->object3D->transform->scale.z) * 0.3333333;
-	CustomSlider* sphereRadiusSlider = new CustomSlider(0.0f, 10.0f, 0.01, "Sphere Radius", sphereRadiusScale);
-    QObject::connect(sphereRadiusSlider, &CustomSlider::Modified, [this](double val) {
-		bulletPhysicsObjectComponent->colShape =  new btSphereShape(btScalar(val));
-		bulletPhysicsObjectComponent->rigidBody->setCollisionShape(bulletPhysicsObjectComponent->colShape);
-        scene->triggerRefresh = true;
-	});
-	sphereRadiusSlider->SetVisible(RIGID_BODY_SHAPE::SPHERE == bulletPhysicsObjectComponent->shape);
-
-
+	CustomSlider* sphereRadiusSlider;
+	{
+		float sphereRadiusScale = (bulletPhysicsObjectComponent->object3D->transform->scale.x + bulletPhysicsObjectComponent->object3D->transform->scale.y+ bulletPhysicsObjectComponent->object3D->transform->scale.z) * 0.3333333;
+		sphereRadiusSlider = new CustomSlider(0.0f, 10.0f, 0.01, "Sphere Radius", sphereRadiusScale);
+		QObject::connect(sphereRadiusSlider, &CustomSlider::Modified, [this](double val) {
+			bulletPhysicsObjectComponent->colShape =  new btSphereShape(btScalar(val));
+			bulletPhysicsObjectComponent->rigidBody->setCollisionShape(bulletPhysicsObjectComponent->colShape);
+			scene->triggerRefresh = true;
+		});
+		sphereRadiusSlider->SetVisible(RIGID_BODY_SHAPE::SPHERE == bulletPhysicsObjectComponent->shape);
+	}
 	//////1.4__________________________________________________________________________________________________________
 	/////Capsule
 	QWidget* capsuleShapeSizeWidget = new QWidget();
-	QHBoxLayout* capsuleShapeSizeLayout = new QHBoxLayout();
-	capsuleShapeSizeWidget->setLayout(capsuleShapeSizeLayout);
-	
-	float capsuleRadiusScale = (bulletPhysicsObjectComponent->object3D->transform->scale.x + bulletPhysicsObjectComponent->object3D->transform->scale.y+ bulletPhysicsObjectComponent->object3D->transform->scale.z) * 0.3333333;
-	CustomSlider* capsuleRadiusSlider = new CustomSlider(0.0f, 10.0f, 0.01, "capsule Radius", capsuleRadiusScale);
-    QObject::connect(capsuleRadiusSlider, &CustomSlider::Modified, [this](double val) {
-		btCapsuleShape* coneShape = (btCapsuleShape*) bulletPhysicsObjectComponent->colShape;
-		float height = coneShape->getHalfHeight() * 2;
+	{
+		QHBoxLayout* capsuleShapeSizeLayout = new QHBoxLayout();
+		capsuleShapeSizeWidget->setLayout(capsuleShapeSizeLayout);
+		
+		float capsuleRadiusScale = (bulletPhysicsObjectComponent->object3D->transform->scale.x + bulletPhysicsObjectComponent->object3D->transform->scale.z) * 0.5 * 0.5; //Get scale average, and divide by 2 to get radius
+		CustomSlider* capsuleRadiusSlider = new CustomSlider(0.0f, 10.0f, 0.01, "capsule Radius", capsuleRadiusScale);
+		QObject::connect(capsuleRadiusSlider, &CustomSlider::Modified, [this](double val) {
+			btCapsuleShape* capsuleShape = (btCapsuleShape*) bulletPhysicsObjectComponent->colShape;
+			float height = capsuleShape->getHalfHeight();
 
-		bulletPhysicsObjectComponent->colShape =  new btCapsuleShape(btScalar(val), height);	
-		bulletPhysicsObjectComponent->rigidBody->setCollisionShape(bulletPhysicsObjectComponent->colShape);
-        scene->triggerRefresh = true;
-	});	
-	capsuleShapeSizeLayout->addLayout(capsuleRadiusSlider);
+			bulletPhysicsObjectComponent->colShape =  new btCapsuleShape(btScalar(val), height);
+			bulletPhysicsObjectComponent->rigidBody->setCollisionShape(bulletPhysicsObjectComponent->colShape);
+			scene->triggerRefresh = true;
+		});	
+		capsuleShapeSizeLayout->addLayout(capsuleRadiusSlider);
 
-	float capsuleHeightScale = (bulletPhysicsObjectComponent->object3D->transform->scale.x + bulletPhysicsObjectComponent->object3D->transform->scale.y+ bulletPhysicsObjectComponent->object3D->transform->scale.z) * 0.3333333;
-	CustomSlider* capsuleHeightSlider = new CustomSlider(0.0f, 10.0f, 0.01, "capsule Height", capsuleHeightScale);
-    QObject::connect(capsuleHeightSlider, &CustomSlider::Modified, [this](double val) {
-		btCapsuleShape* coneShape = (btCapsuleShape*) bulletPhysicsObjectComponent->colShape;
-		float radius = coneShape->getRadius();
+		float capsuleHeightScale = (bulletPhysicsObjectComponent->object3D->transform->scale.x + bulletPhysicsObjectComponent->object3D->transform->scale.y+ bulletPhysicsObjectComponent->object3D->transform->scale.z) * 0.3333333;
+		CustomSlider* capsuleHeightSlider = new CustomSlider(0.0f, 10.0f, 0.01, "capsule Height", capsuleHeightScale);
+		QObject::connect(capsuleHeightSlider, &CustomSlider::Modified, [this](double val) {
+			btCapsuleShape* capsuleShape = (btCapsuleShape*) bulletPhysicsObjectComponent->colShape;
+			float radius = capsuleShape->getRadius();
 
-		bulletPhysicsObjectComponent->colShape =  new btCapsuleShape(radius, btScalar(val));	
-		bulletPhysicsObjectComponent->rigidBody->setCollisionShape(bulletPhysicsObjectComponent->colShape);
-        scene->triggerRefresh = true;
-	});	
-	capsuleShapeSizeLayout->addLayout(capsuleHeightSlider);
-	capsuleShapeSizeWidget->setVisible(RIGID_BODY_SHAPE::CAPSULE == bulletPhysicsObjectComponent->shape);
+			bulletPhysicsObjectComponent->colShape =  new btCapsuleShape(radius, btScalar(val) * 0.5);	
+			bulletPhysicsObjectComponent->rigidBody->setCollisionShape(bulletPhysicsObjectComponent->colShape);
+			scene->triggerRefresh = true;
+		});	
+		capsuleShapeSizeLayout->addLayout(capsuleHeightSlider);
+		capsuleShapeSizeWidget->setVisible(RIGID_BODY_SHAPE::CAPSULE == bulletPhysicsObjectComponent->shape);
+	}
+
+	//////1.5__________________________________________________________________________________________________________
+	/////Cylinder
+	Vector3Inspector* cylinderSizeInspector;
+	{
+		glm::vec3 min, max;
+		bulletPhysicsObjectComponent->bb->GetLocalBounds(&min, &max);
+		min *= bulletPhysicsObjectComponent->object3D->transform->scale;
+		max *= bulletPhysicsObjectComponent->object3D->transform->scale;
+
+		float sizeX = max.x - min.x;
+		float sizeY = max.y - min.y;
+		float sizeZ = max.z - min.z;	
+		cylinderSizeInspector = new Vector3Inspector("Cylinder Collider Size", glm::vec3(sizeX, sizeY, sizeZ));
+		connect(cylinderSizeInspector, &Vector3Inspector::Modified, this, [this](glm::vec3 vector) {
+			std::cout << glm::to_string(vector) << std::endl;
+			bulletPhysicsObjectComponent->colShape =  new btCylinderShape(btVector3(vector.x * 0.5,vector.y * 0.5,vector.z * 0.5));
+			bulletPhysicsObjectComponent->rigidBody->setCollisionShape(bulletPhysicsObjectComponent->colShape);
+			scene->triggerRefresh = true;
+		});
+		cylinderSizeInspector->setVisible(RIGID_BODY_SHAPE::CYLINDER == bulletPhysicsObjectComponent->shape);
+	}
 
 	///__________________________________________________________________________________________________________
 
-
 	///2.__________________________________________________________________________________________________________
-	//Set the SHAPE (W/ REALTIME WIREFRAME VISUALIZATION)
+	//Set the SHAPE
 	QHBoxLayout* shapeLayout = new QHBoxLayout();
 	QComboBox* shapeList = new QComboBox();
 	QLabel* shapeLabel = new QLabel("Collider Shape");
@@ -140,7 +169,7 @@ BulletPhysicsObjectInspector::BulletPhysicsObjectInspector(BulletPhysicsObjectCo
 	shapeLayout->addWidget(shapeList);
 	mainLayout->addLayout(shapeLayout);
 
-	connect(shapeList, static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged), this, [this, boxSizeInspector, coneShapeSizeWidget, sphereRadiusSlider, capsuleShapeSizeWidget](int index) {
+	connect(shapeList, static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged), this, [this, boxSizeInspector,cylinderSizeInspector, coneShapeSizeWidget, sphereRadiusSlider, capsuleShapeSizeWidget](int index) {
 		if(RIGID_BODY_SHAPE::BOX == (RIGID_BODY_SHAPE) index) {
 			glm::vec3 min, max;
 			bulletPhysicsObjectComponent->bb->GetLocalBounds(&min, &max);
@@ -161,6 +190,7 @@ BulletPhysicsObjectInspector::BulletPhysicsObjectInspector(BulletPhysicsObjectCo
 			coneShapeSizeWidget->setVisible(false);	
 			sphereRadiusSlider->SetVisible(false);	
 			capsuleShapeSizeWidget->setVisible(false);
+			cylinderSizeInspector->setVisible(false);
 		} else if(RIGID_BODY_SHAPE::CONE == (RIGID_BODY_SHAPE) index) {
 			float radiusScale = 0.25 * (bulletPhysicsObjectComponent->object3D->transform->scale.x + bulletPhysicsObjectComponent->object3D->transform->scale.y) * 0.5;
 			float height = 1 * bulletPhysicsObjectComponent->object3D->transform->scale.z;
@@ -175,6 +205,7 @@ BulletPhysicsObjectInspector::BulletPhysicsObjectInspector(BulletPhysicsObjectCo
 			coneShapeSizeWidget->setVisible(true);	
 			sphereRadiusSlider->SetVisible(false);	
 			capsuleShapeSizeWidget->setVisible(false);
+			cylinderSizeInspector->setVisible(false);
 		} else if(RIGID_BODY_SHAPE::SPHERE == (RIGID_BODY_SHAPE) index) {
 			float radiusScale = (bulletPhysicsObjectComponent->object3D->transform->scale.x + bulletPhysicsObjectComponent->object3D->transform->scale.y+ bulletPhysicsObjectComponent->object3D->transform->scale.z) * 0.3333333;
 			bulletPhysicsObjectComponent->colShape =  new btSphereShape(btScalar(radiusScale));
@@ -185,6 +216,7 @@ BulletPhysicsObjectInspector::BulletPhysicsObjectInspector(BulletPhysicsObjectCo
 			coneShapeSizeWidget->setVisible(false);	
 			sphereRadiusSlider->SetVisible(true);	
 			capsuleShapeSizeWidget->setVisible(false);
+			cylinderSizeInspector->setVisible(false);
 		}  else if(RIGID_BODY_SHAPE::CAPSULE == (RIGID_BODY_SHAPE) index) {
 			float radiusScale = (bulletPhysicsObjectComponent->object3D->transform->scale.x + bulletPhysicsObjectComponent->object3D->transform->scale.z) * 0.5;
 			float height = 2 * bulletPhysicsObjectComponent->object3D->transform->scale.z;
@@ -195,13 +227,19 @@ BulletPhysicsObjectInspector::BulletPhysicsObjectInspector(BulletPhysicsObjectCo
 			boxSizeInspector->setVisible(false);			
 			coneShapeSizeWidget->setVisible(false);	
 			sphereRadiusSlider->SetVisible(false);
-			capsuleShapeSizeWidget->setVisible(true);				
+			capsuleShapeSizeWidget->setVisible(true);	
+			cylinderSizeInspector->setVisible(false);			
+		}  else if(RIGID_BODY_SHAPE::CYLINDER == (RIGID_BODY_SHAPE) index) {
+
+			boxSizeInspector->setVisible(false);			
+			coneShapeSizeWidget->setVisible(false);	
+			sphereRadiusSlider->SetVisible(false);
+			capsuleShapeSizeWidget->setVisible(false);	
+			cylinderSizeInspector->setVisible(true);		
+		}  else if(RIGID_BODY_SHAPE::MESH == (RIGID_BODY_SHAPE) index) {
+			//https://pybullet.org/Bullet/phpBB3/viewtopic.php?t=4513	
 		} 
-		//else if(RIGID_BODY_SHAPE::CYLINDER == (RIGID_BODY_SHAPE) index) {
-		// 	//https://pybullet.org/Bullet/BulletFull/classbtCylinderShape.html#a168602b231f1a308281a65fdb8d4f93d
-		// } else if(RIGID_BODY_SHAPE::MESH == (RIGID_BODY_SHAPE) index) {
-		// 	//https://pybullet.org/Bullet/phpBB3/viewtopic.php?t=4513	
-		// } else if(RIGID_BODY_SHAPE::HEIGHTFIELD == (RIGID_BODY_SHAPE) index) {
+		// else if(RIGID_BODY_SHAPE::HEIGHTFIELD == (RIGID_BODY_SHAPE) index) {
 		// 	//https://pybullet.org/Bullet/BulletFull/classbtHeightfieldTerrainShape.html
 		// }
         scene->triggerRefresh = true;
@@ -221,7 +259,7 @@ BulletPhysicsObjectInspector::BulletPhysicsObjectInspector(BulletPhysicsObjectCo
 	mainLayout->addWidget(coneShapeSizeWidget);
 	mainLayout->addLayout(sphereRadiusSlider);
 	mainLayout->addWidget(capsuleShapeSizeWidget);
-
+	mainLayout->addWidget(cylinderSizeInspector);
 	///__________________________________________________________________________________________________________
 
 	///4.__________________________________________________________________________________________________________
@@ -243,13 +281,48 @@ BulletPhysicsObjectInspector::BulletPhysicsObjectInspector(BulletPhysicsObjectCo
     });
 	///__________________________________________________________________________________________________________
 	
+	///5.__________________________________________________________________________________________________________
 	//Set the margin
+	CustomSlider* marginSlider = new CustomSlider(0.0f, 2.0f, 0.01, "Collider Margin", bulletPhysicsObjectComponent->margin);
+    mainLayout->addLayout(marginSlider);
+    QObject::connect(marginSlider, &CustomSlider::Modified, [this](double val) {
+        bulletPhysicsObjectComponent->margin = val;
+		bulletPhysicsObjectComponent->colShape->setMargin(val);
+        scene->triggerRefresh = true;
+    });	
+
+	///__________________________________________________________________________________________________________
 	
-	//Set all theses guys
-	// Friction
-	// RollingFriction
-	// SpinningFriction
-	// AnisotropicFriction
+	///5.__________________________________________________________________________________________________________
+	//Set the Friction
+	QGroupBox* frictionGroupBox = new QGroupBox("Friction Settings");
+	QVBoxLayout* frictionMainLayout = new QVBoxLayout();
+	frictionGroupBox->setLayout(frictionMainLayout);
+
+	CustomSlider* frictionSlider = new CustomSlider(0.0f, 2.0f, 0.01, "friction", bulletPhysicsObjectComponent->rigidBody->getFriction());
+    QObject::connect(frictionSlider, &CustomSlider::Modified, [this](double val) {
+        bulletPhysicsObjectComponent->rigidBody->setFriction(val);
+        scene->triggerRefresh = true;
+    });
+	frictionMainLayout->addLayout(frictionSlider);
+	
+	
+	CustomSlider* rollingFrictionSlider = new CustomSlider(0.0f, 1.0f, 0.001, "Rolling Friction",bulletPhysicsObjectComponent->rigidBody->getRollingFriction());
+    QObject::connect(rollingFrictionSlider, &CustomSlider::Modified, [this](double val) {
+        bulletPhysicsObjectComponent->rigidBody->setRollingFriction(val);
+        scene->triggerRefresh = true;
+    });
+	frictionMainLayout->addLayout(rollingFrictionSlider);
+
+	CustomSlider* spinningFrictionSlider = new CustomSlider(0.0f, 1.0f, 0.001, "spinning Friction",bulletPhysicsObjectComponent->rigidBody->getSpinningFriction());
+    QObject::connect(spinningFrictionSlider, &CustomSlider::Modified, [this](double val) {
+        bulletPhysicsObjectComponent->rigidBody->setSpinningFriction(val);
+        scene->triggerRefresh = true;
+    });
+	frictionMainLayout->addLayout(spinningFrictionSlider);
+
+	mainLayout->addWidget(frictionGroupBox);
+	///__________________________________________________________________________________________________________
 
 	//If soft or deformable
 		//Material settings
@@ -287,6 +360,10 @@ BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object, dou
 			colShape =  new btConeShapeZ(0.25, 1);
 		} else if(_shape == RIGID_BODY_SHAPE::SPHERE) {
 			colShape =  new btSphereShape(btScalar(object->transform->scale.x));
+		} else if(_shape == RIGID_BODY_SHAPE::CAPSULE) {
+			colShape =  new btCapsuleShape(1, 2);
+		} else if(_shape == RIGID_BODY_SHAPE::CYLINDER) {
+			colShape =  new btCylinderShape(btVector3(1, 1, 1));
 		}
 		  
 		/// Create Dynamic Objects
@@ -311,9 +388,9 @@ BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object, dou
 		btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, colShape, localInertia);
 		rigidBody = new btRigidBody(rbInfo);
 		
-		rigidBody->setFriction(1.f);
-		rigidBody->setRollingFriction(0.01);
-		rigidBody->setSpinningFriction(0.01);
+		rigidBody->setFriction(0.5f);
+		rigidBody->setRollingFriction(0.1);
+		rigidBody->setSpinningFriction(0.1);
 		rigidBody->setAnisotropicFriction(colShape->getAnisotropicRollingFrictionDirection(), btCollisionObject::CF_ANISOTROPIC_ROLLING_FRICTION);
 	} else if(_bodyType == BODY_TYPE::SOFT) {
 		std::vector<btScalar> vertices(mesh->vertices.size() * 3);
@@ -567,11 +644,19 @@ void BulletPhysicsObjectComponent::OnRender() {
 		} else if(shape == RIGID_BODY_SHAPE::CAPSULE) {
 			glm::vec3 position = object3D->transform->position;
 			glm::vec3 rotation = object3D->transform->rotation;
-			btCapsuleShape* coneShape = (btCapsuleShape*) colShape;
-			float radius = coneShape->getRadius();
-			float height = coneShape->getHalfHeight() * 2;
-			glm::vec3 scale =  glm::vec3(radius, height, radius);
-			object3D->scene->drawImmediate.DrawWireCapsule(position, rotation, scale, glm::vec4(1, 0, 0, 1));
+
+			btCapsuleShape* capsuleShape = (btCapsuleShape*) colShape;
+			float radius = capsuleShape->getRadius();
+			float height = capsuleShape->getHalfHeight() * 2 + 2 * radius;
+
+			object3D->scene->drawImmediate.DrawWireCapsule(position, rotation, glm::vec3(1), height, radius, glm::vec4(1, 0, 0, 1));
+		} else if(shape == RIGID_BODY_SHAPE::CYLINDER) {
+			glm::vec3 position = object3D->transform->position;
+			glm::vec3 rotation = object3D->transform->rotation;
+
+			btCylinderShape* capsuleShape = (btCylinderShape*) colShape;
+			btVector3 size = capsuleShape->getHalfExtentsWithMargin();
+			object3D->scene->drawImmediate.DrawWireCylinder(position, rotation, glm::vec3(size.x(), size.y(), size.z()), glm::vec4(1, 0, 0, 1));
 		}
 	}
 }

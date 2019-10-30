@@ -61,6 +61,7 @@ class BulletPhysicsObjectComponent : public Component {
 	
     
         double mass = 0;
+        double margin = 0.25;
         // RIGID_BODY_TYPE type;
         RIGID_BODY_SHAPE shape;
         BODY_TYPE bodyType;
