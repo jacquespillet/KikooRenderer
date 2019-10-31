@@ -65,10 +65,13 @@ namespace CoreEngine {
         AddObject(terrain);
         simulation.AddObject(terrain);
           
-        Object3D* cone = GetCylinder(this, "cone", glm::vec3(0, 5, 0), glm::vec3(0, 0, 0), glm::vec3(1), KikooRenderer::Util::GetRandomColor(), 4, 1);
+        // Object3D* cone = GetCylinder(this, "cone", glm::vec3(0, 5, 0), glm::vec3(0, 0, 0), glm::vec3(1), KikooRenderer::Util::GetRandomColor(), 4, 1);
+        // Object3D* cone = GetSphere(this, "cone", glm::vec3(0, 5, 0), glm::vec3(0, 0, 0), glm::vec3(1), KikooRenderer::Util::GetRandomColor());
+        Object3D* cone = CoreEngine::ObjectFromModelFile(this, "Bunny", "resources/Models/bunny/untitled.obj");
         cone->Enable();  
         cone->Start();
-        BulletPhysicsObjectComponent* physicsCone = new BulletPhysicsObjectComponent(cone, 1, RIGID_BODY_SHAPE::CYLINDER, BODY_TYPE::RIGID);
+        cone->transform->position.y = 5;
+        BulletPhysicsObjectComponent* physicsCone = new BulletPhysicsObjectComponent(cone, 1, RIGID_BODY_SHAPE::MESH, BODY_TYPE::RIGID);
         cone->AddComponent(physicsCone);
         AddObject(cone);
         simulation.AddObject(cone);

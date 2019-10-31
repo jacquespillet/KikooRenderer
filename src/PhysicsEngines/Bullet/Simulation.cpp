@@ -18,11 +18,12 @@ void Simulation::SetScene(CoreEngine::Scene* _scene) {
 }
 
 void Simulation::SetWorld(WORLD_TYPE _worldType) {
-	Destroy();
+	Destroy(false);
 	worldType = _worldType;
 	Init();
 	for(int i=0; i<scene->objects3D.size(); i++) {
 		CoreEngine::BulletPhysicsObjectComponent* physicsComponent = scene->objects3D[i]->GetComponent<CoreEngine::BulletPhysicsObjectComponent>();
+		// physicsComponent->Init(); // ?????????????????
 		if(physicsComponent != nullptr) {
 			if(worldType == WORLD_TYPE::RIGID && (physicsComponent->bodyType == CoreEngine::BODY_TYPE::SOFT || physicsComponent->bodyType == CoreEngine::BODY_TYPE::DEFORMABLE)) {
 				//DONT ADD IT IF NOT COMPATIBLE WITH CURRENT WORLD
@@ -109,7 +110,6 @@ void Simulation::Init() {
     	world->setLineSearch(false);
 		btVector3 gravity = btVector3(0, -10, 0);
 		world->setGravity(gravity);		
-
 	}
     GetSceneData();
 }
@@ -261,7 +261,7 @@ void Simulation::SetSceneData() {
 }
 
 
-void Simulation::Destroy() {
+void Simulation::Destroy(bool destroyObjects) {
 	objects.clear();
     softBodies.clear();
 	
@@ -271,10 +271,10 @@ void Simulation::Destroy() {
 		btRigidBody* body = btRigidBody::upcast(obj);
 		if (body && body->getMotionState())
 		{
-			delete body->getMotionState();
+			if(destroyObjects) delete body->getMotionState();
 		}
 		dynamicsWorld->removeCollisionObject(obj);
-		delete obj;
+		if(destroyObjects) delete obj;
 	}
 
 	//delete collision shapes
@@ -282,7 +282,7 @@ void Simulation::Destroy() {
 	{
 		btCollisionShape* shape = collisionShapes[j];
 		collisionShapes[j] = 0;
-		delete shape;
+		if(destroyObjects) delete shape;
 	}
 
 	//delete dynamics world

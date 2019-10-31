@@ -24,16 +24,8 @@ public:
 	BulletPhysicsObjectComponent* bulletPhysicsObjectComponent;
 	Scene* scene;
 
-	// QDoubleSpinBox* xPositionSpinBox;
-	// QDoubleSpinBox* yPositionSpinBox;
-	// QDoubleSpinBox* zPositionSpinBox;
-	// QDoubleSpinBox* xRotationSpinBox;
-	// QDoubleSpinBox* yRotationSpinBox;
-	// QDoubleSpinBox* zRotationSpinBox;
-	// QDoubleSpinBox* xScaleSpinBox;
-	// QDoubleSpinBox* yScaleSpinBox;
-	// QDoubleSpinBox* zScaleSpinBox;
-
+    QGroupBox* rigidBodySettingsGroupBox;
+    QGroupBox* softBodySettingsGroupBox;
 
 	void Refresh();
 };
@@ -50,6 +42,8 @@ class BulletPhysicsObjectComponent : public Component {
         void OnDestroy();
 		void Recompute();
 
+        void Init();
+
         ComponentInspector* GetInspector();
 
 		BulletPhysicsObjectInspector* bulletPhysicsObjectInspector;
@@ -58,7 +52,10 @@ class BulletPhysicsObjectComponent : public Component {
         static void FromJSON(QJsonObject json, Object3D* obj);		
 
         bool showBounds = false;
-	
+
+        std::vector<int> staticNodeIndices;
+
+        Object3D* meshColliderObject;
     
         double mass = 0;
         double margin = 0.25;

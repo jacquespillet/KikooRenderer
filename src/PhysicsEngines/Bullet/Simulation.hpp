@@ -30,7 +30,7 @@ public:
     void SetScene(CoreEngine::Scene* scene);
     void Init();
     void Simulate();
-    void Destroy();
+    void Destroy(bool destroyObjects = true);
 
     void AddObject(CoreEngine::Object3D* object3D);
     void RemoveObject(CoreEngine::Object3D* object3D);

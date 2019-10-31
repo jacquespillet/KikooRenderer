@@ -20,14 +20,44 @@ BulletPhysicsObjectInspector::BulletPhysicsObjectInspector(BulletPhysicsObjectCo
 	this->bulletPhysicsObjectComponent = _bulletPhysicsObjectComponent;
 	Object3D* object = bulletPhysicsObjectComponent->object3D;
 	scene = object->scene;
+
 	QVBoxLayout* mainLayout = new QVBoxLayout();
 
+	///0.__________________________________________________________________________________________________________
+	//Body Type
+	QHBoxLayout* bodyTypeLayout = new QHBoxLayout();
+	QComboBox* bodyTypeList = new QComboBox();
+	QLabel* bodyTypeLabel = new QLabel("Body Type");
+	bodyTypeList->addItem("Rigid");
+	bodyTypeList->addItem("Soft");
+	bodyTypeList->addItem("Deformable");
+
+	bodyTypeList->setCurrentIndex(bulletPhysicsObjectComponent->bodyType);
+
+	bodyTypeLayout->addWidget(bodyTypeLabel);
+	bodyTypeLayout->addWidget(bodyTypeList);
+	mainLayout->addLayout(bodyTypeLayout);
+
+	connect(bodyTypeList, static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged), this, [this](int index) {
+		//TODO : CHECK IF PRESENT IN THE SCENE : If going from soft to rigid in a rigid world, the object will not be in the scene!
+		bulletPhysicsObjectComponent->object3D->scene->GetSimulation()->RemoveObject(bulletPhysicsObjectComponent->object3D);
+		bulletPhysicsObjectComponent->bodyType = (BODY_TYPE)index;
+		bulletPhysicsObjectComponent->Init(); 
+		bulletPhysicsObjectComponent->object3D->scene->GetSimulation()->AddObject(bulletPhysicsObjectComponent->object3D);
+        scene->triggerRefresh = true;
+		rigidBodySettingsGroupBox->setVisible(false);
+		softBodySettingsGroupBox->setVisible(true);
+	});
 	
 	///1.__________________________________________________________________________________________________________
 	//Shape size inspectors
 	
 	//////1.1__________________________________________________________________________________________________________
 	/////Box
+	QVBoxLayout* rigidBodyLayout = new QVBoxLayout();
+	rigidBodySettingsGroupBox = new QGroupBox("Rigid Body Settings");
+	rigidBodySettingsGroupBox->setLayout(rigidBodyLayout);
+
 	Vector3Inspector* boxSizeInspector;
 	{
 		glm::vec3 min, max;
@@ -140,7 +170,6 @@ BulletPhysicsObjectInspector::BulletPhysicsObjectInspector(BulletPhysicsObjectCo
 		float sizeZ = max.z - min.z;	
 		cylinderSizeInspector = new Vector3Inspector("Cylinder Collider Size", glm::vec3(sizeX, sizeY, sizeZ));
 		connect(cylinderSizeInspector, &Vector3Inspector::Modified, this, [this](glm::vec3 vector) {
-			std::cout << glm::to_string(vector) << std::endl;
 			bulletPhysicsObjectComponent->colShape =  new btCylinderShape(btVector3(vector.x * 0.5,vector.y * 0.5,vector.z * 0.5));
 			bulletPhysicsObjectComponent->rigidBody->setCollisionShape(bulletPhysicsObjectComponent->colShape);
 			scene->triggerRefresh = true;
@@ -167,7 +196,7 @@ BulletPhysicsObjectInspector::BulletPhysicsObjectInspector(BulletPhysicsObjectCo
 
 	shapeLayout->addWidget(shapeLabel);
 	shapeLayout->addWidget(shapeList);
-	mainLayout->addLayout(shapeLayout);
+	rigidBodyLayout->addLayout(shapeLayout);
 
 	connect(shapeList, static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged), this, [this, boxSizeInspector,cylinderSizeInspector, coneShapeSizeWidget, sphereRadiusSlider, capsuleShapeSizeWidget](int index) {
 		if(RIGID_BODY_SHAPE::BOX == (RIGID_BODY_SHAPE) index) {
@@ -194,7 +223,6 @@ BulletPhysicsObjectInspector::BulletPhysicsObjectInspector(BulletPhysicsObjectCo
 		} else if(RIGID_BODY_SHAPE::CONE == (RIGID_BODY_SHAPE) index) {
 			float radiusScale = 0.25 * (bulletPhysicsObjectComponent->object3D->transform->scale.x + bulletPhysicsObjectComponent->object3D->transform->scale.y) * 0.5;
 			float height = 1 * bulletPhysicsObjectComponent->object3D->transform->scale.z;
-			std::cout << "Values " << radiusScale << "  " << height << std::endl;
 
 			bulletPhysicsObjectComponent->colShape =  new btConeShapeZ(radiusScale, height);
 
@@ -237,35 +265,42 @@ BulletPhysicsObjectInspector::BulletPhysicsObjectInspector(BulletPhysicsObjectCo
 			capsuleShapeSizeWidget->setVisible(false);	
 			cylinderSizeInspector->setVisible(true);		
 		}  else if(RIGID_BODY_SHAPE::MESH == (RIGID_BODY_SHAPE) index) {
-			//https://pybullet.org/Bullet/phpBB3/viewtopic.php?t=4513	
+			boxSizeInspector->setVisible(false);			
+			coneShapeSizeWidget->setVisible(false);	
+			sphereRadiusSlider->SetVisible(false);
+			capsuleShapeSizeWidget->setVisible(false);	
+			cylinderSizeInspector->setVisible(false);
+
+			//Duplicate object into meshColliderObject
 		} 
 		// else if(RIGID_BODY_SHAPE::HEIGHTFIELD == (RIGID_BODY_SHAPE) index) {
 		// 	//https://pybullet.org/Bullet/BulletFull/classbtHeightfieldTerrainShape.html
 		// }
         scene->triggerRefresh = true;
 	});
+
+	rigidBodyLayout->addWidget(boxSizeInspector);
+	rigidBodyLayout->addWidget(coneShapeSizeWidget);
+	rigidBodyLayout->addLayout(sphereRadiusSlider);
+	rigidBodyLayout->addWidget(capsuleShapeSizeWidget);
+	rigidBodyLayout->addWidget(cylinderSizeInspector);
 	///__________________________________________________________________________________________________________
 	
 	///3.__________________________________________________________________________________________________________
 	///Enable / Disable visualisation of the bounding box
 	QCheckBox* rigidBodyVisibleCheckBox = new QCheckBox("Show Bounds");
-    mainLayout->addWidget(rigidBodyVisibleCheckBox);
+    rigidBodyLayout->addWidget(rigidBodyVisibleCheckBox);
 	connect(rigidBodyVisibleCheckBox, &QCheckBox::stateChanged, this, [this](int state ) {
 		bulletPhysicsObjectComponent->showBounds = state > 0;
         scene->triggerRefresh = true;
 	});
-
-	mainLayout->addWidget(boxSizeInspector);
-	mainLayout->addWidget(coneShapeSizeWidget);
-	mainLayout->addLayout(sphereRadiusSlider);
-	mainLayout->addWidget(capsuleShapeSizeWidget);
-	mainLayout->addWidget(cylinderSizeInspector);
 	///__________________________________________________________________________________________________________
+
 
 	///4.__________________________________________________________________________________________________________
     ///Sets the mass of the physical object
 	CustomSlider* massSlider = new CustomSlider(0.0f, 3.0f, 0.01, "Mass", bulletPhysicsObjectComponent->mass);
-    mainLayout->addLayout(massSlider);
+    rigidBodyLayout->addLayout(massSlider);
     QObject::connect(massSlider, &CustomSlider::Modified, [this](double val) {
         bulletPhysicsObjectComponent->mass = val;
 
@@ -284,7 +319,7 @@ BulletPhysicsObjectInspector::BulletPhysicsObjectInspector(BulletPhysicsObjectCo
 	///5.__________________________________________________________________________________________________________
 	//Set the margin
 	CustomSlider* marginSlider = new CustomSlider(0.0f, 2.0f, 0.01, "Collider Margin", bulletPhysicsObjectComponent->margin);
-    mainLayout->addLayout(marginSlider);
+    rigidBodyLayout->addLayout(marginSlider);
     QObject::connect(marginSlider, &CustomSlider::Modified, [this](double val) {
         bulletPhysicsObjectComponent->margin = val;
 		bulletPhysicsObjectComponent->colShape->setMargin(val);
@@ -321,13 +356,40 @@ BulletPhysicsObjectInspector::BulletPhysicsObjectInspector(BulletPhysicsObjectCo
     });
 	frictionMainLayout->addLayout(spinningFrictionSlider);
 
-	mainLayout->addWidget(frictionGroupBox);
+	rigidBodyLayout->addWidget(frictionGroupBox);
 	///__________________________________________________________________________________________________________
+	mainLayout->addWidget(rigidBodySettingsGroupBox);
+
+	//II. Soft Bodies
+	//___________________________________________________________________________________________________________
+	QVBoxLayout* softBodyLayout = new QVBoxLayout();
+	softBodySettingsGroupBox = new QGroupBox("Soft Body Settings");
+	softBodySettingsGroupBox->setLayout(softBodyLayout);
+
+    double initialVal = (bulletPhysicsObjectComponent->softBody != nullptr) ? 0.01 : bulletPhysicsObjectComponent->softBody->m_materials[0]->m_kLST;
+	CustomSlider* stiffnessSlider = new CustomSlider(0.0f, 1.0f, 0.001, "Stiffness",initialVal);
+	QObject::connect(stiffnessSlider, &CustomSlider::Modified, [this](double val) {
+		bulletPhysicsObjectComponent->softBody->m_materials[0]->m_kLST = val;  // Linear stiffness coefficient [0,1]
+		bulletPhysicsObjectComponent->softBody->m_materials[0]->m_kAST = val;  // Area/Angular stiffness coefficient [0,1]
+		bulletPhysicsObjectComponent->softBody->m_materials[0]->m_kVST = val;
+        scene->triggerRefresh = true;
+    });
+	softBodyLayout->addLayout(stiffnessSlider);
+
+
+    initialVal = (bulletPhysicsObjectComponent->softBody != nullptr) ? 0.1 : bulletPhysicsObjectComponent->softBody->m_cfg.kMT;
+	CustomSlider* poseMatchingSlider = new CustomSlider(0.0f, 1.0f, 0.001, "poseMatching",initialVal);
+    QObject::connect(poseMatchingSlider, &CustomSlider::Modified, [this](double val) {
+		bulletPhysicsObjectComponent->softBody->m_cfg.kMT = val;
+		scene->triggerRefresh = true;
+    });
+	softBodyLayout->addLayout(poseMatchingSlider);
+
+	softBodySettingsGroupBox->setVisible(false);
+	mainLayout->addWidget(softBodySettingsGroupBox);
 
 	//If soft or deformable
-		//Material settings
 		//Deformation settings
-		//Pose Saving settings
 		//Wind settings
 		//Contact hardness settings
 
@@ -336,34 +398,43 @@ BulletPhysicsObjectInspector::BulletPhysicsObjectInspector(BulletPhysicsObjectCo
 	setLayout(mainLayout);
 }
 
-BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object, double _mass, RIGID_BODY_SHAPE _shape, BODY_TYPE _bodyType, std::vector<int> staticNodeIndices) : Component("Bullet", object) {
-	this->mass = _mass;
-	this->bb = object->GetComponent<BoundingBoxComponent>();
-	this->mesh = object->GetComponent<MeshFilterComponent>();
-	this->transform = object->transform;
-	this->shape = _shape;
-	this->bodyType = _bodyType;
+void BulletPhysicsObjectComponent::Init() {
 
-	if(_bodyType == BODY_TYPE::RIGID) {
-		if(_shape == RIGID_BODY_SHAPE::BOX) {
+	if(bodyType == BODY_TYPE::RIGID) {
+		if(shape == RIGID_BODY_SHAPE::BOX) {
 			glm::vec3 min, max;
 			bb->GetLocalBounds(&min, &max);
-			min *= object->transform->scale;
-			max *= object->transform->scale;
+			min *= object3D->transform->scale;
+			max *= object3D->transform->scale;
 
 			float sizeX = std::max(max.x - min.x, 0.1f);
 			float sizeY = std::max(max.y - min.y, 0.1f);
 			float sizeZ = std::max(max.z - min.z, 0.1f);
 			
 			colShape =  new btBoxShape(btVector3(sizeX * 0.5,sizeY * 0.5,sizeZ * 0.5));
-		} else if (_shape == RIGID_BODY_SHAPE::CONE) {
+		} else if (shape == RIGID_BODY_SHAPE::CONE) {
 			colShape =  new btConeShapeZ(0.25, 1);
-		} else if(_shape == RIGID_BODY_SHAPE::SPHERE) {
-			colShape =  new btSphereShape(btScalar(object->transform->scale.x));
-		} else if(_shape == RIGID_BODY_SHAPE::CAPSULE) {
+		} else if(shape == RIGID_BODY_SHAPE::SPHERE) {
+			colShape =  new btSphereShape(btScalar(object3D->transform->scale.x));
+		} else if(shape == RIGID_BODY_SHAPE::CAPSULE) {
 			colShape =  new btCapsuleShape(1, 2);
-		} else if(_shape == RIGID_BODY_SHAPE::CYLINDER) {
+		} else if(shape == RIGID_BODY_SHAPE::CYLINDER) {
 			colShape =  new btCylinderShape(btVector3(1, 1, 1));
+		} else if(shape == RIGID_BODY_SHAPE::MESH) {
+			btTriangleMesh* trimesh = new btTriangleMesh();
+			for (int i = 0; i < mesh->GetTriangles().size(); i+=3)
+			{
+				int index0 = mesh->GetTriangles()[i];
+				int index1 = mesh->GetTriangles()[i + 1];
+				int index2 = mesh->GetTriangles()[i + 2];
+
+				btVector3 vertex0(mesh->vertices[index0].position.x, mesh->vertices[index0].position.y, mesh->vertices[index0].position.z);
+				btVector3 vertex1(mesh->vertices[index1].position.x, mesh->vertices[index1].position.y, mesh->vertices[index1].position.z);
+				btVector3 vertex2(mesh->vertices[index2].position.x, mesh->vertices[index2].position.y, mesh->vertices[index2].position.z);
+			
+				trimesh->addTriangle(vertex0, vertex1, vertex2);
+			}
+			colShape = new btConvexTriangleMeshShape(trimesh);
 		}
 		  
 		/// Create Dynamic Objects
@@ -392,7 +463,7 @@ BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object, dou
 		rigidBody->setRollingFriction(0.1);
 		rigidBody->setSpinningFriction(0.1);
 		rigidBody->setAnisotropicFriction(colShape->getAnisotropicRollingFrictionDirection(), btCollisionObject::CF_ANISOTROPIC_ROLLING_FRICTION);
-	} else if(_bodyType == BODY_TYPE::SOFT) {
+	} else if(bodyType == BODY_TYPE::SOFT) {
 		std::vector<btScalar> vertices(mesh->vertices.size() * 3);
 		glm::mat4 modelMatrix = transform->GetModelMatrix();
 		transform->position = glm::vec3(0);
@@ -405,21 +476,21 @@ BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object, dou
 			vertices[j]   =  (btScalar)(finalPos.x);
 			vertices[j+1] = (btScalar)(finalPos.y);
 			vertices[j+2] = (btScalar)(finalPos.z);
-		}		
+		}	
 		btSoftRigidDynamicsWorld* world = (btSoftRigidDynamicsWorld*)object3D->scene->GetSimulation()->dynamicsWorld; 
 
 		softBody = btSoftBodyHelpers::CreateFromTriMesh (world->getWorldInfo(),
 			&vertices[0], 
-			&mesh->GetTriangles()[0], 
+			&mesh->GetTriangles()[0],
 			mesh->GetTriangles().size() / 3
 		);
 
 		softBody->generateBendingConstraints(2, softBody->m_materials[0]);
 
 		softBody->getCollisionShape()->setMargin(0.2);	
-		softBody->m_cfg.piterations = 200;
-		softBody->m_cfg.citerations = 200;
-		softBody->m_cfg.diterations = 200;
+		softBody->m_cfg.piterations = 10;
+		softBody->m_cfg.citerations = 10;
+		softBody->m_cfg.diterations = 10;
 		// softBody->m_cfg.viterations = 200;
 		
 		//MATERIAL SETTINGS
@@ -431,7 +502,7 @@ BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object, dou
 		
 		//SAVE POSE
 		{
-			softBody->m_cfg.kMT = 0.2;
+			softBody->m_cfg.kMT = 0.1;
 			softBody->setPose(true, true);
 		}
 
@@ -446,8 +517,6 @@ BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object, dou
 		//WIND
 		{
 			// softBody->m_cfg.aeromodel = btSoftBody::eAeroModel::V_TwoSided;
-			// softBody->setTotalMass(0.0001);
-			// softBody->addForce(btVector3(0, 0.01, 0), 0);
 		}
 
 		//OTHER PARAMS
@@ -484,7 +553,7 @@ BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object, dou
 		for(int i=0; i<staticNodeIndices.size(); i++) {
 			softBody->setMass(staticNodeIndices[i], 0);
 		}
-	} else if(_bodyType == BODY_TYPE::DEFORMABLE) {
+	} else if(bodyType == BODY_TYPE::DEFORMABLE) {
 		std::vector<btScalar> vertices(mesh->vertices.size() * 3);
 		glm::mat4 modelMatrix = transform->GetModelMatrix();
 		transform->position = glm::vec3(0);
@@ -599,7 +668,18 @@ BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object, dou
 		}
 
 	}
-	
+}
+
+BulletPhysicsObjectComponent::BulletPhysicsObjectComponent(Object3D* object, double _mass, RIGID_BODY_SHAPE _shape, BODY_TYPE _bodyType, std::vector<int> _staticNodeIndices) : Component("Bullet", object) {
+	this->mass = _mass;
+	this->bb = object->GetComponent<BoundingBoxComponent>();
+	this->mesh = object->GetComponent<MeshFilterComponent>();
+	this->transform = object->transform;
+	this->shape = _shape;
+	this->bodyType = _bodyType;
+	this->staticNodeIndices = _staticNodeIndices;
+
+	Init();
 }
 
 void BulletPhysicsObjectComponent::OnStart() {
@@ -657,7 +737,12 @@ void BulletPhysicsObjectComponent::OnRender() {
 			btCylinderShape* capsuleShape = (btCylinderShape*) colShape;
 			btVector3 size = capsuleShape->getHalfExtentsWithMargin();
 			object3D->scene->drawImmediate.DrawWireCylinder(position, rotation, glm::vec3(size.x(), size.y(), size.z()), glm::vec4(1, 0, 0, 1));
-		}
+		} else if(shape == RIGID_BODY_SHAPE::MESH) {
+			// float margin = colShape->getMargin();
+			// glm::vec3 scale = tmpScale + glm::vec3(5);
+			// meshColliderObject->transform->scale = scale;
+			// meshColliderObject->Render();
+		}		
 	}
 }
 
