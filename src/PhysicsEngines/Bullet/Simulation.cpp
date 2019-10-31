@@ -160,25 +160,27 @@ void Simulation::AddObject(CoreEngine::Object3D* object3D) {
 
 void Simulation::RemoveObject(CoreEngine::Object3D* object3D) {
 	CoreEngine::BulletPhysicsObjectComponent* physicsObjectComponent = object3D->GetComponent<CoreEngine::BulletPhysicsObjectComponent>();
-	dynamicsWorld->removeRigidBody(physicsObjectComponent->rigidBody);
+	if(physicsObjectComponent != nullptr) {
+		dynamicsWorld->removeRigidBody(physicsObjectComponent->rigidBody);
 
-	for(int i=0; i<objects.size(); i++) {
-		if(objects[i] == object3D) {
-			objects.erase(objects.begin() + i);
-			break;
+		for(int i=0; i<objects.size(); i++) {
+			if(objects[i] == object3D) {
+				objects.erase(objects.begin() + i);
+				break;
+			}
 		}
-	}
 
-	for(int i=0; i<softBodies.size(); i++) {
-		if(softBodies[i] == object3D) {
-			softBodies.erase(softBodies.begin() + i);
-			break;
+		for(int i=0; i<softBodies.size(); i++) {
+			if(softBodies[i] == object3D) {
+				softBodies.erase(softBodies.begin() + i);
+				break;
+			}
 		}
+
+		initialTransforms.erase(object3D);
+
+		collisionShapes.remove (physicsObjectComponent->colShape);
 	}
-
-	initialTransforms.erase(object3D);
-
-	collisionShapes.remove (physicsObjectComponent->colShape);
 }
 
 void Simulation::GetSceneData() {

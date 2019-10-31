@@ -50,7 +50,6 @@ namespace CoreEngine {
 
 		std::vector<glm::vec3> positions;
 
-        Object3D* GetBoxObject();
 
         bool shouldRefresh = false;
 
@@ -60,7 +59,6 @@ namespace CoreEngine {
         static void FromJSON(QJsonObject json, Object3D* obj);
     
     private: 
-        Object3D* boxObject;
         TransformComponent* transform;
 		BoundingBoxInspector* boundingBoxInspector;
     };

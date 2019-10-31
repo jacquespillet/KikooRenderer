@@ -429,7 +429,7 @@ namespace CoreEngine {
 			int intersectInx = -1;
 			for(int i=0; i<rotateObject->childObjects.size(); i++) {
 				double currentDistance;
-				bool intersects = Util::RayWireCircleTest(ray.origin, ray.direction, rotateObject->childObjects[i]->transform->GetWorldModelMatrix(), 1, currentDistance);
+				bool intersects = Util::RayWireCircleTest(ray.origin, ray.direction, rotateObject->childObjects[i]->transform->GetWorldModelMatrix(),  this->transform->scale.x, currentDistance);
 				if(intersects) {
 					if(currentDistance <= minDistance) {
 						minDistance = currentDistance;
