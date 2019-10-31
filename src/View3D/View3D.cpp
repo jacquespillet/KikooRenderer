@@ -185,12 +185,10 @@ View3D::View3D() : QDockWidget("3D View")
     stopButton->setIcon(stopButtonIcon);
     viewportToolbar->addWidget(stopButton);
 
-	connect(stopButton, &QPushButton::clicked, this, [this, stopButton]() {
+	connect(stopButton, &QPushButton::clicked, this, [this, playButton]() {
 		view3DGL->scene->Stop();
-		if(view3DGL->scene->IsPlaying()) {
-			QIcon ButtonIcon(style()->standardIcon(QStyle::SP_MediaPause));
-			stopButton->setIcon(ButtonIcon);
-		}
+        QIcon ButtonIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+        playButton->setIcon(ButtonIcon);
 	});    
 
 

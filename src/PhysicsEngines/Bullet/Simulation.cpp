@@ -149,6 +149,13 @@ void Simulation::AddObject(CoreEngine::Object3D* object3D) {
 			objects.push_back(object3D);
 		}
 	}
+
+	for(int i=0; i<objects.size(); i++) {
+		Transform t;
+		t.position = objects[i]->transform->position;
+		t.rotation = objects[i]->transform->rotation;
+		initialTransforms[objects[i]] = t;
+	}	
 }
 
 void Simulation::RemoveObject(CoreEngine::Object3D* object3D) {
@@ -168,6 +175,8 @@ void Simulation::RemoveObject(CoreEngine::Object3D* object3D) {
 			break;
 		}
 	}
+
+	initialTransforms.erase(object3D);
 
 	collisionShapes.remove (physicsObjectComponent->colShape);
 }
@@ -260,6 +269,15 @@ void Simulation::Simulate() {
 void Simulation::SetSceneData() {
 }
 
+void Simulation::Stop() {
+	for(int i=0; i<objects.size(); i++) {
+		Transform t = initialTransforms[objects[i]];
+		objects[i]->transform->position = t.position;
+		objects[i]->transform->rotation = t.rotation;
+		objects[i]->transform->hasChanged = true;
+	}
+	scene->triggerRefresh = true;
+}
 
 void Simulation::Destroy(bool destroyObjects) {
 	objects.clear();
@@ -286,24 +304,24 @@ void Simulation::Destroy(bool destroyObjects) {
 	}
 
 	//delete dynamics world
-	delete dynamicsWorld;
+	if(dynamicsWorld != nullptr) delete dynamicsWorld;
 
 	//delete solver
-	delete solver;
+	if(solver != nullptr) delete solver;
 
 	//delete broadphase
-	delete overlappingPairCache;
+	if(overlappingPairCache != nullptr) delete overlappingPairCache;
 
 	//delete dispatcher
-	delete dispatcher;
+	if(dispatcher != nullptr) delete dispatcher;
 
-	delete collisionConfiguration;
+	if(collisionConfiguration != nullptr) delete collisionConfiguration;
 
-	delete softBodySolver;
+	if(softBodySolver != nullptr) delete softBodySolver;
 
-	delete deformableBodySolver;
+	if(deformableBodySolver != nullptr) delete deformableBodySolver;
 	
-	delete deformableConstraintSolver;
+	if(deformableConstraintSolver != nullptr) delete deformableConstraintSolver;
 
 	collisionShapes.clear();
 }

@@ -473,7 +473,8 @@ namespace CoreEngine {
     }
 
     void Scene::Stop() {
-        // simulation.Stop();
+        isPlaying = false;
+        simulation.Stop();
     }    
 
     bool Scene::IsPlaying() {

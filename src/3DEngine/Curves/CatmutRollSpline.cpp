@@ -55,7 +55,6 @@ void CatmutRollSpline::Update() {
     if(isEdit) {
         for(int i=0; i<editingObjects.size(); i++) {
             if(editingObjects[i]->transform->hasChanged) {
-                std::cout << "HERE "<< std::endl;
                 points[i] = editingObjects[i]->transform->GetWorldPosition();
                 ComputePositions();
                 editingObjects[i]->transform->hasChanged = false;

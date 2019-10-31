@@ -16,6 +16,10 @@ namespace CoreEngine {
 			Object3D* xline = GetLine(scene, "lineX", glm::vec3(0, 0, 0), glm::vec3(1, 0, 0), glm::vec4(1.0, 0.0, 0.0, 1.0), true);
 			xcone->depthTest = false;
 			xline->depthTest = false;
+			xcone->transform->hasChanged = false;
+			xline->transform->hasChanged = false;
+			xcone->GetComponent<MaterialComponent>()->firstIter = false;
+			xline->GetComponent<MaterialComponent>()->firstIter = false;
 
 			translateObject->AddObject(xcone);
 			translateObject->AddObject(xline);
@@ -24,6 +28,10 @@ namespace CoreEngine {
 			Object3D* yline = GetLine(scene, "lineY", glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), glm::vec4(0.0, 1.0, 0.0, 1.0), true);
 			ycone->depthTest = false;
 			yline->depthTest = false;
+			ycone->transform->hasChanged = false;
+			yline->transform->hasChanged = false;
+			ycone->GetComponent<MaterialComponent>()->firstIter = false;
+			yline->GetComponent<MaterialComponent>()->firstIter = false;
 
 			translateObject->AddObject(ycone);
 			translateObject->AddObject(yline);
@@ -32,6 +40,10 @@ namespace CoreEngine {
 			Object3D* zline = GetLine(scene, "lineZ", glm::vec3(0, 0, 0), glm::vec3(0, 0, 1), glm::vec4(0.0, 0.0, 1.0, 1.0), true);
 			zcone->depthTest = false;
 			zline->depthTest = false;
+			zcone->transform->hasChanged = false;
+			zline->transform->hasChanged = false;
+			zcone->GetComponent<MaterialComponent>()->firstIter = false;
+			zline->GetComponent<MaterialComponent>()->firstIter = false;
 
 			translateObject->AddObject(zcone);
 			translateObject->AddObject(zline);

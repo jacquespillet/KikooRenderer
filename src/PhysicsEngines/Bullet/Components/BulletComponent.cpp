@@ -45,8 +45,14 @@ BulletPhysicsObjectInspector::BulletPhysicsObjectInspector(BulletPhysicsObjectCo
 		bulletPhysicsObjectComponent->Init(); 
 		bulletPhysicsObjectComponent->object3D->scene->GetSimulation()->AddObject(bulletPhysicsObjectComponent->object3D);
         scene->triggerRefresh = true;
-		rigidBodySettingsGroupBox->setVisible(false);
-		softBodySettingsGroupBox->setVisible(true);
+
+		if((BODY_TYPE)index == BODY_TYPE::RIGID) {
+			rigidBodySettingsGroupBox->setVisible(true);
+			softBodySettingsGroupBox->setVisible(false);
+		} else if((BODY_TYPE)index == BODY_TYPE::RIGID) {
+			rigidBodySettingsGroupBox->setVisible(false);
+			softBodySettingsGroupBox->setVisible(true);
+		}
 	});
 	
 	///1.__________________________________________________________________________________________________________
@@ -366,7 +372,8 @@ BulletPhysicsObjectInspector::BulletPhysicsObjectInspector(BulletPhysicsObjectCo
 	softBodySettingsGroupBox = new QGroupBox("Soft Body Settings");
 	softBodySettingsGroupBox->setLayout(softBodyLayout);
 
-    double initialVal = (bulletPhysicsObjectComponent->softBody != nullptr) ? 0.01 : bulletPhysicsObjectComponent->softBody->m_materials[0]->m_kLST;
+    // double initialVal = (bulletPhysicsObjectComponent->softBody == nullptr) ? 0.01 : bulletPhysicsObjectComponent->softBody->m_materials[0]->m_kLST;
+    double initialVal = 0.1;
 	CustomSlider* stiffnessSlider = new CustomSlider(0.0f, 1.0f, 0.001, "Stiffness",initialVal);
 	QObject::connect(stiffnessSlider, &CustomSlider::Modified, [this](double val) {
 		bulletPhysicsObjectComponent->softBody->m_materials[0]->m_kLST = val;  // Linear stiffness coefficient [0,1]
@@ -377,7 +384,8 @@ BulletPhysicsObjectInspector::BulletPhysicsObjectInspector(BulletPhysicsObjectCo
 	softBodyLayout->addLayout(stiffnessSlider);
 
 
-    initialVal = (bulletPhysicsObjectComponent->softBody != nullptr) ? 0.1 : bulletPhysicsObjectComponent->softBody->m_cfg.kMT;
+    // initialVal = (bulletPhysicsObjectComponent->softBody == nullptr) ? 0.1 : bulletPhysicsObjectComponent->softBody->m_cfg.kMT;
+    initialVal = 0.1;
 	CustomSlider* poseMatchingSlider = new CustomSlider(0.0f, 1.0f, 0.001, "poseMatching",initialVal);
     QObject::connect(poseMatchingSlider, &CustomSlider::Modified, [this](double val) {
 		bulletPhysicsObjectComponent->softBody->m_cfg.kMT = val;
@@ -590,79 +598,6 @@ void BulletPhysicsObjectComponent::Init() {
 			world->addForce(softBody, mass_spring2);
 			// m_forces.push_back(mass_spring2);
 			
-			btVector3 gravity = btVector3(0, -10, 0);
-			btDeformableGravityForce* gravity_force2 =  new btDeformableGravityForce(gravity);
-			world->addForce(softBody, gravity_force2);
-			// m_forces.push_back(gravity_force2);			
-
-			// softBody->generateBendingConstraints(2, softBody->m_materials[0]);
-
-			// softBody->getCollisionShape()->setMargin(0.2);	
-			// softBody->m_cfg.piterations = 2;
-			// softBody->m_cfg.citerations = 2;
-			// softBody->m_cfg.diterations = 2;
-			// // softBody->m_cfg.viterations = 200;
-			
-			// //MATERIAL SETTINGS
-			// {
-			// 	// softBody->m_materials[0]->m_kLST = 0.01;  // Linear stiffness coefficient [0,1]
-			// 	// softBody->m_materials[0]->m_kAST = 0.01;  // Area/Angular stiffness coefficient [0,1]
-			// 	// softBody->m_materials[0]->m_kVST = 0.01;  // Volume stiffness coefficient [0,1]
-			// }
-			
-			// //SAVE POSE
-			// {
-				// softBody->m_cfg.kMT = 1;
-				// softBody->setPose(false, true);
-			// }
-
-			// //DEFORMATION
-			// {
-			// 	// softBody->m_cfg.kDF = 0.5;
-			// 	// softBody->m_cfg.kDP = 0.001;  // fun factor...
-			// 	// softBody->m_cfg.kPR = 2000;	 //Pressure coefficient [-inf,+inf]	
-			// 	// softBody->m_cfg.kVC = 20;
-			// }
-
-			// //WIND
-			// {
-			// 	// softBody->m_cfg.aeromodel = btSoftBody::eAeroModel::V_TwoSided;
-			// 	// softBody->setTotalMass(0.0001);
-			// 	// softBody->addForce(btVector3(0, 0.01, 0), 0);
-			// }
-
-			// //CONTACT HARDNESS
-			// {
-			// 	softBody->m_cfg.kCHR = 1;              // Rigid contacts hardness [0,1]
-			// 	softBody->m_cfg.kKHR = 1;              // Kinetic contacts hardness [0,1]
-			// 	softBody->m_cfg.kSHR = 1;              // Soft contacts hardness [0,1]
-			// 	softBody->m_cfg.kAHR = 1;              // Anchors hardness [0,1]
-			// 	softBody->m_cfg.kSRHR_CL = 1;          // Soft vs rigid hardness [0,1] (cluster only)
-			// 	softBody->m_cfg.kSKHR_CL = 1;          // Soft vs kinetic hardness [0,1] (cluster only)
-			// 	softBody->m_cfg.kSSHR_CL = 1;          // Soft vs soft hardness [0,1] (cluster only)
-			// }
-
-			// //OTHER PARAMS
-			// {
-			// 	// softBody->m_cfg.kLF = 0;  // Lift coefficient [0,+inf]
-			// 	// softBody->m_cfg.kDG = 0;  // Drag coefficient [0,+inf]
-			// 	// btScalar kVCF;
-			// }
-			
-			// softBody->randomizeConstraints();		
-			// softBody->m_cfg.collisions |= btSoftBody::fCollision::VF_SS;
-			
-			// softBody->setTotalMass(150);
-
-			// //Other possible settings
-			// // btScalar kSR_SPLT_CL;       // Soft vs rigid impulse split [0,1] (cluster only)
-			// // btScalar kSK_SPLT_CL;       // Soft vs rigid impulse split [0,1] (cluster only)
-			// // btScalar kSS_SPLT_CL;       // Soft vs rigid impulse split [0,1] (cluster only)
-			// // btScalar maxvolume;         // Maximum volume ratio for pose
-			// // btScalar timescale;         // Time scale
-
-
-			
 			btDeformableGravityForce* gravity_force =  new btDeformableGravityForce(btVector3(0, -10, 0));
 			world->addForce(softBody, gravity_force);
 		}
@@ -692,7 +627,27 @@ void BulletPhysicsObjectComponent::OnEnable() {
 
 void BulletPhysicsObjectComponent::OnUpdate() {
 	if(object3D->transform->hasChanged) {
-		//UPDATE THE BODY POSITION
+		std::cout << "Should update position " << std::endl;
+		btTransform transform;
+		transform.setIdentity();
+
+		transform.setOrigin(btVector3(object3D->transform->position.x, object3D->transform->position.y, object3D->transform->position.z));
+		btQuaternion rotation;
+		rotation.setEulerZYX (object3D->transform->rotation.z * DEGTORAD, object3D->transform->rotation.y * DEGTORAD, object3D->transform->rotation.x * DEGTORAD);
+		transform.setRotation(rotation);
+		if(bodyType == BODY_TYPE::RIGID) {
+			btVector3 inertia;
+			rigidBody->getCollisionShape()->calculateLocalInertia( mass, inertia );
+			rigidBody->setMassProps(mass, inertia);
+
+			rigidBody->setWorldTransform (transform);
+			rigidBody->getMotionState()->setWorldTransform (transform);
+			rigidBody->setLinearVelocity (btVector3(0, 0, 0));
+			rigidBody->setAngularVelocity (btVector3(0, 0, 0));
+		} else {
+			softBody->setWorldTransform (transform);		
+			softBody->setVelocity (btVector3(0, 0, 0));		
+		}
 	}
 }
 

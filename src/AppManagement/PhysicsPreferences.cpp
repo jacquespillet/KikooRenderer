@@ -19,7 +19,7 @@ PhysicsPreferences::PhysicsPreferences(PreferencesWindow* mainPrefWindow) {
 	QLabel* worldTypeLabel = new QLabel("World Type");
     worldTypeList->addItem("Rigid");
     worldTypeList->addItem("Soft");
-    worldTypeList->addItem("Deformable");
+    // worldTypeList->addItem("Deformable");
 	worldTypeList->setCurrentIndex(0);
 
 	worldTypeLayout->addWidget(worldTypeLabel);

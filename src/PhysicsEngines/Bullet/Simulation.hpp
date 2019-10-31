@@ -30,6 +30,7 @@ public:
     void SetScene(CoreEngine::Scene* scene);
     void Init();
     void Simulate();
+    void Stop();
     void Destroy(bool destroyObjects = true);
 
     void AddObject(CoreEngine::Object3D* object3D);
@@ -43,6 +44,14 @@ public:
 protected:
     void GetSceneData();
     void SetSceneData();
+
+
+    struct Transform {
+        glm::vec3 position;
+        glm::vec3 rotation;
+    };
+    bool firstFrame = true;
+    std::map<CoreEngine::Object3D*,Transform> initialTransforms;
 
     CoreEngine::Scene* scene;
 

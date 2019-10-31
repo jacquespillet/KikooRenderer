@@ -276,7 +276,7 @@ void MaterialComponent::SetupShaderUniforms(glm::mat4 modelMatrix, glm::mat4 vie
 					if(lightComponent != nullptr) {
 						//Only update the light uniforms if something changed OR if it is the first iteration of the material
 						if(transformComponent->hasChanged || lightComponent->hasChanged || firstIter) {
-							// std::cout << object3D->name << transformComponent->hasChanged << "  "<< lightComponent->hasChanged << " " << firstIter <<  std::endl;
+							std::cout << object3D->name << transformComponent->hasChanged << "  "<< lightComponent->hasChanged << " " << firstIter <<  std::endl;
    
 							std::string varName = "lights[" + std::to_string(i) + "].position";
 							GLuint loc = ogl->glGetUniformLocation(this->shader.programShaderObject, varName.c_str());
