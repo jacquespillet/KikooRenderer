@@ -62,6 +62,7 @@ set(MainWindowSrc
 	3DEngine/WaterTiles/WaveTile/WaveTileShader.cpp
 
 	3DEngine/Misc/LensFlare/LensFlare.cpp
+	3DEngine/Misc/LensFlare/LensFlareShader.cpp
 
 	3DEngine/CameraControllers/CameraController.cpp
 

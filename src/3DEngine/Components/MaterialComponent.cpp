@@ -150,7 +150,11 @@ void MaterialComponent::OnUpdate(){
 	}
 }
 void MaterialComponent::OnRender(){} 
-void MaterialComponent::OnDestroy(){} 
+void MaterialComponent::OnDestroy(){
+	GETGL
+	ogl->glUseProgram(0);
+	ogl->glDeleteProgram(shader.programShaderObject);
+} 
 void MaterialComponent::Recompute(){} 
 
 ComponentInspector* MaterialComponent::GetInspector() {

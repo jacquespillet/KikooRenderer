@@ -10,6 +10,7 @@ namespace CoreEngine {
 
 class MaterialComponent;
 class MeshFilterComponent;
+class CameraScene;
 
 class LensFlare : public Object3D {
 public: 
@@ -17,6 +18,7 @@ public:
 
     void Start() override;
     void Enable() override;
+    void LateRender() override;
     void Render(glm::mat4* overrideViewMatrix=nullptr) override;
     void DepthRenderPass(LightComponent* light) override;
     void Update() override;
@@ -36,6 +38,15 @@ private:
     
     MaterialComponent* quamaterial;
     MeshFilterComponent* mesh;
+    Shader lensFlareShader;
+    
+    std::vector<Texture> textures;
+    std::vector<glm::vec2> sizes;
+
+    CameraScene* camera;
+
+    float spacing;
+    glm::vec2 screenCenter;
 };
 
 }
