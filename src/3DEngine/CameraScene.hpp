@@ -67,6 +67,8 @@ class CameraScene : public Object3D{
         float GetSpeedFactor();
         void  SetSpeedFactor(float value);
 
+        bool sortObjects = true;
+
     protected:
         float eyeDistance;
         float fov;

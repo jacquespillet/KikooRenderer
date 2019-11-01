@@ -68,6 +68,8 @@ class TransformComponent : public Component {
 
 		bool hasChanged = true;
 
+        float camDistance;
+		
 		QJsonObject ToJSON();
         static void FromJSON(QJsonObject json, Object3D* obj);
 

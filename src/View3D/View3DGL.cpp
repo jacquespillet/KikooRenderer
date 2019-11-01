@@ -73,6 +73,7 @@ namespace KikooRenderer {
             ogl->glEnable(GL_BLEND);
             ogl->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+
             ogl->glEnable(GL_DEPTH_TEST);
             
             ogl->glEnable(GL_MULTISAMPLE);
@@ -81,10 +82,6 @@ namespace KikooRenderer {
             // ogl->glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 			
 
-            //enable blending
-            //glBlendFunc(GL_ZERO, GL_SRC_COLOR);
-            //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-            //glBlendFunc(GL_SRC_ALPHA, GL_ONE);            
 
 			scene->Start();
         }

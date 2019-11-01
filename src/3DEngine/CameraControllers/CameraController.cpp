@@ -35,18 +35,24 @@ void CameraController::OnUpdate() {
         this->camera->transform->position += elapsedTimeMoving * forwardVec * speedFactor * this->camera->scene->deltaTime;
         camera->scene->triggerRefresh = true;
         elapsedTimeMoving = (std::min)((float)(elapsedTimeMoving + this->camera->scene->deltaTime), 4.0f);
+        
+        this->camera->transform->hasChanged = true;
     }
 
     if(backwardPressed) {
         this->camera->transform->position -= elapsedTimeMoving * forwardVec * speedFactor * this->camera->scene->deltaTime;
         camera->scene->triggerRefresh = true;
         elapsedTimeMoving = (std::min)((float)(elapsedTimeMoving + this->camera->scene->deltaTime), 4.0f);
+        
+        this->camera->transform->hasChanged = true;
     }
 
     if(rightPressed) {
         this->camera->transform->position += elapsedTimeMoving * rightVec * speedFactor * this->camera->scene->deltaTime;
         camera->scene->triggerRefresh = true;
         elapsedTimeMoving = (std::min)((float)(elapsedTimeMoving + this->camera->scene->deltaTime), 4.0f);
+        
+        this->camera->transform->hasChanged = true;
     }
 
     
@@ -54,6 +60,8 @@ void CameraController::OnUpdate() {
         this->camera->transform->position -= elapsedTimeMoving * rightVec * speedFactor * this->camera->scene->deltaTime;
         camera->scene->triggerRefresh = true;
         elapsedTimeMoving = (std::min)((float)(elapsedTimeMoving + this->camera->scene->deltaTime), 4.0f);
+        
+        this->camera->transform->hasChanged = true;
     }
 }
 
@@ -119,6 +127,8 @@ void CameraController::OnMouseMoveEvent(QMouseEvent *e) {
 
         previousX = newX;
         previousY = newY;
+        
+        this->camera->transform->hasChanged = true;
     }
 
     if(isMiddleClicked) {
@@ -140,6 +150,8 @@ void CameraController::OnMouseMoveEvent(QMouseEvent *e) {
 
         previousX = newX;
         previousY = newY;
+        
+        this->camera->transform->hasChanged = true;
     }
 }
 
@@ -152,11 +164,15 @@ void CameraController::OnWheelEvent(QWheelEvent *e) {
         this->camera->transform->position.y += glm::column(transform, 2).y * speedFactor * 0.1;
         this->camera->transform->position.z += glm::column(transform, 2).z * speedFactor * 0.1;
         this->camera->SetOrthoFOV(0.5);
+        
+        this->camera->transform->hasChanged = true;
     } else if(point.y() < 0) {
         this->camera->transform->position.x -= glm::column(transform, 2).x * speedFactor * 0.1;
         this->camera->transform->position.y -= glm::column(transform, 2).y * speedFactor * 0.1;
         this->camera->transform->position.z -= glm::column(transform, 2).z * speedFactor * 0.1;
         this->camera->SetOrthoFOV(0.5);
+        
+        this->camera->transform->hasChanged = true;
     }
 }
 

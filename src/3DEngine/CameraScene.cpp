@@ -7,6 +7,24 @@
 namespace KikooRenderer {
 namespace CoreEngine {
 
+void InsertionSort(std::vector<Object3D*>& arr)  
+{  
+    Object3D* key;
+    int i, j;  
+    for (i = 1; i < arr.size(); i++) 
+    {  
+        key = arr[i];  
+        j = i - 1;  
+  
+        while (j >= 0 && arr[j]->transform->camDistance < key->transform->camDistance) 
+        {  
+            arr[j + 1] = arr[j];  
+            j = j - 1;  
+        }  
+        arr[j + 1] = key;  
+    }  
+} 
+
 CameraScene::CameraScene(Scene* _scene, float _eyeDistance, float _fov, float _near, float _far, float _aspect) : Object3D("Camera", _scene) {
 	transform = new TransformComponent(this);
 
@@ -20,8 +38,8 @@ CameraScene::CameraScene(Scene* _scene, float _eyeDistance, float _fov, float _n
     UpdateProjectionMatrix();
 
     this->transform->position.x = 0;
-    this->transform->position.y = 5;
-    this->transform->position.z = -10;
+    this->transform->position.y = 2;
+    this->transform->position.z = -3;
 
 	projectionType = ProjectionType::Perspective;
     viewMatrix = glm::inverse(this->transform->GetModelMatrix()); 
@@ -59,6 +77,11 @@ void CameraScene::OnKeyReleaseEvent(QKeyEvent *e){
 void CameraScene::OnUpdate(){
     transform->OnUpdate();
     cameraController->OnUpdate();
+
+    if(transform->hasChanged ) {
+        InsertionSort(scene->objects3D);  
+        transform->hasChanged = false;
+    }
 }
 
 void CameraScene::OnKeyPressEvent(QKeyEvent *e){

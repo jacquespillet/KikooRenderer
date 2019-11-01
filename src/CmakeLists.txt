@@ -94,6 +94,7 @@ set(MainWindowSrc
 	AppManagement/PreferencesWindow.cpp
 	AppManagement/BackgroundPreferences.cpp
 	AppManagement/3DUIPreferences.cpp
+	AppManagement/RenderingPreferences.cpp
 	AppManagement/PhysicsPreferences.cpp
 	AppManagement/PostProcessingPreferences.cpp
 

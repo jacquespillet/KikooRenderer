@@ -51,7 +51,6 @@ namespace CoreEngine {
         skyboxCube = GetCube(this, "Cubemap", glm::vec3(0), glm::vec3(0), glm::vec3(100), glm::vec4(0.1, 0.1, 0.1, 1));
         skyboxCube->Start();
         skyboxCube->Enable();
-          
 
         simulation.SetScene(this);
         simulation.worldType = KikooRenderer::Physics::Bullet::WORLD_TYPE::RIGID;

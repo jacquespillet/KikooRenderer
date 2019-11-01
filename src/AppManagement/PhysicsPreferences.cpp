@@ -6,14 +6,13 @@ namespace KikooRenderer
 PhysicsPreferences::PhysicsPreferences(PreferencesWindow* mainPrefWindow) {
     this->mainPrefWindow = mainPrefWindow;
 
-    //0. FXAA Post
-    // -------------------------------------------------------------------
     QVBoxLayout* mainLayout = new QVBoxLayout();
     mainLayout->setAlignment(Qt::AlignTop);
     setLayout(mainLayout);
 
   
-	//World Type
+    //0. World Type
+    // -------------------------------------------------------------------
 	QHBoxLayout* worldTypeLayout = new QHBoxLayout();
 	QComboBox* worldTypeList = new QComboBox();
 	QLabel* worldTypeLabel = new QLabel("World Type");

@@ -143,6 +143,8 @@ void TransformComponent::OnStart(){}
 void TransformComponent::OnEnable(){}
 void TransformComponent::OnUpdate(){
 	AnimateToTransform();
+
+	camDistance = glm::distance(position, object3D->scene->camera->transform->position);
 }
 void TransformComponent::OnRender(){} 
 void TransformComponent::OnDestroy(){} 
