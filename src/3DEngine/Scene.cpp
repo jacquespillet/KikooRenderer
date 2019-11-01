@@ -7,7 +7,7 @@
 #include "Components/LightComponent.hpp"
 #include "Components/BoundingComponent.hpp"
 
-#include "Curves/CatmutRollSpline.hpp"
+#include "Misc/LensFlare/LensFlare.hpp"
 
 #include "Util/RandomUtil.hpp"
 
@@ -57,7 +57,12 @@ namespace CoreEngine {
         simulation.Init();
         
         drawImmediate.Init(); 
-        
+
+        LensFlare* lf = new LensFlare("ls", this);
+        lf->Start();
+        lf->Enable();
+        AddObject(lf);
+
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
             objects3D[i]->Start();

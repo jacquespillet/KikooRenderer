@@ -61,6 +61,8 @@ set(MainWindowSrc
 	3DEngine/WaterTiles/WaveTile/WaveTile.cpp
 	3DEngine/WaterTiles/WaveTile/WaveTileShader.cpp
 
+	3DEngine/Misc/LensFlare/LensFlare.cpp
+
 	3DEngine/CameraControllers/CameraController.cpp
 
 	3DEngine/Curves/CatmutRollSpline.cpp
