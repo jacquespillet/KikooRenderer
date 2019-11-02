@@ -99,7 +99,8 @@ Object3D* GetQuad(Scene* scene, std::string name, glm::vec3 _position, glm::vec3
     //Setup material
     MaterialComponent* material = new MaterialComponent(newObject);
     material->albedo = _color;
-    Shader shader = scene->standardShaders.unlitMeshShader;
+    Shader shader = scene->standardShaders.blinnPhongShader;
+    // Shader shader = scene->standardShaders.unlitMeshShader;
     material->SetShader(shader);
  
     BoundingBoxComponent* boundingBox = new BoundingBoxComponent(newObject);

@@ -39,7 +39,7 @@ void LensFlare::Update() {
 
 std::vector<QWidget*> LensFlare::GetInspectorWidgets() {
     std::vector<QWidget*> res;
-]
+
 
     return res;
 }

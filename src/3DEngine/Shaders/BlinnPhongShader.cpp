@@ -52,6 +52,43 @@ namespace CoreEngine
         scene->triggerRefresh = true;
     });
 
+
+    //Height Map
+    TexturePicker* heightPicker = new TexturePicker("height Map", heightMapStr);
+    shaderParamsLayout->addWidget(heightPicker);
+    connect(heightPicker, &TexturePicker::FileModified, this, [this](QString string) {
+        scene->glWindow->makeCurrent();
+        heightMapStr = string.toStdString();
+        heightMap = Texture(heightMapStr, GL_TEXTURE3, false);
+        scene->triggerRefresh = true;
+        scene->glWindow->doneCurrent();
+    });    
+    
+    CustomSlider* heightMapInfluenceSlider = new CustomSlider(0, 0.3, 0.001, "height Map Influence", heightMapInfluence);
+    shaderParamsLayout->addLayout(heightMapInfluenceSlider);
+    QObject::connect( heightMapInfluenceSlider, &CustomSlider::Modified, [this](double val) {
+        heightMapInfluence = val;
+        scene->triggerRefresh = true;
+    });
+
+	//Shader
+	QHBoxLayout* parallaxModeLayout = new QHBoxLayout();
+	QComboBox* parallaxModeList = new QComboBox();
+	QLabel* parallaxModeLabel = new QLabel("parallax Mode");
+    parallaxModeList->addItem("Simple Offset");
+    parallaxModeList->addItem("RayMarching interpolation");
+    parallaxModeList->addItem("RayMarching Binary Search");
+	parallaxModeList->setCurrentIndex(2);
+
+	parallaxModeLayout->addWidget(parallaxModeLabel);
+	parallaxModeLayout->addWidget(parallaxModeList);
+
+	shaderParamsLayout->addLayout(parallaxModeLayout);
+	connect(parallaxModeList, static_cast<void (QComboBox::*)(int index)>(&QComboBox::currentIndexChanged), this, [this](int index) {
+        this->parallaxMode = (PARALLAX_MODE) index;
+        scene->triggerRefresh = true;
+    });    
+
     CustomSlider* ambientSlider = new CustomSlider(0, 1, 0.01, "Ambient Factor", ambientFactor);
     shaderParamsLayout->addLayout(ambientSlider);
     QObject::connect( ambientSlider, &CustomSlider::Modified, [this](double val) {
@@ -92,7 +129,6 @@ namespace CoreEngine
 
 void BlinnPhongParams::SetUniforms() {
     GETGL
-
     /*
     * When textures changed in the form, load them for the incoming frame
     */
@@ -122,6 +158,7 @@ void BlinnPhongParams::SetUniforms() {
 
         int normalMapInfluenceLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "normalMapInfluence");
         ogl->glUniform1f(normalMapInfluenceLocation, normalMapInfluence);
+
     }  else {
         int hasNormalTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasNormalTex"); 
         ogl->glUniform1i(hasNormalTexLocation, 0);
@@ -143,6 +180,29 @@ void BlinnPhongParams::SetUniforms() {
         int hasSpecularTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasSpecularTex"); 
         ogl->glUniform1i(hasSpecularTexLocation, 0);
     }
+
+    /*
+    Set variables for Bump mapping : 
+        * Texture variable
+        * bool hasHeightMap
+    */
+    if(heightMap.loaded) {
+        heightMap.Use();
+        int texLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "heightTexture"); 
+        ogl->glUniform1i(texLocation, 3); 
+
+        int hasheightTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasHeightTex"); 
+        ogl->glUniform1i(hasheightTexLocation, 1);
+
+        int heightMapInfluenceLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "heightMapInfluence");
+        ogl->glUniform1f(heightMapInfluenceLocation, heightMapInfluence);
+
+        int parallaxModeLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "parallaxMode");
+        ogl->glUniform1i(parallaxModeLocation, (int)parallaxMode);
+    } else {
+        int hasheightTexLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "hasHeightTex"); 
+        ogl->glUniform1i(hasheightTexLocation, 0);
+    }    
 
     int reflectSkyboxInt = reflectSkybox ? 1 : 0;
     int reflectSkyboxLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "reflectSkybox"); 

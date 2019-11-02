@@ -30,6 +30,12 @@ public:
     Texture specularMap;
     std::string specularMapStr;
     bool shouldLoadSpecular = false;
+    
+    Texture heightMap;
+    std::string heightMapStr;
+    float heightMapInfluence = 0.001;
+    enum PARALLAX_MODE {SIMPLE, RAYMARCHING, RAYMARCHING_BINARY};
+    PARALLAX_MODE parallaxMode;
 
     //Color of specular reflections
     glm::vec4 specularColor;

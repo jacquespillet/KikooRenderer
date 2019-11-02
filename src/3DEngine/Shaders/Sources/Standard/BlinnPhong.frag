@@ -92,13 +92,17 @@ uniform vec3 cameraPos;
 uniform sampler2D albedoTexture;
 uniform sampler2D specularTexture;
 uniform sampler2D normalTexture;
+uniform sampler2D heightTexture;
 uniform samplerCube cubemapTexture;
 uniform int hasAlbedoTex;
 uniform int hasSpecularTex;
 uniform int hasNormalTex;
+uniform int hasHeightTex;
 uniform float normalMapInfluence;
+uniform float heightMapInfluence;
 uniform int reflectSkybox;
 uniform int receiveShadow;
+uniform int parallaxMode;
 
 
 uniform float ambientFactor;
@@ -191,29 +195,113 @@ float DirectionalShadowCalculation(vec4 fragPosLightSpace, int inx)
     return max(0, shadow);
 } 
 
+vec2 finalUv;
+
+float GetHeight(vec2 uv) {
+    return texture(heightTexture, uv).r;
+}
+
+vec2 ParallaxOffset(vec2 viewDir) {
+    float height = GetHeight(fragUv);
+    height -= 0.5;    
+    height *= heightMapInfluence;  
+    return viewDir * height;
+}
+
+vec2 ParallaxRayMarching(vec2 viewDir, int doBinarySearch) {
+    int numSteps = 10;
+    int numSearchSteps = 3;
+
+    vec2 uvOffset = vec2(0, 0);
+    float stepSize = 1.0 / numSteps;
+    vec2 uvDelta = viewDir * stepSize * heightMapInfluence;
+
+    float stepHeight = 1;
+    float surfaceHeight = GetHeight(fragUv  );
+
+    vec2 prevUVOffset = uvOffset;
+    float prevStepHeight = stepHeight;
+    float prevSurfaceHeight = surfaceHeight;
+
+    for(int i=1; i<numSteps && stepHeight > surfaceHeight; i++) {
+        prevUVOffset = uvOffset;
+        prevStepHeight = stepHeight;
+        prevSurfaceHeight = surfaceHeight;
+
+        uvOffset -= uvDelta;
+        stepHeight -= stepSize;
+        surfaceHeight = GetHeight(fragUv + uvOffset);
+    }
+
+    if(doBinarySearch > 0) {
+        for (int i = 0; i < numSearchSteps; i++) {
+            uvDelta *= 0.5;
+            stepSize *= 0.5;
+
+            if (stepHeight < surfaceHeight) {
+                uvOffset += uvDelta;
+                stepHeight += stepSize;
+            }
+            else {
+                uvOffset -= uvDelta;
+                stepHeight -= stepSize;
+            }
+            surfaceHeight = GetHeight(fragUv + uvOffset);        
+        }
+    } else {
+        float prevDifference = prevStepHeight - prevSurfaceHeight;
+        float difference = surfaceHeight - stepHeight;
+        float t = prevDifference / (prevDifference + difference);
+        uvOffset = prevUVOffset - uvDelta * t;
+    }
+
+    return uvOffset;
+}
+
+void doParallax(mat4 worldToTangentMatrix) {
+    vec3 fragToCam = cameraPos - fragPos;
+    vec3 tangentViewDir = normalize(worldToTangentMatrix * vec4(fragToCam, 1)).xyz;
+    tangentViewDir.xy /= (tangentViewDir.z + 0.42);
+
+    vec2 offset;
+    if(parallaxMode == 0) {
+        offset = ParallaxOffset(tangentViewDir.xy);
+    } else {
+        int doBinarySearch = parallaxMode == 2 ? 1 : 0;
+        offset = ParallaxRayMarching(tangentViewDir.xy, doBinarySearch);
+    }
+
+    finalUv.xy += offset;
+}
+
+
 void main()
 {
+    mat4 worldToTangentMatrix;
+    vec3 fragBitangent = normalize(cross(fragNormal, fragTangent.xyz) * fragTangent.w); 
+    worldToTangentMatrix[0] = vec4(normalize(fragTangent.xyz), 1);
+    worldToTangentMatrix[1] = vec4(normalize(fragBitangent), 1);
+    worldToTangentMatrix[2] = vec4(normalize(fragNormal), 1);
+    worldToTangentMatrix[3] = vec4(0, 0, 0, 1);
+
+    finalUv = fragUv;
+    doParallax(worldToTangentMatrix);
+
     vec3 fragToCam = cameraPos - fragPos;
 
-    vec4 finalAlbedo   = (hasAlbedoTex==1) ? albedo * texture(albedoTexture, fragUv) : albedo;
-    
+    vec4 finalAlbedo   = (hasAlbedoTex==1) ? albedo * texture(albedoTexture, finalUv) : albedo;
+
     vec3 finalNormal   = vec3(0);
     if(hasNormalTex==1) {
-        finalNormal = (texture(normalTexture, fragUv).xyz - 0.5) * 2.0;
-        vec3 fragBitangent = normalize(cross(fragNormal, fragTangent.xyz) * fragTangent.w); 
-        mat4 theMatrix;
-        theMatrix[0] = vec4(normalize(fragTangent.xyz), 1);
-        theMatrix[1] = -vec4(normalize(fragBitangent), 1);
-        theMatrix[2] = vec4(normalize(fragNormal), 1);
-        theMatrix[3] = vec4(0, 0, 0, 1);
-        theMatrix = inverse(theMatrix);
-        finalNormal = (inverse(transpose(modelMatrix)) * theMatrix * vec4(finalNormal.xyz, 0)).xyz;
+        finalNormal = (texture(normalTexture, finalUv).xyz - 0.5) * 2.0;
+        mat4 tangentToWorldMatrix = inverse(worldToTangentMatrix);
+        finalNormal = (inverse(transpose(modelMatrix)) * tangentToWorldMatrix * vec4(finalNormal.xyz, 0)).xyz;
     } else {
         finalNormal = (inverse(transpose(modelMatrix)) * normalize(vec4(fragNormal.xyz, 0))).xyz;
     }
     
 
-    float finalSpecularFactor = (hasSpecularTex==1) ? texture(specularTexture, fragUv).x : specularFactor;
+    float finalSpecularFactor = (hasSpecularTex==1) ? texture(specularTexture, finalUv).x : specularFactor;
     
     vec4 finalSpecularColor = specularColor;
     if(reflectSkybox == 1) {
