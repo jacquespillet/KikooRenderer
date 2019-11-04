@@ -4,6 +4,9 @@ set(MainWindowSrc
 	
 	View3D/View3D.cpp
 	View3D/View3DGL.cpp
+
+
+	3DEngine/Texture/Texture3D.cpp
 	
 	3DEngine/Components/Component.cpp
 	3DEngine/Components/BaseMeshes.cpp
@@ -62,6 +65,8 @@ set(MainWindowSrc
 	3DEngine/WaterTiles/WaveTile/WaveTileShader.cpp
 
 	3DEngine/Misc/LensFlare/LensFlare.cpp
+
+	3DEngine/Clouds/Cloud_1.cpp
 
 	3DEngine/CameraControllers/CameraController.cpp
 

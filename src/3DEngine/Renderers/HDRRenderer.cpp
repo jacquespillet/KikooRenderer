@@ -212,7 +212,7 @@ void HDRRenderer::Render() {
         if(scene->objects3D[i] && scene->objects3D[i]->visible && scene->objects3D[i]->MatchesMask(scene->GetLayerMask())) {
             scene->objects3D[i]->LateRender();
         }
-    }    
+    }
 
     if(useMSAA) alternateFBO->Disable();
     else quadFBO->Disable();
@@ -220,6 +220,10 @@ void HDRRenderer::Render() {
     //If rendered in multisampled framebuffer, blit it into single sample framebuffer
     if(useMSAA){
         alternateFBO->CopyToFramebuffer(quadFBO);
+    }
+
+    for(int i=0; i<scene->rayMarchedObjects.size(); i++) {
+        scene->rayMarchedObjects[i]->RayMarch(quadFBO);
     }
     
     //If post processes, process, else render the FBO on the quad

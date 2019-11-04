@@ -9,6 +9,8 @@ class Component;
 class TransformComponent;
 class LightComponent;
 class Scene;
+class Framebuffer;
+
 class Object3D {
     public: 
         std::string name;
@@ -34,6 +36,8 @@ class Object3D {
 
         bool faceCamera = false;
 
+        bool isRayMarched = false;
+
 
         Object3D(std::string name, Scene* scene);
         ~Object3D();
@@ -58,6 +62,7 @@ class Object3D {
         virtual void Start();
         virtual void Enable();
         virtual void Render(glm::mat4* overrideViewMatrix = nullptr);
+        virtual void RayMarch(Framebuffer* fb);
         virtual void LateRender();
         virtual void DepthRenderPass(LightComponent* light);
         virtual void Update();

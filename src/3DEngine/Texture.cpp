@@ -72,8 +72,15 @@ namespace CoreEngine
 		ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		GLint texType = (bpp == 3) ? GL_RGB : GL_RGBA;
-		
+		GLint texType;
+		if(bpp == 4) {
+			texType = GL_RGBA;
+		} else if(bpp == 3) {
+			texType = GL_RGB;
+		} else if(bpp == 1) {
+			texType = GL_RED;
+		}
+
 		ogl->glTexImage2D(GL_TEXTURE_2D, 0, texType, width, height, 0, texType, GL_UNSIGNED_BYTE, (unsigned char *)data.data());
 		ogl->glGenerateMipmap(GL_TEXTURE_2D);
 		

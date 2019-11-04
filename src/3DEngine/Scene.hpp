@@ -32,6 +32,7 @@ class Scene {
 
 		std::vector<Object3D*> objects3D;
 		std::vector<Object3D*> lightObjects;
+		std::vector<Object3D*> rayMarchedObjects;
 		// std::vector<ParticleSystem*> particleSystems;
 		ParticleSystem* ps;
 

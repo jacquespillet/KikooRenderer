@@ -4,6 +4,7 @@
 #include "Components/TransformComponent.hpp"
 #include "Components/LightComponent.hpp"
 #include "Util.hpp"
+#include "Framebuffer.hpp"
 
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLFunctions_3_3_Core>
@@ -161,7 +162,8 @@ void Object3D::Render(glm::mat4* overrideViewMatrix) {
 		}
 		
 		MaterialComponent* material = (this->GetComponent<MaterialComponent>());
-		if(material != nullptr) {
+		if(material != nullptr) {	
+
 			material->SetupShaderUniforms(mMatrix, vMatrix, pMatrix, this->scene);
 			//Draw
 			for(int i=0; i<components.size(); i++) {
@@ -171,9 +173,13 @@ void Object3D::Render(glm::mat4* overrideViewMatrix) {
 	}
 	
 	//unbind shader program
-	ogl->glUseProgram(0);
+	// ogl->glUseProgram(0);
 	ogl->glEnable(GL_DEPTH_TEST);
 	ogl->glCullFace(GL_BACK);
+}
+
+void Object3D::RayMarch(Framebuffer* fb) {
+
 }
 
 void Object3D::LateRender() {

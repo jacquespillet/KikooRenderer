@@ -8,6 +8,7 @@
 #include "Components/BoundingComponent.hpp"
 
 #include "Misc/LensFlare/LensFlare.hpp"
+#include "Clouds/Cloud_1.hpp"
 
 #include "Shaders/BlinnPhongShader.hpp"
 
@@ -60,30 +61,10 @@ namespace CoreEngine {
         
         drawImmediate.Init(); 
 
-        Object3D* plane = GetQuad(this, "Quad", glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(1));
-        {
-            BlinnPhongParams* shaderParams = (BlinnPhongParams*) plane->GetComponent<MaterialComponent>()->params;
-            std::cout << "SCENE "<< shaderParams << std::endl;
-        }
-        
-        plane->Start();
-        plane->Enable();
-        {
-            BlinnPhongParams* shaderParams = (BlinnPhongParams*) plane->GetComponent<MaterialComponent>()->params;
-            std::cout << "SCENE "<< shaderParams << std::endl;
-        }
-
-        Texture albedoTex("resources/Textures/MiscTextures/Parallax/0/parallax-albedo.png",GL_TEXTURE0);
-        plane->GetComponent<MaterialComponent>()->albedoTex = albedoTex;
-        // Texture normalsTex("resources/Textures/MiscTextures/Parallax/0/parallax-normals.png",GL_TEXTURE1, false);
-        // Texture heightTex("resources/Textures/MiscTextures/Parallax/0/parallax-heights.png",GL_TEXTURE2, false);
-        // shaderParams->normalMapStr = normalsTex;
-        // shaderParams->normalMapStr = "resources/Textures/MiscTextures/Parallax/0/parallax-normals.png";
-        // shaderParams->shouldLoadNormal = true;
-        // std::cout << "LOADED " << shaderParams->normalMap.loaded << std::endl;
-        // shaderParams->heightMap = heightTex;
-
-        AddObject(plane);
+        // Object3D* plane = GetQuad(this, "Quad", glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(1));
+        Cloud_1* cloud = new Cloud_1("Cloud", this);
+        cloud->isRayMarched = true;
+        AddObject(cloud);
 
 
         //Start each object
@@ -147,9 +128,13 @@ namespace CoreEngine {
                 }
             }
         }
-
         object->name = currentName;
-        objects3D.push_back(object);
+
+        if(!object->isRayMarched) {
+            objects3D.push_back(object);
+        } else {
+            rayMarchedObjects.push_back(object);
+        }
 
 		LightComponent* light =  object->GetComponent<LightComponent>();
 		if (light != nullptr) {
