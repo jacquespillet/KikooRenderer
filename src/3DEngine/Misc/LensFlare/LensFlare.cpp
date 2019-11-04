@@ -3,22 +3,42 @@
 #include "../../BaseObjects.hpp"
 #include "../../Components/MaterialComponent.hpp"
 #include "../../Components/MeshFilterComponent.hpp"
-
+#include "3DEngine/CameraScene.hpp"
+#include "LensFlareShader.hpp"
 
 namespace KikooRenderer {
 
 namespace CoreEngine {
 
 LensFlare::LensFlare(std::string name, Scene* scene) : Object3D(name, scene) {
-    
-    quad = GetQuad(scene, "particle", glm::vec3(-1, 0.01, -1), glm::vec3(0, 0, 0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
+    lensFlareShader = GetLensFlareShader();
+
+    quad = GetQuad(scene, "flare", glm::vec3(-1, 0.01, -1), glm::vec3(0, 0, 0), glm::vec3(1), glm::vec4(0.5, 0.5, 0.5, 1));
     quad->Start();
     quad->Enable();
 
 
     quamaterial = quad->GetComponent<MaterialComponent>();
-    
+    quamaterial->SetShader(lensFlareShader);
+
+    // textures.push_back(tex);
+    textures.push_back(Texture("resources/Textures/LensFlare/tex4.png", GL_TEXTURE0));
+    textures.push_back(Texture("resources/Textures/LensFlare/tex8.png", GL_TEXTURE0));
+    textures.push_back(Texture("resources/Textures/LensFlare/tex4.png", GL_TEXTURE0));
+    textures.push_back(Texture("resources/Textures/LensFlare/tex8.png", GL_TEXTURE0));
+
+    sizes.push_back(glm::vec2(0.15));
+    sizes.push_back(glm::vec2(0.035));
+    sizes.push_back(glm::vec2(0.035));
+    sizes.push_back(glm::vec2(0.15));
+
+
+
+    spacing = 0.1;
+
     mesh = quad->GetComponent<MeshFilterComponent>();
+
+    camera = scene->camera;
 }
 
 void LensFlare::WindowResize(int w, int h) {
@@ -39,32 +59,49 @@ void LensFlare::Update() {
 
 std::vector<QWidget*> LensFlare::GetInspectorWidgets() {
     std::vector<QWidget*> res;
-
-
     return res;
 }
 
 
 void LensFlare::Render(glm::mat4* overrideViewMatrixp) {
-    GETGL
-    // ogl->glUseProgram(waterShader.programShaderObject);
-    // ogl->glUniform1f(ogl->glGetUniformLocation(waterShader.programShaderObject, "time"), scene->elapsedTime);
+ 
+}
+
+void LensFlare::LateRender() {
+   GETGL
+
+   if(scene->lightObjects.size() > 0) {
+        glm::mat4 mvpMatrix = camera->GetProjectionMatrix() * camera->GetViewMatrix() * scene->lightObjects[0]->transform->GetWorldModelMatrix();       
+        
+        glm::vec4 projectedLightPos(0, 0, 0, 1);
+        projectedLightPos = mvpMatrix * projectedLightPos;
+        if(projectedLightPos.w > 0) {
+            projectedLightPos /= projectedLightPos.w;
+
+            glm::vec2 screenSpaceLightPos = glm::vec2(projectedLightPos.x, projectedLightPos.y);
+            glm::vec2 lightToCenter = -screenSpaceLightPos;
+
+            for(int i=0; i<textures.size(); i++) {
+                glm::vec2 direction = glm::normalize(lightToCenter);
+                direction *= (i * spacing);
+
+                glm::vec3 position = glm::vec3(screenSpaceLightPos, -0.01 * i) + glm::vec3(direction, 0);
+                glm::vec3 size(sizes[i], 1);   
+
+                ogl->glUseProgram(lensFlareShader.programShaderObject);
+                ogl->glUniform3fv(ogl->glGetUniformLocation(lensFlareShader.programShaderObject, "screenPosition"), 1, glm::value_ptr(position));
+                ogl->glUniform3fv(ogl->glGetUniformLocation(lensFlareShader.programShaderObject, "size"), 1, glm::value_ptr(size));
+
+                ogl->glActiveTexture(GL_TEXTURE0);
+                ogl->glBindTexture(GL_TEXTURE_2D, textures[i].glTex);
+                ogl->glUniform1i(ogl->glGetUniformLocation(lensFlareShader.programShaderObject, "albedoTexture"), 0);    
+
+                quad->Render();
+            }    
+        }
+   }
+   quamaterial->firstIter = false;
     
-    // glm::mat4 viewProjection = scene->camera->GetProjectionMatrix() * scene->camera->GetViewMatrix();
-    // int viewProjectionMatLoc = ogl->glGetUniformLocation(waterShader.programShaderObject, "viewProjectionMatrix"); 
-    // ogl->glUniformMatrix4fv(viewProjectionMatLoc, 1, false, glm::value_ptr(viewProjection));
-
-    // for(int i=0; i<waves.size(); i++) {
-    //     std::string name = "waves[" + std::to_string(i) + "]";
-    //     ogl->glUniform4fv(ogl->glGetUniformLocation(waterShader.programShaderObject, name.c_str()), 1, glm::value_ptr(waves[i]));
-    // }
-
-    // // ogl->glUniform4fv(ogl->glGetUniformLocation(waterShader.programShaderObject, "waves[0]"), 1, glm::value_ptr(glm::vec4(1, 0, 0.75, 6)));
-    
-    // ogl->glUniform1i(ogl->glGetUniformLocation(waterShader.programShaderObject, "numWaves"), waves.size());
-
-    // if(quamaterial->firstIter) quamaterial->firstIter = false;
-    quad->Render();
 }
 
 void LensFlare::DepthRenderPass(LightComponent* light) {

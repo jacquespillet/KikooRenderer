@@ -52,6 +52,7 @@ namespace CoreEngine {
 		transformWidget->Enable();
 
         skyboxCube = GetCube(this, "Cubemap", glm::vec3(0), glm::vec3(0), glm::vec3(100), glm::vec4(0.1, 0.1, 0.1, 1));
+        skyboxCube->GetComponent<MaterialComponent>()->SetShader(standardShaders.blinnPhongShader);
         skyboxCube->Start();
         skyboxCube->Enable();
 
