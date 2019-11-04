@@ -50,6 +50,8 @@ Cloud_1::Cloud_1(std::string name, Scene* scene) : Object3D(name, scene) {
     uniform mat4 boxTransform;
     uniform vec3 boxScale;
 
+    uniform float time;
+
     float RayBoxTest(vec3 rayOrig, vec3 rayDir, mat4 transform, vec3 minScale,vec3 maxScale)
     {
         float distance = -1;
@@ -102,21 +104,26 @@ Cloud_1::Cloud_1(std::string name, Scene* scene) : Object3D(name, scene) {
         
         vec3 finalColor = color;
         if(distance > 0) {
-            float sampleSize = 1;
-            float numSteps = 100.0f;
-            float stepSize = (sampleSize / numSteps) * 1 ;
+            vec3 hitPoint = rayOrig.xyz + rayDir.xyz * distance;
+            hitPoint = hitPoint * 0.5 + 1.0;
+            float value = texture(noiseTex, vec3(hitPoint.x, hitPoint.y, time * 0.25)).r;
+            finalColor = vec3(value, value, value);
 
-            float finalValue = 0;
-            for(float i=0; i<numSteps; i++) {
-                vec3 newPos = rayOrig.xyz + rayDir.xyz * ( distance + i * stepSize);
+            // float sampleSize = 1;
+            // float numSteps = 100.0f;
+            // float stepSize = (sampleSize / numSteps) * 1 ;
 
-                float noiseValue = sampleDensity(newPos);
-                finalValue += noiseValue * stepSize;
-            }
-            finalValue = exp(-finalValue);
-            finalValue = max(0, finalValue - 0.1);
+            // float finalValue = 0;
+            // for(float i=0; i<numSteps; i++) {
+            //     vec3 newPos = rayOrig.xyz + rayDir.xyz * ( distance + i * stepSize);
 
-            finalColor = finalValue * vec3(1, 1, 1) + (1 - finalValue) * color;
+            //     float noiseValue = sampleDensity(newPos);
+            //     finalValue += noiseValue * stepSize;
+            // }
+            // finalValue = exp(-finalValue);
+            // finalValue = max(0, finalValue - 0.1);
+
+            // finalColor = finalValue * vec3(1, 1, 1) + (1 - finalValue) * color;
         }
 
 
@@ -150,70 +157,28 @@ Cloud_1::Cloud_1(std::string name, Scene* scene) : Object3D(name, scene) {
 
     //CLOUD 3D
     int texRes = 128;
-    uint32_t numPoints = 25;
-    std::vector<glm::vec3> points(numPoints);
-
-    for(int i=0; i<numPoints; i++) {
-        points[i] = glm::vec3((Util::GetRand() * texRes), (Util::GetRand() * texRes), (Util::GetRand() * texRes));
-    }
-
-    points.resize(numPoints * 2);
-    for(int i=0, j=numPoints; i<numPoints; i++, j++) {
-        points[j] = points[i] + glm::vec3(0, 0, texRes);    
-    }
-    
-    points.resize(numPoints * 3);
-    for(int i=0, j=numPoints * 2; i<numPoints; i++, j++) {
-        points[j] = points[i] + glm::vec3(0, 0, -texRes);
-    }
-
-    points.resize(numPoints * 4);
-    for(int i=0, j=numPoints * 3; i<numPoints; i++, j++) {
-        points[j] = points[i] + glm::vec3(texRes, 0, 0);
-    }
-
-    points.resize(numPoints * 5);
-    for(int i=0, j=numPoints * 4; i<numPoints; i++, j++) {
-        points[j] = points[i] + glm::vec3(-texRes, 0, 0);
-    }
-
-
-    points.resize(numPoints * 5);
-    for(int i=0, j=numPoints * 4; i<numPoints; i++, j++) {
-        points[j] = points[i] + glm::vec3(0, texRes, 0);
-    }
-
-    points.resize(numPoints * 6);
-    for(int i=0, j=numPoints * 5; i<numPoints; i++, j++) {
-        points[j] = points[i] + glm::vec3(0, -texRes, 0);
-    }
-
+    // int texRes = 128;
+    // uint32_t numPoints = 12;
     std::vector<uint8_t> cloudTexture(texRes * texRes * texRes);
-    
-    // for(int i=0; i< texRes * texRes* texRes; i++) {
-    float maxDistance = -1;
     for(int z=0, inx=0; z< texRes; z++) {
         for(int y=0; y< texRes; y++) {
             for(int x=0; x< texRes; x++, inx++) {
-                float distance = texRes * texRes;
-                glm::vec3 pos((float)x, (float)y, (float)z);
-
-                for(int j=0; j<points.size(); j++) {
-                    float currentDistance = glm::distance(pos, points[j]);
-                    if(currentDistance < distance) distance = currentDistance;
-                }
-                cloudTexture[inx] = distance;
-
-                if(distance > maxDistance) maxDistance = distance;
+                if(inx % 10000 == 0) std::cout << inx << std::endl;
+                glm::vec3 uvw( ((float)x / (float)texRes) * 2.0 - 1.0, ((float)y / (float)texRes) * 2.0 - 1.0, ((float)z / (float)texRes) * 2.0 - 1.0 );
+                float value = Util::GetWorleyNoise3D(uvw.x, uvw.y, uvw.z, 1);
+                cloudTexture[inx] = (uint8_t)(value * 255);
             }
         }
     }
 
-    for(int i=0; i<cloudTexture.size(); i++) {
-        cloudTexture[i] = ((float)cloudTexture[i] / maxDistance) * 255;
-    }
+    std::cout << "HERE " << std::endl;
     
     noiseTex = Texture3D(1, cloudTexture, texRes, texRes,texRes, 1);
+    std::cout << "HERE 11" << std::endl;
+    
+        
+
+    // noiseTex = Texture3D(1, cloudTexture, texRes, texRes,texRes, 1);
 }
 
 void Cloud_1::WindowResize(int w, int h) {
@@ -260,6 +225,8 @@ void Cloud_1::RayMarch(Framebuffer* _fb) {
     
     ogl->glUniform1f(ogl->glGetUniformLocation(cloudShader.programShaderObject, "camFov"), scene->camera->GetFov());  
     ogl->glUniform1f(ogl->glGetUniformLocation(cloudShader.programShaderObject, "camAspectRatio"), scene->camera->GetAspect());  
+    
+    ogl->glUniform1f(ogl->glGetUniformLocation(cloudShader.programShaderObject, "time"), scene->elapsedTime);  
 
     ogl->glUniformMatrix4fv(ogl->glGetUniformLocation(cloudShader.programShaderObject, "boxTransform"), 1, false, glm::value_ptr(transform->GetWorldModelMatrix()));  
 

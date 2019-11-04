@@ -31,5 +31,12 @@ NoiseSample GetFracNoise2D(float x, float y,float frequency = 16, int octaves = 
 
 NoiseSample GetFracNoise3D(float x, float y, float t, float frequency = 16, int octaves = 2, float lacunarity = 2.0f, float persistence = 0.5f);   
 
+//Worley Noise
+float GetWorleyNoise3D(float x, float y, float z, float frequency);
+
+
+float GetPerlinWorleyNoise(float x, float y, float z, int numPoints);
+
+
 }
 }

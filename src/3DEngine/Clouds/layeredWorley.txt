@@ -1,0 +1,57 @@
+
+// Determines how many cells there are
+#define NUM_CELLS 5.0
+
+// Arbitrary random, can be replaced with a function of your choice
+float rand(vec3 co){
+    return fract(sin(dot(co.xyz ,vec3(12.9898,78.233, 42.632))) * 43758.5453);
+}
+
+// Returns the point in a given cell
+vec3 get_cell_point(ivec3 cell) {
+	vec3 cell_base = vec3(cell) / NUM_CELLS;
+	float noise_x = rand(vec3(cell));
+    float noise_y = rand(vec3(cell.yzx));
+    float noise_z = rand(vec3(cell.yxz));
+    return cell_base + (0.5 + 1.5 * vec3(noise_x, noise_y, noise_z)) / NUM_CELLS;
+}
+
+// Performs worley noise by checking all adjacent cells
+// and comparing the distance to their points
+float worley(vec3 coord) {
+    ivec3 cell = ivec3(coord * NUM_CELLS);
+    float dist = 1.0;
+    
+    // Search in the surrounding 5x5 cell block
+    for (int x = 0; x < 5; x++) { 
+        for (int y = 0; y < 5; y++) {
+        	for (int z = 0; z < 5; z++) {
+                vec3 cell_point = get_cell_point(cell + ivec3(x-2, y-2, z-2));
+                dist = min(dist, distance(cell_point, coord));
+            }
+        }
+    }
+    
+    dist /= length(vec3(1.0 / NUM_CELLS));
+    dist = 1.0 - dist;
+    return dist;
+}
+
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+	vec2 uv = fragCoord.xy / iResolution.xy;
+    uv.y *= iResolution.y / iResolution.x;
+    
+   // uv *=10.0f;
+	float worley1 = worley(vec3(uv, iTime * 0.1));
+    float worley2 = worley(vec3(uv * 10.0, iTime * 0.1));
+    
+    float layered = worley1 - (1.0-worley2)*0.25;
+	//layered = clamp(layered);
+
+    fragColor = vec4(worley1);
+    
+    
+    
+}
