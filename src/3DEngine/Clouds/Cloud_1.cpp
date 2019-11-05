@@ -51,7 +51,9 @@ Cloud_1::Cloud_1(std::string name, Scene* scene) : Object3D(name, scene) {
     uniform mat4 boxTransform;
     uniform vec3 boxScale;
 
-    uniform float time;
+    uniform float densityThreshold;
+    uniform float densityFactor;
+    uniform float frequency;
 
     float RayBoxTest(vec3 rayOrig, vec3 rayDir, mat4 transform, vec3 minScale,vec3 maxScale)
     {
@@ -80,11 +82,8 @@ Cloud_1::Cloud_1(std::string name, Scene* scene) : Object3D(name, scene) {
 
     float sampleDensity(vec3 position) {
         // float uvw = position * offset + offset; 
-        float value = texture(noiseTex, position).r;
-        // value = max(0, value - 0.2) * densityMultiplier;
-        value = max(0, value - 0.2) * 10;
-        // value *= 10;
-        
+        float value = texture(noiseTex, position * frequency).r;
+        value = min(1, max(0, value - densityThreshold)) * densityFactor;
         return value;
     }
 
@@ -105,25 +104,24 @@ Cloud_1::Cloud_1(std::string name, Scene* scene) : Object3D(name, scene) {
         
         vec3 finalColor = color;
         if(distance > 0) {
-            vec3 hitPoint = rayOrig.xyz + rayDir.xyz * distance;
-            float value = texture(noiseTex, vec3(hitPoint.x, hitPoint.y, (time * 0.25))).r;
-            finalColor = vec3(value, value, value);
+            // vec3 hitPoint = rayOrig.xyz + rayDir.xyz * distance;
+            // float value = texture(noiseTex, vec3(hitPoint.x, hitPoint.y, (time * 0.25))).r;
+            // finalColor = vec3(value, value, value);
 
-            // float sampleSize = 1;
-            // float numSteps = 100.0f;
-            // float stepSize = (sampleSize / numSteps) * 1 ;
+            float sampleSize = 1;
+            float numSteps = 10.0f;
+            float stepSize = (sampleSize / numSteps);
 
-            // float finalValue = 0;
-            // for(float i=0; i<numSteps; i++) {
-            //     vec3 newPos = rayOrig.xyz + rayDir.xyz * ( distance + i * stepSize);
+            float finalValue = 0;
+            for(float i=0; i<numSteps; i++) {
+                vec3 newPos = rayOrig.xyz + rayDir.xyz * ( distance + i * stepSize);
+                
+                float noiseValue = sampleDensity(newPos);
+                finalValue += noiseValue * stepSize;
+            }
+            finalValue = exp(-finalValue);
 
-            //     float noiseValue = sampleDensity(newPos);
-            //     finalValue += noiseValue * stepSize;
-            // }
-            // finalValue = exp(-finalValue);
-            // finalValue = max(0, finalValue - 0.1);
-
-            // finalColor = finalValue * vec3(1, 1, 1) + (1 - finalValue) * color;
+            finalColor = finalValue * color  + (1 - finalValue) * vec3(1, 1, 1);
         }
 
 
@@ -164,8 +162,8 @@ Cloud_1::Cloud_1(std::string name, Scene* scene) : Object3D(name, scene) {
             for(int x=0; x< texRes; x++, inx++) {
                 if(inx % 10000 == 0) std::cout << inx << std::endl;
                 glm::vec3 uvw(((float)x / (float)texRes) , ((float)y / (float)texRes) , ((float)z / (float)texRes)  );
-                float value = Util::GetPerlinWorleyNoise(uvw.x, uvw.y, uvw.z, 4);
-                cloudTexture[inx] = (uint8_t)(value * 255);
+                float r = Util::GetPerlinWorleyNoise(uvw.x, uvw.y, uvw.z, 4);
+                cloudTexture[inx] = (uint8_t)(r * 255);
             }
         }
     }
@@ -198,6 +196,36 @@ void Cloud_1::Update() {
 std::vector<QWidget*> Cloud_1::GetInspectorWidgets() {
     std::vector<QWidget*> res;
     res.push_back(this->transform->GetInspector());
+    
+    QGroupBox* mainGroupbox = new QGroupBox("Cloud");
+    QVBoxLayout* mainLayout = new QVBoxLayout();
+    mainGroupbox->setLayout(mainLayout);
+
+
+    
+    CustomSlider* densityThresholdSlider = new CustomSlider(0, 0.1, 0.0001, "densityThreshold", densityThreshold);
+    mainLayout->addLayout(densityThresholdSlider);
+    QObject::connect( densityThresholdSlider, &CustomSlider::Modified, [this](double val) {
+        densityThreshold = val;
+        scene->triggerRefresh=true;
+    });
+    
+        
+    CustomSlider* densityFactorSlider = new CustomSlider(0, 100, 0.5, "densityFactor", densityFactor);
+    mainLayout->addLayout(densityFactorSlider);
+    QObject::connect( densityFactorSlider, &CustomSlider::Modified, [this](double val) {
+        densityFactor = val;
+        scene->triggerRefresh=true;
+    });
+     
+    CustomSlider* frequencySlider = new CustomSlider(0, 4, 0.001, "frequency", frequency);
+    mainLayout->addLayout(frequencySlider);
+    QObject::connect( frequencySlider, &CustomSlider::Modified, [this](double val) {
+        frequency = val;
+        scene->triggerRefresh=true;
+    });
+    
+    res.push_back(mainGroupbox);
     return res;
 }
 
@@ -224,7 +252,9 @@ void Cloud_1::RayMarch(Framebuffer* _fb) {
     ogl->glUniform1f(ogl->glGetUniformLocation(cloudShader.programShaderObject, "camFov"), scene->camera->GetFov());  
     ogl->glUniform1f(ogl->glGetUniformLocation(cloudShader.programShaderObject, "camAspectRatio"), scene->camera->GetAspect());  
     
-    ogl->glUniform1f(ogl->glGetUniformLocation(cloudShader.programShaderObject, "time"), scene->elapsedTime);  
+    ogl->glUniform1f(ogl->glGetUniformLocation(cloudShader.programShaderObject, "densityThreshold"), densityThreshold);  
+    ogl->glUniform1f(ogl->glGetUniformLocation(cloudShader.programShaderObject, "densityFactor"), densityFactor);  
+    ogl->glUniform1f(ogl->glGetUniformLocation(cloudShader.programShaderObject, "frequency"), frequency);  
 
     ogl->glUniformMatrix4fv(ogl->glGetUniformLocation(cloudShader.programShaderObject, "boxTransform"), 1, false, glm::value_ptr(transform->GetWorldModelMatrix()));  
 

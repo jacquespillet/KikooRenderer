@@ -520,14 +520,6 @@ float Noise(glm::vec3 p, float scale )
 	
     f = f*f*(3.0f-2.0f*f);	// Cosine interpolation approximation
 	
-    // float res = glm::mix(
-    //                 glm::mix(Hash(p, 				 scale),
-	// 					Hash(p + glm::vec3(1.0, 0.0,), scale), f.x),
-	// 				glm::mix(Hash(p + glm::vec3(0.0, 1.0), scale),
-	// 					Hash(p + glm::vec3(1.0, 1.0), scale), f.x), f.y
-    //             );
-
-
     float res = glm::mix( glm::mix( glm::mix(
                           Hash(p, 				         scale), 
                           Hash(p + glm::vec3(1.0, 0.0,0.0), scale), f.x),
@@ -548,7 +540,7 @@ float fBm(glm::vec3 p)
 	// Change starting scale to any integer value...
 	float scale = 10.;
     p = mod(p, scale);
-	float amp   = 0.6;
+	float amp   = 0.1;
 	
 	for (int i = 0; i < 5; i++)
 	{
@@ -557,30 +549,22 @@ float fBm(glm::vec3 p)
 		// Scale must be multiplied by an integer value...
 		scale *= 2.;
 	}
-	// Clamp it just in case....
 	return glm::min(f, 1.0f);
 }
 
 float GetPerlinWorleyNoise(float x, float y, float z, float frequency) {
-    glm::mat2 m = glm::mat2(1.5, 1.3, -1.5, 1.3 );
-    
-    // float w = (1.0 + noise3D(glm::vec3(x, y, z))) * 
-    float w = 0;
-    // w += 1.0 + voronoi2D(glm::vec3(x, y, z), 1.0f);
-    // w += 0.5 * voronoi2D(glm::vec3(x, y, z), 2.);
-    w += voronoi2D(glm::vec3(x, y, z), 4.);
-            //   ((1.0 + voronoi2D(glm::vec3(x, y, z), 1.0f)) + 
-            //   (0.5 * voronoi2D(glm::vec3(x, y, z), 2.)) + 
-            //   (0.25 * voronoi2D(glm::vec3(x, y, z), 4.)));
-    
-    // float w = (1.0 + noise3D(vec3(uv, iTime * 0.25))) * 
-    //           ((1.0 + voronoi2D(uv)) + 
-    //           (0.5 * voronoi2D(uv * 2.)) + 
-    //           (0.25 * voronoi2D(uv * 4.)));
-    // Draw the min distance (distance field)
-    // glm::vec3 color = glm::vec3(w / 4.0);
+    float w = (fBm(glm::vec3(x, y, z)))
+            * ((voronoi2D(glm::vec3(x, y, z), 1)) 
+            + (0.5 * voronoi2D(glm::vec3(x, y, z), 2.)) 
+            + (0.25 * voronoi2D(glm::vec3(x, y, z), 4.)));
 
-    return (w / 4.0);
+    return (w / 4);
+
+    // float w =  ((voronoi2D(glm::vec3(x, y, z), 1)) 
+    //         + (0.5 * voronoi2D(glm::vec3(x, y, z), 2.)) 
+    //         + (0.25 * voronoi2D(glm::vec3(x, y, z), 4.)));
+
+    // return (w/3);
 }
 
 }
