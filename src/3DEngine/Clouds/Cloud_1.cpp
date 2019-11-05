@@ -7,6 +7,7 @@
 #include "../Texture.hpp"
 #include "Util/RandomUtil.hpp"
 #include "Util/NoiseUtil.hpp"
+#include "Util/Image.hpp"
 
 namespace KikooRenderer {
 
@@ -105,8 +106,7 @@ Cloud_1::Cloud_1(std::string name, Scene* scene) : Object3D(name, scene) {
         vec3 finalColor = color;
         if(distance > 0) {
             vec3 hitPoint = rayOrig.xyz + rayDir.xyz * distance;
-            hitPoint = hitPoint * 0.5 + 1.0;
-            float value = texture(noiseTex, vec3(hitPoint.x, hitPoint.y, time * 0.25)).r;
+            float value = texture(noiseTex, vec3(hitPoint.x, hitPoint.y, (time * 0.25))).r;
             finalColor = vec3(value, value, value);
 
             // float sampleSize = 1;
@@ -157,24 +157,22 @@ Cloud_1::Cloud_1(std::string name, Scene* scene) : Object3D(name, scene) {
 
     //CLOUD 3D
     int texRes = 128;
-    // int texRes = 128;
-    // uint32_t numPoints = 12;
     std::vector<uint8_t> cloudTexture(texRes * texRes * texRes);
+
     for(int z=0, inx=0; z< texRes; z++) {
         for(int y=0; y< texRes; y++) {
             for(int x=0; x< texRes; x++, inx++) {
                 if(inx % 10000 == 0) std::cout << inx << std::endl;
-                glm::vec3 uvw( ((float)x / (float)texRes) * 2.0 - 1.0, ((float)y / (float)texRes) * 2.0 - 1.0, ((float)z / (float)texRes) * 2.0 - 1.0 );
-                float value = Util::GetWorleyNoise3D(uvw.x, uvw.y, uvw.z, 1);
+                glm::vec3 uvw(((float)x / (float)texRes) , ((float)y / (float)texRes) , ((float)z / (float)texRes)  );
+                float value = Util::GetPerlinWorleyNoise(uvw.x, uvw.y, uvw.z, 4);
                 cloudTexture[inx] = (uint8_t)(value * 255);
             }
         }
     }
 
-    std::cout << "HERE " << std::endl;
+
     
     noiseTex = Texture3D(1, cloudTexture, texRes, texRes,texRes, 1);
-    std::cout << "HERE 11" << std::endl;
     
         
 

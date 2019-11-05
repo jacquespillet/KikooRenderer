@@ -453,28 +453,10 @@ NoiseSample GetFracNoise3D(float x, float y, float t,float frequency, int octave
 }
 
 /////////////////___________________________________
-// Arbitrary random, can be replaced with a function of your choice
-float rand(glm::vec3 co){
-    float intPart;
-    return modf(sin(dot(co ,glm::vec3(12.9898,78.233, 42.632))) * 43758.5453, &intPart);
-}
-
-// Returns the point in a given cell
-glm::vec3 get_cell_point(glm::ivec3 cell, int numPoints) {
-	glm::vec3 cell_base = glm::vec3(cell) / numPoints;
-	float noise_x = rand(glm::vec3(cell));
-    float noise_y = rand(glm::vec3(cell.y, cell.z,cell.x));
-    float noise_z = rand(glm::vec3(cell.y, cell.x, cell.z));
-    return cell_base + (0.5f + 1.5f * glm::vec3(noise_x, noise_y, noise_z)) / numPoints;
-}
-/////////////////___________________________________
-
-/////////////////___________________________________
 // 2D voronoi noise.
 float r(float n)
 {
-    float intpart;
- 	return modf(cos(n*89.42)*343.42, &intpart);
+ 	return glm::fract(cos(n*89.42)*343.42);
 }
 
 glm::vec3 r(glm::vec3 n)
@@ -482,21 +464,22 @@ glm::vec3 r(glm::vec3 n)
  	return glm::vec3(r(n.x*23.62-300.0+n.y*34.35 + n.z*56.35),r(n.x*45.13+256.0+n.y*38.89 + n.z*32.35), r(n.x*45.13+256.0+n.y*38.89 + n.z*43.35)); 
 }
 
-float voronoi2D(glm::vec3 n)
+float voronoi2D(glm::vec3 n, float frequency)
 {
+    n *= frequency;
     float dis = 2.0;
+    
     for (int z= -1; z <= 1; z++) 
     {
         for (int y= -1; y <= 1; y++) 
         {
             for (int x= -1; x <= 1; x++) 
             {
-                // Neighbor place in the grid
-                glm::vec3 p = glm::floor(n) + glm::vec3(x,y, z);
-
-                float d = glm::length(r(p) + glm::vec3(x, y, z) - glm::fract(n));
-                if (dis > d)
-                {
+                glm::vec3 p = glm::floor(n) + glm::vec3(x,y, z); //Neighbour center
+                glm::vec3 neighbour = r(glm::mod(p, frequency)) + glm::vec3(x, y, z); //Neighbour point
+                float d = glm::length(neighbour - glm::fract(n));
+                
+                if (dis > d) {
                     dis = d;   
                 }
             }
@@ -508,73 +491,92 @@ float voronoi2D(glm::vec3 n)
 /////////////////___________________________________
 
 float GetWorleyNoise3D(float x, float y, float z, float frequency) {
-    float value = (0.25 * voronoi2D(glm::vec3(x, y, z) * 4));
-    value = std::max(0.0f, std::min(1.0f, value));
+    float value = voronoi2D(glm::vec3(x, y, z), frequency);
     return value;
-    // int numPoints = 6;
-
-    // glm::vec3 coord(x, y, z);
-    // coord *= frequency;
-
-    // glm::ivec3 cell = glm::ivec3(coord * numPoints);
-    // float dist = 1.0;
-    
-    // // Search in the surrounding 5x5 cell block
-    // for (int x = 0; x < 5; x++) {
-    //     for (int y = 0; y < 5; y++) {
-    //     	for (int z = 0; z < 5; z++) {
-    //             glm::vec3 cell_point = get_cell_point(cell + glm::ivec3(x-2, y-2, z-2), numPoints);
-    //             dist = std::min(dist, distance(cell_point, coord));
-    //         }
-    //     }
-    // }
-    
-    // dist /= length(glm::vec3(1.0 / numPoints));
-    // dist = 1.0 - dist;
-
-    // return dist;
 }
 
 
 
 
 
-glm::vec3 hash2( glm::vec3 p )
+//----------------------------------------------------------------------------------------
+float Hash(glm::vec3 p, float scale)
 {
-	p = glm::vec3( dot(p,glm::vec3(127.1,311.7, 74.7)),
-			  dot(p,glm::vec3(269.5,183.3,246.1)),
-			  dot(p,glm::vec3(113.5,271.9,124.6)));
-
-	return -1.0f + 2.0*fract(sin(p)*43758.5453123);
+	// This is tiling part, adjusts with the scale...
+	p = glm::mod(p, scale);
+	return glm::fract(glm::sin(glm::dot(p, glm::vec3(27.16898, 38.90563, 30.23908))) * 5151.5473453);
 }
 
-// 3D Gradient noise by iq.
-float noise3D( glm::vec3 p )
+//----------------------------------------------------------------------------------------
+float Noise(glm::vec3 p, float scale )
 {
-    glm::vec3 i = floor( p );
-    glm::vec3 f = fract( p );
+	glm::vec3 f;
 	
-	glm::vec3 u = f*f*(3.0f-2.0f*f);
+	p *= scale;
 
-    return glm::mix( glm::mix( glm::mix( dot( hash2( i + glm::vec3(0.0,0.0,0.0) ), f - glm::vec3(0.0,0.0,0.0) ), 
-                          dot( hash2( i + glm::vec3(1.0,0.0,0.0) ), f - glm::vec3(1.0,0.0,0.0) ), u.x),
-                     glm::mix( dot( hash2( i + glm::vec3(0.0,1.0,0.0) ), f - glm::vec3(0.0,1.0,0.0) ), 
-                          dot( hash2( i + glm::vec3(1.0,1.0,0.0) ), f - glm::vec3(1.0,1.0,0.0) ), u.x), u.y),
-                glm::mix( glm::mix( dot( hash2( i + glm::vec3(0.0,0.0,1.0) ), f - glm::vec3(0.0,0.0,1.0) ), 
-                          dot( hash2( i + glm::vec3(1.0,0.0,1.0) ), f - glm::vec3(1.0,0.0,1.0) ), u.x),
-                     glm::mix( dot( hash2( i + glm::vec3(0.0,1.0,1.0) ), f - glm::vec3(0.0,1.0,1.0) ), 
-                          dot( hash2( i + glm::vec3(1.0,1.0,1.0) ), f - glm::vec3(1.0,1.0,1.0) ), u.x), u.y), u.z );
+	
+	f = fract(p);		// Separate integer from fractional
+    p = floor(p);
+	
+    f = f*f*(3.0f-2.0f*f);	// Cosine interpolation approximation
+	
+    // float res = glm::mix(
+    //                 glm::mix(Hash(p, 				 scale),
+	// 					Hash(p + glm::vec3(1.0, 0.0,), scale), f.x),
+	// 				glm::mix(Hash(p + glm::vec3(0.0, 1.0), scale),
+	// 					Hash(p + glm::vec3(1.0, 1.0), scale), f.x), f.y
+    //             );
+
+
+    float res = glm::mix( glm::mix( glm::mix(
+                          Hash(p, 				         scale), 
+                          Hash(p + glm::vec3(1.0, 0.0,0.0), scale), f.x),
+                     glm::mix( Hash(p + glm::vec3(0.0, 1.0,0.0), scale), 
+                          Hash(p + glm::vec3(1.0, 1.0,0.0), scale), f.x), f.y),
+                glm::mix( glm::mix( Hash(p + glm::vec3(0.0, 0.0,1.0), scale), 
+                          Hash(p + glm::vec3(1.0, 0.0,1.0), scale), f.x),
+                     glm::mix( Hash(p + glm::vec3(0.0, 1.0,1.0), scale), 
+                          Hash(p + glm::vec3(1.0, 1.0,1.0), scale), f.x), f.y), f.z );                        
+    return res;
 }
 
+//----------------------------------------------------------------------------------------
+float fBm(glm::vec3 p)
+{
+    p += glm::vec3(sin(0.7), cos(0.45), sin(0.21))*(.1);
+	float f = 0.0;
+	// Change starting scale to any integer value...
+	float scale = 10.;
+    p = mod(p, scale);
+	float amp   = 0.6;
+	
+	for (int i = 0; i < 5; i++)
+	{
+		f += Noise(p, scale) * amp;
+		amp *= .5;
+		// Scale must be multiplied by an integer value...
+		scale *= 2.;
+	}
+	// Clamp it just in case....
+	return glm::min(f, 1.0f);
+}
 
-float GetPerlinWorleyNoise(float x, float y, float z, int numPoints) {
+float GetPerlinWorleyNoise(float x, float y, float z, float frequency) {
     glm::mat2 m = glm::mat2(1.5, 1.3, -1.5, 1.3 );
     
-    float w = (1.0 + noise3D(glm::vec3(x, y, z))) * 
-              ((1.0 + voronoi2D(glm::vec3(x, y, z))) + 
-              (0.5 * voronoi2D(glm::vec3(x, y, z) * 2.)) + 
-              (0.25 * voronoi2D(glm::vec3(x, y, z) * 4.)));
-
+    // float w = (1.0 + noise3D(glm::vec3(x, y, z))) * 
+    float w = 0;
+    // w += 1.0 + voronoi2D(glm::vec3(x, y, z), 1.0f);
+    // w += 0.5 * voronoi2D(glm::vec3(x, y, z), 2.);
+    w += voronoi2D(glm::vec3(x, y, z), 4.);
+            //   ((1.0 + voronoi2D(glm::vec3(x, y, z), 1.0f)) + 
+            //   (0.5 * voronoi2D(glm::vec3(x, y, z), 2.)) + 
+            //   (0.25 * voronoi2D(glm::vec3(x, y, z), 4.)));
+    
+    // float w = (1.0 + noise3D(vec3(uv, iTime * 0.25))) * 
+    //           ((1.0 + voronoi2D(uv)) + 
+    //           (0.5 * voronoi2D(uv * 2.)) + 
+    //           (0.25 * voronoi2D(uv * 4.)));
     // Draw the min distance (distance field)
     // glm::vec3 color = glm::vec3(w / 4.0);
 
