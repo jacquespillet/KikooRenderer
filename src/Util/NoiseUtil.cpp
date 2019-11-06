@@ -540,7 +540,7 @@ float fBm(glm::vec3 p)
 	// Change starting scale to any integer value...
 	float scale = 10.;
     p = mod(p, scale);
-	float amp   = 0.1;
+	float amp   = 0.2;
 	
 	for (int i = 0; i < 5; i++)
 	{
@@ -554,17 +554,14 @@ float fBm(glm::vec3 p)
 
 float GetPerlinWorleyNoise(float x, float y, float z, float frequency) {
     float w = (fBm(glm::vec3(x, y, z)))
-            * ((voronoi2D(glm::vec3(x, y, z), 1)) 
-            + (0.5 * voronoi2D(glm::vec3(x, y, z), 2.)) 
-            + (0.25 * voronoi2D(glm::vec3(x, y, z), 4.)));
+            * ((voronoi2D(glm::vec3(x, y, z), 4)) 
+            + (0.5 * voronoi2D(glm::vec3(x, y, z), 8.)) 
+            + (0.25 * voronoi2D(glm::vec3(x, y, z), 12.)));
 
     return (w / 4);
 
-    // float w =  ((voronoi2D(glm::vec3(x, y, z), 1)) 
-    //         + (0.5 * voronoi2D(glm::vec3(x, y, z), 2.)) 
-    //         + (0.25 * voronoi2D(glm::vec3(x, y, z), 4.)));
-
-    // return (w/3);
+    // float w = (fBm(glm::vec3(x, y, z)));
+    // return (w);
 }
 
 }

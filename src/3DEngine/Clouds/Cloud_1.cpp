@@ -55,9 +55,11 @@ Cloud_1::Cloud_1(std::string name, Scene* scene) : Object3D(name, scene) {
     uniform float densityFactor;
     uniform float frequency;
 
-    float RayBoxTest(vec3 rayOrig, vec3 rayDir, mat4 transform, vec3 minScale,vec3 maxScale)
+    // const vec3 lightPos = vec3(10, 10, 10);
+    uniform vec3 lightPos;
+
+    bool RayBoxTest(vec3 rayOrig, vec3 rayDir, mat4 transform, vec3 minScale,vec3 maxScale, out float distance)
     {
-        float distance = -1;
         //transform ray
         mat4 invTr = inverse(transform); 
         rayOrig = vec3( invTr * vec4(rayOrig, 1) );
@@ -69,21 +71,57 @@ Cloud_1::Cloud_1(std::string name, Scene* scene) : Object3D(name, scene) {
         vec3 t2 = (maxScale - rayOrig) * rayDirInv;
         
         vec3 intersectionPosition = rayOrig + t2.x * rayDir;
-        float tmin = max( max( min(t1.x, t2.x), min(t1.y, t2.y)), min(t1.z, t2.z));
-        float tmax = min( min( max(t1.x, t2.x), max(t1.y, t2.y)), max(t1.z, t2.z));
-        bool raybox = tmax >= max(0.0f, tmin);
-        distance = tmin; 
-    
-        if(!raybox)
-            distance = -1;
+        float tmin = (max)( (max)( (min)(t1.x, t2.x), (min)(t1.y, t2.y)), (min)(t1.z, t2.z));
+        float tmax = (min)( (min)( (max)(t1.x, t2.x), (max)(t1.y, t2.y)), (max)(t1.z, t2.z));
+        bool raybox = tmax >= (max)(0.0f, tmin);
 
-        return distance;
+        if(tmin < 0) {
+            distance = tmax;
+        } else {
+            distance = tmin;
+        }         
+       
+        if(!raybox)
+            distance = -1; 
+        
+        return raybox;
     }
 
-    float sampleDensity(vec3 position) {
-        // float uvw = position * offset + offset; 
-        float value = texture(noiseTex, position * frequency).r;
+    float sampleDensity(vec3 position, out float lightDensity) {
+        vec4 noiseSample = texture(noiseTex, position * frequency).rgba;
+        
+        float value = (noiseSample.r + noiseSample.g + noiseSample.b + noiseSample.a) * 0.25;
+
+        float heightFactor = 1 - (position.y / boxScale.y);
+        value *= heightFactor;
+
+
         value = min(1, max(0, value - densityThreshold)) * densityFactor;
+        
+
+
+        //Light Computation
+        //_________________________________
+        // vec3 pointToLight = normalize(lightPos - position);
+        // float toLightDistance=0;
+        // RayBoxTest(position , pointToLight, boxTransform, vec3(-0.5),vec3(0.5), toLightDistance);
+
+        // float sampleSize = toLightDistance;
+        // float numSteps = 10.0f;
+        // float stepSize = sampleSize / numSteps;
+
+        // lightDensity = 0;
+        // for(float i=0; i<numSteps; i++) {
+        //     vec3 newPos = position + pointToLight * ( i * stepSize);
+            
+        //     float noiseValue = texture(noiseTex, newPos * frequency).r;
+        //     noiseValue = min(1, max(0, noiseValue - densityThreshold)) * densityFactor * 0.1;
+
+        //     lightDensity += exp(-noiseValue * stepSize);
+        // }
+        // // lightDensity = exp(-lightDensity);
+        //_________________________________
+
         return value;
     }
 
@@ -100,28 +138,34 @@ Cloud_1::Cloud_1(std::string name, Scene* scene) : Object3D(name, scene) {
         rayDir = camModelMatrix * rayDir;
         rayDir = normalize(rayDir);
 
-        float distance = RayBoxTest(rayOrig.xyz, rayDir.xyz, boxTransform, vec3(-0.5),vec3(0.5));
+        float distance=0;
+        bool intersects = RayBoxTest(rayOrig.xyz, rayDir.xyz, boxTransform, vec3(-0.5),vec3(0.5), distance);
         
         vec3 finalColor = color;
-        if(distance > 0) {
-            // vec3 hitPoint = rayOrig.xyz + rayDir.xyz * distance;
-            // float value = texture(noiseTex, vec3(hitPoint.x, hitPoint.y, (time * 0.25))).r;
-            // finalColor = vec3(value, value, value);
+        if(intersects) {
+            vec3 hitPoint = rayOrig.xyz + rayDir.xyz * (distance + 0.0001);
+            
+            float insideDistance=0;
+            RayBoxTest(hitPoint , rayDir.xyz, boxTransform, vec3(-0.5),vec3(0.5), insideDistance);
 
-            float sampleSize = 1;
+            float sampleSize = insideDistance - 0.2;
             float numSteps = 10.0f;
-            float stepSize = (sampleSize / numSteps);
-
+            float stepSize = sampleSize / numSteps;
+ 
             float finalValue = 0;
-            for(float i=0; i<numSteps; i++) {
+            float finalLightDensity=1;
+            for(float i=2; i<numSteps; i++) {
                 vec3 newPos = rayOrig.xyz + rayDir.xyz * ( distance + i * stepSize);
                 
-                float noiseValue = sampleDensity(newPos);
+                float lightDensity=0;
+                float noiseValue = sampleDensity(newPos, lightDensity);
+
+                finalLightDensity += lightDensity * stepSize;
                 finalValue += noiseValue * stepSize;
             }
             finalValue = exp(-finalValue);
 
-            finalColor = finalValue * color  + (1 - finalValue) * vec3(1, 1, 1);
+            finalColor = finalValue * color  + (1 - finalValue) * vec3(finalLightDensity, finalLightDensity, finalLightDensity);
         }
 
 
@@ -155,24 +199,28 @@ Cloud_1::Cloud_1(std::string name, Scene* scene) : Object3D(name, scene) {
 
     //CLOUD 3D
     int texRes = 128;
-    std::vector<uint8_t> cloudTexture(texRes * texRes * texRes);
+    std::vector<uint8_t> cloudTexture(texRes * texRes * texRes * 4);
 
     for(int z=0, inx=0; z< texRes; z++) {
         for(int y=0; y< texRes; y++) {
-            for(int x=0; x< texRes; x++, inx++) {
+            for(int x=0; x< texRes; x++, inx+=4) {
                 if(inx % 10000 == 0) std::cout << inx << std::endl;
                 glm::vec3 uvw(((float)x / (float)texRes) , ((float)y / (float)texRes) , ((float)z / (float)texRes)  );
                 float r = Util::GetPerlinWorleyNoise(uvw.x, uvw.y, uvw.z, 4);
-                cloudTexture[inx] = (uint8_t)(r * 255);
+                float g = Util::GetWorleyNoise3D(uvw.x, uvw.y, uvw.z, 8);
+                float b = Util::GetWorleyNoise3D(uvw.x, uvw.y, uvw.z, 12);
+                float a = Util::GetWorleyNoise3D(uvw.x, uvw.y, uvw.z, 16);
+                cloudTexture[inx] =   (uint8_t)(r * 255);
+                cloudTexture[inx+1] = (uint8_t)(g * 255);
+                cloudTexture[inx+2] = (uint8_t)(b * 255);
+                cloudTexture[inx+3] = (uint8_t)(a * 255);
             }
         }
     }
+    noiseTex = Texture3D(1, cloudTexture, texRes, texRes,texRes, 4);
 
 
     
-    noiseTex = Texture3D(1, cloudTexture, texRes, texRes,texRes, 1);
-    
-        
 
     // noiseTex = Texture3D(1, cloudTexture, texRes, texRes,texRes, 1);
 }
@@ -203,7 +251,7 @@ std::vector<QWidget*> Cloud_1::GetInspectorWidgets() {
 
 
     
-    CustomSlider* densityThresholdSlider = new CustomSlider(0, 0.1, 0.0001, "densityThreshold", densityThreshold);
+    CustomSlider* densityThresholdSlider = new CustomSlider(0, 0.5, 0.001, "densityThreshold", densityThreshold);
     mainLayout->addLayout(densityThresholdSlider);
     QObject::connect( densityThresholdSlider, &CustomSlider::Modified, [this](double val) {
         densityThreshold = val;
@@ -211,7 +259,7 @@ std::vector<QWidget*> Cloud_1::GetInspectorWidgets() {
     });
     
         
-    CustomSlider* densityFactorSlider = new CustomSlider(0, 100, 0.5, "densityFactor", densityFactor);
+    CustomSlider* densityFactorSlider = new CustomSlider(0, 500, 1, "densityFactor", densityFactor);
     mainLayout->addLayout(densityFactorSlider);
     QObject::connect( densityFactorSlider, &CustomSlider::Modified, [this](double val) {
         densityFactor = val;
@@ -259,6 +307,11 @@ void Cloud_1::RayMarch(Framebuffer* _fb) {
     ogl->glUniformMatrix4fv(ogl->glGetUniformLocation(cloudShader.programShaderObject, "boxTransform"), 1, false, glm::value_ptr(transform->GetWorldModelMatrix()));  
 
     ogl->glUniform3fv(ogl->glGetUniformLocation(cloudShader.programShaderObject, "boxScale"), 1,  glm::value_ptr(transform->scale));
+
+    if(scene->lightObjects.size() > 0) {
+        ogl->glUniform3fv(ogl->glGetUniformLocation(cloudShader.programShaderObject, "lightPos"), 1,  glm::value_ptr(scene->lightObjects[0]->transform->position));
+    }
+    
 
     ogl->glActiveTexture(GL_TEXTURE1);
     ogl->glBindTexture(GL_TEXTURE_3D, noiseTex.glTex);

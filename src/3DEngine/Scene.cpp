@@ -62,11 +62,13 @@ namespace CoreEngine {
         
         drawImmediate.Init(); 
 
-        // Object3D* plane = GetQuad(this, "Quad", glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(1));
+        // Object3D* plane = GetQuad(this, "Quad", glm::vec3(0), glm::vec3(0), glm::vec3(5), glm::vec4(1));
         Cloud_1* cloud = new Cloud_1("Cloud", this);
         cloud->isRayMarched = true;
         AddObject(cloud);
-
+        
+        // Object3D* plane = GetCube(this, "Quad", glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(1));
+        // AddObject(plane);
 
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
@@ -403,7 +405,7 @@ namespace CoreEngine {
                 for(int i=0; i<objects3D.size(); i++) {
                     double distance;
                     Object3D* intersectedObject = objects3D[i]->Intersects(ray, distance);
-
+                    std::cout << objects3D[i]->name << "  " << distance << std::endl;
                     if(intersectedObject != nullptr) {
                         if(distance < minDistance) {
                             minDistance = distance;
