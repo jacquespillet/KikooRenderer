@@ -43,9 +43,14 @@ private:
     MaterialComponent* quadMaterial;
     MeshFilterComponent* mesh;
 
+    float channel0Influence = 1;
+    float channel1Influence = 1;
+    float channel2Influence = 1;
+    float channel3Influence = 1;
+
     float densityThreshold=0.12;
     float densityFactor=20;
-    float frequency=1;
+    float frequency=0.5;
 };
 
 }

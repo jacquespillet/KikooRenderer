@@ -9,6 +9,8 @@
 #include "Util/NoiseUtil.hpp"
 #include "Util/Image.hpp"
 
+#include "Util/ThreadingUtil.hpp"
+
 namespace KikooRenderer {
 
 namespace CoreEngine {
@@ -55,6 +57,11 @@ Cloud_1::Cloud_1(std::string name, Scene* scene) : Object3D(name, scene) {
     uniform float densityFactor;
     uniform float frequency;
 
+    uniform float channel0Influence;
+    uniform float channel1Influence;
+    uniform float channel2Influence;
+    uniform float channel3Influence;
+
     // const vec3 lightPos = vec3(10, 10, 10);
     uniform vec3 lightPos;
 
@@ -90,7 +97,10 @@ Cloud_1::Cloud_1(std::string name, Scene* scene) : Object3D(name, scene) {
     float sampleDensity(vec3 position, out float lightDensity) {
         vec4 noiseSample = texture(noiseTex, position * frequency).rgba;
         
-        float value = (noiseSample.r + noiseSample.g + noiseSample.b + noiseSample.a) * 0.25;
+        float value = (noiseSample.r * channel0Influence)
+                    * ( noiseSample.g * channel1Influence * 0.6
+                    + noiseSample.b * channel2Influence * 0.3
+                    + noiseSample.a * channel3Influence * 0.1);
 
         float heightFactor = 1 - (position.y / boxScale.y);
         value *= heightFactor;
@@ -144,12 +154,13 @@ Cloud_1::Cloud_1(std::string name, Scene* scene) : Object3D(name, scene) {
         vec3 finalColor = color;
         if(intersects) {
             vec3 hitPoint = rayOrig.xyz + rayDir.xyz * (distance + 0.0001);
-            
+
+
             float insideDistance=0;
             RayBoxTest(hitPoint , rayDir.xyz, boxTransform, vec3(-0.5),vec3(0.5), insideDistance);
 
             float sampleSize = insideDistance - 0.2;
-            float numSteps = 10.0f;
+            float numSteps = 50.0f;
             float stepSize = sampleSize / numSteps;
  
             float finalValue = 0;
@@ -167,9 +178,6 @@ Cloud_1::Cloud_1(std::string name, Scene* scene) : Object3D(name, scene) {
 
             finalColor = finalValue * color  + (1 - finalValue) * vec3(finalLightDensity, finalLightDensity, finalLightDensity);
         }
-
-
-
         outputColor= vec4(finalColor.rgb, 1);
     }
     )";
@@ -201,22 +209,25 @@ Cloud_1::Cloud_1(std::string name, Scene* scene) : Object3D(name, scene) {
     int texRes = 128;
     std::vector<uint8_t> cloudTexture(texRes * texRes * texRes * 4);
 
-    for(int z=0, inx=0; z< texRes; z++) {
-        for(int y=0; y< texRes; y++) {
-            for(int x=0; x< texRes; x++, inx+=4) {
-                if(inx % 10000 == 0) std::cout << inx << std::endl;
-                glm::vec3 uvw(((float)x / (float)texRes) , ((float)y / (float)texRes) , ((float)z / (float)texRes)  );
-                float r = Util::GetPerlinWorleyNoise(uvw.x, uvw.y, uvw.z, 4);
-                float g = Util::GetWorleyNoise3D(uvw.x, uvw.y, uvw.z, 8);
-                float b = Util::GetWorleyNoise3D(uvw.x, uvw.y, uvw.z, 12);
-                float a = Util::GetWorleyNoise3D(uvw.x, uvw.y, uvw.z, 16);
-                cloudTexture[inx] =   (uint8_t)(r * 255);
-                cloudTexture[inx+1] = (uint8_t)(g * 255);
-                cloudTexture[inx+2] = (uint8_t)(b * 255);
-                cloudTexture[inx+3] = (uint8_t)(a * 255);
-            }
-        }
-    }
+    Util::ThreadPool( std::function<void(uint64_t, uint64_t)>([this, texRes, &cloudTexture](uint64_t i, uint64_t t)
+    {
+        uint64_t inx = i * 4;
+        // uint64_t z = t % texRes * texRes;
+        int z = inx / (texRes * texRes);
+        uint64_t _inx = inx - (z * texRes * texRes);
+        int y = _inx / texRes;
+        int x = _inx % texRes;
+        glm::vec3 uvw(((float)x / (float)texRes) , ((float)y / (float)texRes) , ((float)z / (float)texRes)  );
+    
+        float r = Util::GetPerlinWorleyNoise(uvw.x, uvw.y, uvw.z, 4);
+        float g = Util::GetWorleyNoise3D(uvw.x, uvw.y, uvw.z, 1);
+        float b = Util::GetWorleyNoise3D(uvw.x, uvw.y, uvw.z, 8);
+        float a = Util::GetWorleyNoise3D(uvw.x, uvw.y, uvw.z, 16);
+        cloudTexture[inx] =   (uint8_t)(r * 255);
+        cloudTexture[inx+1] = (uint8_t)(g * 255);
+        cloudTexture[inx+2] = (uint8_t)(b * 255);
+        cloudTexture[inx+3] = (uint8_t)(a * 255);
+    }), cloudTexture.size()/4).Block();
     noiseTex = Texture3D(1, cloudTexture, texRes, texRes,texRes, 4);
 
 
@@ -272,6 +283,35 @@ std::vector<QWidget*> Cloud_1::GetInspectorWidgets() {
         frequency = val;
         scene->triggerRefresh=true;
     });
+
+
+    CustomSlider* channel0InfluenceSlider = new CustomSlider(0, 1, 0.001, "channel0Influence", channel0Influence);
+    mainLayout->addLayout(channel0InfluenceSlider);
+    QObject::connect( channel0InfluenceSlider, &CustomSlider::Modified, [this](double val) {
+        channel0Influence = val;
+        scene->triggerRefresh=true;
+    });  
+    
+    CustomSlider* channel1InfluenceSlider = new CustomSlider(0, 1, 0.001, "channel1Influence", channel1Influence);
+    mainLayout->addLayout(channel1InfluenceSlider);
+    QObject::connect( channel1InfluenceSlider, &CustomSlider::Modified, [this](double val) {
+        channel1Influence = val;
+        scene->triggerRefresh=true;
+    });  
+    
+    CustomSlider* channel2InfluenceSlider = new CustomSlider(0, 1, 0.001, "channel2Influence", channel2Influence);
+    mainLayout->addLayout(channel2InfluenceSlider);
+    QObject::connect( channel2InfluenceSlider, &CustomSlider::Modified, [this](double val) {
+        channel2Influence = val;
+        scene->triggerRefresh=true;
+    });  
+    
+    CustomSlider* channel3InfluenceSlider = new CustomSlider(0, 1, 0.001, "channel3Influence", channel3Influence);
+    mainLayout->addLayout(channel3InfluenceSlider);
+    QObject::connect( channel3InfluenceSlider, &CustomSlider::Modified, [this](double val) {
+        channel3Influence = val;
+        scene->triggerRefresh=true;
+    });    
     
     res.push_back(mainGroupbox);
     return res;
@@ -303,6 +343,11 @@ void Cloud_1::RayMarch(Framebuffer* _fb) {
     ogl->glUniform1f(ogl->glGetUniformLocation(cloudShader.programShaderObject, "densityThreshold"), densityThreshold);  
     ogl->glUniform1f(ogl->glGetUniformLocation(cloudShader.programShaderObject, "densityFactor"), densityFactor);  
     ogl->glUniform1f(ogl->glGetUniformLocation(cloudShader.programShaderObject, "frequency"), frequency);  
+
+    ogl->glUniform1f(ogl->glGetUniformLocation(cloudShader.programShaderObject, "channel0Influence"), channel0Influence);  
+    ogl->glUniform1f(ogl->glGetUniformLocation(cloudShader.programShaderObject, "channel1Influence"), channel1Influence);  
+    ogl->glUniform1f(ogl->glGetUniformLocation(cloudShader.programShaderObject, "channel2Influence"), channel2Influence);  
+    ogl->glUniform1f(ogl->glGetUniformLocation(cloudShader.programShaderObject, "channel3Influence"), channel3Influence);  
 
     ogl->glUniformMatrix4fv(ogl->glGetUniformLocation(cloudShader.programShaderObject, "boxTransform"), 1, false, glm::value_ptr(transform->GetWorldModelMatrix()));  
 

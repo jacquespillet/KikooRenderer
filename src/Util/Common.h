@@ -57,6 +57,9 @@
 #include <Qt3DRender/QRenderSettings>
 
 
+//cptl
+#include <ctpl_stl.h>
+
 //glm
 #define GLM_FORCE_INLINE 
 //#define GLM_FORCE_SSE2
