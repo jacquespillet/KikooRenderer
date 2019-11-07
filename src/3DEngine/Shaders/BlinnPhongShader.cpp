@@ -256,6 +256,7 @@ Shader GetBlinnPhongShader() {
     blinnPhongShader.name = "Blinn Phong";
     std::cout << "StandardShaders:Compile: Compiling blinnPhongShader" << std::endl; 
 
+    t.close();
     return blinnPhongShader;
 }
 }
