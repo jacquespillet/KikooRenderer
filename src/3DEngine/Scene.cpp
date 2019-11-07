@@ -52,7 +52,7 @@ namespace CoreEngine {
 		transformWidget->Enable();
 
         skyboxCube = GetCube(this, "Cubemap", glm::vec3(0), glm::vec3(0), glm::vec3(100), glm::vec4(0.1, 0.1, 0.1, 1));
-        skyboxCube->GetComponent<MaterialComponent>()->SetShader(standardShaders.blinnPhongShader);
+        skyboxCube->GetComponent<MaterialComponent>()->SetShader(standardShaders.unlitMeshShader);
         skyboxCube->Start();
         skyboxCube->Enable();
 
@@ -61,14 +61,6 @@ namespace CoreEngine {
         simulation.Init();
         
         drawImmediate.Init(); 
-
-        // Object3D* plane = GetQuad(this, "Quad", glm::vec3(0), glm::vec3(0), glm::vec3(5), glm::vec4(1));
-        Cloud_1* cloud = new Cloud_1("Cloud", this);
-        cloud->isRayMarched = true;
-        AddObject(cloud);
-        
-        // Object3D* plane = GetCube(this, "Quad", glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(1));
-        // AddObject(plane);
 
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {
@@ -159,6 +151,13 @@ namespace CoreEngine {
 				}
 			}
 		}
+        
+        for (int i = 0; i < rayMarchedObjects.size(); i++) {
+            if (rayMarchedObjects[i] == object) {
+                rayMarchedObjects.erase(rayMarchedObjects.begin() + i);
+                break;
+            }
+        }
 
         for(int i=0; i<objects3D.size(); i++) {
             if(objects3D[i] == object) {

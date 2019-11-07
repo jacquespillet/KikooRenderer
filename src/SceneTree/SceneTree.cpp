@@ -4,6 +4,9 @@
 
 #include "3DEngine/BaseObjects.hpp"
 
+#include "3DEngine/Clouds/Cloud_1.hpp"
+#include "3DEngine/Misc/LensFlare/LensFlare.hpp"
+
 namespace KikooRenderer 
 {
 
@@ -85,6 +88,9 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
 	QString NonUniformBSplineStr = "Non Uniform B Spline";
 	QString NURBSStr = "NURBS";
 
+	QString cloudStr = "Cloud";
+	QString lensFlareStr = "Lens Flare";
+
 
 	QPoint menuPos;
 	if(!fromMainWindow) menuPos = tree->mapToGlobal(pos);
@@ -134,6 +140,11 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
     addCurveMenu->addAction(NURBSStr);
     addObjectMenu->addMenu(addCurveMenu);
 
+	QMenu* addMiscMenu = new QMenu("Misc");
+    addMiscMenu->addAction(cloudStr);
+    addMiscMenu->addAction(lensFlareStr);
+    addObjectMenu->addMenu(addMiscMenu);
+
 	myMenu.addMenu(addObjectMenu);
     QAction* selectedItem = myMenu.exec(menuPos);
 
@@ -174,6 +185,8 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
 		if (selectedItem->text() == NonUniformBSplineStr) objectToAdd = CoreEngine::GetNonUniformBSpline(view3D->view3DGL->scene, name.toStdString(),glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0));
 		if (selectedItem->text() == NURBSStr) objectToAdd = CoreEngine::GetNURBS(view3D->view3DGL->scene, name.toStdString(),glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(0));
 
+		if (selectedItem->text() == cloudStr) objectToAdd =  new  CoreEngine::Cloud_1("Cloud", view3D->view3DGL->scene);
+		if (selectedItem->text() == lensFlareStr) objectToAdd =  new  CoreEngine::LensFlare("LensFlare", view3D->view3DGL->scene);
 
 		// if (selectedIndexes.size() > 0) {
 		// 	TreeItem* parentItem = (TreeItem*)model->itemFromIndex(selectedIndexes[0]);

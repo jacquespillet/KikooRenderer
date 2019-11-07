@@ -554,14 +554,7 @@ float fBm(glm::vec3 p)
 
 float GetPerlinWorleyNoise(float x, float y, float z, float frequency) {
     float w = (fBm(glm::vec3(x, y, z)));
-            // * ((voronoi2D(glm::vec3(x, y, z), 4)) 
-            // + (0.5 * voronoi2D(glm::vec3(x, y, z), 8.)) 
-            // + (0.25 * voronoi2D(glm::vec3(x, y, z), 12.)));
-
     return w;
-
-    // float w = (fBm(glm::vec3(x, y, z)));
-    // return (w);
 }
 
 }
