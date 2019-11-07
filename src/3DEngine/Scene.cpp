@@ -7,12 +7,10 @@
 #include "Components/LightComponent.hpp"
 #include "Components/BoundingComponent.hpp"
 
-#include "Misc/LensFlare/LensFlare.hpp"
-#include "Clouds/Cloud_1.hpp"
-
 #include "Shaders/BlinnPhongShader.hpp"
 
 #include "Util/RandomUtil.hpp"
+
 
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLFunctions_3_3_Core>
@@ -32,7 +30,8 @@ namespace CoreEngine {
         this->started = true;
         standardShaders.Compile();
 
-        this->renderer = new HDRRenderer(this);
+        this->renderer = new DeferredRenderer(this);
+        // this->renderer = new HDRRenderer(this);
         // this->renderer = new ForwardRenderer(this);
 
         grid = GetGrid(this, "Grid");
@@ -61,14 +60,6 @@ namespace CoreEngine {
         simulation.Init();
         
         drawImmediate.Init(); 
-
-        // Object3D* plane = GetQuad(this, "Quad", glm::vec3(0), glm::vec3(0), glm::vec3(5), glm::vec4(1));
-        Cloud_1* cloud = new Cloud_1("Cloud", this);
-        cloud->isRayMarched = true;
-        AddObject(cloud);
-        
-        // Object3D* plane = GetCube(this, "Quad", glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(1));
-        // AddObject(plane);
 
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {

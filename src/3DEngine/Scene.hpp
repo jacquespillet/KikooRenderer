@@ -7,19 +7,16 @@
 #include "TransformWidget.hpp"
 #include "ObjectDetails/ObjectDetails.hpp"
 #include "Cubemap.hpp"
-#include "Renderers/HDRRenderer.hpp"
 #include "DrawImmediate.hpp"
 
 #include "PhysicsEngines/Physics.hpp"
+#include "Renderers/Renderers.hpp"
 
 namespace KikooRenderer {
 class ObjectDetailsPanel;
 class SceneTree;
 
 namespace CoreEngine {
-
-class Renderer;
-
 class Scene {
     public: 
         Scene();
@@ -33,8 +30,6 @@ class Scene {
 		std::vector<Object3D*> objects3D;
 		std::vector<Object3D*> lightObjects;
 		std::vector<Object3D*> rayMarchedObjects;
-		// std::vector<ParticleSystem*> particleSystems;
-		ParticleSystem* ps;
 
 		StandardShaders standardShaders;
 		CameraScene* camera;

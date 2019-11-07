@@ -41,6 +41,7 @@ set(MainWindowSrc
 	
 	3DEngine/Renderers/Renderer.cpp
 	3DEngine/Renderers/HDRRenderer.cpp
+	3DEngine/Renderers/Deferred.cpp
 
 	3DEngine/Shaders/ShaderParams.cpp
 	3DEngine/Shaders/BlinnPhongShader.cpp

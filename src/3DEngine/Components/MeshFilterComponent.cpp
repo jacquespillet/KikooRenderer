@@ -418,6 +418,40 @@ void MeshFilterComponent::FromJSON(QJsonObject json, Object3D* obj) {
 	obj->AddComponent(mesh);
 }
 
+// //Returns the start index of the two neighbouring triangles in the triangles array
+// std::vector<int> MeshFilterComponent::GetNeighbouringTriangles(int triangleInx) {
+// 	std::vector<int>res;
+// 	for(int i=0; i<triangles.size(); i+=3) {	
+// 		if(triangles[i] == triangleInx || triangles[i+1]== triangleInx || triangles[i+2]== triangleInx) { //triangleInx is in this triangle
+// 			if(
+// 				(triangles[i] == triangleInx+1 || triangles[i+1]== triangleInx+1 || triangles[i+2]== triangleInx+1) || //triangleInx+1 is in this triangle
+// 				(triangles[i] == triangleInx+2 || triangles[i+1]== triangleInx+2 || triangles[i+2]== triangleInx+2)	   //triangleInx+2 is in this triangle
+// 			) { 
+// 				res.push_back(i); //the triangle i shares 2 vertices with the input triangle
+// 			}			
+// 		}
+// 	}
+// }
+
+// void MeshFilterComponent::Subdivide() {
+// 	std::vector<glm::vec3> facePoints(triangles.size()/3);
+// 	for(int i=0; i<triangles.size(); i+=3) {	
+// 		glm::vec3 facePoint = (vertices[triangles[i]].position + vertices[triangles[i+1]].position + vertices[triangles[i+1]].position) * 0.333333;
+// 		facePoints.push_back(facePoint);
+// 	}	
+// 	for(int i=0; i<triangles.size(); i+=3) {	
+// 		glm::vec3 edgePoint1 = (vertices[triangles[i]].position + vertices[triangles[i+1]].position) * 0.5;
+// 		std::vector<int> neighbouringTriangles = GetNeighbouringTriangles(i);
+// 		if(neighbouringTriangles.size() == 2) {
+
+// 		}
+// 		//Get the two triangles neighbouring this edge
+
+// 		glm::vec3 edgePoint2 = (vertices[triangles[i]].position + vertices[triangles[i+2]].position) * 0.5;
+// 		glm::vec3 edgePoint3 = (vertices[triangles[i+2]].position + vertices[triangles[i+1]].position) * 0.5;
+// 	}
+// }
+
 
 
 }
