@@ -50,15 +50,34 @@ public:
 	 *            - the font file.
 	 */
 	MetaFile(std::string file, std::string imageFile) {
+		// std::cout <<"0" << std::endl;
 		padding.resize(4);
+		// std::cout <<"1" << std::endl;
 		// this.aspectRatio = (double) Display.getWidth() / (double) Display.getHeight();
 		this->aspectRatio = 1;
+		// std::cout <<"2" << std::endl;
 		openFile(file);
+		// std::cout <<"3" << std::endl;
 		loadPaddingData();
+		// std::cout <<"4" << std::endl;
 		loadLineSizes();
+		// // std::cout <<"5" << std::endl;
 		int imageWidth = getValueOfVariable("scaleW");
+		std::cout << imageWidth << std::endl;
+		// // std::cout <<"6" << std::endl;
 		loadCharacterData(imageWidth);
+		// std::cout <<"7" << std::endl;
 		close();
+		// std::cout <<"8" << std::endl;
+	}
+
+	~MetaFile() {
+		std::map<int, Character*>::iterator it;
+
+		for ( it = metaData.begin(); it != metaData.end(); it++ )
+		{
+			delete it->second;
+		}		
 	}
 
 	double getSpaceWidth() {
@@ -71,15 +90,24 @@ public:
 
 private:
 	std::vector<std::string> SplitString(std::string s, std::string delimiter) {
+		// std::cout << "0" << std::endl;
 		std::vector<std::string> res;
+		// std::cout << "1" << std::endl;
 
 		size_t pos = 0;
 		std::string token;
+		// std::cout << "3" << std::endl;    
 		while ((pos = s.find(delimiter)) != std::string::npos) {
+			// std::cout << "4" << std::endl;
 			token = s.substr(0, pos);
+			// std::cout << "5" << std::endl;
 			res.push_back(token);
+			// std::cout << "6" << std::endl;
 			s.erase(0, pos + delimiter.length());
+			// std::cout << "7" << std::endl;
 		}
+		res.push_back(s);
+		return res;
 	}
 
 	/**
@@ -88,15 +116,29 @@ private:
 	 * @return {@code true} if the end of the file hasn't been reached.
 	 */
 	bool processNextLine() {
+		// std::cout << "0" << std::endl;
 		values.clear();
+		// std::cout << "1" << std::endl;
 		if (!reader.eof())  {
+			// std::cout << "2" << std::endl;
 			std::string line = "";
+			// std::cout << "3" << std::endl;
 			std::getline(reader, line);
+
+			if(line.size() ==0) return false;
+			// std::cout << "4" << std::endl;
 			std::vector<std::string> splittedLine = SplitString(line, SPLITTER);
+			// std::cout << "5" << std::endl;
 			for (int i=0; i<splittedLine.size(); i++) {
+				// std::cout << "7" << std::endl;
 				std::vector<std::string> valuePairs = SplitString(splittedLine[i], "=");
+				// std::cout << "SPLITTED " << splittedLine[i] << "  " << valuePairs.size() << std::endl;
+				// std::cout << "8" << std::endl;
 				if (valuePairs.size() == 2) {
+					// std::cout << "9" << std::endl;
 					values[valuePairs[0]]= valuePairs[1];
+					// std::cout << valuePairs[0] << " -> " << valuePairs[1] << std::endl;
+					// std::cout << "10" << std::endl;
 				}
 			}
 			return true;
@@ -126,19 +168,18 @@ private:
 	 * @return The int array of values associated with the variable.
 	 */
 	std::vector<int> getValuesOfVariable(std::string variable) {
-		// String[] numbers = values.get(variable).split(NUMBER_SEPARATOR);
-		// int[] actualValues = new int[numbers.length];
-		// for (int i = 0; i < actualValues.length; i++) {
-		// 	actualValues[i] = Integer.parseInt(numbers[i]);
-		// }
-		// return actualValues;
+		std::vector<std::string> numbers = SplitString(values[variable], NUMBER_SEPARATOR); 
+		std::vector<int>actualValues(numbers.size());
+		for (int i = 0; i < actualValues.size(); i++) {
+			actualValues[i] = std::stoi(numbers[i]);
+		}
+		return actualValues;
 	}
 
 	/**
 	 * Closes the font file after finishing reading.
 	 */
 	void close() {
-
     	reader.close();
 	}
 
@@ -149,7 +190,7 @@ private:
 	 *            - the font file.
 	 */
 	void openFile(std::string file) {
-		reader = std::ifstream("Shaders/Other/AxisHelper.vert");
+		reader = std::ifstream(file);
 	}
 
 	/**
@@ -157,10 +198,15 @@ private:
 	 * the texture atlas.
 	 */
 	void loadPaddingData() {
+		// std::cout << "0" << std::endl;
 		processNextLine();
-		// this.padding = getValuesOfVariable("padding");
-		// this.paddingWidth = padding[PAD_LEFT] + padding[PAD_RIGHT];
-		// this.paddingHeight = padding[PAD_TOP] + padding[PAD_BOTTOM];
+		// std::cout << "1" << std::endl;
+		this->padding = getValuesOfVariable("padding");
+		// std::cout << "2" << std::endl;
+		this->paddingWidth = padding[PAD_LEFT] + padding[PAD_RIGHT];
+		// std::cout << "3" << std::endl;
+		this->paddingHeight = padding[PAD_TOP] + padding[PAD_BOTTOM];
+		// std::cout << "4" << std::endl;
 	}
 
 	/**
