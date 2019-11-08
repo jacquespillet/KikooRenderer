@@ -21,6 +21,7 @@ Shader GetUnlitShader() {
     unlitMeshShader.isLit = false;
     unlitMeshShader.isDepthPass = false;
 
+    t.close();
 
     unlitMeshShader.SetId(SHADER_IDS::UNLIT);
     unlitMeshShader.name = "Unlit";

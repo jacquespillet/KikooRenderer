@@ -38,6 +38,8 @@ Shader GetAxisHelperShader() {
     axisHelperShader.isDepthPass = false;
     axisHelperShader.SetId(5);
 
+    t.close();
+
     return axisHelperShader;
 }
 }

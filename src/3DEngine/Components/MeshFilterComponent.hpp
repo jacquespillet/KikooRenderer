@@ -88,6 +88,8 @@ class MeshFilterComponent : public Component {
 
         std::vector<int> GetTriangles();
 
+        // void Subdivide();
+
         
     private: 
         void InitBuffers();

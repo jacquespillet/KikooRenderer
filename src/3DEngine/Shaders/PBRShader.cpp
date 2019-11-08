@@ -20,6 +20,7 @@ Shader GetPBRShader() {
     fragBuffer << t.rdbuf();
     PBRShader.fragSrc= fragBuffer.str();
     
+    t.close();
     
     PBRShader.SetId(SHADER_IDS::PBR);
     PBRShader.name = "PBR";

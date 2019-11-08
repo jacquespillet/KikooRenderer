@@ -18,6 +18,7 @@ void GetGouraudShader(Shader* gouraudShader) {
     fragBuffer << t.rdbuf();
     gouraudShader->fragSrc= fragBuffer.str();
     
+    t.close();
 
     gouraudShader->SetId(SHADER_IDS::GOURAUD);
     gouraudShader->name = "Gouraud";
