@@ -5,6 +5,7 @@
 #include "../../Framebuffer.hpp"
 
 #include "MetaFile.hpp"
+#include "Line.hpp"
 
 namespace KikooRenderer {
 
@@ -34,29 +35,35 @@ public:
         QJsonObject json;
         json["type"] = "TexturedText";
     }
-
-    void SetText(std::string);
+   
+    void SetText(std::string);     
 
 private:
     Object3D* quad;
     MaterialComponent* quamaterial;
     MeshFilterComponent* mesh;
-    // Shader lensFlareShader;
-    
+      
     // std::vector<Texture> textures;
     // std::vector<glm::vec2> sizes;
 
     CameraScene* camera;
 
     Text::MetaFile* mf;
+    
+    int SPACE_ASCII = 32;
 
     void InitMetaFile(std::string fontFile, std::string imageFile);
-    void CreateStructure(std::string text);
-    void CompleteStructure();
-    void CreateVertices();
-    void AddVerticesForCharacter();
-    void AddVertices();
-    void AddTexCoords();
+    std::vector<Text::Line> CreateStructure(std::string text);
+    
+    struct TextMeshData {
+        std::vector<float> vertexPositions;
+        std::vector<float> textureCoords;        
+    };
+
+    TextMeshData CreateVertices(std::string text, std::vector<Text::Line> lines);
+    void AddVerticesForCharacter(double curserX, double curserY, Text::Character character, double fontSize,std::vector<float>& vertices);
+    void AddVertices(std::vector<float>& vertices, double x, double y, double maxX, double maxY);
+    void AddTexCoords(std::vector<float>& texCoords, double x, double y, double maxX, double maxY);
 
 
 	std::string textString ="test";
@@ -73,7 +80,9 @@ private:
 	// FontType font;
     std::string font;
 
-	boolean centerText = false;
+	bool centerText = false;
+
+    double LINE_HEIGHT =  0.03f;    
     
 };
 

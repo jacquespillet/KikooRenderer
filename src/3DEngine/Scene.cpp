@@ -11,6 +11,8 @@
 
 #include "Util/RandomUtil.hpp"
 
+#include "3DEngine/Text/TexturedText/TexturedText.hpp"
+
 
 #include <QtGui/QOpenGLFunctions>
 #include <QOpenGLFunctions_3_3_Core>
@@ -59,7 +61,12 @@ namespace CoreEngine {
         simulation.worldType = KikooRenderer::Physics::Bullet::WORLD_TYPE::RIGID;
         simulation.Init();
         
-        drawImmediate.Init(); 
+        drawImmediate.Init();
+
+        TexturedText* text = new TexturedText("test", this);
+        text->SetText("Test");
+
+
 
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {

@@ -6,7 +6,6 @@
 #include "../../Components/MeshFilterComponent.hpp"
 #include "3DEngine/CameraScene.hpp"
 
-#include "Line.hpp"
 
 namespace KikooRenderer {
 
@@ -32,10 +31,11 @@ TexturedText::TexturedText(std::string name, Scene* scene) : Object3D(name, scen
 }
 
 void TexturedText::SetText(std::string text) {
-    CreateStructure(text);
+    std::vector<Text::Line> lines = CreateStructure(text);
+    TextMeshData data = CreateVertices(text, lines);
 }
 
-void TexturedText::CreateStructure(std::string text) {
+std::vector<Text::Line> TexturedText::CreateStructure(std::string text) {
     int fontSize = 1;
     int maxLineSize = 10;
 
@@ -43,14 +43,115 @@ void TexturedText::CreateStructure(std::string text) {
     Text::Line currentLine(mf->getSpaceWidth(), fontSize, maxLineSize);
     Text::Word currentWord(fontSize);
     for(char& c : text) {
-        // do_things_with(c);
+        int ascii = (int) c;
+        if(ascii == SPACE_ASCII) {   
+            bool added = currentLine.attemptToAddWord(currentWord);
+            if(!added) {
+                lines.push_back(currentLine);
+                currentLine = Text::Line(mf->getSpaceWidth(), fontSize, maxLineSize);
+                currentLine.attemptToAddWord(currentWord);
+            }
+            currentWord = Text::Word(fontSize);
+            continue;
+        }
+
+        Text::Character character = (*mf->getCharacter(ascii));
+        currentWord.addCharacter(character);
     }
-    //STOPPED HEre
+
+    bool added = currentLine.attemptToAddWord(currentWord);
+    if (!added) {
+        lines.push_back(currentLine);
+        currentLine = Text::Line(mf->getSpaceWidth(), fontSize, maxLineSize);
+        currentLine.attemptToAddWord(currentWord);
+    }
+    lines.push_back(currentLine);    
+
+    return lines;
 }
 
-void TexturedText::InitMetaFile(std::string fontFile, std::string imageFile) {
-    mf = new Text::MetaFile(fontFile, imageFile);   
+TexturedText::TextMeshData TexturedText::CreateVertices(std::string text, std::vector<Text::Line> lines) {
+    int fontSize = 1;
+    int maxLineSize = 10;
+
+    TexturedText::TextMeshData data;
+    int numLines = lines.size();
+    
+    double curserX = 0;
+    double curserY = 0;
+    std::vector<float> vertices;
+    std::vector<float> textureCoords;
+    for (int i=0; i<numLines; i++) {
+        Text::Line line = lines[i];
+        if (centerText) {
+            curserX = (line.getMaxLength() - line.getLineLength()) / 2;
+        }
+        for (int j=0; j<line.getWords().size(); j++) {
+            Text::Word word = line.getWords()[j];
+            for (int k=0; k<word.getCharacters().size(); k++) {
+                Text::Character letter = word.getCharacters()[k];
+                AddVerticesForCharacter(curserX, curserY, letter, fontSize, vertices);
+                AddTexCoords(textureCoords, letter.getxTextureCoord(), letter.getyTextureCoord(),
+                        letter.getXMaxTextureCoord(), letter.getYMaxTextureCoord());
+                curserX += letter.getxAdvance() * fontSize;
+            }
+            curserX += mf->getSpaceWidth() * fontSize;
+        }
+        curserX = 0;
+        curserY += LINE_HEIGHT * fontSize;
+    }
+
+    data.textureCoords = textureCoords;	    
+    data.vertexPositions = vertices;
+    return data;
 }
+
+void TexturedText::AddVerticesForCharacter(double curserX, double curserY, Text::Character character, double fontSize,std::vector<float>& vertices) {
+    double x = curserX + (character.getxOffset() * fontSize);
+    double y = curserY + (character.getyOffset() * fontSize);
+    double maxX = x + (character.getSizeX() * fontSize);
+    double maxY = y + (character.getSizeY() * fontSize);
+    double properX = (2 * x) - 1;
+    double properY = (-2 * y) + 1;
+    double properMaxX = (2 * maxX) - 1;
+    double properMaxY = (-2 * maxY) + 1;
+    AddVertices(vertices, properX, properY, properMaxX, properMaxY);
+}
+
+void TexturedText::AddVertices(std::vector<float>& vertices, double x, double y, double maxX, double maxY) {
+    vertices.push_back((float) x);
+    vertices.push_back((float) y);
+    vertices.push_back((float) x);
+    vertices.push_back((float) maxY);
+    vertices.push_back((float) maxX);
+    vertices.push_back((float) maxY);
+    vertices.push_back((float) maxX);
+    vertices.push_back((float) maxY);
+    vertices.push_back((float) maxX);
+    vertices.push_back((float) y);
+    vertices.push_back((float) x);
+    vertices.push_back((float) y);
+}
+
+void TexturedText::AddTexCoords(std::vector<float>& texCoords, double x, double y, double maxX, double maxY) {
+    texCoords.push_back((float) x);
+    texCoords.push_back((float) y);
+    texCoords.push_back((float) x);
+    texCoords.push_back((float) maxY);
+    texCoords.push_back((float) maxX);
+    texCoords.push_back((float) maxY);
+    texCoords.push_back((float) maxX);
+    texCoords.push_back((float) maxY);
+    texCoords.push_back((float) maxX);
+    texCoords.push_back((float) y);
+    texCoords.push_back((float) x);
+    texCoords.push_back((float) y);
+}
+
+
+void TexturedText::InitMetaFile(std::string fontFile, std::string imageFile) {
+    mf = new Text::MetaFile(fontFile, imageFile);     
+}        
 
 void TexturedText::WindowResize(int w, int h) {
 }
