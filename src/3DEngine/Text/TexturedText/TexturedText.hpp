@@ -39,8 +39,8 @@ public:
     void SetText(std::string);     
 
 private:
-    Object3D* quad;
-    MaterialComponent* quamaterial;
+    Object3D* quads;
+    MaterialComponent* quadsmaterial;
     MeshFilterComponent* mesh;
       
     // std::vector<Texture> textures;
@@ -66,23 +66,14 @@ private:
     void AddTexCoords(std::vector<float>& texCoords, double x, double y, double maxX, double maxY);
 
 
-	std::string textString ="test";
-	float fontSize = 1;
-
-	int textMeshVao;
-	int vertexCount;
-	glm::vec3 colour =  glm::vec3(1.0f, 0.0f, 0.0f);
-
-	glm::vec2 position;
-	float lineMaxSize;
-	int numberOfLines;
-
 	// FontType font;
     std::string font;
 
+    double LINE_HEIGHT =  0.03f;
+	int DESIRED_PADDING = 3;
+    int fontSize = 1;
+    int maxLineSize = 10;
 	bool centerText = false;
-
-    double LINE_HEIGHT =  0.03f;    
     
 };
 

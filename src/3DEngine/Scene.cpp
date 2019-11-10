@@ -64,7 +64,8 @@ namespace CoreEngine {
         drawImmediate.Init();
 
         TexturedText* text = new TexturedText("test", this);
-        text->SetText("Test");
+        text->SetText("qfewoikqwjfoiewj");
+        AddObject(text);
 
 
 

@@ -49,7 +49,9 @@ public:
 	 * @param file
 	 *            - the font file.
 	 */
-	MetaFile(std::string file, std::string imageFile) {
+	MetaFile(std::string file, std::string imageFile, double lineHeight, int desiredPadding) {
+		LINE_HEIGHT = lineHeight;
+		DESIRED_PADDING = desiredPadding;
 		// std::cout <<"0" << std::endl;
 		padding.resize(4);
 		// std::cout <<"1" << std::endl;
