@@ -112,7 +112,10 @@ set(MainWindowSrc
 
 	Renderer/RayTracer.cpp
 	Renderer/Camera.cpp
-	Renderer/Shapes.cpp
+	Renderer/Shapes/Shape.cpp
+	Renderer/Shapes/Sphere.cpp
+	Renderer/Shapes/Box.cpp
+	Renderer/Shapes/TriangleMesh.cpp
 	Renderer/Materials/Material.cpp
 	Renderer/Materials/Lambertian.cpp
 	Renderer/Materials/Metallic.cpp

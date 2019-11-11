@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Util/Common.h"
-#include "Shapes.hpp"
+#include "Shapes/Shape.hpp"
 #include "Geometry/Ray.hpp"
 
 namespace KikooRenderer{

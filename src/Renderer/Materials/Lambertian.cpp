@@ -1,5 +1,5 @@
 #include "Lambertian.hpp"
-#include "../Shapes.hpp"
+#include "../Shapes/Shape.hpp"
 #include "Geometry/Util.h"
 
 

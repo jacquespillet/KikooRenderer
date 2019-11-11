@@ -4,6 +4,10 @@
 #include "Geometry/Util.h"
 #include "Util/ThreadingUtil.hpp"
 
+#include "Shapes/Sphere.hpp"
+#include "Shapes/Box.hpp"
+#include "Shapes/TriangleMesh.hpp"
+
 #include "Materials/Material.hpp"
 #include "Materials/Lambertian.hpp"
 #include "Materials/Metallic.hpp"
@@ -73,8 +77,8 @@ namespace OfflineRenderer {
             objects.push_back(sphere);
         }
 
-        for(float x = -11; x<11; x+=2) {
-            for(float z = -11; z<11; z+=2) {
+        for(float x = -5; x<5; x+=2) {
+            for(float z = -5; z<5; z+=2) {
                 double materialRandom = ((double) rand()) / (double) RAND_MAX;   
                 double xPos = x + (((double) rand()) / (double) RAND_MAX) * 0.9;   
                 double zPos = z + (((double) rand()) / (double) RAND_MAX) * 0.9;   
@@ -102,13 +106,12 @@ namespace OfflineRenderer {
             }
         }
 
-        Material material(glm::vec4(0.7,0.6,0.5, 1.0));
-        Sphere* sphere = new Sphere(glm::vec3(0,1, 0), 1.0, &material);
-        objects.push_back(sphere);
-
-        Material material2(glm::vec4(0,1,0, 0.5));
-        Sphere* sphere2 = new Sphere(glm::vec3(-4,1, 0), 1.0, &material2);
-        objects.push_back(sphere2);
+        Material lb(glm::vec4(0.6, 0.1, 0.2, 0.5));
+        // lb.fuzz = 0.6; 
+        lb.LoadTexture("resources/Textures/MiscTextures/Other/earth.jpg");
+        Sphere* box = new Sphere(glm::vec3(0,0, 0), 1, &lb);
+        // TriangleMesh* box = new TriangleMesh(glm::vec3(0,1, 0), glm::vec3(1,1, 1), &lb, "resources/Models/bunny/untitled.obj");
+        objects.push_back(box);
 
         KikooRenderer::Util::ThreadPool( std::function<void(uint64_t, uint64_t)>([this, width, numSamples, height, &camera, &image](uint64_t i, uint64_t t)
         {

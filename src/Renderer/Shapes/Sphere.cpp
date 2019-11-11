@@ -1,4 +1,4 @@
-#include "Shapes.hpp"
+#include "Sphere.hpp"
 
 namespace KikooRenderer {
 namespace OfflineRenderer {
@@ -10,6 +10,16 @@ namespace OfflineRenderer {
     glm::vec3 Sphere::GetPosition(double time) {
         //If moving : set position at time
         return this->position;
+    }
+
+    glm::vec2 Sphere::GetUv(glm::vec3 p) {
+        float phi = std::atan2(p.z, p.x);
+        float theta = std::asin(p.y);
+
+        float u = 1.0f - (phi + PI) / (2.0f * PI);
+        float v = (theta + PI/2.0f) / PI;
+
+        return glm::vec2(u, v);
     }
 
 
@@ -25,22 +35,26 @@ namespace OfflineRenderer {
             double t = (- b - sqrt(delta)) / (2 * a);
             if(t > tMin && t < tMax) {
                 glm::vec3 hitPosition = ray.pointAtPosition(t);
+                glm::vec2 uv = GetUv(hitPosition);
                 hitPoint = {
                     t, 
                     hitPosition,
                     glm::normalize(hitPosition -  GetPosition(ray.time)),
-                    material
+                    material,
+                    uv
                 };
                 return t;
             }
             t = (- b + sqrt(delta)) / (2 * a);
             if(t > tMin && t < tMax) {
                 glm::vec3 hitPosition = ray.pointAtPosition(t);
+                glm::vec2 uv = GetUv(hitPosition);
                 hitPoint = {
                     t, 
                     hitPosition,
                     glm::normalize(hitPosition -  GetPosition(ray.time)),
-                    material
+                    material,
+                    uv
                 };
                 return t;
             }
