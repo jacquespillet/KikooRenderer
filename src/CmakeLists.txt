@@ -112,8 +112,10 @@ set(MainWindowSrc
 
 	Renderer/RayTracer.cpp
 	Renderer/Camera.cpp
-	Renderer/Material.cpp
 	Renderer/Shapes.cpp
+	Renderer/Materials/Material.cpp
+	Renderer/Materials/Lambertian.cpp
+	Renderer/Materials/Metallic.cpp
 	)
 
 add_executable(MainWindow ${MainWindowSrc})

@@ -2,7 +2,7 @@
 
 namespace KikooRenderer {
 namespace OfflineRenderer {
-    Sphere::Sphere(glm::vec3 position, double radius, Material material) : material(material){
+    Sphere::Sphere(glm::vec3 position, double radius, Material* material) : material(material){
         this->position = position;
         this->radius = radius;
     };
@@ -29,7 +29,7 @@ namespace OfflineRenderer {
                     t, 
                     hitPosition,
                     glm::normalize(hitPosition -  GetPosition(ray.time)),
-                    &material
+                    material
                 };
                 return t;
             }
@@ -40,7 +40,7 @@ namespace OfflineRenderer {
                     t, 
                     hitPosition,
                     glm::normalize(hitPosition -  GetPosition(ray.time)),
-                    &material
+                    material
                 };
                 return t;
             }
