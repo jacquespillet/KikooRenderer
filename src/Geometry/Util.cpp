@@ -5,11 +5,11 @@ namespace Geometry {
     glm::vec3 randomInSphere(){
         glm::vec3 result;
         do {
-            double randomX = ((double) rand()) / (double) RAND_MAX;
-            double randomY = ((double) rand()) / (double) RAND_MAX;
-            double randomZ = ((double) rand()) / (double) RAND_MAX;
+            double randomX = ((double) rand()) / (double) (RAND_MAX+1);
+            double randomY = ((double) rand()) / (double) (RAND_MAX+1);
+            double randomZ = ((double) rand()) / (double) (RAND_MAX+1);
             result = 2.0 * glm::vec3(randomX, randomY, randomZ) - glm::vec3(1, 1, 1);
-        } while(glm::length(result) > 1);
+        } while(glm::length2(result) > 1);
 
         return result;
     }
@@ -17,7 +17,7 @@ namespace Geometry {
     glm::vec3 RandomInDisk() {
         glm::vec3 p;
         do {
-            double randomX = ((double) rand()) / (double) RAND_MAX;
+            double randomX = ((double) rand()) / (double) (RAND_MAX+1);
             double randomY = ((double) rand()) / (double) RAND_MAX;
             p = 2.0 * glm::vec3(randomX, randomY, 0) - glm::vec3(1, 1, 0);
         } while(glm::dot(p, p) >= 1.0);

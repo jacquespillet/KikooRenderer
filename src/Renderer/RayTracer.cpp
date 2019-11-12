@@ -4,6 +4,8 @@
 #include "Geometry/Util.h"
 #include "Util/ThreadingUtil.hpp"
 
+#include "3DEngine/Components/BaseMeshes.hpp"
+
 #include "Shapes/Sphere.hpp"
 #include "Shapes/Box.hpp"
 #include "Shapes/TriangleMesh.hpp"
@@ -40,19 +42,21 @@ namespace OfflineRenderer {
             }
         }
 
-        
+            
         if(hit) {//If we hit something
             KikooRenderer::Geometry::Ray scattered; //Scattered ray
             glm::vec3 attenuation;
-            if(depth < 30 && closestPoint.material->Scatter(ray, closestPoint, attenuation, scattered)) { // check if ray is scattered && iterations < 50
-                return attenuation * GetColor(scattered, depth+1);
+            glm::vec3 emitted = closestPoint.material->emitted();
+            if(depth < 1 && closestPoint.material->Scatter(ray, closestPoint, attenuation, scattered)) { // check if ray is scattered && iterations < 50
+                return emitted + attenuation * GetColor(scattered, depth+1);
             } else {
-                return glm::vec3(0, 0, 0);
+                return emitted;
             }
         } else { //Draw background      
-             glm::vec3 direction = glm::normalize(ray.direction);
+            glm::vec3 direction = glm::normalize(ray.direction);
             double t = 0.5 * direction.y + 1.0;
             glm::vec3 backgroundColor = (1.0 - t) * glm::vec3(1, 1, 1) + t * glm::vec3(0.5, 0.7, 1);
+            // glm::vec3 backgroundColor = glm::vec3(0);
             return backgroundColor;
         }
     }
@@ -60,58 +64,91 @@ namespace OfflineRenderer {
     void RayTracer::WriteImage() {
         int width = 300;
         int height = 200;
-        int numSamples = 60;
+        int numSamples = 50;
 
         KikooRenderer::Util::FileIO::Image image(width, height);
 
         //1. Create the camera 
-        glm::vec3 camPos = glm::vec3(1, 1, 1.5);
+        glm::vec3 camPos = glm::vec3(0,1, 3);
         glm::vec3 lookAt = glm::vec3(0, 0, 0);
         double distanceToFocus = glm::distance(camPos, lookAt);
-        Camera camera(camPos, lookAt, glm::vec3(0, 1, 0), 90, (double)width/(double)height, 0.0001, distanceToFocus, 0, 1);
+        Camera camera(camPos, lookAt, glm::vec3(0, 1, 0), 70, (double)width/(double)height, 0.0001, distanceToFocus, 0, 1);
         
-        //2. Create some objects
+
+        // Box* box = new Box(glm::vec3(0,0, 0),glm::vec3(1,1, 1), &lb);
+        
+        std::vector<glm::vec3> vertex;
+        std::vector<glm::vec3> normals;
+        std::vector<glm::vec2> uv;
+        std::vector<glm::vec4> colors;
+        std::vector<int> triangles;
+        CoreEngine::GetCubeBuffers(&vertex, &normals, &uv, &colors, &triangles);        
+
+
+        // //Box1
         {
-            Material material(glm::vec4(0.2, 0.2, 0.2, 1.0));
-            Sphere* sphere = new Sphere(glm::vec3(0, -1000, 0), 1000, &material);
-            objects.push_back(sphere);
-        }
+            Material lb(glm::vec4(0.73));
+            TriangleMesh* box = new TriangleMesh(glm::vec3(1, 0, 0), glm::vec3(1), &lb, vertex, normals, uv, triangles);
+            objects.push_back(box);
+        }  
 
-        for(float x = -5; x<5; x+=2) {
-            for(float z = -5; z<5; z+=2) {
-                double materialRandom = ((double) rand()) / (double) RAND_MAX;   
-                double xPos = x + (((double) rand()) / (double) RAND_MAX) * 0.9;   
-                double zPos = z + (((double) rand()) / (double) RAND_MAX) * 0.9;   
-                double radius = 0.2;
-                double r = ((double) rand()) / (double) RAND_MAX;   
-                double g = ((double) rand()) / (double) RAND_MAX;   
-                double b = ((double) rand()) / (double) RAND_MAX;
-                if(materialRandom < 0.6) { //Dielectric
-                    double fuzz = ((double) rand()) / (double) RAND_MAX + 1.0;
-                    // Material material(glm::vec4(r, g, b, 0.5));
-                    Metallic lb(glm::vec4(r, g, b, 0.5));
-                    lb.fuzz = 0.01; 
-                    Sphere* sphere = new Sphere(glm::vec3(xPos, 0.2, zPos), radius, &lb);
-                    objects.push_back(sphere);
-                } else if(materialRandom < 0.9) { // Metallic
-                    double fuzz = ((double) rand()) / (double) RAND_MAX;
-                    Material material(glm::vec4(r, g, b, 1.0));
-                    Sphere* sphere = new Sphere(glm::vec3(xPos, 0.2, zPos), radius, &material);
-                    objects.push_back(sphere);
-                } else { //Diffuse
-                    Material material(glm::vec4(r, g, b, 1.0));
-                    Sphere* sphere = new Sphere(glm::vec3(xPos, 0.2, zPos), radius, &material);
-                    objects.push_back(sphere);
-                }
-            }
-        }
+        // //Bottom
+        // {
+        //     Material lb(glm::vec4(0.73));
+        //     TriangleMesh* box = new TriangleMesh(glm::vec3(0, -0.5, 0), glm::vec3(1, 0.01, 1), &lb, vertex, normals, uv, triangles);
+        //     // TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), &lb, vertex, normals, uv, triangles);
+        //     objects.push_back(box);
+        // }    
 
-        Material lb(glm::vec4(0.6, 0.1, 0.2, 0.5));
-        // lb.fuzz = 0.6; 
-        lb.LoadTexture("resources/Textures/MiscTextures/Other/earth.jpg");
-        Sphere* box = new Sphere(glm::vec3(0,0, 0), 1, &lb);
-        // TriangleMesh* box = new TriangleMesh(glm::vec3(0,1, 0), glm::vec3(1,1, 1), &lb, "resources/Models/bunny/untitled.obj");
-        objects.push_back(box);
+        // // //Top
+        // {
+        //     Material lb(glm::vec4(0.73));
+        //     TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0.5, 0), glm::vec3(1, 0.01, 1), &lb, vertex, normals, uv, triangles);
+        //     objects.push_back(box);
+        // }  
+ 
+        // // //Back
+        // {
+        //     Material lb(glm::vec4(0.73));
+        //     TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, -0.5), glm::vec3(1, 1, 0.01), &lb, vertex, normals, uv, triangles);
+        //     objects.push_back(box);
+        // }
+
+        // //Right
+        // {
+        //     Material lb(glm::vec4(1, 0, 0, 1));
+        //     TriangleMesh* box = new TriangleMesh(glm::vec3(0.5, 0, 0), glm::vec3(0.01,1, 1), &lb, vertex, normals, uv, triangles);
+        //     objects.push_back(box);
+        // }                     
+
+        // //Left
+        // {
+        //     Material lb(glm::vec4(0, 1, 0, 1));
+        //     TriangleMesh* box = new TriangleMesh(glm::vec3(-0.5, 0, 0), glm::vec3(0.01,1, 1), &lb, vertex, normals, uv, triangles);
+        //     objects.push_back(box);
+        // }   
+
+        // //Top
+        // {
+        //     Material lb(glm::vec4(0.73));
+        //     // lb.emitter = true;
+        //     TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0.45, 0), glm::vec3(0.2, 0.01, 0.2), &lb, vertex, normals, uv, triangles);
+        //     objects.push_back(box);
+        // }   
+
+        // // //Box1
+        // {
+        //     Material lb(glm::vec4(0.73));
+        //     TriangleMesh* box = new TriangleMesh(glm::vec3(0.15, 0, 0.2), glm::vec3(0.25, 0.4, 0.25), &lb, vertex, normals, uv, triangles);
+        //     objects.push_back(box);
+        // }  
+
+        // // //Box1
+        // {
+        //     Material lb(glm::vec4(0.73));
+        //     TriangleMesh* box = new TriangleMesh(glm::vec3(-0.15, 0, 0.3), glm::vec3(0.25, 0.34, 0.25), &lb, vertex, normals, uv, triangles);
+        //     objects.push_back(box);
+        // }  
 
         KikooRenderer::Util::ThreadPool( std::function<void(uint64_t, uint64_t)>([this, width, numSamples, height, &camera, &image](uint64_t i, uint64_t t)
         {
@@ -140,6 +177,8 @@ namespace OfflineRenderer {
             color.r = sqrt(color.r);
             color.g = sqrt(color.g);
             color.b = sqrt(color.b);
+
+            color = glm::min(glm::vec3(1.0f), glm::max(glm::vec3(0.0f), color));
 
 
             image.SetPixel(x, height - y - 1, color);

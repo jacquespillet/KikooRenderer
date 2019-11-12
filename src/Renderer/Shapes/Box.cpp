@@ -18,16 +18,16 @@ namespace OfflineRenderer {
 
 
     double Box::HitRay(KikooRenderer::Geometry::Ray ray, double tMin, double tMax, Point& hitPoint) {
-        glm::vec3 rayOrig = glm::vec3( invTransf * glm::vec4(ray.origin, 1) );
-        glm::vec3 rayDir = glm::vec3( invTransf * glm::vec4(ray.direction, 0) );
+        ray.origin = glm::vec3( invTransf * glm::vec4(ray.origin, 1) );
+        ray.direction = glm::vec3( invTransf * glm::vec4(ray.direction, 0) );
         double distance;
 
         //AABB Ray intersection 
-        glm::vec3 rayDirInv = glm::vec3(1.0f / rayDir.x, 1.0f / rayDir.y, 1.0f / rayDir.z); 
-        glm::vec3 t1 = (glm::vec3(-0.5) - rayOrig) * rayDirInv;
-        glm::vec3 t2 = (glm::vec3(0.5) - rayOrig) * rayDirInv;
+        glm::vec3 rayDirInv = glm::vec3(1.0f / ray.direction.x, 1.0f / ray.direction.y, 1.0f / ray.direction.z); 
+        glm::vec3 t1 = (glm::vec3(-0.5) - ray.origin) * rayDirInv;
+        glm::vec3 t2 = (glm::vec3(0.5) - ray.origin) * rayDirInv;
         
-        glm::vec3 intersectionPosition = rayOrig + t2.x * rayDir;
+        glm::vec3 intersectionPosition = ray.origin + t2.x * ray.direction;
         float tmin = (std::max)( (std::max)( (std::min)(t1.x, t2.x), (std::min)(t1.y, t2.y)), (std::min)(t1.z, t2.z));
         float tmax = (std::min)( (std::min)( (std::max)(t1.x, t2.x), (std::max)(t1.y, t2.y)), (std::max)(t1.z, t2.z));
         bool raybox = tmax >= (std::max)(0.0f, tmin);

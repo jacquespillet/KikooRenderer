@@ -13,6 +13,9 @@ class Material {
         glm::vec4 albedo;
         virtual bool Scatter(KikooRenderer::Geometry::Ray in,  Point point, glm::vec3& attenuation, KikooRenderer::Geometry::Ray& scattered);
 
+        bool emitter = false;
+        virtual glm::vec3 emitted();
+
         void LoadTexture(std::string fileName);
         std::vector<uint8_t> textureData;
         int width=0; 
