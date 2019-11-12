@@ -9,8 +9,8 @@ namespace OfflineRenderer {
         this->size = size;
 
         glm::mat4 transf(1);
-        transf = glm::scale(transf, size);
         transf = glm::translate(transf, position);
+        transf = glm::scale(transf, size);
         invTransf = glm::inverse(transf);
   
         Util::FileIO::LoadModel(filename, &vertex, &normals, &uv, &colors, &triangles);
@@ -30,7 +30,6 @@ namespace OfflineRenderer {
         this->normals = normals;
         this->vertex = vertex;
         this->uv = uv;
-
     }
 
     glm::vec3 TriangleMesh::GetPosition(double time) {
@@ -87,6 +86,9 @@ namespace OfflineRenderer {
         const glm::vec2 &st2 = this->uv[triIndex + 2]; 
         hitTextureCoordinates = (1 - uv.x - uv.y) * st0 + uv.x * st1 + uv.y * st2; 
     }     
+    TriangleMesh::~TriangleMesh() {
+        delete material;
+    }
 
 
     double TriangleMesh::HitRay(KikooRenderer::Geometry::Ray ray, double tMin, double tMax, Point& hitPoint) {

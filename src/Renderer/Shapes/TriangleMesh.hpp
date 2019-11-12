@@ -16,6 +16,7 @@ class TriangleMesh : public Shape {
         Material* material;
         TriangleMesh(glm::vec3 position, glm::vec3 size, Material* material, std::string fileName);
         TriangleMesh(glm::vec3 position, glm::vec3 size, Material* material, std::vector<glm::vec3> vertex,std::vector<glm::vec3> normals,std::vector<glm::vec2> uv, std::vector<int> triangles);
+        ~TriangleMesh();
         double HitRay(KikooRenderer::Geometry::Ray ray, double tMin, double tMax, Point& hitPoint);
         glm::vec3 GetPosition(double time);
         glm::vec3 GetSize(double time);

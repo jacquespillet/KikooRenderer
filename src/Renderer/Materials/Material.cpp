@@ -8,8 +8,8 @@ namespace OfflineRenderer {
 
     Material::Material(glm::vec4 albedo) : albedo(albedo) {}
     bool Material::Scatter(KikooRenderer::Geometry::Ray in,  Point point, glm::vec3& attenuation, KikooRenderer::Geometry::Ray& scattered) {
-        glm::vec3 target = point.position + point.normal;
-        // glm::vec3 target = point.position + point.normal + Geometry::randomInSphere();
+        // glm::vec3 target = point.position + point.normal;
+        glm::vec3 target = point.position + point.normal + Geometry::randomInSphere();
         scattered = Geometry::Ray(point.position, target-point.position);
         if(hasTexture) {
             float texCoordX = std::min((float)width, std::max(0.0f, point.uv.x * (float)width));
@@ -25,9 +25,9 @@ namespace OfflineRenderer {
             // attenuation = target;
             // attenuation = point.normal;
             // attenuation = point.position;
-            // attenuation = albedo;
-            attenuation = glm::vec3 (point.position.r, 0, 0 );
-
+            // std::cout << glm::to_string(attenuation) << std::endl;
+            // attenuation = glm::vec3 (point.position.b, 0, 0 );
+            attenuation = albedo;
         }
         return true;
     }
