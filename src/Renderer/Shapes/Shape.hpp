@@ -14,6 +14,8 @@ struct Point {
     glm::vec3 normal;
     Material* material;
     glm::vec2 uv;
+    glm::vec3 tangent;
+    glm::vec3 bitangent;
 };
 
 class Shape {

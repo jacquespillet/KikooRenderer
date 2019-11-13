@@ -1,6 +1,6 @@
 #include "TriangleMesh.hpp"
-
 #include "Util/ModelLoader.hpp"
+#include "../Util/Geometry.hpp"
 
 namespace KikooRenderer {
 namespace OfflineRenderer {
@@ -14,6 +14,8 @@ namespace OfflineRenderer {
         invTransf = glm::inverse(transf);
   
         Util::FileIO::LoadModel(filename, &vertex, &normals, &uv, &colors, &triangles);
+
+        CalculateTangents(tangents, bitangents, vertex,  normals, uv, triangles);
     };
 
     TriangleMesh::TriangleMesh(glm::vec3 position, glm::vec3 size, Material* material, std::vector<glm::vec3> vertex,std::vector<glm::vec3> normals,std::vector<glm::vec2> uv, std::vector<int> triangles): material(material), invTransf(glm::mat4(1)) {
@@ -30,6 +32,8 @@ namespace OfflineRenderer {
         this->normals = normals;
         this->vertex = vertex;
         this->uv = uv;
+
+        CalculateTangents(tangents, bitangents, vertex,  normals, uv, triangles);
     }
 
     glm::vec3 TriangleMesh::GetPosition(double time) {
@@ -70,15 +74,19 @@ namespace OfflineRenderer {
         const uint32_t &triIndex, 
         const glm::vec2 &uv, 
         glm::vec3 &hitNormal, 
+        glm::vec3 &hitTangent, 
+        glm::vec3 &hitBitangent, 
         glm::vec2 &hitTextureCoordinates) const 
     { 
         // face normal
         const glm::vec3 &v0 = vertex[triangles[triIndex]]; 
         const glm::vec3 &v1 = vertex[triangles[triIndex + 1]]; 
         const glm::vec3 &v2 = vertex[triangles[triIndex + 2]]; 
-        // hitNormal = glm::cross((v1 - v0), (v2 - v0)); //Wrong
         hitNormal = glm::cross((v2 - v0), (v1 - v0)); //Correct
         hitNormal = glm::normalize(hitNormal); 
+
+        hitTangent = v2-v0;
+        hitBitangent = glm::cross(hitNormal, hitTangent);
  
         // texture coordinates
         const glm::vec2 &st0 = this->uv[triIndex]; 
@@ -98,6 +106,8 @@ namespace OfflineRenderer {
         glm::vec2 uv;
 
         glm::vec3 hitNormal;
+        glm::vec3 hitTangent;
+        glm::vec3 hitBitangent;
         glm::vec2 hitUv;
 
         KikooRenderer::Geometry::Ray tmpRay = ray;
@@ -117,10 +127,11 @@ namespace OfflineRenderer {
                 uv.y = v; 
                 isect |= true; 
 
-                GetSurfaceProperties(i, uv, hitNormal, hitUv);
+                GetSurfaceProperties(i, uv, hitNormal, hitTangent, hitBitangent, hitUv);
             }
         }
 
+  
         
         if(isect)  {
             hitPoint = {
@@ -128,7 +139,9 @@ namespace OfflineRenderer {
                 tmpRay.pointAtPosition(tNear),
                 hitNormal,
                 material,
-                hitUv
+                hitUv,
+                hitTangent, 
+                hitBitangent
             }; 
             return tNear;
         }

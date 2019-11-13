@@ -9,7 +9,7 @@ struct Point;
     
 class Lambertian : public Material {
     public: 
-        Lambertian(){}
+        // Lambertian() : Material(){}
         Lambertian(glm::vec4 albedo);
         glm::vec4 albedo;
         bool Scatter(KikooRenderer::Geometry::Ray in,  Point point, glm::vec3& attenuation, KikooRenderer::Geometry::Ray& scattered) override;

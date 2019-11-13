@@ -2,16 +2,22 @@
 #include "Util/Common.h"
 #include "Geometry/Ray.hpp"
 
+#include "../BRDF.hpp"
+
 namespace KikooRenderer{
 namespace OfflineRenderer {
 struct Point;
     
 class Material {
     public: 
-        Material(){}
+        // Material(){}
         Material(glm::vec4 albedo);
         glm::vec4 albedo;
         virtual bool Scatter(KikooRenderer::Geometry::Ray in,  Point point, glm::vec3& attenuation, KikooRenderer::Geometry::Ray& scattered);
+
+        BRDF brdf;
+
+        bool useBrdf = false;
 
         bool emitter = false;
         virtual glm::vec3 emitted();

@@ -37,5 +37,7 @@ inline float CosDPhi(const glm::vec3 &wa, const glm::vec3 &wb) {
                            (wb.x * wb.x + wb.y * wb.y)), -1.0f, 1.0f);
 }
 
+void CalculateTangents(std::vector<glm::vec3>& tangents ,std::vector<glm::vec3>& bitangents ,std::vector<glm::vec3> _vertices,  std::vector<glm::vec3> normals, std::vector<glm::vec2> uv,std::vector<int> triangles);
+
 }
 }

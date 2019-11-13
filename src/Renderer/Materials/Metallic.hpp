@@ -9,7 +9,7 @@ struct Point;
     
 class Metallic : public Material {
     public: 
-        Metallic(){}
+        // Metallic(){}
         Metallic(glm::vec4 albedo);
         glm::vec4 albedo;
         bool Scatter(KikooRenderer::Geometry::Ray in,  Point point, glm::vec3& attenuation, KikooRenderer::Geometry::Ray& scattered) override;

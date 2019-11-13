@@ -110,6 +110,7 @@ set(MainWindowSrc
 	AppManagement/PhysicsPreferences.cpp
 	AppManagement/PostProcessingPreferences.cpp
 
+	Renderer/Util/Geometry.cpp
 	Renderer/RayTracer.cpp
 	Renderer/Camera.cpp
 	Renderer/Shapes/Shape.cpp

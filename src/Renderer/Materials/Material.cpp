@@ -5,12 +5,11 @@
 
 #include "../Util/Geometry.hpp"
 
-#include "../BRDF.hpp"
 
 namespace KikooRenderer{
 namespace OfflineRenderer {
 
-    Material::Material(glm::vec4 albedo) : albedo(albedo) {}
+    Material::Material(glm::vec4 albedo) : albedo(albedo), brdf(albedo) {}
     bool Material::Scatter(KikooRenderer::Geometry::Ray in,  Point point, glm::vec3& attenuation, KikooRenderer::Geometry::Ray& scattered) {
         // glm::vec3 target = point.position + point.normal;
         glm::vec3 target = point.position + point.normal + Geometry::randomInSphere();
@@ -26,14 +25,33 @@ namespace OfflineRenderer {
             // attenuation.g = point.uv.y;
             // attenuation.b = 0;
         } else {
+            //DEBUG
             // attenuation = target;
             // attenuation = point.normal;
             // attenuation = point.position;
             // std::cout << glm::to_string(attenuation) << std::endl;
             // attenuation = glm::vec3 (point.position.b, 0, 0 );
-            attenuation = albedo;
+
+            if(useBrdf) {
+                glm::mat4 worldToTangentMatrix(1);
+                worldToTangentMatrix[0] = glm::vec4(glm::normalize(point.tangent), 1);
+                worldToTangentMatrix[1] = glm::vec4(glm::normalize(point.bitangent), 1);
+                worldToTangentMatrix[2] = glm::vec4(glm::normalize(point.normal), 1);
+                worldToTangentMatrix[3] = glm::vec4(0, 0, 0, 1);
+                // Compute the direction from point to viewer in tangent space
+                glm::vec4 cameraToPoint = glm::vec4(point.position - glm::vec3(0,0, 1), 0);
+                cameraToPoint = worldToTangentMatrix * cameraToPoint;
+                
+                float numSamples = 1;
+                // attenuation = brdf.Sample_f(cameraToPoint, &target, glm::vec2(1), &numSamples);
+                attenuation = albedo;
+            } else {
+                attenuation = albedo;
+            }
         }
-        return true;
+        
+        if(useBrdf)return glm::dot(scattered.direction, point.normal) > 0;
+        else return true;
     }
 
     glm::vec3 Material::emitted() {
