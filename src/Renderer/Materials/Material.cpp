@@ -3,6 +3,10 @@
 #include "Geometry/Util.h"
 #include <stb_image.h>
 
+#include "../Util/Geometry.hpp"
+
+#include "../BRDF.hpp"
+
 namespace KikooRenderer{
 namespace OfflineRenderer {
 

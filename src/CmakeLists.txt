@@ -119,6 +119,7 @@ set(MainWindowSrc
 	Renderer/Materials/Material.cpp
 	Renderer/Materials/Lambertian.cpp
 	Renderer/Materials/Metallic.cpp
+	Renderer/BRDF.cpp
 	)
 
 add_executable(MainWindow ${MainWindowSrc})
