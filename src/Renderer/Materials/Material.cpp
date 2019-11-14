@@ -38,13 +38,15 @@ namespace OfflineRenderer {
                 worldToTangentMatrix[1] = glm::vec4(glm::normalize(point.bitangent), 1);
                 worldToTangentMatrix[2] = glm::vec4(glm::normalize(point.normal), 1);
                 worldToTangentMatrix[3] = glm::vec4(0, 0, 0, 1);
-                // Compute the direction from point to viewer in tangent space
-                glm::vec4 cameraToPoint = glm::vec4(point.position - glm::vec3(0,0, 1), 0);
+                
+                // glm::vec4 cameraToPoint = glm::vec4(point.position - in.origin, 0);
+                glm::vec4 cameraToPoint = glm::vec4(in.origin - point.position, 0);
                 cameraToPoint = worldToTangentMatrix * cameraToPoint;
                 
                 float numSamples = 1;
-                // attenuation = brdf.Sample_f(cameraToPoint, &target, glm::vec2(1), &numSamples);
-                attenuation = albedo;
+                attenuation = brdf.Sample_f(cameraToPoint, &target, glm::vec2(1), &numSamples);
+                // std::cout << glm::to_string(albedo) << "  " << glm::to_string(attenuation) << std::endl;
+                // attenuation = albedo;
             } else {
                 attenuation = albedo;
             }

@@ -47,7 +47,7 @@ namespace OfflineRenderer {
             KikooRenderer::Geometry::Ray scattered; //Scattered ray
             glm::vec3 attenuation;
             glm::vec3 emitted = closestPoint.material->emitted();
-            if(depth < 1 && closestPoint.material->Scatter(ray, closestPoint, attenuation, scattered)) { // check if ray is scattered && iterations < 50
+            if(depth < 5 && closestPoint.material->Scatter(ray, closestPoint, attenuation, scattered)) { // check if ray is scattered && iterations < 50
                 glm::vec3 res = emitted + attenuation * GetColor(scattered, depth+1);
                 return res;
             } else {
@@ -63,14 +63,14 @@ namespace OfflineRenderer {
     }
 
     void RayTracer::WriteImage() {
-        int width = 300;
-        int height = 200;
-        int numSamples = 50;
+        int width = 1920;
+        int height = 1080;
+        int numSamples = 60;
 
         KikooRenderer::Util::FileIO::Image image(width, height);
 
         //1. Create the camera 
-        glm::vec3 camPos = glm::vec3(0,0.2, 0.3);
+        glm::vec3 camPos = glm::vec3(0,0.2, 0.2);
         glm::vec3 lookAt = glm::vec3(0, 0, 0);
         double distanceToFocus = glm::distance(camPos, lookAt);
         Camera camera(camPos, lookAt, glm::vec3(0, 1, 0), 70, (double)width/(double)height, 0.0001, distanceToFocus, 0, 1);
@@ -93,12 +93,21 @@ namespace OfflineRenderer {
             objects.push_back(box);
         }    
 
+        // {
+        //     Material* lb = new Material(glm::vec4(0.73));
+        //     lb->emitter = true;
+        //     TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0.49, 0), glm::vec3(0.2, 0.01, 0.2), lb, vertex, normals, uv, triangles);
+        //     objects.push_back(box);
+        // }           
+
         // //Box1
         {
             Material* lb = new Material(glm::vec4(0.73));
             lb->useBrdf = true;
             // TriangleMesh* box = new TriangleMesh(glm::vec3(-0.2, 0, 0), glm::vec3(0.25, 0.6, 0.25), lb, vertex, normals, uv, triangles);
-            TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(0.1), lb, "resources/Models/bunny/untitled.obj");
+            // TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(0.1), lb, "resources/Models/bunny/untitled.obj");
+            // TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(0.1), lb, "resources/Models/dragon/dragon.obj");
+            TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(0.1), lb, "resources/Models/bunny/bunny.obj");
             objects.push_back(box);
         }  
 
