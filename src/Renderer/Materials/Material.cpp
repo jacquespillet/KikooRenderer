@@ -25,34 +25,33 @@ namespace OfflineRenderer {
             // attenuation.g = point.uv.y;
             // attenuation.b = 0;
         } else {
-            //DEBUG
-            // attenuation = target;
-            // attenuation = point.normal;
-            // attenuation = point.position;
-            // std::cout << glm::to_string(attenuation) << std::endl;
-            // attenuation = glm::vec3 (point.position.b, 0, 0 );
-
             if(useBrdf) {
+                glm::vec3 reflected = glm::reflect(glm::normalize(in.direction), glm::normalize(point.normal));
+                scattered = Geometry::Ray(point.position, reflected);
+
                 glm::mat4 worldToTangentMatrix(1);
-                worldToTangentMatrix[0] = glm::vec4(glm::normalize(point.tangent), 1);
-                worldToTangentMatrix[1] = glm::vec4(glm::normalize(point.bitangent), 1);
-                worldToTangentMatrix[2] = glm::vec4(glm::normalize(point.normal), 1);
+                worldToTangentMatrix[0] = glm::vec4(glm::normalize(point.tangent), 0);
+                worldToTangentMatrix[1] = glm::vec4(glm::normalize(point.bitangent), 0);
+                worldToTangentMatrix[2] = glm::vec4(glm::normalize(point.normal), 0);
                 worldToTangentMatrix[3] = glm::vec4(0, 0, 0, 1);
                 
-                // glm::vec4 cameraToPoint = glm::vec4(point.position - in.origin, 0);
-                glm::vec4 cameraToPoint = glm::vec4(in.origin - point.position, 0);
-                cameraToPoint = worldToTangentMatrix * cameraToPoint;
+                glm::vec4 pointToCamera = glm::vec4(in.origin - point.position , 0);
+                glm::vec4 reflectedTangentSpace = worldToTangentMatrix * glm::vec4(reflected, 0.0f);
+
+                pointToCamera = worldToTangentMatrix * pointToCamera;
                 
                 float numSamples = 1;
-                attenuation = brdf.Sample_f(cameraToPoint, &target, glm::vec2(1), &numSamples);
-                // std::cout << glm::to_string(albedo) << "  " << glm::to_string(attenuation) << std::endl;
-                // attenuation = albedo;
+                attenuation = brdf.Sample_f(pointToCamera, &target, glm::vec2(1), &numSamples);
+
+                std::cout <<  glm::to_string(reflectedTangentSpace) << "  " << glm::to_string(target) << std::endl;
+            
             } else {
                 attenuation = albedo;
             }
         }
         
-        if(useBrdf)return glm::dot(scattered.direction, point.normal) > 0;
+        // if(useBrdf)return glm::dot(scattered.direction, point.normal) > 0;
+        if(useBrdf)return true;
         else return true;
     }
 

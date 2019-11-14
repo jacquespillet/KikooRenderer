@@ -68,12 +68,13 @@ float BRDF::FrConductor(float cosThetaI, float etaI, float etaT) {
 glm::vec3 BRDF::Sample_f(const glm::vec3 &wo, glm::vec3 *wi, const glm::vec2 &sample, float *pdf) {
     if(wi == nullptr) *wi = glm::vec3(-wo.x, -wo.y, wo.z);
     *wi = glm::vec3(-wo.x, -wo.y, wo.z);
+
     *pdf = 1;
 
-    // glm::vec3 res = this->FrDielectric( CosTheta(*wi),  1.0f,  refractionIndex)  * R / AbsCosTheta(*wi);
-    glm::vec3 res = this->FrConductor( CosTheta(*wi),  1.0f,  refractionIndex)  * R / AbsCosTheta(*wi);
+    glm::vec3 res = this->FrDielectric( CosTheta(*wi),  1.0f,  refractionIndex)  * R / AbsCosTheta(*wi);
+    // glm::vec3 res = this->FrConductor( CosTheta(*wi),  1.0f,  refractionIndex)  * R / AbsCosTheta(*wi);
     return res;
-}        
+}
 
 }
 }

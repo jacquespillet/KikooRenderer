@@ -30,7 +30,7 @@ namespace OfflineRenderer {
         Point closestPoint = { std::numeric_limits<float>::max(), glm::vec3(0), glm::vec3(0), nullptr, glm::vec2(0),  glm::vec3(0),  glm::vec3(0)};
         bool hit = false;
 
-        //1. Find the closest object that hits the ray
+        //1. Find the closest object that hits the ray ( This is where we should use bounding boxes)
         for(int i=0; i<objects.size(); i++) {
             Point hitPoint;
             double t = objects[i]->HitRay(ray, 0.0001, std::numeric_limits<float>::max(), hitPoint);
@@ -44,16 +44,18 @@ namespace OfflineRenderer {
 
             
         if(hit) {//If we hit something
-            KikooRenderer::Geometry::Ray scattered; //Scattered ray
+            KikooRenderer::Geometry::Ray scatteredVector; //Scattered ray
             glm::vec3 attenuation;
             glm::vec3 emitted = closestPoint.material->emitted();
-            if(depth < 5 && closestPoint.material->Scatter(ray, closestPoint, attenuation, scattered)) { // check if ray is scattered && iterations < 50
-                glm::vec3 res = emitted + attenuation * GetColor(scattered, depth+1);
+
+            bool hasScattered = closestPoint.material->Scatter(ray, closestPoint, attenuation, scatteredVector);
+            if(depth < 5 && hasScattered) { //Secondary rays : Get the scattered direction of the scattered ray
+                glm::vec3 res = emitted + attenuation * GetColor(scatteredVector, depth+1); //Get the color of this scattered ray, times it with previous ray attenuation
                 return res;
             } else {
-                return emitted;
+                return emitted + attenuation; //If the ray was not scattered, return the color of the last attenuation
             }
-        } else { //Draw background      
+        } else { //If we did not hit anything, we hit the sky --> returns the sky color
             glm::vec3 direction = glm::normalize(ray.direction);
             double t = 0.5 * direction.y + 1.0;
             glm::vec3 backgroundColor = (1.0 - t) * glm::vec3(1, 1, 1) + t * glm::vec3(0.5, 0.7, 1);
@@ -63,9 +65,9 @@ namespace OfflineRenderer {
     }
 
     void RayTracer::WriteImage() {
-        int width = 1920;
-        int height = 1080;
-        int numSamples = 60;
+        int width = 400;
+        int height = 300;
+        int numSamples = 10;
 
         KikooRenderer::Util::FileIO::Image image(width, height);
 
@@ -91,7 +93,7 @@ namespace OfflineRenderer {
             TriangleMesh* box = new TriangleMesh(glm::vec3(0, -0.2, 0), glm::vec3(1, 0.01, 1), lb, vertex, normals, uv, triangles);
             // TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), lb, vertex, normals, uv, triangles);
             objects.push_back(box);
-        }    
+        }
 
         // {
         //     Material* lb = new Material(glm::vec4(0.73));
@@ -104,12 +106,13 @@ namespace OfflineRenderer {
         {
             Material* lb = new Material(glm::vec4(0.73));
             lb->useBrdf = true;
-            // TriangleMesh* box = new TriangleMesh(glm::vec3(-0.2, 0, 0), glm::vec3(0.25, 0.6, 0.25), lb, vertex, normals, uv, triangles);
-            // TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(0.1), lb, "resources/Models/bunny/untitled.obj");
+            // Metallic* lb = new Metallic(glm::vec4(0.73));
+            TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(0.1), lb, "resources/Models/bunny/untitled.obj");
+            // TriangleMesh* box = new Trian    gleMesh(glm::vec3(0, 0, 0), glm::vec3(0.25, 0.6, 0.25), lb, vertex, normals, uv, triangles);
             // TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(0.1), lb, "resources/Models/dragon/dragon.obj");
-            TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(0.1), lb, "resources/Models/bunny/bunny.obj");
+            // TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(0.1), lb, "resources/Models/bunny/bunny.obj");
             objects.push_back(box);
-        }  
+        }
 
         KikooRenderer::Util::ThreadPool( std::function<void(uint64_t, uint64_t)>([this, width, numSamples, height, &camera, &image](uint64_t i, uint64_t t)
         {

@@ -14,7 +14,7 @@ class Metallic : public Material {
         glm::vec4 albedo;
         bool Scatter(KikooRenderer::Geometry::Ray in,  Point point, glm::vec3& attenuation, KikooRenderer::Geometry::Ray& scattered) override;
 
-        double fuzz = 0;
+        double fuzz = 0.01;
 };
 
 }

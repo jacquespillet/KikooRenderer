@@ -84,15 +84,22 @@ namespace OfflineRenderer {
         const glm::vec3 &v2 = vertex[triangles[triIndex + 2]]; 
         hitNormal = glm::cross((v2 - v0), (v1 - v0)); //Correct
         hitNormal = glm::normalize(hitNormal); 
-
-        hitTangent = v2-v0;
-        hitBitangent = glm::cross(hitNormal, hitTangent);
  
         // texture coordinates
         const glm::vec2 &st0 = this->uv[triIndex]; 
         const glm::vec2 &st1 = this->uv[triIndex + 1]; 
         const glm::vec2 &st2 = this->uv[triIndex + 2]; 
         hitTextureCoordinates = (1 - uv.x - uv.y) * st0 + uv.x * st1 + uv.y * st2; 
+
+        const glm::vec3 &t0 = tangents[triIndex]; 
+        const glm::vec3 &t1 = tangents[triIndex + 1]; 
+        const glm::vec3 &t2 = tangents[triIndex + 2]; 
+        hitTangent = (1 - uv.x - uv.y) * t0 + uv.x * t1 + uv.y * t2;
+
+        const glm::vec3 &b0 = bitangents[triIndex]; 
+        const glm::vec3 &b1 = bitangents[triIndex + 1]; 
+        const glm::vec3 &b2 = bitangents[triIndex + 2]; 
+        hitBitangent = (1 - uv.x - uv.y) * b0 + uv.x * b1 + uv.y * b2;
     }     
     TriangleMesh::~TriangleMesh() {
         delete material;

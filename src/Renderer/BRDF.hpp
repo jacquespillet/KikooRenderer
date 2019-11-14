@@ -17,7 +17,7 @@ class BRDF {
     private:
         int type;
 
-        float refractionIndex = 1.1;
+        float refractionIndex = 1.5;
         float k = 10; //Absorbtion coefficient of conductor materials
         glm::vec3 R;
         
