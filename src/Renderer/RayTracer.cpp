@@ -14,6 +14,9 @@
 #include "Materials/Lambertian.hpp"
 #include "Materials/Metallic.hpp"
 
+#include "SpatialAcceleration/BVH.hpp"
+#include "Shapes/Aggregate.hpp"
+
 namespace KikooRenderer {
 namespace OfflineRenderer {
 
@@ -49,11 +52,11 @@ namespace OfflineRenderer {
             glm::vec3 emitted = closestPoint.material->emitted();
 
             bool hasScattered = closestPoint.material->Scatter(ray, closestPoint, attenuation, scatteredVector);
-            if(depth < 5 && hasScattered) { //Secondary rays : Get the scattered direction of the scattered ray
+            if(depth < 4 && hasScattered) { //Secondary rays : Get the scattered direction of the scattered ray
                 glm::vec3 res = emitted + attenuation * GetColor(scatteredVector, depth+1); //Get the color of this scattered ray, times it with previous ray attenuation
                 return res;
             } else {
-                return emitted + attenuation; //If the ray was not scattered, return the color of the last attenuation
+                return emitted; //If the ray was not scattered, return the color of the last attenuation
             }
         } else { //If we did not hit anything, we hit the sky --> returns the sky color
             glm::vec3 direction = glm::normalize(ray.direction);
@@ -72,13 +75,10 @@ namespace OfflineRenderer {
         KikooRenderer::Util::FileIO::Image image(width, height);
 
         //1. Create the camera 
-        glm::vec3 camPos = glm::vec3(0,0.2, 0.2);
+        glm::vec3 camPos = glm::vec3(0,0.1, 0.2);
         glm::vec3 lookAt = glm::vec3(0, 0, 0);
         double distanceToFocus = glm::distance(camPos, lookAt);
         Camera camera(camPos, lookAt, glm::vec3(0, 1, 0), 70, (double)width/(double)height, 0.0001, distanceToFocus, 0, 1);
-        
-
-        // Box* box = new Box(glm::vec3(0,0, 0),glm::vec3(1,1, 1), &lb);
         
         std::vector<glm::vec3> vertex;
         std::vector<glm::vec3> normals;
@@ -90,17 +90,11 @@ namespace OfflineRenderer {
         //Bottom
         {
             Material* lb = new Material(glm::vec4(0.8, 0.1, 0.1, 1.0));
+            // lb->useBrdf = true;
             TriangleMesh* box = new TriangleMesh(glm::vec3(0, -0.2, 0), glm::vec3(1, 0.01, 1), lb, vertex, normals, uv, triangles);
             // TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), lb, vertex, normals, uv, triangles);
             objects.push_back(box);
         }
-
-        // {
-        //     Material* lb = new Material(glm::vec4(0.73));
-        //     lb->emitter = true;
-        //     TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0.49, 0), glm::vec3(0.2, 0.01, 0.2), lb, vertex, normals, uv, triangles);
-        //     objects.push_back(box);
-        // }           
 
         // //Box1
         {
@@ -114,11 +108,13 @@ namespace OfflineRenderer {
             objects.push_back(box);
         }
 
+        clock_t tStart = clock();
+        // for(int i=0; i<width * height; i++) {
         KikooRenderer::Util::ThreadPool( std::function<void(uint64_t, uint64_t)>([this, width, numSamples, height, &camera, &image](uint64_t i, uint64_t t)
         {
             int x = i % width;
             int y = i / width;
-            if(x ==0) std::cout << y << " / " << width << std::endl;
+            if(x ==0) std::cout << y << " / " << height << std::endl;
 
             glm::vec3 color(0);
 
@@ -149,7 +145,10 @@ namespace OfflineRenderer {
             image.SetPixel(x, height - y - 1, color);
             // std::cout << glm::to_string(color) << std::endl  ;
         }), width * height ).Block();
-
+        // }
+        
+        std::cout << "Time taken: "<< (double)(clock() - tStart)/CLOCKS_PER_SEC << std::endl;
+        
         image.toPPM("Test.ppm");
         for(int i=0; i<objects.size(); i++) {
             delete objects[i];

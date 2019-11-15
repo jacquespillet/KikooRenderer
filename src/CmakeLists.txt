@@ -116,10 +116,12 @@ set(MainWindowSrc
 	Renderer/Shapes/Shape.cpp
 	Renderer/Shapes/Sphere.cpp
 	Renderer/Shapes/Box.cpp
+	Renderer/Shapes/Aggregate.cpp
 	Renderer/Shapes/TriangleMesh.cpp
 	Renderer/Materials/Material.cpp
 	Renderer/Materials/Lambertian.cpp
 	Renderer/Materials/Metallic.cpp
+	Renderer/SpatialAcceleration/BVH.cpp
 	Renderer/BRDF.cpp
 	)
 

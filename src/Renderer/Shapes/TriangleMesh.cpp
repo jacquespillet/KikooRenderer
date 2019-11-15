@@ -2,38 +2,51 @@
 #include "Util/ModelLoader.hpp"
 #include "../Util/Geometry.hpp"
 
+#include "Util/ThreadingUtil.hpp"
+
 namespace KikooRenderer {
 namespace OfflineRenderer {
     TriangleMesh::TriangleMesh(glm::vec3 position, glm::vec3 size, Material* material, std::string filename) : material(material), invTransf(glm::mat4(1)){
         this->position = position;
         this->size = size;
-
-        glm::mat4 transf(1);
-        transf = glm::translate(transf, position);
-        transf = glm::scale(transf, size);
-        invTransf = glm::inverse(transf);
-  
         Util::FileIO::LoadModel(filename, &vertex, &normals, &uv, &colors, &triangles);
 
-        CalculateTangents(tangents, bitangents, vertex,  normals, uv, triangles);
+        Init();
     };
 
     TriangleMesh::TriangleMesh(glm::vec3 position, glm::vec3 size, Material* material, std::vector<glm::vec3> vertex,std::vector<glm::vec3> normals,std::vector<glm::vec2> uv, std::vector<int> triangles): material(material), invTransf(glm::mat4(1)) {
         this->position = position;
         this->size = size;
-
-        glm::mat4 transf(1);
-        transf = glm::translate(transf, position);
-        transf = glm::scale(transf, size);
-        invTransf = glm::inverse(transf);
-        // invTransf = transf;
-
         this->triangles = triangles;
         this->normals = normals;
         this->vertex = vertex;
         this->uv = uv;
 
+        Init();
+    }
+
+    void TriangleMesh::Init() {
+
+        glm::mat4 transf(1);
+        transf = glm::translate(transf, position);
+        transf = glm::scale(transf, size);
+        invTransf = glm::inverse(transf);
+
+
         CalculateTangents(tangents, bitangents, vertex,  normals, uv, triangles);
+
+        maxWorld = glm::vec3(std::numeric_limits<float>::max());
+        minWorld = glm::vec3(std::numeric_limits<float>::min());
+        for(int i=0; i<vertex.size(); i++) {
+            glm::vec3 transformedPos = transf * glm::vec4(vertex[i], 1);
+            if(transformedPos.x < minWorld.x) minWorld.x = transformedPos.x;
+            if(transformedPos.y < minWorld.y) minWorld.y = transformedPos.y;
+            if(transformedPos.z < minWorld.z) minWorld.z = transformedPos.z;
+
+            if(transformedPos.x > maxWorld.x) maxWorld.x = transformedPos.x;
+            if(transformedPos.y > maxWorld.y) maxWorld.y = transformedPos.y;
+            if(transformedPos.z > maxWorld.z) maxWorld.z = transformedPos.z;
+        }
     }
 
     glm::vec3 TriangleMesh::GetPosition(double time) {
@@ -69,6 +82,11 @@ namespace OfflineRenderer {
     
         return true; 
     }     
+
+    void TriangleMesh::GetWorldBounds(glm::vec3& min, glm::vec3& max) {
+        min = minWorld;
+        max = maxWorld;
+    }
 
     void TriangleMesh::GetSurfaceProperties( 
         const uint32_t &triIndex, 
@@ -109,7 +127,6 @@ namespace OfflineRenderer {
     double TriangleMesh::HitRay(KikooRenderer::Geometry::Ray ray, double tMin, double tMax, Point& hitPoint) {
         uint32_t j = 0; 
         bool isect = false;
-        double tNear = 9999999;
         glm::vec2 uv;
 
         glm::vec3 hitNormal;
@@ -123,22 +140,53 @@ namespace OfflineRenderer {
         ray.direction = glm::vec3( invTransf * glm::vec4(ray.direction, 0) );
         // ray.direction = glm::normalize(glm::vec3( invTransf * glm::vec4(ray.direction, 0) ));
 
-        for (uint32_t i = 0; i < triangles.size(); i+=3) { 
-            const glm::vec3 &v0 = vertex[triangles[i]]; 
-            const glm::vec3 &v1 = vertex[triangles[i + 1]]; 
-            const glm::vec3 &v2 = vertex[triangles[i + 2]]; 
-            float t = tNear, u, v; 
-            if (rayTriangleIntersect(ray.origin, ray.direction, v0, v1, v2, t, u, v) && t < tNear) { 
-                tNear = t; 
-                uv.x = u; 
-                uv.y = v; 
-                isect |= true; 
-
-                GetSurfaceProperties(i, uv, hitNormal, hitTangent, hitBitangent, hitUv);
-            }
+        double tNear = 9999999;
+        {
+            for (uint32_t i = 0; i < triangles.size(); i+=3) { 
+                const glm::vec3 &v0 = vertex[triangles[i]]; 
+                const glm::vec3 &v1 = vertex[triangles[i + 1]]; 
+                const glm::vec3 &v2 = vertex[triangles[i + 2]]; 
+                float t = tNear, u, v; 
+                if (rayTriangleIntersect(ray.origin, ray.direction, v0, v1, v2, t, u, v) && t < tNear) { 
+                    tNear = t; 
+                    // hitU = u; 
+                    // hitV = v; 
+                    uv.x = u; 
+                    uv.y = v; 
+                    isect = true; 
+                    GetSurfaceProperties(i, uv, hitNormal, hitTangent, hitBitangent, hitUv);
+                }
+            }            
         }
 
-  
+        {
+            std::atomic<double> tNear2(std::numeric_limits<double>::max());
+            std::atomic<uint32_t> hitIndex;
+            std::atomic<float> hitU;
+            std::atomic<float> hitV;
+
+            KikooRenderer::Util::ThreadPool( std::function<void(uint64_t, uint64_t)>([this, &tNear2, ray, &hitU, &hitV, &hitIndex, &isect](uint64_t i, uint64_t threadInx)
+            {
+                const glm::vec3 &v0 = vertex[triangles[i]]; 
+                const glm::vec3 &v1 = vertex[triangles[i + 1]]; 
+                const glm::vec3 &v2 = vertex[triangles[i + 2]]; 
+                float t = tNear2, u, v; 
+                if (rayTriangleIntersect(ray.origin, ray.direction, v0, v1, v2, t, u, v) && t < tNear2) { 
+                    tNear2 = t; 
+                    hitU = u; 
+                    hitV = v; 
+                    isect = true; 
+                    hitIndex = i;
+                }
+            }), triangles.size() ).Block();
+            // GetSurfaceProperties(i, uv, hitNormal, hitTangent, hitBitangent, hitUv);
+        }
+        
+        // uv = glm::vec2(hitU.load(), hitV.load());
+        // uint32_t inx = hitIndex;
+        // GetSurfaceProperties(inx, uv, hitNormal, hitTangent, hitBitangent, hitUv);
+
+        glm::vec3 hitPos = tmpRay.pointAtPosition(tNear);
         
         if(isect)  {
             hitPoint = {

@@ -23,6 +23,7 @@ class Shape {
         Shape(){}
         virtual double HitRay(KikooRenderer::Geometry::Ray ray, double tMin, double tMax, Point& hitPoint) = 0;
         virtual glm::vec3 GetPosition(double time) = 0;
+        virtual void GetWorldBounds(glm::vec3& min, glm::vec3& max);
 };
 }
 }
