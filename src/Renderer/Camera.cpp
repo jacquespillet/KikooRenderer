@@ -29,7 +29,7 @@ namespace OfflineRenderer {
         glm::vec3 rd = lensRadius * Geometry::RandomInDisk();
         glm::vec3 offset =  rd.x * u  + rd.y * v;
         double time = time0 + ((double) rand() / (double) RAND_MAX) * (time1 - time0);
-        return KikooRenderer::Geometry::Ray(position + offset, lowerLeft + s * horizontal + t*vertical - position - offset, time);
+        return KikooRenderer::Geometry::Ray(position + offset, glm::normalize(lowerLeft + s * horizontal + t*vertical - position - offset), time);
     }
 
 

@@ -34,19 +34,8 @@ namespace OfflineRenderer {
 
 
         CalculateTangents(tangents, bitangents, vertex,  normals, uv, triangles);
-
-        maxWorld = glm::vec3(std::numeric_limits<float>::max());
-        minWorld = glm::vec3(std::numeric_limits<float>::min());
-        for(int i=0; i<vertex.size(); i++) {
-            glm::vec3 transformedPos = transf * glm::vec4(vertex[i], 1);
-            if(transformedPos.x < minWorld.x) minWorld.x = transformedPos.x;
-            if(transformedPos.y < minWorld.y) minWorld.y = transformedPos.y;
-            if(transformedPos.z < minWorld.z) minWorld.z = transformedPos.z;
-
-            if(transformedPos.x > maxWorld.x) maxWorld.x = transformedPos.x;
-            if(transformedPos.y > maxWorld.y) maxWorld.y = transformedPos.y;
-            if(transformedPos.z > maxWorld.z) maxWorld.z = transformedPos.z;
-        }
+        
+        bounds = Bounds(vertex, transf);
     }
 
     glm::vec3 TriangleMesh::GetPosition(double time) {
@@ -84,8 +73,6 @@ namespace OfflineRenderer {
     }     
 
     void TriangleMesh::GetWorldBounds(glm::vec3& min, glm::vec3& max) {
-        min = minWorld;
-        max = maxWorld;
     }
 
     void TriangleMesh::GetSurfaceProperties( 
@@ -112,12 +99,14 @@ namespace OfflineRenderer {
         const glm::vec3 &t0 = tangents[triIndex]; 
         const glm::vec3 &t1 = tangents[triIndex + 1]; 
         const glm::vec3 &t2 = tangents[triIndex + 2]; 
+        hitTangent = glm::vec3(uv.x, uv.y, 0);
         hitTangent = (1 - uv.x - uv.y) * t0 + uv.x * t1 + uv.y * t2;
+        // hitTangent = glm::normalize(v2 - v0);
 
         const glm::vec3 &b0 = bitangents[triIndex]; 
         const glm::vec3 &b1 = bitangents[triIndex + 1]; 
         const glm::vec3 &b2 = bitangents[triIndex + 2]; 
-        hitBitangent = (1 - uv.x - uv.y) * b0 + uv.x * b1 + uv.y * b2;
+        hitBitangent = glm::normalize(glm::cross(hitTangent, hitNormal));
     }     
     TriangleMesh::~TriangleMesh() {
         delete material;
@@ -125,6 +114,21 @@ namespace OfflineRenderer {
 
 
     double TriangleMesh::HitRay(KikooRenderer::Geometry::Ray ray, double tMin, double tMax, Point& hitPoint) {
+        // double distance;
+        // if(distance = bounds.Hit(ray) >0) {
+        //    hitPoint = {
+        //         distance, 
+        //         ray.pointAtPosition(distance),
+        //         glm::vec3(0),
+        //         material,
+        //         glm::vec2(0),
+        //         glm::vec3(0), 
+        //         glm::vec3(0)
+        //     }; 
+        //     return distance;
+        // }
+        // else return -1;
+
         uint32_t j = 0; 
         bool isect = false;
         glm::vec2 uv;
@@ -149,8 +153,6 @@ namespace OfflineRenderer {
                 float t = tNear, u, v; 
                 if (rayTriangleIntersect(ray.origin, ray.direction, v0, v1, v2, t, u, v) && t < tNear) { 
                     tNear = t; 
-                    // hitU = u; 
-                    // hitV = v; 
                     uv.x = u; 
                     uv.y = v; 
                     isect = true; 
@@ -159,32 +161,6 @@ namespace OfflineRenderer {
             }            
         }
 
-        {
-            std::atomic<double> tNear2(std::numeric_limits<double>::max());
-            std::atomic<uint32_t> hitIndex;
-            std::atomic<float> hitU;
-            std::atomic<float> hitV;
-
-            KikooRenderer::Util::ThreadPool( std::function<void(uint64_t, uint64_t)>([this, &tNear2, ray, &hitU, &hitV, &hitIndex, &isect](uint64_t i, uint64_t threadInx)
-            {
-                const glm::vec3 &v0 = vertex[triangles[i]]; 
-                const glm::vec3 &v1 = vertex[triangles[i + 1]]; 
-                const glm::vec3 &v2 = vertex[triangles[i + 2]]; 
-                float t = tNear2, u, v; 
-                if (rayTriangleIntersect(ray.origin, ray.direction, v0, v1, v2, t, u, v) && t < tNear2) { 
-                    tNear2 = t; 
-                    hitU = u; 
-                    hitV = v; 
-                    isect = true; 
-                    hitIndex = i;
-                }
-            }), triangles.size() ).Block();
-            // GetSurfaceProperties(i, uv, hitNormal, hitTangent, hitBitangent, hitUv);
-        }
-        
-        // uv = glm::vec2(hitU.load(), hitV.load());
-        // uint32_t inx = hitIndex;
-        // GetSurfaceProperties(inx, uv, hitNormal, hitTangent, hitBitangent, hitUv);
 
         glm::vec3 hitPos = tmpRay.pointAtPosition(tNear);
         

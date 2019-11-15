@@ -24,6 +24,9 @@ namespace OfflineRenderer {
             glm::vec3 wi = -glm::vec3(worldToTangentMatrix * glm::vec4(in.direction, 0));
             attenuation = brdf.Sample_f(wi, &t, glm::vec2(1), &numSamples);
             scattered = Geometry::Ray(point.position, glm::reflect(in.direction, point.normal));
+            
+            attenuation = point.tangent;
+
         } else {
             glm::vec3 target = glm::reflect(in.direction, point.normal);
             scattered = Geometry::Ray(point.position, target);

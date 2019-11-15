@@ -122,6 +122,7 @@ set(MainWindowSrc
 	Renderer/Materials/Lambertian.cpp
 	Renderer/Materials/Metallic.cpp
 	Renderer/SpatialAcceleration/BVH.cpp
+	Renderer/SpatialAcceleration/Bounds.cpp
 	Renderer/BRDF.cpp
 	)
 

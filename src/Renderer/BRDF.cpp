@@ -69,6 +69,8 @@ glm::vec3 BRDF::Sample_f(const glm::vec3 &wo, glm::vec3 *wi, const glm::vec2 &sa
     *wi = glm::vec3(-wo.x, -wo.y, wo.z);
     *pdf = 1;
 
+    refractionIndex = 1.5;
+
     glm::vec3 res = this->FrDielectric( CosTheta(*wi),  1.0f,  refractionIndex)  * R / AbsCosTheta(*wi);
     // glm::vec3 res = this->FrConductor( CosTheta(*wi),  1.0f,  refractionIndex)  * R / AbsCosTheta(*wi);
     return res;

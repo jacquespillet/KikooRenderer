@@ -52,11 +52,11 @@ namespace OfflineRenderer {
             glm::vec3 emitted = closestPoint.material->emitted();
 
             bool hasScattered = closestPoint.material->Scatter(ray, closestPoint, attenuation, scatteredVector);
-            if(depth < 4 && hasScattered) { //Secondary rays : Get the scattered direction of the scattered ray
+            if(depth < 0 && hasScattered) { //Secondary rays : Get the scattered direction of the scattered ray
                 glm::vec3 res = emitted + attenuation * GetColor(scatteredVector, depth+1); //Get the color of this scattered ray, times it with previous ray attenuation
                 return res;
             } else {
-                return emitted; //If the ray was not scattered, return the color of the last attenuation
+                return emitted + attenuation; //If the ray was not scattered, return the color of the last attenuation
             }
         } else { //If we did not hit anything, we hit the sky --> returns the sky color
             glm::vec3 direction = glm::normalize(ray.direction);
@@ -75,7 +75,7 @@ namespace OfflineRenderer {
         KikooRenderer::Util::FileIO::Image image(width, height);
 
         //1. Create the camera 
-        glm::vec3 camPos = glm::vec3(0,0.1, 0.2);
+        glm::vec3 camPos = glm::vec3(0,1, 2);
         glm::vec3 lookAt = glm::vec3(0, 0, 0);
         double distanceToFocus = glm::distance(camPos, lookAt);
         Camera camera(camPos, lookAt, glm::vec3(0, 1, 0), 70, (double)width/(double)height, 0.0001, distanceToFocus, 0, 1);
@@ -87,31 +87,23 @@ namespace OfflineRenderer {
         std::vector<int> triangles;
         CoreEngine::GetCubeBuffers(&vertex, &normals, &uv, &colors, &triangles);        
 
-        //Bottom
-        {
-            Material* lb = new Material(glm::vec4(0.8, 0.1, 0.1, 1.0));
-            // lb->useBrdf = true;
-            TriangleMesh* box = new TriangleMesh(glm::vec3(0, -0.2, 0), glm::vec3(1, 0.01, 1), lb, vertex, normals, uv, triangles);
-            // TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), lb, vertex, normals, uv, triangles);
-            objects.push_back(box);
-        }
 
         // //Box1
         {
             Material* lb = new Material(glm::vec4(0.73));
             lb->useBrdf = true;
             // Metallic* lb = new Metallic(glm::vec4(0.73));
-            TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(0.1), lb, "resources/Models/bunny/untitled.obj");
-            // TriangleMesh* box = new Trian    gleMesh(glm::vec3(0, 0, 0), glm::vec3(0.25, 0.6, 0.25), lb, vertex, normals, uv, triangles);
+            // TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(1), lb, "resources/Models/bunny/untitled.obj");
+            TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(2.734376, 1.968750, 1), lb, vertex, normals, uv, triangles);
             // TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(0.1), lb, "resources/Models/dragon/dragon.obj");
             // TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(0.1), lb, "resources/Models/bunny/bunny.obj");
             objects.push_back(box);
         }
 
         clock_t tStart = clock();
-        // for(int i=0; i<width * height; i++) {
-        KikooRenderer::Util::ThreadPool( std::function<void(uint64_t, uint64_t)>([this, width, numSamples, height, &camera, &image](uint64_t i, uint64_t t)
-        {
+        for(int i=0; i<width * height; i++) {
+        // KikooRenderer::Util::ThreadPool( std::function<void(uint64_t, uint64_t)>([this, width, numSamples, height, &camera, &image](uint64_t i, uint64_t t)
+        // {
             int x = i % width;
             int y = i / width;
             if(x ==0) std::cout << y << " / " << height << std::endl;
@@ -141,12 +133,10 @@ namespace OfflineRenderer {
 
             color = glm::min(glm::vec3(1.0f), glm::max(glm::vec3(0.0f), color));
 
-
             image.SetPixel(x, height - y - 1, color);
-            // std::cout << glm::to_string(color) << std::endl  ;
-        }), width * height ).Block();
-        // }
-        
+        // }), width * height).Block();
+        }
+
         std::cout << "Time taken: "<< (double)(clock() - tStart)/CLOCKS_PER_SEC << std::endl;
         
         image.toPPM("Test.ppm");

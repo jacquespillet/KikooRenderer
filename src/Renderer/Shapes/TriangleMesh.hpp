@@ -2,6 +2,7 @@
 #include "Shape.hpp"
 #include "Geometry/Ray.hpp"
 #include "../Materials/Material.hpp"
+#include "../SpatialAcceleration/Bounds.hpp"
 
 namespace KikooRenderer {
 namespace OfflineRenderer {
@@ -25,8 +26,8 @@ class TriangleMesh : public Shape {
 private:
         void Init();
         
-        glm::vec3 minWorld;
-        glm::vec3 maxWorld;
+        Bounds bounds;
+
         glm::mat4 transf;
 
         void GetSurfaceProperties( const uint32_t &triIndex,  const glm::vec2 &uv, glm::vec3 &hitNormal,glm::vec3 &hitTangent,glm::vec3 &hitBitangent, glm::vec2 &hitTextureCoordinates) const;

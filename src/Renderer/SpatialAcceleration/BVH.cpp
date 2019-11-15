@@ -24,7 +24,7 @@ namespace OfflineRenderer {
         //  choose spliting dimension (maximum extent of the bound)
         //  Partition primitives into two sets
         //      Compute middle index
-    //          
+        //          
         //  builds children
     }
 }

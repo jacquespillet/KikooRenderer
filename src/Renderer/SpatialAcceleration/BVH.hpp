@@ -1,22 +1,10 @@
 #pragma once
 #include "../Shapes/Shape.hpp"
-
+#include "Bounds.hpp"
 namespace KikooRenderer {
 namespace OfflineRenderer {
 class BVH  {
     public:
-        struct Bounds {
-            glm::vec3 min;
-            glm::vec3 max;
-
-            Bounds(std::vector<Bounds> bounds) {
-                //
-            }
-            
-            Bounds(Bounds b0, Bounds b1) {
-                //
-            }
-        };
 
         struct BVHNode {
             Bounds bounds;
