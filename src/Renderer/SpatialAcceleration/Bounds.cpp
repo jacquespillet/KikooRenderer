@@ -24,8 +24,8 @@ Bounds::Bounds(std::vector<glm::vec3> vertices, glm::mat4 _transform) {
     }
     
     transform = glm::mat4(1);
-    transform = glm::scale(transform, GetSize());
     transform = glm::translate(transform, GetCenter());
+    transform = glm::scale(transform, GetSize());
 
     inverseTransform = glm::inverse(transform);
 

@@ -358,6 +358,6 @@ void main()
         finalColor.rgb += (1.0 - shadow) *  attenuation * (diffuse + specular).rgb;            
     }
     outputColor = finalColor;
-    // outputColor.rgb = finalNormal;
+    outputColor.rgb = fragTangent.xyz;
     outputColor.a = finalAlbedo.a;
 }

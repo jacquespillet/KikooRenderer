@@ -123,7 +123,9 @@ set(MainWindowSrc
 	Renderer/Materials/Metallic.cpp
 	Renderer/SpatialAcceleration/BVH.cpp
 	Renderer/SpatialAcceleration/Bounds.cpp
-	Renderer/BRDF.cpp
+	Renderer/Textures/Cubemap.cpp
+	Renderer/BRDF/BRDF.cpp
+	Renderer/MicroFacets.cpp
 	)
 
 add_executable(MainWindow ${MainWindowSrc})

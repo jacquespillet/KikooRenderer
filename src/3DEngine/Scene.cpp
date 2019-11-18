@@ -67,7 +67,8 @@ namespace CoreEngine {
         text->SetText("qfewoikqwjfoiewj");
         AddObject(text);
 
-
+        Object3D* cube = GetCube(this, "cub", glm::vec3(0), glm::vec3(0), glm::vec3(1), glm::vec4(1));
+        AddObject(cube);
 
         //Start each object
         for(int i=0; i<objects3D.size(); i++) {

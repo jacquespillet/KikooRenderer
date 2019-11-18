@@ -1,5 +1,5 @@
 #include "BRDF.hpp"
-#include "Util/Geometry.hpp"
+#include "../Util/Geometry.hpp"
 namespace KikooRenderer{
 namespace OfflineRenderer {
 
@@ -70,10 +70,56 @@ glm::vec3 BRDF::Sample_f(const glm::vec3 &wo, glm::vec3 *wi, const glm::vec2 &sa
     *pdf = 1;
 
     refractionIndex = 1.5;
+    k = 0.5;
+    // glm::vec3 res = this->FrDielectric( CosTheta(*wi),  1.0f,  refractionIndex)  * R / AbsCosTheta(*wi);
+    glm::vec3 res = this->FrConductor( CosTheta(*wi),  1.0f,  refractionIndex)  * R / AbsCosTheta(*wi);
+    return res; 
+}
 
-    glm::vec3 res = this->FrDielectric( CosTheta(*wi),  1.0f,  refractionIndex)  * R / AbsCosTheta(*wi);
-    // glm::vec3 res = this->FrConductor( CosTheta(*wi),  1.0f,  refractionIndex)  * R / AbsCosTheta(*wi);
-    return res;
+glm::vec3 BRDF::Sample_f_Transmission(const glm::vec3 &wo, glm::vec3 *wi, const glm::vec2 &sample, float *pdf) {
+    refractionIndex = 1.5;
+    
+    bool entering = CosTheta(wo) > 0;
+    float etaI = entering ? 1 : refractionIndex;
+    float etaT = entering ? refractionIndex : 1;
+
+    *wi = glm::refract(-wo, glm::faceforward(glm::vec3(0, 0, 1), -wo, glm::vec3(0, 0, 1)), etaI / etaT);
+
+    *pdf = 1;
+    glm::vec3 ft = R * (glm::vec3(1.) - FrDielectric(CosTheta(*wi), etaI, etaT));
+    // ft *= (etaI * etaI) / (etaT * etaT);
+
+    return ft / AbsCosTheta(*wi); 
+}
+
+glm::vec3 BRDF::OrenNayar(const glm::vec3 &wo, glm::vec3& wi) {
+    float sigma = 50;
+    float sigma2 = sigma * sigma;
+    float A = 1.f - (sigma2 / (2.f * (sigma2 + 0.33f)));
+    float B = 0.45f * sigma2 / (sigma2 + 0.09f);
+
+    float sinThetaI = SinTheta(wi);
+    float sinThetaO = SinTheta(wo);    
+
+    float maxCos = 0;
+    if (sinThetaI > 1e-4 && sinThetaO > 1e-4) {
+        float sinPhiI = SinPhi(wi), cosPhiI = CosPhi(wi);
+        float sinPhiO = SinPhi(wo), cosPhiO = CosPhi(wo);
+        float dCos = cosPhiI * cosPhiO + sinPhiI * sinPhiO;
+        maxCos = std::max((float)0, dCos);
+    }    
+
+    float sinAlpha, tanBeta;
+    if (AbsCosTheta(wi) > AbsCosTheta(wo)) {
+        sinAlpha = sinThetaO;
+        tanBeta = sinThetaI / AbsCosTheta(wi);
+    } else {
+        sinAlpha = sinThetaI;
+        tanBeta = sinThetaO / AbsCosTheta(wo);
+    }
+
+    return R * (1.0 / PI) * (A + B * maxCos * sinAlpha * tanBeta);
+
 }
 
 }

@@ -34,7 +34,10 @@ namespace OfflineRenderer {
 
 
         CalculateTangents(tangents, bitangents, vertex,  normals, uv, triangles);
-        
+        // for(int i=0; i<tangents.size(); i++) {
+        //     std::cout << glm::to_string(vertex[i]) << "  " <<glm::to_string(tangents[i]) << "  " <<glm::to_string(bitangents[i]) << "  " <<std::endl;
+        // }
+
         bounds = Bounds(vertex, transf);
     }
 
@@ -83,30 +86,26 @@ namespace OfflineRenderer {
         glm::vec3 &hitBitangent, 
         glm::vec2 &hitTextureCoordinates) const 
     { 
-        // face normal
-        const glm::vec3 &v0 = vertex[triangles[triIndex]]; 
-        const glm::vec3 &v1 = vertex[triangles[triIndex + 1]]; 
-        const glm::vec3 &v2 = vertex[triangles[triIndex + 2]]; 
-        hitNormal = glm::cross((v2 - v0), (v1 - v0)); //Correct
-        hitNormal = glm::normalize(hitNormal); 
+        const glm::vec3 n0 = this->normals[triangles[triIndex]]; 
+        const glm::vec3 n1 = this->normals[triangles[triIndex + 1]]; 
+        const glm::vec3 n2 = this->normals[triangles[triIndex + 2]]; 
+        hitNormal = (1 - uv.x - uv.y) * n0 + uv.x * n1 + uv.y * n2;
  
         // texture coordinates
-        const glm::vec2 &st0 = this->uv[triIndex]; 
-        const glm::vec2 &st1 = this->uv[triIndex + 1]; 
-        const glm::vec2 &st2 = this->uv[triIndex + 2]; 
+        const glm::vec2 st0 = this->uv[triangles[triIndex]]; 
+        const glm::vec2 st1 = this->uv[triangles[triIndex + 1]]; 
+        const glm::vec2 st2 = this->uv[triangles[triIndex + 2]]; 
         hitTextureCoordinates = (1 - uv.x - uv.y) * st0 + uv.x * st1 + uv.y * st2; 
 
-        const glm::vec3 &t0 = tangents[triIndex]; 
-        const glm::vec3 &t1 = tangents[triIndex + 1]; 
-        const glm::vec3 &t2 = tangents[triIndex + 2]; 
-        hitTangent = glm::vec3(uv.x, uv.y, 0);
-        hitTangent = (1 - uv.x - uv.y) * t0 + uv.x * t1 + uv.y * t2;
-        // hitTangent = glm::normalize(v2 - v0);
+        const glm::vec3 t0 = this->tangents[triangles[triIndex]]; 
+        const glm::vec3 t1 = this->tangents[triangles[triIndex + 1]]; 
+        const glm::vec3 t2 = this->tangents[triangles[triIndex + 2]]; 
+        hitTangent = (1 - uv.x - uv.y) * t0 + uv.x * t1 + uv.y * t2; 
 
-        const glm::vec3 &b0 = bitangents[triIndex]; 
-        const glm::vec3 &b1 = bitangents[triIndex + 1]; 
-        const glm::vec3 &b2 = bitangents[triIndex + 2]; 
-        hitBitangent = glm::normalize(glm::cross(hitTangent, hitNormal));
+        const glm::vec3 b0 = this->bitangents[triangles[triIndex]]; 
+        const glm::vec3 b1 = this->bitangents[triangles[triIndex + 1]]; 
+        const glm::vec3 b2 = this->bitangents[triangles[triIndex + 2]]; 
+        hitBitangent = (1 - uv.x - uv.y) * b0 + uv.x * b1 + uv.y * b2;
     }     
     TriangleMesh::~TriangleMesh() {
         delete material;
@@ -129,54 +128,55 @@ namespace OfflineRenderer {
         // }
         // else return -1;
 
-        uint32_t j = 0; 
-        bool isect = false;
-        glm::vec2 uv;
+        double distance;
+        if(distance = bounds.Hit(ray) >0) { // BB Check
 
-        glm::vec3 hitNormal;
-        glm::vec3 hitTangent;
-        glm::vec3 hitBitangent;
-        glm::vec2 hitUv;
+            uint32_t j = 0; 
+            bool isect = false;
+            glm::vec2 uv;
 
-        KikooRenderer::Geometry::Ray tmpRay = ray;
-        
-        ray.origin = glm::vec3( invTransf * glm::vec4(ray.origin, 1) );
-        ray.direction = glm::vec3( invTransf * glm::vec4(ray.direction, 0) );
-        // ray.direction = glm::normalize(glm::vec3( invTransf * glm::vec4(ray.direction, 0) ));
+            glm::vec3 hitNormal;
+            glm::vec3 hitTangent;
+            glm::vec3 hitBitangent;
+            glm::vec2 hitUv;
 
-        double tNear = 9999999;
-        {
-            for (uint32_t i = 0; i < triangles.size(); i+=3) { 
-                const glm::vec3 &v0 = vertex[triangles[i]]; 
-                const glm::vec3 &v1 = vertex[triangles[i + 1]]; 
-                const glm::vec3 &v2 = vertex[triangles[i + 2]]; 
-                float t = tNear, u, v; 
-                if (rayTriangleIntersect(ray.origin, ray.direction, v0, v1, v2, t, u, v) && t < tNear) { 
-                    tNear = t; 
-                    uv.x = u; 
-                    uv.y = v; 
-                    isect = true; 
-                    GetSurfaceProperties(i, uv, hitNormal, hitTangent, hitBitangent, hitUv);
-                }
-            }            
-        }
+            KikooRenderer::Geometry::Ray tmpRay = ray;
+            
+            ray.origin = glm::vec3( invTransf * glm::vec4(ray.origin, 1) );
+            ray.direction = glm::vec3( invTransf * glm::vec4(ray.direction, 0) );
+            // ray.direction = glm::normalize(glm::vec3( invTransf * glm::vec4(ray.direction, 0) ));
 
-
-        glm::vec3 hitPos = tmpRay.pointAtPosition(tNear);
-        
-        if(isect)  {
-            hitPoint = {
-                tNear, 
-                tmpRay.pointAtPosition(tNear),
-                hitNormal,
-                material,
-                hitUv,
-                hitTangent, 
-                hitBitangent
-            }; 
-            return tNear;
-        }
-        else return -1;
+            double tNear = 9999999;
+            {
+                for (uint32_t i = 0; i < triangles.size(); i+=3) { 
+                    const glm::vec3 &v0 = vertex[triangles[i]]; 
+                    const glm::vec3 &v1 = vertex[triangles[i + 1]]; 
+                    const glm::vec3 &v2 = vertex[triangles[i + 2]]; 
+                    float t = tNear, u, v; 
+                    if (rayTriangleIntersect(ray.origin, ray.direction, v0, v1, v2, t, u, v) && t < tNear) { 
+                        tNear = t; 
+                        uv.x = u; 
+                        uv.y = v; 
+                        isect |= true; 
+                        GetSurfaceProperties(i, uv, hitNormal, hitTangent, hitBitangent, hitUv);
+                    }
+                }            
+            }
+            
+            if(isect)  {
+                hitPoint = {
+                    tNear, 
+                    tmpRay.pointAtPosition(tNear),
+                    hitNormal,
+                    material,
+                    hitUv,
+                    hitTangent, 
+                    hitBitangent
+                }; 
+                return tNear;
+            }
+            else return -1;
+        } else return -1;
     }
 }
 }

@@ -926,7 +926,7 @@ Object3D* ObjectFromModelFile(Scene* scene, std::string name, std::string filena
     Util::FileIO::LoadModel(filename, &vertex, &normals, &uv, &colors, &triangles);
 
     MeshFilterComponent* mesh = new MeshFilterComponent(newObject);
-    mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles, false);
+    mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles, true);
     //Setup transform
     TransformComponent* transform = new  TransformComponent(newObject );
     

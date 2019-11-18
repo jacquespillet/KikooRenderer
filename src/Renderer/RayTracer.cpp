@@ -52,7 +52,7 @@ namespace OfflineRenderer {
             glm::vec3 emitted = closestPoint.material->emitted();
 
             bool hasScattered = closestPoint.material->Scatter(ray, closestPoint, attenuation, scatteredVector);
-            if(depth < 0 && hasScattered) { //Secondary rays : Get the scattered direction of the scattered ray
+            if(depth < 10 && hasScattered) { //Secondary rays : Get the scattered direction of the scattered ray
                 glm::vec3 res = emitted + attenuation * GetColor(scatteredVector, depth+1); //Get the color of this scattered ray, times it with previous ray attenuation
                 return res;
             } else {
@@ -62,20 +62,20 @@ namespace OfflineRenderer {
             glm::vec3 direction = glm::normalize(ray.direction);
             double t = 0.5 * direction.y + 1.0;
             glm::vec3 backgroundColor = (1.0 - t) * glm::vec3(1, 1, 1) + t * glm::vec3(0.5, 0.7, 1);
-            // glm::vec3 backgroundColor = glm::vec3(0);
+            // glm::vec3 backgroundColor(0);
             return backgroundColor;
         }
     }
 
     void RayTracer::WriteImage() {
-        int width = 400;
-        int height = 300;
-        int numSamples = 10;
+        int width = 500;
+        int height = 450;
+        int numSamples = 20;
 
         KikooRenderer::Util::FileIO::Image image(width, height);
 
         //1. Create the camera 
-        glm::vec3 camPos = glm::vec3(0,1, 2);
+        glm::vec3 camPos = glm::vec3(0,1, 4);
         glm::vec3 lookAt = glm::vec3(0, 0, 0);
         double distanceToFocus = glm::distance(camPos, lookAt);
         Camera camera(camPos, lookAt, glm::vec3(0, 1, 0), 70, (double)width/(double)height, 0.0001, distanceToFocus, 0, 1);
@@ -92,18 +92,33 @@ namespace OfflineRenderer {
         {
             Material* lb = new Material(glm::vec4(0.73));
             lb->useBrdf = true;
-            // Metallic* lb = new Metallic(glm::vec4(0.73));
-            // TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(1), lb, "resources/Models/bunny/untitled.obj");
-            TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(2.734376, 1.968750, 1), lb, vertex, normals, uv, triangles);
-            // TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(0.1), lb, "resources/Models/dragon/dragon.obj");
-            // TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(0.1), lb, "resources/Models/bunny/bunny.obj");
+            // Material* lb = new Metallic(glm::vec4(0.73));
+            TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(1), lb, "resources/Models/bunny/untitled2.obj");
+            // TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(1.5, 1.5, 1), lb, vertex, normals, uv, triangles);
+            objects.push_back(box);
+        }
+
+
+        // Light
+        {
+            Material* lb = new Material(glm::vec4(0.73, 0, 0, 1));
+            // lb->emitter = true;
+            TriangleMesh* box = new TriangleMesh(glm::vec3(-1, 0, -2), glm::vec3(1.5, 1.5, 1), lb, vertex, normals, uv, triangles);
+            objects.push_back(box);
+        }
+
+        // Light
+        {
+            Material* lb = new Material(glm::vec4(0, 0.73, 0, 1));
+            // lb->emitter = true;
+            TriangleMesh* box = new TriangleMesh(glm::vec3(1, 0, -2), glm::vec3(1.5, 1.5, 1), lb, vertex, normals, uv, triangles);
             objects.push_back(box);
         }
 
         clock_t tStart = clock();
-        for(int i=0; i<width * height; i++) {
-        // KikooRenderer::Util::ThreadPool( std::function<void(uint64_t, uint64_t)>([this, width, numSamples, height, &camera, &image](uint64_t i, uint64_t t)
-        // {
+        // for(int i=0; i<width * height; i++) {
+        KikooRenderer::Util::ThreadPool( std::function<void(uint64_t, uint64_t)>([this, width, numSamples, height, &camera, &image](uint64_t i, uint64_t t)
+        {
             int x = i % width;
             int y = i / width;
             if(x ==0) std::cout << y << " / " << height << std::endl;
@@ -134,8 +149,8 @@ namespace OfflineRenderer {
             color = glm::min(glm::vec3(1.0f), glm::max(glm::vec3(0.0f), color));
 
             image.SetPixel(x, height - y - 1, color);
-        // }), width * height).Block();
-        }
+        }), width * height).Block();
+        // }
 
         std::cout << "Time taken: "<< (double)(clock() - tStart)/CLOCKS_PER_SEC << std::endl;
         

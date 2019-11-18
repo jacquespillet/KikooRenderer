@@ -2,7 +2,7 @@
 #include "Util/Common.h"
 #include "Geometry/Ray.hpp"
 
-#include "../BRDF.hpp"
+#include "../BRDF/BRDF.hpp"
 
 namespace KikooRenderer{
 namespace OfflineRenderer {

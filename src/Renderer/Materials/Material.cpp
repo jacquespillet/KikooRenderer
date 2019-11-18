@@ -20,19 +20,30 @@ namespace OfflineRenderer {
             worldToTangentMatrix[3] = glm::vec4(0, 0, 0, 1);
 
             float numSamples = 1;
-            glm::vec3 t;
             glm::vec3 wi = -glm::vec3(worldToTangentMatrix * glm::vec4(in.direction, 0));
-            attenuation = brdf.Sample_f(wi, &t, glm::vec2(1), &numSamples);
-            scattered = Geometry::Ray(point.position, glm::reflect(in.direction, point.normal));
+            // attenuation = brdf.Sample_f(wi, &t, glm::vec2(1), &numSamples);
+            // scattered = Geometry::Ray(point.position, glm::reflect(in.direction, point.normal));
             
-            attenuation = point.tangent;
-
+            // glm::vec3 t;
+            // attenuation = brdf.Sample_f_Transmission(wi, &t, glm::vec2(1), &numSamples);
+            // scattered = Geometry::Ray(point.position, glm::vec3(glm::inverse(worldToTangentMatrix) * glm::vec4(t, 1)));
+            
+            glm::vec3 target = point.position + point.normal + Geometry::randomInSphere();
+            scattered = Geometry::Ray(point.position, target);
+            attenuation = brdf.OrenNayar(wi, glm::vec3(worldToTangentMatrix * glm::vec4(target, 0)));
+            
         } else {
-            glm::vec3 target = glm::reflect(in.direction, point.normal);
+            glm::vec3 target = point.position + point.normal + Geometry::randomInSphere();
             scattered = Geometry::Ray(point.position, target);
             attenuation = albedo;
         }
         
+        //Debugging Materials
+        // attenuation = point.position;
+        // attenuation = glm::vec3(point.uv, 0);
+        // attenuation = point.normal;
+        // attenuation = point.tangent;
+        // attenuation = point.bitangent;
         return true;
     }
 
