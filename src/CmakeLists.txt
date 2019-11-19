@@ -125,6 +125,7 @@ set(MainWindowSrc
 	Renderer/SpatialAcceleration/Bounds.cpp
 	Renderer/Textures/Cubemap.cpp
 	Renderer/BRDF/BRDF.cpp
+	Renderer/BRDF/TorranceSparrow.cpp
 	Renderer/MicroFacets.cpp
 	)
 

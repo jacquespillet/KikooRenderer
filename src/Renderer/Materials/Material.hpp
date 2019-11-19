@@ -3,6 +3,7 @@
 #include "Geometry/Ray.hpp"
 
 #include "../BRDF/BRDF.hpp"
+#include "../BRDF/TorranceSparrow.hpp"
 
 namespace KikooRenderer{
 namespace OfflineRenderer {
@@ -16,6 +17,7 @@ class Material {
         virtual bool Scatter(KikooRenderer::Geometry::Ray in,  Point point, glm::vec3& attenuation, KikooRenderer::Geometry::Ray& scattered);
 
         BRDF brdf;
+        TorranceSparrow brdf2;
 
         bool useBrdf = false;
 

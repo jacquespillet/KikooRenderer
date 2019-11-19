@@ -11,11 +11,11 @@ class BRDF {
         glm::vec3 f(glm::vec3 wo, glm::vec3 wi);
         glm::vec3 rho(const glm::vec3 wo, int numSamples, glm::vec2* samples);
         
-        glm::vec3 Sample_f(const glm::vec3 &wo, glm::vec3 *wi, const glm::vec2 &sample, float *pdf);
-        glm::vec3 Sample_f_Transmission(const glm::vec3 &wo, glm::vec3 *wi, const glm::vec2 &sample, float *pdf);
-        glm::vec3 OrenNayar(const glm::vec3 &wo, glm::vec3& wi);
+        virtual glm::vec3 Sample_f(const glm::vec3 &wo, glm::vec3 *wi, const glm::vec2 &sample, float *pdf);
+        virtual glm::vec3 Sample_f_Transmission(const glm::vec3 &wo, glm::vec3 *wi, const glm::vec2 &sample, float *pdf);
+        virtual glm::vec3 OrenNayar(const glm::vec3 &wo, glm::vec3& wi);
 
-    private:
+    protected:
         int type;
 
         float refractionIndex = 1.05;

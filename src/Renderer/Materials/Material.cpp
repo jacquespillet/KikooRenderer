@@ -9,7 +9,7 @@
 namespace KikooRenderer{
 namespace OfflineRenderer {
 
-    Material::Material(glm::vec4 albedo) : albedo(albedo), brdf(albedo) {}
+    Material::Material(glm::vec4 albedo) : albedo(albedo), brdf(albedo), brdf2(albedo) {}
     bool Material::Scatter(KikooRenderer::Geometry::Ray in,  Point point, glm::vec3& attenuation, KikooRenderer::Geometry::Ray& scattered) {
 
         if(useBrdf) {
@@ -28,9 +28,12 @@ namespace OfflineRenderer {
             // attenuation = brdf.Sample_f_Transmission(wi, &t, glm::vec2(1), &numSamples);
             // scattered = Geometry::Ray(point.position, glm::vec3(glm::inverse(worldToTangentMatrix) * glm::vec4(t, 1)));
             
-            glm::vec3 target = point.position + point.normal + Geometry::randomInSphere();
+            // glm::vec3 target = point.position + point.normal + Geometry::randomInSphere();
+            glm::vec3 target = glm::reflect(in.direction, point.normal);
             scattered = Geometry::Ray(point.position, target);
-            attenuation = brdf.OrenNayar(wi, glm::vec3(worldToTangentMatrix * glm::vec4(target, 0)));
+
+            // attenuation = brdf.OrenNayar(wi, glm::vec3(worldToTangentMatrix * glm::vec4(target, 0)));
+            attenuation = brdf2.f(wi, glm::vec3(worldToTangentMatrix * glm::vec4(target, 0)));
             
         } else {
             glm::vec3 target = point.position + point.normal + Geometry::randomInSphere();

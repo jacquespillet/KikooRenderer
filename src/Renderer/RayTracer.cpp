@@ -70,7 +70,7 @@ namespace OfflineRenderer {
     void RayTracer::WriteImage() {
         int width = 500;
         int height = 450;
-        int numSamples = 20;
+        int numSamples = 10;
 
         KikooRenderer::Util::FileIO::Image image(width, height);
 
