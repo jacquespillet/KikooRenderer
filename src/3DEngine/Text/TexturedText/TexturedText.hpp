@@ -39,13 +39,11 @@ public:
     void SetText(std::string);     
 
 private:
+    std::string text = "Text";
     Object3D* quads;
     MaterialComponent* quadsmaterial;
     MeshFilterComponent* mesh;
       
-    // std::vector<Texture> textures;
-    // std::vector<glm::vec2> sizes;
-
     CameraScene* camera;
 
     Text::MetaFile* mf;
@@ -65,8 +63,6 @@ private:
     void AddVertices(std::vector<float>& vertices, double x, double y, double maxX, double maxY);
     void AddTexCoords(std::vector<float>& texCoords, double x, double y, double maxX, double maxY);
 
-
-	// FontType font;
     std::string font;
 
     double LINE_HEIGHT =  0.03f;

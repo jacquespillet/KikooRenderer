@@ -6,6 +6,7 @@
 
 #include "3DEngine/Clouds/Cloud_1.hpp"
 #include "3DEngine/Misc/LensFlare/LensFlare.hpp"
+#include "3DEngine/Text/TexturedText/TexturedText.hpp"
 
 namespace KikooRenderer 
 {
@@ -90,6 +91,7 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
 
 	QString cloudStr = "Cloud";
 	QString lensFlareStr = "Lens Flare";
+	QString textStr = "Text";
 
 
 	QPoint menuPos;
@@ -143,6 +145,7 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
 	QMenu* addMiscMenu = new QMenu("Misc");
     addMiscMenu->addAction(cloudStr);
     addMiscMenu->addAction(lensFlareStr);
+    addMiscMenu->addAction(textStr);
     addObjectMenu->addMenu(addMiscMenu);
 
 	myMenu.addMenu(addObjectMenu);
@@ -187,6 +190,7 @@ void SceneTree::ShowContextMenu(const QPoint& pos, bool fromMainWindow)
 
 		if (selectedItem->text() == cloudStr) objectToAdd =  new  CoreEngine::Cloud_1("Cloud", view3D->view3DGL->scene);
 		if (selectedItem->text() == lensFlareStr) objectToAdd =  new  CoreEngine::LensFlare("LensFlare", view3D->view3DGL->scene);
+		if (selectedItem->text() == textStr) objectToAdd =  new  CoreEngine::TexturedText("LensFlare", view3D->view3DGL->scene);
 
 		// if (selectedIndexes.size() > 0) {
 		// 	TreeItem* parentItem = (TreeItem*)model->itemFromIndex(selectedIndexes[0]);

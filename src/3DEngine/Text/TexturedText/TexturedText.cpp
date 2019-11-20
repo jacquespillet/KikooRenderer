@@ -24,6 +24,8 @@ TexturedText::TexturedText(std::string name, Scene* scene) : Object3D(name, scen
     InitMetaFile("resources/Fonts/arial.fnt", "resources/Fonts/arial.png");
 
     transform = quads->transform;
+
+    SetText(text);
 }
 
 void TexturedText::SetText(std::string text) {
@@ -48,6 +50,7 @@ void TexturedText::SetText(std::string text) {
     for(int i=0; i<vertex.size(); i++) {
         triangles.push_back(i);
     }
+
     mesh->LoadFromBuffers( vertex, normals, uv, colors, triangles, true);
     mesh->meshType = PRIMITIVE_MESH::QUAD_MESH;
     mesh->RebuildBuffers();
@@ -188,6 +191,33 @@ void TexturedText::Update() {
 
 std::vector<QWidget*> TexturedText::GetInspectorWidgets() {
     std::vector<QWidget*> res;
+    res.push_back(this->transform->GetInspector());
+
+    QGroupBox* mainGroupbox = new QGroupBox("Cloud");
+    QVBoxLayout* mainLayout = new QVBoxLayout();
+    mainGroupbox->setLayout(mainLayout);
+
+    QLabel* label = new QLabel("Text");
+    QLineEdit* textLineEdit = new QLineEdit(QString::fromStdString(text));
+    QObject::connect(textLineEdit, &QLineEdit::textChanged, [this](const QString &text) {
+        scene->glWindow->makeCurrent();
+        SetText(text.toStdString());
+        scene->triggerRefresh=true;
+        scene->glWindow->doneCurrent();
+    });
+    mainLayout->addWidget(label);
+    mainLayout->addWidget(textLineEdit);
+
+    CustomSlider* lineHeightSlider = new CustomSlider(0, 1, 0.001, "lineHeight", LINE_HEIGHT);
+    mainLayout->addLayout(lineHeightSlider);
+    QObject::connect( lineHeightSlider, &CustomSlider::Modified, [this](double val) {
+        LINE_HEIGHT = val;
+        scene->triggerRefresh=true;
+    });
+        
+
+
+    res.push_back(mainGroupbox);
     return res;
 }
 
