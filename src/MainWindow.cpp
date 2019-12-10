@@ -23,7 +23,7 @@ namespace KikooRenderer {
 
 
         //Run raytracer scene
-        // rayTracer.WriteImage();
+        rayTracer.WriteImage();
 
         setCentralWidget(view3D);
         addDockWidget(Qt::LeftDockWidgetArea, sceneTree);

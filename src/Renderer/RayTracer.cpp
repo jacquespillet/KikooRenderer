@@ -91,10 +91,7 @@ namespace OfflineRenderer {
         // //Box1
         {
             Material* lb = new Material(glm::vec4(0.73));
-            lb->useBrdf = true;
-            // Material* lb = new Metallic(glm::vec4(0.73));
             TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(1), lb, "resources/Models/bunny/untitled2.obj");
-            // TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(1.5, 1.5, 1), lb, vertex, normals, uv, triangles);
             objects.push_back(box);
         }
 
@@ -116,7 +113,6 @@ namespace OfflineRenderer {
         }
 
         clock_t tStart = clock();
-        // for(int i=0; i<width * height; i++) {
         KikooRenderer::Util::ThreadPool( std::function<void(uint64_t, uint64_t)>([this, width, numSamples, height, &camera, &image](uint64_t i, uint64_t t)
         {
             int x = i % width;
@@ -150,7 +146,6 @@ namespace OfflineRenderer {
 
             image.SetPixel(x, height - y - 1, color);
         }), width * height).Block();
-        // }
 
         std::cout << "Time taken: "<< (double)(clock() - tStart)/CLOCKS_PER_SEC << std::endl;
         

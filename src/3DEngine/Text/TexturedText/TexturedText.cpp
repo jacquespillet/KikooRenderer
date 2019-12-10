@@ -29,6 +29,8 @@ TexturedText::TexturedText(std::string name, Scene* scene) : Object3D(name, scen
 }
 
 void TexturedText::SetText(std::string text) {
+    this->text = text;
+
     std::vector<Text::Line> lines = CreateStructure(text);
     TextMeshData data = CreateVertices(text, lines);
 
@@ -212,7 +214,10 @@ std::vector<QWidget*> TexturedText::GetInspectorWidgets() {
     mainLayout->addLayout(lineHeightSlider);
     QObject::connect( lineHeightSlider, &CustomSlider::Modified, [this](double val) {
         LINE_HEIGHT = val;
+        scene->glWindow->makeCurrent();
+        SetText(this->text);
         scene->triggerRefresh=true;
+        scene->glWindow->doneCurrent();
     });
         
 
