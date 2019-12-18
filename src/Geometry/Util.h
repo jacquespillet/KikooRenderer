@@ -3,9 +3,11 @@
 
 namespace KikooRenderer{
 namespace Geometry {
-
+    double RandomInRange(double a, double b);
     glm::vec3 randomInSphere();
+    glm::vec3 randomOnSphere();
     glm::vec3 RandomInDisk();
+    glm::vec3 RandomCosineDirection();
 
     double Schlick(double cosine, double inx);
 

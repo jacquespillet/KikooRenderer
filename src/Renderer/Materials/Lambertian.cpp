@@ -7,7 +7,7 @@ namespace KikooRenderer{
 namespace OfflineRenderer {
 
     Lambertian::Lambertian(glm::vec4 albedo) : Material(albedo), albedo(albedo) {}
-    bool Lambertian::Scatter(KikooRenderer::Geometry::Ray in,  Point point, glm::vec3& attenuation, KikooRenderer::Geometry::Ray& scattered) {
+    bool Lambertian::Scatter(KikooRenderer::Geometry::Ray in,  Point point, glm::vec3& attenuation, KikooRenderer::Geometry::Ray& scattered, float& pdf) {
         glm::vec3 outNormal;
         glm::vec3 reflected = glm::reflect(in.direction, point.normal);
         double niOverNt;

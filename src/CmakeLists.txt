@@ -113,6 +113,8 @@ set(MainWindowSrc
 	Renderer/Util/Geometry.cpp
 	Renderer/RayTracer.cpp
 	Renderer/Camera.cpp
+	Renderer/PDF/pdf.cpp
+	Renderer/PDF/cosinePdf.cpp
 	Renderer/Shapes/Shape.cpp
 	Renderer/Shapes/Sphere.cpp
 	Renderer/Shapes/Box.cpp

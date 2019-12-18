@@ -17,6 +17,8 @@
 #include "SpatialAcceleration/BVH.hpp"
 #include "Shapes/Aggregate.hpp"
 
+#include "PDF/cosinePdf.hpp"
+
 namespace KikooRenderer {
 namespace OfflineRenderer {
 
@@ -50,19 +52,46 @@ namespace OfflineRenderer {
             KikooRenderer::Geometry::Ray scatteredVector; //Scattered ray
             glm::vec3 attenuation;
             glm::vec3 emitted = closestPoint.material->emitted();
-
-            bool hasScattered = closestPoint.material->Scatter(ray, closestPoint, attenuation, scatteredVector);
+            
+            float pdf;
+            bool hasScattered = closestPoint.material->Scatter(ray, closestPoint, attenuation, scatteredVector, pdf);
             if(depth < 10 && hasScattered) { //Secondary rays : Get the scattered direction of the scattered ray
-                glm::vec3 res = emitted + attenuation * GetColor(scatteredVector, depth+1); //Get the color of this scattered ray, times it with previous ray attenuation
+
+                //SAMPLE LIGHT
+                // glm::vec3 onLight = glm::vec3(Geometry::RandomInRange(-0.1, 0.1), 0.99, Geometry::RandomInRange(-0.1, 0.1));
+                // glm::vec3 toLight = onLight - closestPoint.position;
+                // float distance = glm::length2(toLight);
+                // toLight = glm::normalize(toLight);
+                // if(glm::dot(toLight, closestPoint.normal) < 0) return emitted;
+
+                // float lightArea = 0.2 * 0.2;
+                // float lightCosine = fabs(toLight.y);
+                // if(lightCosine < 0.000001) return emitted;
+
+                // pdf = distance / (lightCosine * lightArea);
+                // scatteredVector = Geometry::Ray(closestPoint.position, toLight);
+
+
+                //SAMPLE COS
+                glm::mat4 worldToTangent(1);
+                worldToTangent[0] = glm::vec4(glm::normalize(closestPoint.tangent), 0);
+                worldToTangent[1] = glm::vec4(glm::normalize(closestPoint.bitangent), 0);
+                worldToTangent[2] = glm::vec4(glm::normalize(closestPoint.normal), 0);
+                worldToTangent[3] = glm::vec4(0, 0, 0, 1);                
+                CosinePdf p(worldToTangent);
+                scatteredVector = Geometry::Ray(closestPoint.position, p.generate());
+                pdf = p.value(scatteredVector.direction);
+
+                glm::vec3 res = emitted + attenuation * closestPoint.material->ScatterPdf(ray, closestPoint, scatteredVector) * GetColor(scatteredVector, depth+1) / pdf; //Get the color of this scattered ray, times it with previous ray attenuation
                 return res;
             } else {
-                return emitted + attenuation; //If the ray was not scattered, return the color of the last attenuation
+                return emitted; //If the ray was not scattered, return the color of the last attenuation
             }
         } else { //If we did not hit anything, we hit the sky --> returns the sky color
-            glm::vec3 direction = glm::normalize(ray.direction);
-            double t = 0.5 * direction.y + 1.0;
-            glm::vec3 backgroundColor = (1.0 - t) * glm::vec3(1, 1, 1) + t * glm::vec3(0.5, 0.7, 1);
-            // glm::vec3 backgroundColor(0);
+            // glm::vec3 direction = glm::normalize(ray.direction);
+            // double t = 0.5 * direction.y + 1.0;
+            // glm::vec3 backgroundColor = (1.0 - t) * glm::vec3(1, 1, 1) + t * glm::vec3(0.5, 0.7, 1);
+            glm::vec3 backgroundColor(0);
             return backgroundColor;
         }
     }
@@ -70,13 +99,13 @@ namespace OfflineRenderer {
     void RayTracer::WriteImage() {
         int width = 500;
         int height = 450;
-        int numSamples = 10;
+        int numSamples = 500;
 
         KikooRenderer::Util::FileIO::Image image(width, height);
 
         //1. Create the camera 
-        glm::vec3 camPos = glm::vec3(0,1, 4);
-        glm::vec3 lookAt = glm::vec3(0, 0, 0);
+        glm::vec3 camPos = glm::vec3(0,0.5, 1.2);
+        glm::vec3 lookAt = glm::vec3(0, 0.5, 0);
         double distanceToFocus = glm::distance(camPos, lookAt);
         Camera camera(camPos, lookAt, glm::vec3(0, 1, 0), 70, (double)width/(double)height, 0.0001, distanceToFocus, 0, 1);
         
@@ -88,29 +117,67 @@ namespace OfflineRenderer {
         CoreEngine::GetCubeBuffers(&vertex, &normals, &uv, &colors, &triangles);        
 
 
+        // //Bottom
+        {
+            Material* lb = new Material(glm::vec4(0.73));
+            TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(1, 0.01, 1), lb, vertex, normals, uv, triangles);
+            objects.push_back(box);
+        }  
+
+        // //Top
+        {
+            Material* lb = new Material(glm::vec4(0.73));
+            TriangleMesh* box = new TriangleMesh(glm::vec3(0, 1, 0), glm::vec3(1, 0.01, 1), lb, vertex, normals, uv, triangles);
+            objects.push_back(box);
+        }
+
+        // //Back
+        {
+            Material* lb = new Material(glm::vec4(0.73));
+            TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0.5, -0.5), glm::vec3(1, 1, 0.01), lb, vertex, normals, uv, triangles);
+            objects.push_back(box);
+        }
+
+        //Right
+        {
+            Material* lb = new Material(glm::vec4(0.8, 0, 0, 1));
+            TriangleMesh* box = new TriangleMesh(glm::vec3(0.5, 0.5, 0), glm::vec3(0.01,1, 1), lb, vertex, normals, uv, triangles);
+            objects.push_back(box);
+        }                     
+
+        //Left
+        {
+            Material* lb = new Material(glm::vec4(0, 0.8, 0, 1));
+            TriangleMesh* box = new TriangleMesh(glm::vec3(-0.5, 0.5, 0), glm::vec3(0.01,1, 1), lb, vertex, normals, uv, triangles);
+            objects.push_back(box);
+        }   
+
+
+        //Light
+        {
+            Material* lb = new Material(glm::vec4(0.73));
+            lb->emitter = true;
+            TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0.99, 0), glm::vec3(0.2, 0.01, 0.2), lb, vertex, normals, uv, triangles);
+            objects.push_back(box);
+        }   
+
+        //Box1
+        {
+            Material* lb = new Material(glm::vec4(0.73));
+            TriangleMesh* box = new TriangleMesh(glm::vec3(0.2, 0, 0), glm::vec3(0.25, 0.6, 0.25), lb, vertex, normals, uv, triangles);
+            objects.push_back(box);
+        }
+
         // //Box1
         {
             Material* lb = new Material(glm::vec4(0.73));
-            TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(1), lb, "resources/Models/bunny/untitled2.obj");
+            TriangleMesh* box = new TriangleMesh(glm::vec3(-0.2, 0.25, 0), glm::vec3(0.25, 0.6, 0.25), lb, vertex, normals, uv, triangles);
+            // TriangleMesh* box = new TriangleMesh(glm::vec3(-0.2, 0, 0), glm::vec3(0.1, 0.4, 0.2), lb, "resources/Models/bunny/untitled.obj");
             objects.push_back(box);
         }
 
 
-        // Light
-        {
-            Material* lb = new Material(glm::vec4(0.73, 0, 0, 1));
-            // lb->emitter = true;
-            TriangleMesh* box = new TriangleMesh(glm::vec3(-1, 0, -2), glm::vec3(1.5, 1.5, 1), lb, vertex, normals, uv, triangles);
-            objects.push_back(box);
-        }
 
-        // Light
-        {
-            Material* lb = new Material(glm::vec4(0, 0.73, 0, 1));
-            // lb->emitter = true;
-            TriangleMesh* box = new TriangleMesh(glm::vec3(1, 0, -2), glm::vec3(1.5, 1.5, 1), lb, vertex, normals, uv, triangles);
-            objects.push_back(box);
-        }
 
         clock_t tStart = clock();
         KikooRenderer::Util::ThreadPool( std::function<void(uint64_t, uint64_t)>([this, width, numSamples, height, &camera, &image](uint64_t i, uint64_t t)

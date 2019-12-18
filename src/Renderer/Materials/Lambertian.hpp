@@ -12,7 +12,7 @@ class Lambertian : public Material {
         // Lambertian() : Material(){}
         Lambertian(glm::vec4 albedo);
         glm::vec4 albedo;
-        bool Scatter(KikooRenderer::Geometry::Ray in,  Point point, glm::vec3& attenuation, KikooRenderer::Geometry::Ray& scattered) override;
+        bool Scatter(KikooRenderer::Geometry::Ray in,  Point point, glm::vec3& attenuation, KikooRenderer::Geometry::Ray& scattered, float& pdf) override;
         double refInx = 1.5;
 };
 

@@ -5,16 +5,19 @@
 #include "../BRDF/BRDF.hpp"
 #include "../BRDF/TorranceSparrow.hpp"
 
+#include "Renderer/PDF/cosinePdf.hpp"
+
 namespace KikooRenderer{
 namespace OfflineRenderer {
 struct Point;
-    
+
 class Material {
     public: 
         // Material(){}
         Material(glm::vec4 albedo);
         glm::vec4 albedo;
-        virtual bool Scatter(KikooRenderer::Geometry::Ray in,  Point point, glm::vec3& attenuation, KikooRenderer::Geometry::Ray& scattered);
+        virtual bool Scatter(KikooRenderer::Geometry::Ray in,  Point point, glm::vec3& attenuation, KikooRenderer::Geometry::Ray& scattered, float& pdf);
+        virtual float ScatterPdf(KikooRenderer::Geometry::Ray in,  Point point, KikooRenderer::Geometry::Ray& scattered);
 
         BRDF brdf;
         TorranceSparrow brdf2;

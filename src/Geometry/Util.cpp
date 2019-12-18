@@ -2,16 +2,46 @@
 
 namespace KikooRenderer{
 namespace Geometry {
+
+    double RandomInRange(double a, double b) {
+        double random = ((double) rand()) / (double) (RAND_MAX+1);
+        random = a + random * (b - a);
+
+        return random;
+    }   
+
     glm::vec3 randomInSphere(){
-        glm::vec3 result;
+        glm::vec3 result(1000);
         do {
             double randomX = ((double) rand()) / (double) (RAND_MAX+1);
             double randomY = ((double) rand()) / (double) (RAND_MAX+1);
             double randomZ = ((double) rand()) / (double) (RAND_MAX+1);
             result = 2.0 * glm::vec3(randomX, randomY, randomZ) - glm::vec3(1, 1, 1);
-        } while(glm::length2(result) > 1);
+        } while(glm::dot(result, result) > 1);
 
         return result;
+    }
+
+    glm::vec3 randomOnSphere(){
+        glm::vec3 result(1000);
+        do {
+            double randomX = ((double) rand()) / (double) (RAND_MAX+1);
+            double randomY = ((double) rand()) / (double) (RAND_MAX+1);
+            double randomZ = ((double) rand()) / (double) (RAND_MAX+1);
+            result = 2.0 * glm::vec3(randomX, randomY, randomZ) - glm::vec3(1, 1, 1);
+        } while(glm::dot(result, result) > 1);
+
+        return glm::normalize(result);
+    }    
+
+    glm::vec3 RandomCosineDirection() {
+        double r1 = ((double) rand()) / (double) (RAND_MAX+1);
+        double r2 = ((double) rand()) / (double) (RAND_MAX+1);
+        double z = sqrt(1-r2);
+        double phi = 2*M_PI*r1;
+        double x = cos(phi)*sqrt(r2);
+        double y = sin(phi)*sqrt(r2);
+        return glm::vec3(x, y, z);
     }
 
     glm::vec3 RandomInDisk() {

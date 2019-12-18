@@ -10,49 +10,36 @@ namespace KikooRenderer{
 namespace OfflineRenderer {
 
     Material::Material(glm::vec4 albedo) : albedo(albedo), brdf(albedo), brdf2(albedo) {}
-    bool Material::Scatter(KikooRenderer::Geometry::Ray in,  Point point, glm::vec3& attenuation, KikooRenderer::Geometry::Ray& scattered) {
 
-        if(useBrdf) {
-            glm::mat4 worldToTangentMatrix(1);
-            worldToTangentMatrix[0] = glm::vec4(glm::normalize(point.tangent), 0);
-            worldToTangentMatrix[1] = glm::vec4(glm::normalize(point.bitangent), 0);
-            worldToTangentMatrix[2] = glm::vec4(glm::normalize(point.normal), 0);
-            worldToTangentMatrix[3] = glm::vec4(0, 0, 0, 1);
+    float Material::ScatterPdf(KikooRenderer::Geometry::Ray in,  Point point, KikooRenderer::Geometry::Ray& scattered) {
+        float cosine = glm::dot(point.normal, glm::normalize(scattered.direction));
+        if(cosine < 0) cosine=0;
+        return cosine / PI;
+    }
 
-            float numSamples = 1;
-            glm::vec3 wi = -glm::vec3(worldToTangentMatrix * glm::vec4(in.direction, 0));
-            // attenuation = brdf.Sample_f(wi, &t, glm::vec2(1), &numSamples);
-            // scattered = Geometry::Ray(point.position, glm::reflect(in.direction, point.normal));
-            
-            // glm::vec3 t;
-            // attenuation = brdf.Sample_f_Transmission(wi, &t, glm::vec2(1), &numSamples);
-            // scattered = Geometry::Ray(point.position, glm::vec3(glm::inverse(worldToTangentMatrix) * glm::vec4(t, 1)));
-            
-            // glm::vec3 target = point.position + point.normal + Geometry::randomInSphere();
-            glm::vec3 target = glm::reflect(in.direction, point.normal);
-            scattered = Geometry::Ray(point.position, target);
+    bool Material::Scatter(KikooRenderer::Geometry::Ray in,  Point point, glm::vec3& attenuation, KikooRenderer::Geometry::Ray& scattered, float& pdf) {
+        // //Transform ray to tangent space
+        glm::mat4 worldToTangent(1);
+        worldToTangent[0] = glm::vec4(glm::normalize(point.tangent), 0);
+        worldToTangent[1] = glm::vec4(glm::normalize(point.bitangent), 0);
+        worldToTangent[2] = glm::vec4(glm::normalize(point.normal), 0);
+        worldToTangent[3] = glm::vec4(0, 0, 0, 1);
 
-            // attenuation = brdf.OrenNayar(wi, glm::vec3(worldToTangentMatrix * glm::vec4(target, 0)));
-            attenuation = brdf2.f(wi, glm::vec3(worldToTangentMatrix * glm::vec4(target, 0)));
-            
-        } else {
-            glm::vec3 target = point.position + point.normal + Geometry::randomInSphere();
-            scattered = Geometry::Ray(point.position, target);
-            attenuation = albedo;
-        }
-        
-        //Debugging Materials
-        // attenuation = point.position;
-        // attenuation = glm::vec3(point.uv, 0);
-        // attenuation = point.normal;
-        // attenuation = point.tangent;
-        // attenuation = point.bitangent;
+        glm::vec4 randomDirection = glm::vec4(Geometry::RandomCosineDirection(), 0);
+        glm::vec3 direction = glm::vec3(worldToTangent * randomDirection);
+        glm::vec3 target = point.position + point.normal + Geometry::randomInSphere();
+
+        scattered = Geometry::Ray(point.position, glm::normalize(direction));
+        attenuation = albedo;
+
+        pdf = glm::dot(point.normal, scattered.direction) / PI;
         return true;
     }
 
     glm::vec3 Material::emitted() {
-        if(emitter) return glm::vec3(5);
-        else return glm::vec3(0);
+        if(emitter) {
+            return glm::vec3(5);
+        }  else return glm::vec3(0);
     }
 
     void Material::LoadTexture(std::string fileName) {
