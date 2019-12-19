@@ -52,32 +52,24 @@ namespace OfflineRenderer {
             
         if(hit) {//If we hit something
             KikooRenderer::Geometry::Ray scatteredVector; //Scattered ray
-            glm::vec3 attenuation;
             glm::vec3 emitted = closestPoint.material->emitted(ray, closestPoint);
             
-            float pdf;
-            bool hasScattered = closestPoint.material->Scatter(ray, closestPoint, attenuation, scatteredVector, pdf);
+            ScatterRecord scatterRecord;
+            bool hasScattered = closestPoint.material->Scatter(ray, closestPoint, scatterRecord);
             if(depth < 10 && hasScattered) { //Secondary rays : Get the scattered direction of the scattered ray
-                //SAMPLE LIGHT
-                ShapePdf sp(objects[5], closestPoint.position);
-                // scatteredVector = Geometry::Ray(closestPoint.position, sp.generate());
-                // pdf = sp.value(scatteredVector.direction);
+                if(scatterRecord.isSpecular) {
+                    return scatterRecord.attenuation * GetColor(scatterRecord.specularRay, depth+1);
+                }                
                 
-                //SAMPLE COS
-                glm::mat4 worldToTangent(1);
-                worldToTangent[0] = glm::vec4(glm::normalize(closestPoint.tangent), 0);
-                worldToTangent[1] = glm::vec4(glm::normalize(closestPoint.bitangent), 0);
-                worldToTangent[2] = glm::vec4(glm::normalize(closestPoint.normal), 0);
-                worldToTangent[3] = glm::vec4(0, 0, 0, 1);                
-                CosinePdf cp(worldToTangent);
-                // scatteredVector = Geometry::Ray(closestPoint.position, p.generate());
-                // pdf = p.value(scatteredVector.direction);
+                // //SAMPLE LIGHT
+                ShapePdf sp(objects[5], closestPoint.position);
 
-                MixturePdf mp(&sp, &cp);
+                MixturePdf mp(&sp, scatterRecord.pdf);
                 scatteredVector = Geometry::Ray(closestPoint.position, mp.generate());
-                pdf = mp.value(scatteredVector.direction);
+                float pdf = mp.value(scatteredVector.direction);
 
-                glm::vec3 res = emitted + attenuation * closestPoint.material->ScatterPdf(ray, closestPoint, scatteredVector) * GetColor(scatteredVector, depth+1) / pdf; //Get the color of this scattered ray, times it with previous ray attenuation
+                glm ::vec3 res = emitted + scatterRecord.attenuation * closestPoint.material->ScatterPdf(ray, closestPoint, scatteredVector) * GetColor(scatteredVector, depth+1) / pdf; //Get the color of this scattered ray, times it with previous ray attenuation
+               
                 return res;
             } else {
                 return emitted; //If the ray was not scattered, return the color of the last attenuation
@@ -128,7 +120,7 @@ namespace OfflineRenderer {
 
         // //Back
         {
-            Material* lb = new Material(glm::vec4(0.73));
+            Metallic* lb = new Metallic(glm::vec4(0.73));
             TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0.5, -0.5), glm::vec3(1, 1, 0.01), lb, vertex, normals, uv, triangles);
             objects.push_back(box);
         }

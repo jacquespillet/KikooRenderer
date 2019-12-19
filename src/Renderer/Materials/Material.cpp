@@ -17,24 +17,20 @@ namespace OfflineRenderer {
         return cosine / PI;
     }
 
-    bool Material::Scatter(KikooRenderer::Geometry::Ray in,  Point point, glm::vec3& attenuation, KikooRenderer::Geometry::Ray& scattered, float& pdf) {
+    bool Material::Scatter(KikooRenderer::Geometry::Ray in,  Point point, ScatterRecord& scatterRecord) {
         if(emitter) return false;
         
-        // //Transform ray to tangent space
+        // // //Transform ray to tangent space
         glm::mat4 worldToTangent(1);
         worldToTangent[0] = glm::vec4(glm::normalize(point.tangent), 0);
         worldToTangent[1] = glm::vec4(glm::normalize(point.bitangent), 0);
         worldToTangent[2] = glm::vec4(glm::normalize(point.normal), 0);
         worldToTangent[3] = glm::vec4(0, 0, 0, 1);
 
-        glm::vec4 randomDirection = glm::vec4(Geometry::RandomCosineDirection(), 0);
-        glm::vec3 direction = glm::vec3(worldToTangent * randomDirection);
-        glm::vec3 target = point.position + point.normal + Geometry::randomInSphere();
+        scatterRecord.isSpecular = false;
+        scatterRecord.attenuation = albedo;
+        scatterRecord.pdf = new CosinePdf(worldToTangent);
 
-        scattered = Geometry::Ray(point.position, glm::normalize(direction));
-        attenuation = albedo;
-
-        pdf = glm::dot(point.normal, scattered.direction) / PI;
         return true;
     }
 

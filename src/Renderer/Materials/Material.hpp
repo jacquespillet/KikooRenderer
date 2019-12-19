@@ -11,12 +11,19 @@ namespace KikooRenderer{
 namespace OfflineRenderer {
 struct Point;
 
+struct ScatterRecord {
+    Geometry::Ray specularRay;
+    bool isSpecular;
+    glm::vec3 attenuation;
+    Pdf* pdf;
+};
+
 class Material {
     public: 
         // Material(){}
         Material(glm::vec4 albedo);
         glm::vec4 albedo;
-        virtual bool Scatter(KikooRenderer::Geometry::Ray in,  Point point, glm::vec3& attenuation, KikooRenderer::Geometry::Ray& scattered, float& pdf);
+        virtual bool Scatter(KikooRenderer::Geometry::Ray in,  Point point, ScatterRecord& scatterRecord);
         virtual float ScatterPdf(KikooRenderer::Geometry::Ray in,  Point point, KikooRenderer::Geometry::Ray& scattered);
 
         BRDF brdf;
