@@ -3,17 +3,18 @@
 #include "Geometry/Ray.hpp"
 #include "Geometry/Util.h"
 #include "../Shapes/Shape.hpp"
+#include "Pdf.hpp"
 
 
 namespace KikooRenderer {
 namespace OfflineRenderer {
 
-class ShapePdf {
+class ShapePdf : public Pdf {
 public: 
     ShapePdf(Shape* shape, const glm::vec3 origin) : shape(shape), origin(origin) {}
 
     //Return the probability that the ray with the given direction has been generated
-    virtual float value(const glm::vec3& direction) {
+    virtual float value(const glm::vec3& direction) const {
         return shape->pdfValue(origin, direction);
     }
 

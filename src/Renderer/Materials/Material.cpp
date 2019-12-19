@@ -38,9 +38,10 @@ namespace OfflineRenderer {
         return true;
     }
 
-    glm::vec3 Material::emitted() {
+    glm::vec3 Material::emitted(const Geometry::Ray& rayIn, Point& rec) {
         if(emitter) {
-            return glm::vec3(5);
+            if (glm::dot(glm::vec3(0, -1, 0), rayIn.direction) < 0.0) return glm::vec3(5);
+            else return glm::vec3(0);            
         }  else return glm::vec3(0);
     }
 

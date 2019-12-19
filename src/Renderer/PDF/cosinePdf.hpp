@@ -2,14 +2,15 @@
 #include "Util/Common.h"
 #include "Geometry/Ray.hpp"
 #include "Geometry/Util.h"
+#include "Pdf.hpp"
 
 namespace KikooRenderer {
 namespace OfflineRenderer {
 
-class CosinePdf {
+class CosinePdf : public Pdf{
 public: 
     CosinePdf(const glm::mat4& _transform) { this->transform = _transform; }
-    virtual float value(const glm::vec3& direction) {
+    virtual float value(const glm::vec3& direction) const {
         glm::vec3 normal =  glm::normalize(glm::vec3(glm::column(transform, 2)));
         float cosine = glm::dot(glm::normalize(direction),normal);
         if(cosine < 0) cosine=0;

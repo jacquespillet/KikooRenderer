@@ -25,7 +25,7 @@ class Material {
         bool useBrdf = false;
 
         bool emitter = false;
-        virtual glm::vec3 emitted();
+        virtual glm::vec3 emitted(const Geometry::Ray& rayIn, Point& rec);
 
         void LoadTexture(std::string fileName);
         std::vector<uint8_t> textureData;
