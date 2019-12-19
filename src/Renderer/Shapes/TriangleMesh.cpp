@@ -113,21 +113,6 @@ namespace OfflineRenderer {
 
 
     double TriangleMesh::HitRay(KikooRenderer::Geometry::Ray ray, double tMin, double tMax, Point& hitPoint) {
-        // double distance;
-        // if(distance = bounds.Hit(ray) >0) {
-        //    hitPoint = {
-        //         distance, 
-        //         ray.pointAtPosition(distance),
-        //         glm::vec3(0),
-        //         material,
-        //         glm::vec2(0),
-        //         glm::vec3(0), 
-        //         glm::vec3(0)
-        //     }; 
-        //     return distance;
-        // }
-        // else return -1;
-
         double distance;
         if(distance = bounds.Hit(ray) >0) { // BB Check
 
@@ -178,5 +163,30 @@ namespace OfflineRenderer {
             else return -1;
         } else return -1;
     }
+
+    float TriangleMesh::pdfValue(glm::vec3 origin, glm::vec3 direction) {
+        Point point;
+        if(this->HitRay(Geometry::Ray(origin, glm::normalize(direction)), 0.001, std::numeric_limits<float>::max(), point)) {
+            // float area = size.x * size.y * size.z;
+            float area = 0.2*0.2;
+            float distance_squared = point.t * point.t;
+            float cosine = fabs(glm::dot(direction, point.normal));
+            return  distance_squared / (cosine * area);
+        } else return 0;     
+    }
+
+    glm::vec3 TriangleMesh::random(glm::vec3 origin) {
+        double halfX = size.x /2;
+        double halfY = size.y /2;
+        double halfZ = size.z /2;
+
+        glm::vec3 onLight = glm::vec3(Geometry::RandomInRange(-halfX, halfX), 
+                                      Geometry::RandomInRange(-halfY, halfY), 
+                                      Geometry::RandomInRange(-halfZ, halfZ));
+        onLight += position;
+        
+        return onLight - origin;
+    }
+
 }
 }

@@ -23,6 +23,9 @@ class TriangleMesh : public Shape {
         glm::vec3 GetSize(double time);
         void GetWorldBounds(glm::vec3& min, glm::vec3& max);
 
+        float pdfValue(glm::vec3 origin, glm::vec3 direction);
+        glm::vec3 random(glm::vec3 origin);
+
 private:
         void Init();
         

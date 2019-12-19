@@ -18,6 +18,8 @@ namespace OfflineRenderer {
     }
 
     bool Material::Scatter(KikooRenderer::Geometry::Ray in,  Point point, glm::vec3& attenuation, KikooRenderer::Geometry::Ray& scattered, float& pdf) {
+        if(emitter) return false;
+        
         // //Transform ray to tangent space
         glm::mat4 worldToTangent(1);
         worldToTangent[0] = glm::vec4(glm::normalize(point.tangent), 0);

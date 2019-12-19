@@ -18,6 +18,7 @@
 #include "Shapes/Aggregate.hpp"
 
 #include "PDF/cosinePdf.hpp"
+#include "PDF/ShapePdf.hpp"
 
 namespace KikooRenderer {
 namespace OfflineRenderer {
@@ -58,29 +59,32 @@ namespace OfflineRenderer {
             if(depth < 10 && hasScattered) { //Secondary rays : Get the scattered direction of the scattered ray
 
                 //SAMPLE LIGHT
-                // glm::vec3 onLight = glm::vec3(Geometry::RandomInRange(-0.1, 0.1), 0.99, Geometry::RandomInRange(-0.1, 0.1));
-                // glm::vec3 toLight = onLight - closestPoint.position;
-                // float distance = glm::length2(toLight);
-                // toLight = glm::normalize(toLight);
-                // if(glm::dot(toLight, closestPoint.normal) < 0) return emitted;
+                ShapePdf sp(objects[5], closestPoint.position);
+                glm::vec3 pointToLight = sp.generate();
+                scatteredVector = Geometry::Ray(closestPoint.position, pointToLight);
+                
+                // float distance = glm::length2(pointToLight);
+                // pointToLight = glm::normalize(pointToLight);
+                // if(glm::dot(pointToLight, closestPoint.normal) < 0) return emitted;
 
                 // float lightArea = 0.2 * 0.2;
-                // float lightCosine = fabs(toLight.y);
+                // float lightCosine = fabs(pointToLight.y);
                 // if(lightCosine < 0.000001) return emitted;
 
                 // pdf = distance / (lightCosine * lightArea);
-                // scatteredVector = Geometry::Ray(closestPoint.position, toLight);
 
+                pdf = sp.value(pointToLight);
+                // std::cout << pdf << std::endl;
 
                 //SAMPLE COS
-                glm::mat4 worldToTangent(1);
-                worldToTangent[0] = glm::vec4(glm::normalize(closestPoint.tangent), 0);
-                worldToTangent[1] = glm::vec4(glm::normalize(closestPoint.bitangent), 0);
-                worldToTangent[2] = glm::vec4(glm::normalize(closestPoint.normal), 0);
-                worldToTangent[3] = glm::vec4(0, 0, 0, 1);                
-                CosinePdf p(worldToTangent);
-                scatteredVector = Geometry::Ray(closestPoint.position, p.generate());
-                pdf = p.value(scatteredVector.direction);
+                // glm::mat4 worldToTangent(1);
+                // worldToTangent[0] = glm::vec4(glm::normalize(closestPoint.tangent), 0);
+                // worldToTangent[1] = glm::vec4(glm::normalize(closestPoint.bitangent), 0);
+                // worldToTangent[2] = glm::vec4(glm::normalize(closestPoint.normal), 0);
+                // worldToTangent[3] = glm::vec4(0, 0, 0, 1);                
+                // CosinePdf p(worldToTangent);
+                // scatteredVector = Geometry::Ray(closestPoint.position, p.generate());
+                // pdf = p.value(scatteredVector.direction);
 
                 glm::vec3 res = emitted + attenuation * closestPoint.material->ScatterPdf(ray, closestPoint, scatteredVector) * GetColor(scatteredVector, depth+1) / pdf; //Get the color of this scattered ray, times it with previous ray attenuation
                 return res;
@@ -99,7 +103,7 @@ namespace OfflineRenderer {
     void RayTracer::WriteImage() {
         int width = 500;
         int height = 450;
-        int numSamples = 500;
+        int numSamples = 10;
 
         KikooRenderer::Util::FileIO::Image image(width, height);
 
