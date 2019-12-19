@@ -171,7 +171,7 @@ namespace OfflineRenderer {
             float area = 0.2*0.2;
             float distance_squared = point.t * point.t;
             float cosine = fabs(glm::dot(direction, point.normal));
-            if(cosine==0) return 0;
+            if(cosine<=0.0001) return 0;
             return  distance_squared / (cosine * area);
         } else return 0;     
     }

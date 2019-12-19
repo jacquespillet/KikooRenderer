@@ -64,12 +64,16 @@ namespace OfflineRenderer {
                 // //SAMPLE LIGHT
                 ShapePdf sp(objects[5], closestPoint.position);
 
-                MixturePdf mp(&sp, scatterRecord.pdf);
+                MixturePdf mp;
+                mp.AddPdf(&sp);
+                mp.AddPdf(scatterRecord.pdf);
+
                 scatteredVector = Geometry::Ray(closestPoint.position, mp.generate());
                 float pdf = mp.value(scatteredVector.direction);
 
                 glm ::vec3 res = emitted + scatterRecord.attenuation * closestPoint.material->ScatterPdf(ray, closestPoint, scatteredVector) * GetColor(scatteredVector, depth+1) / pdf; //Get the color of this scattered ray, times it with previous ray attenuation
                
+               delete scatterRecord.pdf;
                 return res;
             } else {
                 return emitted; //If the ray was not scattered, return the color of the last attenuation
@@ -120,7 +124,7 @@ namespace OfflineRenderer {
 
         // //Back
         {
-            Metallic* lb = new Metallic(glm::vec4(0.73));
+            Material* lb = new Material(glm::vec4(0.73));
             TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0.5, -0.5), glm::vec3(1, 1, 0.01), lb, vertex, normals, uv, triangles);
             objects.push_back(box);
         }
@@ -144,9 +148,9 @@ namespace OfflineRenderer {
         {
             Material* lb = new Material(glm::vec4(0.73));
             lb->emitter = true;
-            TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0.999, 0), glm::vec3(0.2, 0.01, 0.2), lb, vertex, normals, uv, triangles);
+            TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0.999, 0), glm::vec3(0.2, 0.3, 0.2), lb, vertex, normals, uv, triangles);
             objects.push_back(box);
-        }   
+        }
 
         //Box1
         {
@@ -158,8 +162,8 @@ namespace OfflineRenderer {
         // //Box1
         {
             Material* lb = new Material(glm::vec4(0.73));
-            TriangleMesh* box = new TriangleMesh(glm::vec3(-0.2, 0.25, 0), glm::vec3(0.25, 0.6, 0.25), lb, vertex, normals, uv, triangles);
-            // TriangleMesh* box = new TriangleMesh(glm::vec3(-0.2, 0, 0), glm::vec3(0.1, 0.4, 0.2), lb, "resources/Models/bunny/untitled.obj");
+            // TriangleMesh* box = new TriangleMesh(glm::vec3(-0.2, 0.25, 0), glm::vec3(0.25, 0.6, 0.25), lb, vertex, normals, uv, triangles);
+            TriangleMesh* box = new TriangleMesh(glm::vec3(-0.2, 0, 0), glm::vec3(0.1, 0.4, 0.2), lb, "resources/Models/bunny/untitled.obj");
             objects.push_back(box);
         }
 
