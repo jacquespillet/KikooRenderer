@@ -168,7 +168,13 @@ namespace OfflineRenderer {
         Point point;
         if(this->HitRay(Geometry::Ray(origin, glm::normalize(direction)), 0.001, std::numeric_limits<float>::max(), point)) {
             // float area = size.x * size.y * size.z;
-            float area = 0.2*0.2;
+            glm::vec3 bbsize = bounds.GetSize();
+            float area = bbsize.x * bbsize.z;
+
+            //Compute the min max in spherical coords from the point
+            //the area is the size of the min/max box
+
+
             float distance_squared = point.t * point.t;
             float cosine = fabs(glm::dot(direction, point.normal));
             if(cosine<=0.0001) return 0;

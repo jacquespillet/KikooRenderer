@@ -70,10 +70,12 @@ namespace OfflineRenderer {
 
                 scatteredVector = Geometry::Ray(closestPoint.position, mp.generate());
                 float pdf = mp.value(scatteredVector.direction);
+                
+                //scatterRecord.attenuation *= Material->BRDF(ray, scatteredRay);
 
                 glm ::vec3 res = emitted + scatterRecord.attenuation * closestPoint.material->ScatterPdf(ray, closestPoint, scatteredVector) * GetColor(scatteredVector, depth+1) / pdf; //Get the color of this scattered ray, times it with previous ray attenuation
                
-               delete scatterRecord.pdf;
+                delete scatterRecord.pdf;
                 return res;
             } else {
                 return emitted; //If the ray was not scattered, return the color of the last attenuation
@@ -162,8 +164,8 @@ namespace OfflineRenderer {
         // //Box1
         {
             Material* lb = new Material(glm::vec4(0.73));
-            // TriangleMesh* box = new TriangleMesh(glm::vec3(-0.2, 0.25, 0), glm::vec3(0.25, 0.6, 0.25), lb, vertex, normals, uv, triangles);
-            TriangleMesh* box = new TriangleMesh(glm::vec3(-0.2, 0, 0), glm::vec3(0.1, 0.4, 0.2), lb, "resources/Models/bunny/untitled.obj");
+            TriangleMesh* box = new TriangleMesh(glm::vec3(-0.2, 0.25, 0), glm::vec3(0.25, 0.6, 0.25), lb, vertex, normals, uv, triangles);
+            // TriangleMesh* box = new TriangleMesh(glm::vec3(-0.2, 0, 0), glm::vec3(0.1, 0.4, 0.2), lb, "resources/Models/bunny/untitled.obj");
             objects.push_back(box);
         }
 
