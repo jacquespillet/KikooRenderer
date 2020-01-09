@@ -56,22 +56,44 @@ namespace OfflineRenderer {
             
             ScatterRecord scatterRecord;
             bool hasScattered = closestPoint.material->Scatter(ray, closestPoint, scatterRecord);
-            if(depth < 10 && hasScattered) { //Secondary rays : Get the scattered direction of the scattered ray
+            if(depth < 1 && hasScattered) { //Secondary rays : Get the scattered direction of the scattered ray
                 if(scatterRecord.isSpecular) {
                     return scatterRecord.attenuation * GetColor(scatterRecord.specularRay, depth+1);
                 }                
                 
-                // //SAMPLE LIGHT
-                ShapePdf sp(objects[5], closestPoint.position);
+                // // //SAMPLE LIGHT
+                // ShapePdf sp(objects[5], closestPoint.position);
 
-                MixturePdf mp;
-                mp.AddPdf(&sp);
-                mp.AddPdf(scatterRecord.pdf);
+                // MixturePdf mp;
+                // mp.AddPdf(&sp);
+                // mp.AddPdf(scatterRecord.pdf);
 
-                scatteredVector = Geometry::Ray(closestPoint.position, mp.generate());
-                float pdf = mp.value(scatteredVector.direction);
+                // float pdf = mp.value(scatteredVector.direction);
+
+                //Algo : 
+                //Step 1 :  Generate a sample within the BRDF --> use inverse transform method : 
+                //Sample new direction in hemisphere based on BRDF from material of hit point : https://computergraphics.stackexchange.com/questions/4979/what-is-importance-sampling
+                glm::mat4 worldToTangent(1);
+                worldToTangent[0] = glm::vec4(glm::normalize(closestPoint.tangent), 0);
+                worldToTangent[1] = glm::vec4(glm::normalize(closestPoint.bitangent), 0);
+                worldToTangent[2] = glm::vec4(glm::normalize(closestPoint.normal), 0);
+                worldToTangent[3] = glm::vec4(0, 0, 0, 1);
+
+                glm::mat4 tangentToWorld = glm::inverse(worldToTangent);
+
+                glm::vec3 outDirection = closestPoint.material->brdf.Generate(worldToTangent * glm::vec4(ray.direction, 0));
+
+                outDirection = tangentToWorld * glm::vec4(outDirection, 0);
                 
-                //scatterRecord.attenuation *= Material->BRDF(ray, scatteredRay);
+                scatteredVector = Geometry::Ray(closestPoint.position, outDirection);
+
+                //Get the PDF value of sampling that direction https://agraphicsguy.wordpress.com/2015/11/01/sampling-microfacet-brdf/ : what was the proba of that direction being sampled ?
+                float pdf = closestPoint.material->brdf.PDF(outDirection);
+
+                //Step 2 : 
+                //evaluate the BRDF based on incoming and outgoing direction & multiply the attenuation with the value : 
+                scatterRecord.attenuation *= closestPoint.aterial->BRDF(worldToTangent * glm::vec4(ray.direction, 0), outDirection);
+                
 
                 glm ::vec3 res = emitted + scatterRecord.attenuation * closestPoint.material->ScatterPdf(ray, closestPoint, scatteredVector) * GetColor(scatteredVector, depth+1) / pdf; //Get the color of this scattered ray, times it with previous ray attenuation
                

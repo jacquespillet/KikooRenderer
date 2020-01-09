@@ -122,5 +122,111 @@ glm::vec3 BRDF::OrenNayar(const glm::vec3 &wo, glm::vec3& wi) {
 
 }
 
+//-------------------------------------------------------
+float DistributionGGX(glm::vec3 N, glm::vec3 H, float roughness)
+{
+    float a      = roughness*roughness;
+    float a2     = a*a;
+    float NdotH  = max(dot(N, H), 0.0);
+    float NdotH2 = NdotH*NdotH;
+	
+    float num   = a2;
+    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+    denom = PI * denom * denom;
+	
+    return num / denom;
+}
+
+float GeometrySchlickGGX(float NdotV, float roughness)
+{
+    float r = (roughness + 1.0);
+    float k = (r*r) / 8.0;
+
+    float num   = NdotV;
+    float denom = NdotV * (1.0 - k) + k;
+	
+    return num / denom;
+}
+float GeometrySmith(glm::vec3 N, glm::vec3 V, glm::vec3 L, float roughness)
+{
+    float NdotV = max(dot(N, V), 0.0);
+    float NdotL = max(dot(N, L), 0.0);
+    float ggx2  = GeometrySchlickGGX(NdotV, roughness);
+    float ggx1  = GeometrySchlickGGX(NdotL, roughness);
+	
+    return ggx1 * ggx2;
+}
+
+glm::vec3 fresnelSchlick(float cosTheta, glm::vec3 F0)
+{
+    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+}  
+
+
+float BRDF::Evaluate(glm::glm::vec3 wi, glm::glm::vec3 wo) {
+    float roughness = 0.5;
+
+    glm::vec3 N(0, 0, 1);
+    glm::vec3 V = wi;
+    glm::vec3 L = wo;
+
+    glm::vec3 F0 = glm::vec3(0.04); 
+    
+    // // reflectance equation
+    glm::vec3 Lo = glm::vec3(0.0);
+    // calculate per-light radiance
+    glm::vec3 H = normalize(V + L);        
+    
+    // // cook-torrance brdf
+    float NDF = DistributionGGX(N, H, roughness);        
+    float G   = GeometrySmith(N, V, L, roughness);      
+    glm::vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);       
+    
+    glm::vec3 kS = F;
+    glm::vec3 kD = glm::vec3(1.0) - kS;
+    kD *= 1.0 - metallic;	  
+    
+    glm::vec3 DFG    = NDF * G * F;
+    float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0);
+    glm::vec3 specular     = DFG / max(denominator, 0.001);  
+        
+    return specular.x;
+}
+
+glm::vec3 BRDF::Generate(glm::vec3 in) {
+    //https://agraphicsguy.wordpress.com/2015/11/01/sampling-microfacet-brdf/
+
+    float alpha = 0.5;
+    double random = ((double) rand()) / (double) RAND_MAX;
+    double numerator = 1 - random;
+    double denominator = random * (alpha * alpha - 1) + 1
+    double theta = acos(sqrt((numerator / denominator)));
+
+    //??
+    double phi = -atan(in.x / in.z);
+
+    glm::vec3 out;
+    out.x = sin(theta)*cos(phi);
+    out.y = sin(theta)*sin(phi);
+    out.z = cos(theta);
+    out = glm::normalize(out);
+
+    return out;
+}
+
+float BRDF::PDF(glm::vec3 wo) {
+    //https://agraphicsguy.wordpress.com/2015/11/01/sampling-microfacet-brdf/
+    
+    double cosTheta = glm::dot(wo, glm::vec3(1, 0, 0));
+    double theta = acos(cosTheta);
+
+    double alpha = 0.5;
+
+    double numerator = 2 * alpha * alpha * cosTheta * sin(theta);
+    double denominator = std::pow(((alpa * alpha - 1) * cosTheta * cosTheta + 1), 2);
+
+    return return numerator / denominator;
+}
+
 }
 }

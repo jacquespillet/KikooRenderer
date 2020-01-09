@@ -15,6 +15,10 @@ class BRDF {
         virtual glm::vec3 Sample_f_Transmission(const glm::vec3 &wo, glm::vec3 *wi, const glm::vec2 &sample, float *pdf);
         virtual glm::vec3 OrenNayar(const glm::vec3 &wo, glm::vec3& wi);
 
+        virtual glm::vec3 Generate(glm::vec3 in);
+        virtual float Evaluate(glm::vec3 wi, glm::vec3 wo);
+        virtual float PDF(glm::vec3 wo);
+
     protected:
         int type;
 
