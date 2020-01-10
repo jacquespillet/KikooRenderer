@@ -80,22 +80,25 @@ namespace OfflineRenderer {
                 worldToTangent[3] = glm::vec4(0, 0, 0, 1);
 
                 glm::mat4 tangentToWorld = glm::inverse(worldToTangent);
-
-                glm::vec3 outDirection = closestPoint.material->brdf.Generate(worldToTangent * glm::vec4(ray.direction, 0));
+                
+                float pdf = 0;
+                glm::vec3 outDirection = closestPoint.material->brdf.Generate(worldToTangent * glm::vec4(ray.direction, 0), &pdf);
 
                 outDirection = tangentToWorld * glm::vec4(outDirection, 0);
                 
                 scatteredVector = Geometry::Ray(closestPoint.position, outDirection);
 
                 //Get the PDF value of sampling that direction https://agraphicsguy.wordpress.com/2015/11/01/sampling-microfacet-brdf/ : what was the proba of that direction being sampled ?
-                float pdf = closestPoint.material->brdf.PDF(outDirection);
+                // float pdf = closestPoint.material->brdf.PDF(outDirection);
 
                 //Step 2 : 
                 //evaluate the BRDF based on incoming and outgoing direction & multiply the attenuation with the value : 
-                scatterRecord.attenuation *= closestPoint.aterial->BRDF(worldToTangent * glm::vec4(ray.direction, 0), outDirection);
+                float brdf = closestPoint.material->brdf.Evaluate(-worldToTangent * glm::vec4(ray.direction, 0), tangentToWorld * glm::vec4(outDirection, 0));
+                scatterRecord.attenuation *= brdf;
                 
-
-                glm ::vec3 res = emitted + scatterRecord.attenuation * closestPoint.material->ScatterPdf(ray, closestPoint, scatteredVector) * GetColor(scatteredVector, depth+1) / pdf; //Get the color of this scattered ray, times it with previous ray attenuation
+                // glm::vec3 res(brdf);
+                glm::vec3 res = emitted + scatterRecord.attenuation * closestPoint.material->ScatterPdf(ray, closestPoint, scatteredVector) * GetColor(scatteredVector, depth+1) / pdf; //Get the color of this scattered ray, times it with previous ray attenuation
+                // glm ::vec3 res = scatterRecord.attenuation;
                
                 delete scatterRecord.pdf;
                 return res;
@@ -103,10 +106,10 @@ namespace OfflineRenderer {
                 return emitted; //If the ray was not scattered, return the color of the last attenuation
             }
         } else { //If we did not hit anything, we hit the sky --> returns the sky color
-            // glm::vec3 direction = glm::normalize(ray.direction);
-            // double t = 0.5 * direction.y + 1.0;
-            // glm::vec3 backgroundColor = (1.0 - t) * glm::vec3(1, 1, 1) + t * glm::vec3(0.5, 0.7, 1);
-            glm::vec3 backgroundColor(0);
+            glm::vec3 direction = glm::normalize(ray.direction);
+            double t = 0.5 * direction.y + 1.0;
+            glm::vec3 backgroundColor = (1.0 - t) * glm::vec3(1, 1, 1) + t * glm::vec3(0.5, 0.7, 1);
+            // glm::vec3 backgroundColor(0);
             return backgroundColor;
         }
     }
@@ -114,7 +117,7 @@ namespace OfflineRenderer {
     void RayTracer::WriteImage() {
         int width = 500;
         int height = 450;
-        int numSamples = 1000;
+        int numSamples = 10;
 
         KikooRenderer::Util::FileIO::Image image(width, height);
 
@@ -132,61 +135,61 @@ namespace OfflineRenderer {
         CoreEngine::GetCubeBuffers(&vertex, &normals, &uv, &colors, &triangles);        
 
 
-        // //Bottom
-        {
-            Material* lb = new Material(glm::vec4(0.73));
-            TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(1, 0.01, 1), lb, vertex, normals, uv, triangles);
-            objects.push_back(box);
-        }  
+        // // //Bottom
+        // {
+        //     Material* lb = new Material(glm::vec4(0.73));
+        //     TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(1, 0.01, 1), lb, vertex, normals, uv, triangles);
+        //     objects.push_back(box);
+        // }  
 
-        // //Top
-        {
-            Material* lb = new Material(glm::vec4(0.73));
-            TriangleMesh* box = new TriangleMesh(glm::vec3(0, 1, 0), glm::vec3(1, 0.01, 1), lb, vertex, normals, uv, triangles);
-            objects.push_back(box);
-        }
+        // // //Top
+        // {
+        //     Material* lb = new Material(glm::vec4(0.73));
+        //     TriangleMesh* box = new TriangleMesh(glm::vec3(0, 1, 0), glm::vec3(1, 0.01, 1), lb, vertex, normals, uv, triangles);
+        //     objects.push_back(box);
+        // }
 
-        // //Back
-        {
-            Material* lb = new Material(glm::vec4(0.73));
-            TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0.5, -0.5), glm::vec3(1, 1, 0.01), lb, vertex, normals, uv, triangles);
-            objects.push_back(box);
-        }
+        // // //Back
+        // {
+        //     Material* lb = new Material(glm::vec4(0.73));
+        //     TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0.5, -0.5), glm::vec3(1, 1, 0.01), lb, vertex, normals, uv, triangles);
+        //     objects.push_back(box);
+        // }
 
-        //Right
-        {
-            Material* lb = new Material(glm::vec4(0.8, 0, 0, 1));
-            TriangleMesh* box = new TriangleMesh(glm::vec3(0.5, 0.5, 0), glm::vec3(0.01,1, 1), lb, vertex, normals, uv, triangles);
-            objects.push_back(box);
-        }                     
+        // //Right
+        // {
+        //     Material* lb = new Material(glm::vec4(0.8, 0, 0, 1));
+        //     TriangleMesh* box = new TriangleMesh(glm::vec3(0.5, 0.5, 0), glm::vec3(0.01,1, 1), lb, vertex, normals, uv, triangles);
+        //     objects.push_back(box);
+        // }                     
 
-        //Left
-        {
-            Material* lb = new Material(glm::vec4(0, 0.8, 0, 1));
-            TriangleMesh* box = new TriangleMesh(glm::vec3(-0.5, 0.5, 0), glm::vec3(0.01,1, 1), lb, vertex, normals, uv, triangles);
-            objects.push_back(box);
-        }   
+        // //Left
+        // {
+        //     Material* lb = new Material(glm::vec4(0, 0.8, 0, 1));
+        //     TriangleMesh* box = new TriangleMesh(glm::vec3(-0.5, 0.5, 0), glm::vec3(0.01,1, 1), lb, vertex, normals, uv, triangles);
+        //     objects.push_back(box);
+        // }   
 
 
-        //Light
-        {
-            Material* lb = new Material(glm::vec4(0.73));
-            lb->emitter = true;
-            TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0.999, 0), glm::vec3(0.2, 0.3, 0.2), lb, vertex, normals, uv, triangles);
-            objects.push_back(box);
-        }
+        // //Light
+        // {
+        //     Material* lb = new Material(glm::vec4(0.73));
+        //     lb->emitter = true;
+        //     TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0.999, 0), glm::vec3(0.2, 0.3, 0.2), lb, vertex, normals, uv, triangles);
+        //     objects.push_back(box);
+        // }
 
         //Box1
         {
-            Material* lb = new Material(glm::vec4(0.73));
+            Material* lb = new Material(glm::vec4(0, 0.73, 0, 1));
             TriangleMesh* box = new TriangleMesh(glm::vec3(0.2, 0, 0), glm::vec3(0.25, 0.6, 0.25), lb, vertex, normals, uv, triangles);
             objects.push_back(box);
         }
 
         // //Box1
         {
-            Material* lb = new Material(glm::vec4(0.73));
-            TriangleMesh* box = new TriangleMesh(glm::vec3(-0.2, 0.25, 0), glm::vec3(0.25, 0.6, 0.25), lb, vertex, normals, uv, triangles);
+            Material* lb = new Material(glm::vec4(0.73, 0, 0, 1));
+            TriangleMesh* box = new TriangleMesh(glm::vec3(-0.2, 0, 0), glm::vec3(0.25, 0.6, 0.25), lb, vertex, normals, uv, triangles);
             // TriangleMesh* box = new TriangleMesh(glm::vec3(-0.2, 0, 0), glm::vec3(0.1, 0.4, 0.2), lb, "resources/Models/bunny/untitled.obj");
             objects.push_back(box);
         }
