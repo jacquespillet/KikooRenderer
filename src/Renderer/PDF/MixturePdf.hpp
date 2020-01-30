@@ -35,5 +35,50 @@ public:
 private:
     std::vector<Pdf*> pdfs;
 };
+
+class MixtureBRDF : public BRDF {
+public: 
+    MixtureBRDF() : BRDF(glm::vec3(1)) {}
+
+    void AddBRDF(BRDF* brdf) {
+        brdfs.push_back(brdf);
+    }
+
+    ~MixtureBRDF() {
+        for(int i=0; i<brdfs.size(); i++) {
+            delete brdfs[i];
+        }
+    }
+
+    //Generate a vector from the in vector
+    virtual glm::vec3 Generate(glm::vec3 in, Point pt, float* pdf, float* brdfValue=nullptr) {
+        //In is already in tangent space.
+        int rand = (int)Geometry::RandomInRange(0, brdfs.size());
+
+        float totalpdf = 0;
+
+        glm::vec3 direction = brdfs[rand]->Generate(in, pt, &totalpdf, brdfValue);
+        glm::vec3 wh = glm::normalize(-in + direction);
+        
+        // *brdf = 0.5 * brdfs[0]->Evaluate(-in, direction) + 0.5 * brdfs[1]->Evaluate(-in, direction);
+
+        float brdfWeight = 1 / (float)brdfs.size();
+        totalpdf *= brdfWeight;
+
+        for(int i=0; i<brdfs.size(); i++) {
+            if(i != rand) {
+                totalpdf += brdfWeight * brdfs[i]->PDF(direction, wh, &pt);
+            }
+        }
+
+        *pdf = totalpdf;
+
+        
+        return direction;
+    }
+private:
+    std::vector<BRDF*> brdfs;
+};
+
 }
 }

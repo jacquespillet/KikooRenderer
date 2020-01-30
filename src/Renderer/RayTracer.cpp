@@ -53,76 +53,104 @@ namespace OfflineRenderer {
         if(hit) {//If we hit something
             KikooRenderer::Geometry::Ray scatteredVector; //Scattered ray
             glm::vec3 emitted = closestPoint.material->emitted(ray, closestPoint);
+
+            if(glm::length(emitted) > 0) { 
+                return emitted;
+            }
             
             ScatterRecord scatterRecord;
             bool hasScattered = closestPoint.material->Scatter(ray, closestPoint, scatterRecord);
-            if(depth < 1 && hasScattered) { //Secondary rays : Get the scattered direction of the scattered ray
-                if(scatterRecord.isSpecular) {
-                    return scatterRecord.attenuation * GetColor(scatterRecord.specularRay, depth+1);
-                }                
+            if(depth < 30 && hasScattered) { //Secondary rays : Get the scattered direction of the scattered ray
                 
-                // // //SAMPLE LIGHT
-                // ShapePdf sp(objects[5], closestPoint.position);
+                glm::mat4 tangentToWorld(1);
+                tangentToWorld[0] = glm::vec4(glm::normalize(closestPoint.tangent), 0);
+                tangentToWorld[1] = glm::vec4(glm::normalize(closestPoint.bitangent), 0);
+                tangentToWorld[2] = glm::vec4(glm::normalize(closestPoint.normal), 0);
+                tangentToWorld[3] = glm::vec4(0, 0, 0, 1);
+                glm::mat4 worldToTangent = glm::inverse(tangentToWorld);
 
-                // MixturePdf mp;
-                // mp.AddPdf(&sp);
-                // mp.AddPdf(scatterRecord.pdf);
-
-                // float pdf = mp.value(scatteredVector.direction);
-
-                //Algo : 
-                //Step 1 :  Generate a sample within the BRDF --> use inverse transform method : 
-                //Sample new direction in hemisphere based on BRDF from material of hit point : https://computergraphics.stackexchange.com/questions/4979/what-is-importance-sampling
-                glm::mat4 worldToTangent(1);
-                worldToTangent[0] = glm::vec4(glm::normalize(closestPoint.tangent), 0);
-                worldToTangent[1] = glm::vec4(glm::normalize(closestPoint.bitangent), 0);
-                worldToTangent[2] = glm::vec4(glm::normalize(closestPoint.normal), 0);
-                worldToTangent[3] = glm::vec4(0, 0, 0, 1);
-
-                glm::mat4 tangentToWorld = glm::inverse(worldToTangent);
+                BRDF* brdf = (BRDF*) closestPoint.material->brdf;
                 
-                float pdf = 0;
-                glm::vec3 outDirection = closestPoint.material->brdf.Generate(worldToTangent * glm::vec4(ray.direction, 0), &pdf);
-
-                outDirection = tangentToWorld * glm::vec4(outDirection, 0);
+                float pdf  = 0;
+                float brdfVal = 0;
+                glm::vec3 outDirection = brdf->Generate(worldToTangent * glm::vec4(ray.direction, 0), closestPoint, &pdf, &brdfVal);
+                glm::vec3 outDirection_world = tangentToWorld * glm::vec4(outDirection, 0);
                 
-                scatteredVector = Geometry::Ray(closestPoint.position, outDirection);
+                scatteredVector = Geometry::Ray(closestPoint.position, glm::normalize(outDirection_world));
 
-                //Get the PDF value of sampling that direction https://agraphicsguy.wordpress.com/2015/11/01/sampling-microfacet-brdf/ : what was the proba of that direction being sampled ?
-                // float pdf = closestPoint.material->brdf.PDF(outDirection);
+                // glm::vec3 res = scatterRecord.attenuation;
+                glm::vec3 res(0);
+                if(pdf > 0) {
+                    // res = glm::vec3(pdf);
+                    res = (emitted + brdfVal * scatterRecord.attenuation * closestPoint.material->ScatterPdf(ray, closestPoint, scatteredVector) * GetColor(scatteredVector, depth+1)) / pdf;
+                    // res = (emitted + brdfVal * scatterRecord.attenuation * closestPoint.material->ScatterPdf(ray, closestPoint, scatteredVector) * GetColor(scatteredVector, depth+1));
+                    // res = (emitted + brdfVal * scatterRecord.attenuation * closestPoint.material->ScatterPdf(ray, closestPoint, scatteredVector) * GetColor(scatteredVector, depth+1)) / pdf;
+                }   
+                  
+                // glm::vec3 inDirection_tangentSpace = worldToTangent * glm::vec4(ray.direction, 0);
+                //WHY ARE THESE TWO DIFFERENT ???
+                // glm::vec3 res = outDirection_world;
+                // glm::vec3 res = glm::reflect(ray.direction, closestPoint.normal);
 
-                //Step 2 : 
-                //evaluate the BRDF based on incoming and outgoing direction & multiply the attenuation with the value : 
-                float brdf = closestPoint.material->brdf.Evaluate(-worldToTangent * glm::vec4(ray.direction, 0), tangentToWorld * glm::vec4(outDirection, 0));
-                scatterRecord.attenuation *= brdf;
-                
-                // glm::vec3 res(brdf);
-                glm::vec3 res = emitted + scatterRecord.attenuation * closestPoint.material->ScatterPdf(ray, closestPoint, scatteredVector) * GetColor(scatteredVector, depth+1) / pdf; //Get the color of this scattered ray, times it with previous ray attenuation
+                // glm::vec3 t = worldToTangent * glm::vec4(ray.direction, 0);
+                // glm::vec3 res = glm::reflect(t, glm::vec3(0, 0, 1));
+                // res = tangentToWorld * glm::vec4(res, 0);
+ 
+                // std::cout << "INTERSECTION " << depth << "  "  <<  glm::to_string(closestPoint.position) << " Direction " << glm::to_string(outDirection_world) << "  " << closestPoint.t << std::endl;
+                // glm::vec3 res = inDirection_tangentSpace;
+                // glm::vec3 res = closestPoint.bitangent;
+                // glm::vec3 res = closestPoint.tangent;
+                // glm::vec3 res = closestPoint.normal;
+
+                // glm::vec3 res = ray.direction; 
+                // glm::vec3 res = closestPoint.normal;
+                // glm::vec3 res = inDirection_tangentSpace;
+                // // glm::vec3 res(pdf);
+                // // std::cout << pdf << std::endl;
+                // // pdf = std::max(0.000001f, pdf);
                 // glm ::vec3 res = scatterRecord.attenuation;
-               
+                
+                
+                // glm::vec3 res = scatterRecord.attenuation;
+                // glm::vec3 res = glm::vec3(pdf);
+                // glm::vec3 res = glm::vec3(brdfVal); 
+                // glm::vec3 res = closestPoint.;
+                // glm::vec3 res = outDirection_world;
+                
+                //Rendering equation
+                // glm::vec3 res = (brdfVal *    GetColor(scatteredVector, depth+1));
+                // glm::vec3 res = 
+                
+                //Things to answer : Why is the PDF that low ? 
+
+                //Generate : gives a ray that is within the BRDF cone
+                //Evaluate : how much of the light coming from the out ray goes to the in ray ?
+                //PDF : What was the probability of sampling that
+
                 delete scatterRecord.pdf;
                 return res;
             } else {
-                return emitted; //If the ray was not scattered, return the color of the last attenuation
+                return emitted; 
             }
         } else { //If we did not hit anything, we hit the sky --> returns the sky color
-            glm::vec3 direction = glm::normalize(ray.direction);
-            double t = 0.5 * direction.y + 1.0;
-            glm::vec3 backgroundColor = (1.0 - t) * glm::vec3(1, 1, 1) + t * glm::vec3(0.5, 0.7, 1);
-            // glm::vec3 backgroundColor(0);
+            // glm::vec3 direction = glm::normalize(ray.direction);
+            // double t = 0.5 * direction.y + 1.0;
+            // glm::vec3 backgroundColor = (1.0 - t) * glm::vec3(1, 1, 1) + t * glm::vec3(0.5, 0.7, 1);
+            // std::cout << "WENT OUT " << std::endl;
+            glm::vec3 backgroundColor(0);
             return backgroundColor;
         }
     }
 
     void RayTracer::WriteImage() {
-        int width = 500;
-        int height = 450;
-        int numSamples = 10;
+        int width = 600;
+        int height = 500;
+        int numSamples = 64;
 
         KikooRenderer::Util::FileIO::Image image(width, height);
 
         //1. Create the camera 
-        glm::vec3 camPos = glm::vec3(0,0.5, 1.2);
+        glm::vec3 camPos = glm::vec3(0,6, 12);
         glm::vec3 lookAt = glm::vec3(0, 0.5, 0);
         double distanceToFocus = glm::distance(camPos, lookAt);
         Camera camera(camPos, lookAt, glm::vec3(0, 1, 0), 70, (double)width/(double)height, 0.0001, distanceToFocus, 0, 1);
@@ -135,73 +163,136 @@ namespace OfflineRenderer {
         CoreEngine::GetCubeBuffers(&vertex, &normals, &uv, &colors, &triangles);        
 
 
-        // // //Bottom
-        // {
-        //     Material* lb = new Material(glm::vec4(0.73));
-        //     TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(1, 0.01, 1), lb, vertex, normals, uv, triangles);
-        //     objects.push_back(box);
-        // }  
 
-        // // //Top
-        // {
-        //     Material* lb = new Material(glm::vec4(0.73));
-        //     TriangleMesh* box = new TriangleMesh(glm::vec3(0, 1, 0), glm::vec3(1, 0.01, 1), lb, vertex, normals, uv, triangles);
-        //     objects.push_back(box);
-        // }
-
-        // // //Back
-        // {
-        //     Material* lb = new Material(glm::vec4(0.73));
-        //     TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0.5, -0.5), glm::vec3(1, 1, 0.01), lb, vertex, normals, uv, triangles);
-        //     objects.push_back(box);
-        // }
-
-        // //Right
-        // {
-        //     Material* lb = new Material(glm::vec4(0.8, 0, 0, 1));
-        //     TriangleMesh* box = new TriangleMesh(glm::vec3(0.5, 0.5, 0), glm::vec3(0.01,1, 1), lb, vertex, normals, uv, triangles);
-        //     objects.push_back(box);
-        // }                     
-
-        // //Left
-        // {
-        //     Material* lb = new Material(glm::vec4(0, 0.8, 0, 1));
-        //     TriangleMesh* box = new TriangleMesh(glm::vec3(-0.5, 0.5, 0), glm::vec3(0.01,1, 1), lb, vertex, normals, uv, triangles);
-        //     objects.push_back(box);
-        // }   
-
-
-        // //Light
-        // {
-        //     Material* lb = new Material(glm::vec4(0.73));
-        //     lb->emitter = true;
-        //     TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0.999, 0), glm::vec3(0.2, 0.3, 0.2), lb, vertex, normals, uv, triangles);
-        //     objects.push_back(box);
-        // }
-
-        //Box1
+        // Light
         {
-            Material* lb = new Material(glm::vec4(0, 0.73, 0, 1));
-            TriangleMesh* box = new TriangleMesh(glm::vec3(0.2, 0, 0), glm::vec3(0.25, 0.6, 0.25), lb, vertex, normals, uv, triangles);
+            Material* lb = new Material(glm::vec4(0.73));
+            DiffuseBRDF* db = new DiffuseBRDF(glm::vec3(1, 1, 1));
+            MixtureBRDF* mb = new MixtureBRDF();
+            mb->AddBRDF(db);
+            lb->brdf = mb;
+            lb->emitter = true;
+            TriangleMesh* box = new TriangleMesh(glm::vec3(0, 9, 0), glm::vec3(4, 0.01, 4), lb, vertex, normals, uv, triangles);
             objects.push_back(box);
         }
 
-        // //Box1
+
+        // //Bottom
         {
-            Material* lb = new Material(glm::vec4(0.73, 0, 0, 1));
-            TriangleMesh* box = new TriangleMesh(glm::vec3(-0.2, 0, 0), glm::vec3(0.25, 0.6, 0.25), lb, vertex, normals, uv, triangles);
-            // TriangleMesh* box = new TriangleMesh(glm::vec3(-0.2, 0, 0), glm::vec3(0.1, 0.4, 0.2), lb, "resources/Models/bunny/untitled.obj");
+            Material* lb = new Material(glm::vec4(0.73));
+            DiffuseBRDF* db = new DiffuseBRDF(glm::vec3(1, 1, 1));
+            ShapeBRDF* sb = new ShapeBRDF(objects[0], this);
+            MixtureBRDF* mb = new MixtureBRDF();
+            // mb->AddBRDF(db);
+            mb->AddBRDF(sb);
+            // BRDF* db = new BRDF(glm::vec3(1, 1, 1));
+            lb->brdf = mb;
+
+            
+            TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(10, 0.1, 10), lb, vertex, normals, uv, triangles);
+            objects.push_back(box);
+        }  
+
+        // //Top
+        {
+            Material* lb = new Material(glm::vec4(0.73));
+            DiffuseBRDF* db = new DiffuseBRDF(glm::vec3(1, 1, 1));
+            ShapeBRDF* sb = new ShapeBRDF(objects[0], this);
+            MixtureBRDF* mb = new MixtureBRDF();
+            // mb->AddBRDF(db);
+            mb->AddBRDF(sb);
+            lb->brdf = mb;
+
+            
+            TriangleMesh* box = new TriangleMesh(glm::vec3(0, 10, 0), glm::vec3(10, 0.1, 10), lb, vertex, normals, uv, triangles);
             objects.push_back(box);
         }
+
+        // //Back
+        {
+            Material* lb = new Material(glm::vec4(0.73));
+            DiffuseBRDF* db = new DiffuseBRDF(glm::vec3(1, 1, 1));
+            ShapeBRDF* sb = new ShapeBRDF(objects[0], this);
+            MixtureBRDF* mb = new MixtureBRDF();
+            // mb->AddBRDF(db);
+            mb->AddBRDF(sb);
+            lb->brdf = mb;
+            
+            // lb->emitter = true;
+            TriangleMesh* box = new TriangleMesh(glm::vec3(0, 5, -5), glm::vec3(10, 10, 0.1), lb, vertex, normals, uv, triangles);
+            objects.push_back(box);
+        }
+
+        //Right
+        {
+            Material* lb = new Material(glm::vec4(0.8, 0, 0, 1));
+            DiffuseBRDF* db = new DiffuseBRDF(glm::vec3(1, 1, 1));
+            ShapeBRDF* sb = new ShapeBRDF(objects[0], this);
+            MixtureBRDF* mb = new MixtureBRDF();
+            // mb->AddBRDF(db);
+            mb->AddBRDF(sb);
+            lb->brdf = mb;
+            
+            TriangleMesh* box = new TriangleMesh(glm::vec3(5, 5, 0), glm::vec3(0.1,10, 10), lb, vertex, normals, uv, triangles);
+            objects.push_back(box);
+        }                     
+
+        //Left
+        {
+            Material* lb = new Material(glm::vec4(0, 0.8, 0, 1));
+            DiffuseBRDF* db = new DiffuseBRDF(glm::vec3(1, 1, 1));
+            ShapeBRDF* sb = new ShapeBRDF(objects[0], this);
+            MixtureBRDF* mb = new MixtureBRDF();
+            // mb->AddBRDF(db);
+            mb->AddBRDF(sb);
+            lb->brdf = mb;
+            
+            TriangleMesh* box = new TriangleMesh(glm::vec3(-5, 5, 0), glm::vec3(0.1,10, 10), lb, vertex, normals, uv, triangles);
+            objects.push_back(box);
+        }   
+
+
+        // Box1
+        {
+            Material* lb = new Material(glm::vec4( 0.73, 0.73,  0.73, 1));
+            BRDF* db = new BRDF(glm::vec3(1, 1, 1));
+            // // DiffuseBRDF* db = new DiffuseBRDF(glm::vec3(1, 1, 1));
+            // // ShapeBRDF* sb = new ShapeBRDF(objects[0]);
+            // MixtureBRDF* mb = new MixtureBRDF();
+            // mb->AddBRDF(db);
+            // // mb->AddBRDF(sb);
+            lb->brdf = db;
+
+            // TriangleMesh* box = new TriangleMesh(glm::vec3(0, 4, 0), glm::vec3(3), lb, "resources/Models/bunny/untitled1.obj");
+            TriangleMesh* box = new TriangleMesh(glm::vec3(0, 2, 0), glm::vec3(7, 1, 7), lb, vertex, normals, uv, triangles);
+            objects.push_back(box);
+        }
+
+        // // //Box1
+        // {
+        //     Material* lb = new Material(glm::vec4(0, 0.73, 0, 1));
+        //     // DiffuseBRDF* db = new DiffuseBRDF(glm::vec3(1, 1, 1));
+        //     ShapeBRDF* sb = new ShapeBRDF(objects[0]);
+        //     // MixtureBRDF* mb = new MixtureBRDF();
+        //     // mb->AddBRDF(db);
+        //     // mb->AddBRDF(sb);
+        //     lb->brdf = sb;
+            
+        //     TriangleMesh* box = new TriangleMesh(glm::vec3(-2, 0, 0), glm::vec3(2.5, 10, 2.5), lb, vertex, normals, uv, triangles);
+        //     // TriangleMesh* box = new TriangleMesh(glm::vec3(-0.2, 0, 0), glm::vec3(0.1, 0.4, 0.2), lb, "resources/Models/bunny/untitled.obj");
+        //     objects.push_back(box);
+        // }
 
 
 
 
         clock_t tStart = clock();
+        // for(int i=0; i<width * height; i++) {
         KikooRenderer::Util::ThreadPool( std::function<void(uint64_t, uint64_t)>([this, width, numSamples, height, &camera, &image](uint64_t i, uint64_t t)
         {
             int x = i % width;
             int y = i / width;
+
             if(x ==0) std::cout << y << " / " << height << std::endl;
 
             glm::vec3 color(0);
@@ -219,8 +310,11 @@ namespace OfflineRenderer {
                 
                 //Raytracing
                 glm::vec3 sampleCol = GetColor(ray, 0);
+                
+
                 color += sampleCol * numSamplesInv;
             }
+            // if(y > 300)  std::cout << x << "  " << y <<  std::endl;
 
             //Gamma correction
             color.r = sqrt(color.r);
@@ -231,8 +325,9 @@ namespace OfflineRenderer {
 
             image.SetPixel(x, height - y - 1, color);
         }), width * height).Block();
+        // }
 
-        std::cout << "Time taken: "<< (double)(clock() - tStart)/CLOCKS_PER_SEC << std::endl;
+        // std::cout << "Time taken: "<< (double)(clock() - tStart)/CLOCKS_PER_SEC << std::endl;
         
         image.toPPM("Test.ppm");
         for(int i=0; i<objects.size(); i++) {

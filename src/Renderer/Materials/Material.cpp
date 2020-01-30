@@ -9,12 +9,12 @@
 namespace KikooRenderer{
 namespace OfflineRenderer {
 
-    Material::Material(glm::vec4 albedo) : albedo(albedo), brdf(albedo), brdf2(albedo) {}
+    Material::Material(glm::vec4 albedo) : albedo(albedo) {}
 
     float Material::ScatterPdf(KikooRenderer::Geometry::Ray in,  Point point, KikooRenderer::Geometry::Ray& scattered) {
-        float cosine = glm::dot(point.normal, glm::normalize(scattered.direction));
+        float cosine = glm::dot(point.normal, glm::normalize(-in.direction));
         if(cosine < 0) cosine=0;
-        return cosine / PI;
+        return cosine;
     }
 
     bool Material::Scatter(KikooRenderer::Geometry::Ray in,  Point point, ScatterRecord& scatterRecord) {
@@ -27,7 +27,7 @@ namespace OfflineRenderer {
         worldToTangent[2] = glm::vec4(glm::normalize(point.normal), 0);
         worldToTangent[3] = glm::vec4(0, 0, 0, 1);
 
-        scatterRecord.isSpecular = false;
+        scatterRecord.isSpecular = brdf->isSpecular;
         scatterRecord.attenuation = albedo;
         scatterRecord.pdf = new CosinePdf(worldToTangent);
 
@@ -36,7 +36,7 @@ namespace OfflineRenderer {
 
     glm::vec3 Material::emitted(const Geometry::Ray& rayIn, Point& rec) {
         if(emitter) {
-            if (glm::dot(glm::vec3(0, -1, 0), rayIn.direction) < 0.0) return glm::vec3(5);
+            if (glm::dot(glm::vec3(0, -1, 0), rayIn.direction) < 0.0) return albedo * 5;
             else return glm::vec3(0);            
         }  else return glm::vec3(0);
     }

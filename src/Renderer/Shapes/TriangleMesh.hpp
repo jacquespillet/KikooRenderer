@@ -14,7 +14,6 @@ class TriangleMesh : public Shape {
         glm::vec3 size;
         glm::mat4 invTransf;
         
-        Material* material;
         TriangleMesh(glm::vec3 position, glm::vec3 size, Material* material, std::string fileName);
         TriangleMesh(glm::vec3 position, glm::vec3 size, Material* material, std::vector<glm::vec3> vertex,std::vector<glm::vec3> normals,std::vector<glm::vec2> uv, std::vector<int> triangles);
         ~TriangleMesh();
@@ -23,7 +22,7 @@ class TriangleMesh : public Shape {
         glm::vec3 GetSize(double time);
         void GetWorldBounds(glm::vec3& min, glm::vec3& max);
 
-        float pdfValue(glm::vec3 origin, glm::vec3 direction);
+        float pdfValue(glm::vec3 origin, glm::vec3 direction, std::vector<Shape*>& shapes);
         glm::vec3 random(glm::vec3 origin);
 
 private:

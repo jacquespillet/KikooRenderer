@@ -6,15 +6,17 @@
 
 namespace KikooRenderer {
 namespace OfflineRenderer {
-    TriangleMesh::TriangleMesh(glm::vec3 position, glm::vec3 size, Material* material, std::string filename) : material(material), invTransf(glm::mat4(1)){
+    TriangleMesh::TriangleMesh(glm::vec3 position, glm::vec3 size, Material* material, std::string filename) : invTransf(glm::mat4(1)){
         this->position = position;
         this->size = size;
+        this->material = material;
         Util::FileIO::LoadModel(filename, &vertex, &normals, &uv, &colors, &triangles);
 
         Init();
     };
 
-    TriangleMesh::TriangleMesh(glm::vec3 position, glm::vec3 size, Material* material, std::vector<glm::vec3> vertex,std::vector<glm::vec3> normals,std::vector<glm::vec2> uv, std::vector<int> triangles): material(material), invTransf(glm::mat4(1)) {
+    TriangleMesh::TriangleMesh(glm::vec3 position, glm::vec3 size, Material* material, std::vector<glm::vec3> vertex,std::vector<glm::vec3> normals,std::vector<glm::vec2> uv, std::vector<int> triangles):  invTransf(glm::mat4(1)) {
+        this->material = material;
         this->position = position;
         this->size = size;
         this->triangles = triangles;
@@ -138,7 +140,7 @@ namespace OfflineRenderer {
                     const glm::vec3 &v1 = vertex[triangles[i + 1]]; 
                     const glm::vec3 &v2 = vertex[triangles[i + 2]]; 
                     float t = tNear, u, v; 
-                    if (rayTriangleIntersect(ray.origin, ray.direction, v0, v1, v2, t, u, v) && t < tNear) { 
+                    if (rayTriangleIntersect(ray.origin, ray.direction, v0, v1, v2, t, u, v) && t < tNear && t > tMin) { 
                         tNear = t; 
                         uv.x = u; 
                         uv.y = v; 
@@ -164,22 +166,34 @@ namespace OfflineRenderer {
         } else return -1;
     }
 
-    float TriangleMesh::pdfValue(glm::vec3 origin, glm::vec3 direction) {
-        Point point;
-        if(this->HitRay(Geometry::Ray(origin, glm::normalize(direction)), 0.001, std::numeric_limits<float>::max(), point)) {
-            // float area = size.x * size.y * size.z;
+    float TriangleMesh::pdfValue(glm::vec3 origin, glm::vec3 direction, std::vector<Shape*>& shapes) {
+        Shape* closestShape = nullptr;
+        Point point = { std::numeric_limits<float>::max(), glm::vec3(0), glm::vec3(0), nullptr, glm::vec2(0),  glm::vec3(0),  glm::vec3(0)};
+
+        for(int i=0; i<shapes.size(); i++) {
+            Point hitPoint;
+            double t = shapes[i]->HitRay(Geometry::Ray(origin, glm::normalize(direction)), 0.0001, std::numeric_limits<float>::max(), hitPoint);
+            if(t > 0) {
+                // hit = true;
+                if(hitPoint.t < point.t) {
+                    point = hitPoint;
+                    closestShape = shapes[i];
+                }
+            }
+        }
+
+        if(closestShape == this) {
             glm::vec3 bbsize = bounds.GetSize();
             float area = bbsize.x * bbsize.z;
-
-            //Compute the min max in spherical coords from the point
-            //the area is the size of the min/max box
-
 
             float distance_squared = point.t * point.t;
             float cosine = fabs(glm::dot(direction, point.normal));
             if(cosine<=0.0001) return 0;
+            
             return  distance_squared / (cosine * area);
-        } else return 0;     
+        } else {
+            return 0;
+        }
     }
 
     glm::vec3 TriangleMesh::random(glm::vec3 origin) {
@@ -192,7 +206,7 @@ namespace OfflineRenderer {
                                       Geometry::RandomInRange(-halfZ, halfZ));
         onLight += position;
         
-        return onLight - origin;
+        return glm::normalize(onLight - origin);
     }
 
 }

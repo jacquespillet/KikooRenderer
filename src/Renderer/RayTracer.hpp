@@ -14,8 +14,8 @@ class RayTracer {
         void WriteImage();
         glm::vec3 GetColor(KikooRenderer::Geometry::Ray ray, int depth);
 
-    private:
         std::vector<Shape*> objects;
+    // private:
 };
 }
 }

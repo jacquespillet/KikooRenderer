@@ -15,7 +15,7 @@ public:
 
     //Return the probability that the ray with the given direction has been generated
     virtual float value(const glm::vec3& direction) const {
-        return shape->pdfValue(origin, direction);
+        // return shape->pdfValue(origin, direction);
     }
 
     //Generate a a vector going from the origin to a random point on the shape

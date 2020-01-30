@@ -48,8 +48,8 @@ void CalculateTangents(std::vector<glm::vec3>& tangents,std::vector<glm::vec3>& 
 
 		tangents[i] = glm::vec3(glm::normalize((t - n * glm::dot(n, t))));
 		
-		float handedness = (glm::dot(glm::cross(n, t), glm::vec3(tan2[i])) < 0.0F) ? -1.0F : 1.0F;
-        bitangents[i] = glm::normalize(glm::cross(n, tangents[i]) * handedness); 
+		float handedness = (glm::dot(glm::cross(n, t), glm::vec3(tan2[i])) < 0.0F) ? 1.0F : -1.0F;
+        bitangents[i] = glm::normalize(glm::cross(n, tangents[i])) * handedness; 
 	}
 }
 
