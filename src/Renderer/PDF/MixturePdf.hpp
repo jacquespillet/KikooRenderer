@@ -51,13 +51,13 @@ public:
     }
 
     //Generate a vector from the in vector
-    virtual glm::vec3 Generate(glm::vec3 in, Point pt, float* pdf, float* brdfValue=nullptr) {
+    virtual glm::vec3 Generate(glm::vec3 in, Point pt, float* pdf, const std::vector<glm::vec2>& brdfSamples, int currentSample, float* brdfValue=nullptr) {
         //In is already in tangent space.
         int rand = (int)Geometry::RandomInRange(0, brdfs.size());
 
         float totalpdf = 0;
 
-        glm::vec3 direction = brdfs[rand]->Generate(in, pt, &totalpdf, brdfValue);
+        glm::vec3 direction = brdfs[rand]->Generate(in, pt, &totalpdf, brdfSamples, currentSample, brdfValue);
         glm::vec3 wh = glm::normalize(-in + direction);
         
         // *brdf = 0.5 * brdfs[0]->Evaluate(-in, direction) + 0.5 * brdfs[1]->Evaluate(-in, direction);

@@ -167,7 +167,7 @@ float fresnelSchlick(float cosTheta, float F0)
 
 
 float BRDF::Evaluate(glm::vec3 wi, glm::vec3 wo) {
-    float alpha = 0.05;
+    float alpha = 0.1;
 
     glm::vec3 N(0, 0, 1);
     glm::vec3 V = wi;
@@ -184,26 +184,27 @@ float BRDF::Evaluate(glm::vec3 wi, glm::vec3 wo) {
     
     float DFG    = NDF * G * F;
     float denominator = 4.0 * std::max(dot(N, V), 0.0001f) * std::max(dot(N, L), 0.0001f);
-    float specular     = DFG / std::max(denominator, 0.001f); 
-        
+    float specular     = DFG / std::max(denominator, 0.0001f); 
+    
     return specular;
 }
 
-glm::vec3 BRDF::Generate(glm::vec3 in, Point pt, float* pdf, float* brdfValue) {
+glm::vec3 BRDF::Generate(glm::vec3 in, Point pt, float* pdf, const std::vector<glm::vec2>& brdfSamples, int currentSample, float* brdfValue) {
     //https://agraphicsguy.wordpress.com/2015/11/01/sampling-microfacet-brdf/
 
-    float alpha = 0.05;
-    double random = Geometry::RandomInRange(0, 1);
+    float alpha = 0.1;
+    double random = brdfSamples[currentSample].x;
     double numerator = 1 - random;
     double denominator = random * (alpha * alpha - 1) + 1;
     double theta = acos(sqrt((numerator / denominator)));
     
-    double phi = Geometry::RandomInRange(0, 2*PI);
+    // double phi = Geometry::RandomInRange(0, 2*PI);
+    double phi = 0;
     
 
     glm::vec3 normal;
     normal.x = std::sin(theta) * std::cos(phi);
-    normal.y = std::sinf(theta) * std::sinf(phi);
+    normal.y = std::sin(theta) * std::sin(phi);
     normal.z = std::cos(theta);
     normal = glm::normalize(normal);
     // std::cout << glm::to_string(normal) << std::endl;
@@ -232,7 +233,7 @@ float BRDF::PDF(glm::vec3 wo, glm::vec3 wh, Point* pt) {
     double cosTheta = glm::dot(glm::normalize(wo), glm::normalize(wh));
     double theta = acos(cosTheta);
 
-    double alpha = 0.05;
+    double alpha = 0.1;
 
     double numerator = 2 * alpha * alpha * cosTheta * sin(theta);
     double denominator = std::pow(((alpha * alpha - 1) * cosTheta * cosTheta + 1), 2);
@@ -248,8 +249,17 @@ float BRDF::PDF(glm::vec3 wo, glm::vec3 wh, Point* pt) {
 DiffuseBRDF::DiffuseBRDF(glm::vec3 color) : BRDF(color) {}
 
 
-glm::vec3 DiffuseBRDF::Generate(glm::vec3 in, Point pt, float* pdf, float* brdfValue) {
-    glm::vec4 randomDirection = glm::vec4(Geometry::RandomCosineDirection(), 0);
+glm::vec3 DiffuseBRDF::Generate(glm::vec3 in, Point pt, float* pdf, const std::vector<glm::vec2>& brdfSamples, int currentSample, float* brdfValue) {
+    // double r1 = ((double) rand()) / (double) (RAND_MAX+1);
+    // double r2 = ((double) rand()) / (double) (RAND_MAX+1);
+    // int currentSample2 = (((float) rand()) / (float) (RAND_MAX+1)) * (brdfSamples.size()-1);
+    double r1 = (double) brdfSamples[currentSample].x; 
+    double r2 = (double) brdfSamples[currentSample].y;
+    
+    glm::vec4 randomDirection = glm::vec4(Geometry::RandomCosineDirection(r1, r2), 0);
+    // std::cout << r1 << "  " << r2 << "  " << glm::to_string(randomDirection) << std::endl;
+    
+
     *pdf=PDF(randomDirection, glm::vec3(0), &pt);
     *brdfValue = Evaluate(-in, randomDirection);
     return randomDirection;
@@ -271,7 +281,7 @@ ShapeBRDF::ShapeBRDF(Shape* s, RayTracer* world) : BRDF(glm::vec3(1)) {
 }
 
 
-glm::vec3 ShapeBRDF::Generate(glm::vec3 in,  Point pt, float* pdf, float* brdfValue) {
+glm::vec3 ShapeBRDF::Generate(glm::vec3 in,  Point pt, float* pdf, const std::vector<glm::vec2>& brdfSamples, int currentSample, float* brdfValue) {
     glm::mat4 tangentToWorld(1);
     tangentToWorld[0] = glm::vec4(glm::normalize(pt.tangent), 0);
     tangentToWorld[1] = glm::vec4(glm::normalize(pt.bitangent), 0);

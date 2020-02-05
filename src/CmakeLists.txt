@@ -96,6 +96,7 @@ set(MainWindowSrc
 	Util/ModelLoader.cpp
 	Util/Image.cpp
 	Util/RandomUtil.cpp
+	Util/Sample.cpp
 	Util/NoiseUtil.cpp
 	Util/ThreadingUtil.cpp
 	

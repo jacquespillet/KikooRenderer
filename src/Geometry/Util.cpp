@@ -44,6 +44,14 @@ namespace Geometry {
         return glm::vec3(x, y, z);
     }
 
+    glm::vec3 RandomCosineDirection(float r1, float r2) {
+        double z = sqrt(1-r2);
+        double phi = 2*M_PI*r1;
+        double x = cos(phi)*sqrt(r2);
+        double y = sin(phi)*sqrt(r2);
+        return glm::vec3(x, y, z);
+    }
+
     glm::vec3 RandomInDisk() {
         glm::vec3 p;
         do {

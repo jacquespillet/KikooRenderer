@@ -3,6 +3,7 @@
 #include "Util/Image.hpp"
 #include "Geometry/Util.h"
 #include "Util/ThreadingUtil.hpp"
+#include "Util/Sample.hpp"
 
 #include "3DEngine/Components/BaseMeshes.hpp"
 
@@ -33,7 +34,7 @@ namespace OfflineRenderer {
     }
 
 
-    glm::vec3 RayTracer::GetColor(KikooRenderer::Geometry::Ray ray, int depth) {
+    glm::vec3 RayTracer::GetColor(KikooRenderer::Geometry::Ray ray, int depth, const std::vector<glm::vec2>& brdfSamples, int currentSample) {
         Point closestPoint = { std::numeric_limits<float>::max(), glm::vec3(0), glm::vec3(0), nullptr, glm::vec2(0),  glm::vec3(0),  glm::vec3(0)};
         bool hit = false;
 
@@ -73,7 +74,7 @@ namespace OfflineRenderer {
                 
                 float pdf  = 0;
                 float brdfVal = 0;
-                glm::vec3 outDirection = brdf->Generate(worldToTangent * glm::vec4(ray.direction, 0), closestPoint, &pdf, &brdfVal);
+                glm::vec3 outDirection = brdf->Generate(worldToTangent * glm::vec4(ray.direction, 0), closestPoint, &pdf, brdfSamples, currentSample, &brdfVal);
                 glm::vec3 outDirection_world = tangentToWorld * glm::vec4(outDirection, 0);
                 
                 scatteredVector = Geometry::Ray(closestPoint.position, glm::normalize(outDirection_world));
@@ -82,9 +83,9 @@ namespace OfflineRenderer {
                 glm::vec3 res(0);
                 if(pdf > 0) {
                     // res = glm::vec3(pdf);
-                    res = (emitted + brdfVal * scatterRecord.attenuation * closestPoint.material->ScatterPdf(ray, closestPoint, scatteredVector) * GetColor(scatteredVector, depth+1)) / pdf;
-                    // res = (emitted + brdfVal * scatterRecord.attenuation * closestPoint.material->ScatterPdf(ray, closestPoint, scatteredVector) * GetColor(scatteredVector, depth+1));
-                    // res = (emitted + brdfVal * scatterRecord.attenuation * closestPoint.material->ScatterPdf(ray, closestPoint, scatteredVector) * GetColor(scatteredVector, depth+1)) / pdf;
+                    res = (emitted + brdfVal * scatterRecord.attenuation * closestPoint.material->ScatterPdf(ray, closestPoint, scatteredVector) * GetColor(scatteredVector, depth+1, brdfSamples, currentSample)) / pdf;
+                    // res = (emitted + brdfVal * scatterRecord.attenuation * closestPoint.material->ScatterPdf(ray, closestPoint, scatteredVector) * GetColor(scatteredVector, depth+1, brdfSamples, currentSample));
+                    // res = (emitted + scatterRecord.attenuation * closestPoint.material->ScatterPdf(ray, closestPoint, scatteredVector) * GetColor(scatteredVector, depth+1, brdfSamples, currentSample)) / pdf;
                 }   
                   
                 // glm::vec3 inDirection_tangentSpace = worldToTangent * glm::vec4(ray.direction, 0);
@@ -145,7 +146,7 @@ namespace OfflineRenderer {
     void RayTracer::WriteImage() {
         int width = 600;
         int height = 500;
-        int numSamples = 64;
+        int numSamples = 128;
 
         KikooRenderer::Util::FileIO::Image image(width, height);
 
@@ -161,6 +162,16 @@ namespace OfflineRenderer {
         std::vector<glm::vec4> colors;
         std::vector<int> triangles;
         CoreEngine::GetCubeBuffers(&vertex, &normals, &uv, &colors, &triangles);        
+
+        
+        std::vector<glm::vec2> pixelSamples(numSamples);
+        Util::MultiJitter(pixelSamples, numSamples);
+        // Util::BoxFilter(pixelSamples, numSamples);
+        
+        std::vector<glm::vec2> lensSamples(numSamples);
+        Util::Random(lensSamples, numSamples);
+        
+
 
 
 
@@ -182,12 +193,13 @@ namespace OfflineRenderer {
             Material* lb = new Material(glm::vec4(0.73));
             DiffuseBRDF* db = new DiffuseBRDF(glm::vec3(1, 1, 1));
             ShapeBRDF* sb = new ShapeBRDF(objects[0], this);
+
             MixtureBRDF* mb = new MixtureBRDF();
             // mb->AddBRDF(db);
             mb->AddBRDF(sb);
-            // BRDF* db = new BRDF(glm::vec3(1, 1, 1));
             lb->brdf = mb;
 
+            // BRDF* db = new BRDF(glm::vec3(1, 1, 1));
             
             TriangleMesh* box = new TriangleMesh(glm::vec3(0, 0, 0), glm::vec3(10, 0.1, 10), lb, vertex, normals, uv, triangles);
             objects.push_back(box);
@@ -263,7 +275,7 @@ namespace OfflineRenderer {
             // // mb->AddBRDF(sb);
             lb->brdf = db;
 
-            // TriangleMesh* box = new TriangleMesh(glm::vec3(0, 4, 0), glm::vec3(3), lb, "resources/Models/bunny/untitled1.obj");
+            // TriangleMesh* box = new TriangleMesh(glm::vec3(0, 4, 0), glm::vec3(3), lb, "resources/Models/bunny/untitled2.obj");
             TriangleMesh* box = new TriangleMesh(glm::vec3(0, 2, 0), glm::vec3(7, 1, 7), lb, vertex, normals, uv, triangles);
             objects.push_back(box);
         }
@@ -288,8 +300,11 @@ namespace OfflineRenderer {
 
         clock_t tStart = clock();
         // for(int i=0; i<width * height; i++) {
-        KikooRenderer::Util::ThreadPool( std::function<void(uint64_t, uint64_t)>([this, width, numSamples, height, &camera, &image](uint64_t i, uint64_t t)
+        KikooRenderer::Util::ThreadPool( std::function<void(uint64_t, uint64_t)>([this, width, numSamples, height, &camera, &image,  pixelSamples](uint64_t i, uint64_t t)
         {
+            std::vector<glm::vec2> brdfSamples(numSamples);
+            Util::MultiJitter(brdfSamples, numSamples);
+            
             int x = i % width;
             int y = i / width;
 
@@ -298,10 +313,12 @@ namespace OfflineRenderer {
             glm::vec3 color(0);
 
             double numSamplesInv = 1.0 / (double)numSamples;
-            for(int i=0; i<numSamples; i++) {
+            for(int j=0; j<numSamples; j++) {
                 //For each pixel, we get n samples. Each sample deviates the original ray randomly
-                double randomX = ((double) rand()) / (double) RAND_MAX;
-                double randomY = ((double) rand()) / (double) RAND_MAX;
+                // double randomX = ((double) rand()) / (double) RAND_MAX;
+                // double randomY = ((double) rand()) / (double) RAND_MAX;
+                double randomX = pixelSamples[j].x;
+                double randomY = pixelSamples[j].y;
                 double u = (double)(x + randomX) / (double)width;
                 double v = (double)(y + randomY) / (double)height;
 
@@ -309,7 +326,7 @@ namespace OfflineRenderer {
                 KikooRenderer::Geometry::Ray ray =  camera.GetRay(u, v);
                 
                 //Raytracing
-                glm::vec3 sampleCol = GetColor(ray, 0);
+                glm::vec3 sampleCol = GetColor(ray, 0, brdfSamples, j);
                 
 
                 color += sampleCol * numSamplesInv;

@@ -19,7 +19,7 @@ class BRDF {
         virtual glm::vec3 Sample_f_Transmission(const glm::vec3 &wo, glm::vec3 *wi, const glm::vec2 &sample, float *pdf);
         virtual glm::vec3 OrenNayar(const glm::vec3 &wo, glm::vec3& wi);
 
-        virtual glm::vec3 Generate(glm::vec3 in, Point pt, float* pdf, float* brdfValue=nullptr);
+        virtual glm::vec3 Generate(glm::vec3 in, Point pt, float* pdf, const std::vector<glm::vec2>& brdfSamples, int currentSample, float* brdfValue=nullptr);
         virtual float Evaluate(glm::vec3 wi, glm::vec3 wo);
         virtual float PDF(glm::vec3 wo, glm::vec3 wh, Point* pt);
 
@@ -39,7 +39,7 @@ class BRDF {
 class DiffuseBRDF : public BRDF {
     public: 
         DiffuseBRDF(glm::vec3 color);
-        virtual glm::vec3 Generate(glm::vec3 in, Point pt, float* pdf, float* brdfValue=nullptr);
+        virtual glm::vec3 Generate(glm::vec3 in, Point pt, float* pdf, const std::vector<glm::vec2>& brdfSamples, int currentSample, float* brdfValue=nullptr);
         virtual float Evaluate(glm::vec3 wi, glm::vec3 wo);
         virtual float PDF(glm::vec3 wo, glm::vec3 wh, Point* pt);
         
@@ -54,7 +54,7 @@ class RayTracer;
 class ShapeBRDF : public BRDF {
     public: 
         ShapeBRDF(Shape* s, RayTracer* world);
-        virtual glm::vec3 Generate(glm::vec3 in, Point pt, float* pdf, float* brdfValue=nullptr);
+        virtual glm::vec3 Generate(glm::vec3 in, Point pt, float* pdf, const std::vector<glm::vec2>& brdfSamples, int currentSample, float* brdfValue=nullptr);
         virtual float Evaluate(glm::vec3 wi, glm::vec3 wo);
         virtual float PDF(glm::vec3 wo, glm::vec3 wh, Point* pt);
         

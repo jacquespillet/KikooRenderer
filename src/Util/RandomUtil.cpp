@@ -3,7 +3,7 @@
 namespace KikooRenderer {
 namespace Util {
 float GetRand() {
-    return ((float)std::rand() / (float)RAND_MAX);
+    return ((float)std::rand() / (float)(RAND_MAX+1));
 }
 
 float GenerateValue(float average, float errorMargin) {

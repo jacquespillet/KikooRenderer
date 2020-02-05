@@ -8,6 +8,7 @@ namespace Geometry {
     glm::vec3 randomOnSphere();
     glm::vec3 RandomInDisk();
     glm::vec3 RandomCosineDirection();
+    glm::vec3 RandomCosineDirection(float r1, float r2);
 
     double Schlick(double cosine, double inx);
 
