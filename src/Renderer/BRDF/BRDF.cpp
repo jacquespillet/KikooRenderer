@@ -167,7 +167,7 @@ float fresnelSchlick(float cosTheta, float F0)
 
 
 float BRDF::Evaluate(glm::vec3 wi, glm::vec3 wo) {
-    float alpha = 0.1;
+    float alpha = 0.05;
 
     glm::vec3 N(0, 0, 1);
     glm::vec3 V = wi;
@@ -184,7 +184,7 @@ float BRDF::Evaluate(glm::vec3 wi, glm::vec3 wo) {
     
     float DFG    = NDF * G * F;
     float denominator = 4.0 * std::max(dot(N, V), 0.0001f) * std::max(dot(N, L), 0.0001f);
-    float specular     = DFG / std::max(denominator, 0.0001f); 
+    float specular     = DFG / std::max(denominator, 0.001f); 
     
     return specular;
 }
@@ -192,7 +192,7 @@ float BRDF::Evaluate(glm::vec3 wi, glm::vec3 wo) {
 glm::vec3 BRDF::Generate(glm::vec3 in, Point pt, float* pdf, const std::vector<glm::vec2>& brdfSamples, int currentSample, float* brdfValue) {
     //https://agraphicsguy.wordpress.com/2015/11/01/sampling-microfacet-brdf/
 
-    float alpha = 0.1;
+    float alpha = 0.05 * 0.05;
     double random = brdfSamples[currentSample].x;
     double numerator = 1 - random;
     double denominator = random * (alpha * alpha - 1) + 1;
@@ -233,7 +233,7 @@ float BRDF::PDF(glm::vec3 wo, glm::vec3 wh, Point* pt) {
     double cosTheta = glm::dot(glm::normalize(wo), glm::normalize(wh));
     double theta = acos(cosTheta);
 
-    double alpha = 0.1;
+    double alpha = 0.05 * 0.05;
 
     double numerator = 2 * alpha * alpha * cosTheta * sin(theta);
     double denominator = std::pow(((alpha * alpha - 1) * cosTheta * cosTheta + 1), 2);

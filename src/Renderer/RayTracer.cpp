@@ -4,6 +4,7 @@
 #include "Geometry/Util.h"
 #include "Util/ThreadingUtil.hpp"
 #include "Util/Sample.hpp"
+#include "Util/RandomUtil.hpp"
 
 #include "3DEngine/Components/BaseMeshes.hpp"
 
@@ -146,7 +147,7 @@ namespace OfflineRenderer {
     void RayTracer::WriteImage() {
         int width = 600;
         int height = 500;
-        int numSamples = 128;
+        int numSamples = 64;
 
         KikooRenderer::Util::FileIO::Image image(width, height);
 
@@ -169,7 +170,7 @@ namespace OfflineRenderer {
         // Util::BoxFilter(pixelSamples, numSamples);
         
         std::vector<glm::vec2> lensSamples(numSamples);
-        Util::Random(lensSamples, numSamples);
+        Util::MultiJitter(lensSamples, numSamples);
         
 
 
@@ -195,8 +196,8 @@ namespace OfflineRenderer {
             ShapeBRDF* sb = new ShapeBRDF(objects[0], this);
 
             MixtureBRDF* mb = new MixtureBRDF();
-            // mb->AddBRDF(db);
-            mb->AddBRDF(sb);
+            mb->AddBRDF(db);
+            // mb->AddBRDF(sb);
             lb->brdf = mb;
 
             // BRDF* db = new BRDF(glm::vec3(1, 1, 1));
@@ -211,8 +212,8 @@ namespace OfflineRenderer {
             DiffuseBRDF* db = new DiffuseBRDF(glm::vec3(1, 1, 1));
             ShapeBRDF* sb = new ShapeBRDF(objects[0], this);
             MixtureBRDF* mb = new MixtureBRDF();
-            // mb->AddBRDF(db);
-            mb->AddBRDF(sb);
+            mb->AddBRDF(db);
+            // mb->AddBRDF(sb);
             lb->brdf = mb;
 
             
@@ -226,8 +227,8 @@ namespace OfflineRenderer {
             DiffuseBRDF* db = new DiffuseBRDF(glm::vec3(1, 1, 1));
             ShapeBRDF* sb = new ShapeBRDF(objects[0], this);
             MixtureBRDF* mb = new MixtureBRDF();
-            // mb->AddBRDF(db);
-            mb->AddBRDF(sb);
+            mb->AddBRDF(db);
+            // mb->AddBRDF(sb);
             lb->brdf = mb;
             
             // lb->emitter = true;
@@ -241,8 +242,8 @@ namespace OfflineRenderer {
             DiffuseBRDF* db = new DiffuseBRDF(glm::vec3(1, 1, 1));
             ShapeBRDF* sb = new ShapeBRDF(objects[0], this);
             MixtureBRDF* mb = new MixtureBRDF();
-            // mb->AddBRDF(db);
-            mb->AddBRDF(sb);
+            mb->AddBRDF(db);
+            // mb->AddBRDF(sb);
             lb->brdf = mb;
             
             TriangleMesh* box = new TriangleMesh(glm::vec3(5, 5, 0), glm::vec3(0.1,10, 10), lb, vertex, normals, uv, triangles);
@@ -255,8 +256,8 @@ namespace OfflineRenderer {
             DiffuseBRDF* db = new DiffuseBRDF(glm::vec3(1, 1, 1));
             ShapeBRDF* sb = new ShapeBRDF(objects[0], this);
             MixtureBRDF* mb = new MixtureBRDF();
-            // mb->AddBRDF(db);
-            mb->AddBRDF(sb);
+            mb->AddBRDF(db);
+            // mb->AddBRDF(sb);
             lb->brdf = mb;
             
             TriangleMesh* box = new TriangleMesh(glm::vec3(-5, 5, 0), glm::vec3(0.1,10, 10), lb, vertex, normals, uv, triangles);
@@ -265,20 +266,20 @@ namespace OfflineRenderer {
 
 
         // Box1
-        {
-            Material* lb = new Material(glm::vec4( 0.73, 0.73,  0.73, 1));
-            BRDF* db = new BRDF(glm::vec3(1, 1, 1));
-            // // DiffuseBRDF* db = new DiffuseBRDF(glm::vec3(1, 1, 1));
-            // // ShapeBRDF* sb = new ShapeBRDF(objects[0]);
-            // MixtureBRDF* mb = new MixtureBRDF();
-            // mb->AddBRDF(db);
-            // // mb->AddBRDF(sb);
-            lb->brdf = db;
+        // {
+        //     Material* lb = new Material(glm::vec4( 0.73, 0.73,  0.73, 1));
+        //     BRDF* db = new BRDF(glm::vec3(1, 1, 1));
+        //     // // DiffuseBRDF* db = new DiffuseBRDF(glm::vec3(1, 1, 1));
+        //     // // ShapeBRDF* sb = new ShapeBRDF(objects[0]);
+        //     // MixtureBRDF* mb = new MixtureBRDF();
+        //     // mb->AddBRDF(db);
+        //     // // mb->AddBRDF(sb);
+        //     lb->brdf = db;
 
-            // TriangleMesh* box = new TriangleMesh(glm::vec3(0, 4, 0), glm::vec3(3), lb, "resources/Models/bunny/untitled2.obj");
-            TriangleMesh* box = new TriangleMesh(glm::vec3(0, 2, 0), glm::vec3(7, 1, 7), lb, vertex, normals, uv, triangles);
-            objects.push_back(box);
-        }
+        //     // TriangleMesh* box = new TriangleMesh(glm::vec3(0, 4, 0), glm::vec3(3), lb, "resources/Models/bunny/untitled.obj");
+        //     TriangleMesh* box = new TriangleMesh(glm::vec3(0, 2, 0), glm::vec3(7, 1, 7), lb, vertex, normals, uv, triangles);
+        //     objects.push_back(box);
+        // }
 
         // // //Box1
         // {
@@ -304,7 +305,7 @@ namespace OfflineRenderer {
         {
             std::vector<glm::vec2> brdfSamples(numSamples);
             Util::MultiJitter(brdfSamples, numSamples);
-            
+
             int x = i % width;
             int y = i / width;
 
@@ -317,10 +318,11 @@ namespace OfflineRenderer {
                 //For each pixel, we get n samples. Each sample deviates the original ray randomly
                 // double randomX = ((double) rand()) / (double) RAND_MAX;
                 // double randomY = ((double) rand()) / (double) RAND_MAX;
-                double randomX = pixelSamples[j].x;
-                double randomY = pixelSamples[j].y;
-                double u = (double)(x + randomX) / (double)width;
-                double v = (double)(y + randomY) / (double)height;
+                int sampleInx = Util::GetRand() * ( pixelSamples.size() -1);
+                double randomX = pixelSamples[sampleInx].x;
+                double randomY = pixelSamples[sampleInx].y;
+                double u = ((double)x + randomX) / (double)width;
+                double v = ((double)y + randomY) / (double)height;
 
                 //Get ray object from camera
                 KikooRenderer::Geometry::Ray ray =  camera.GetRay(u, v);
@@ -346,6 +348,13 @@ namespace OfflineRenderer {
 
         // std::cout << "Time taken: "<< (double)(clock() - tStart)/CLOCKS_PER_SEC << std::endl;
         
+        // for(int i=0; i<numSamples; i++) {
+        //     double x = pixelSamples[i].x * (width-1);
+        //     double y = pixelSamples[i].y * (height-1);
+
+        //     image.SetPixel(x, height - y - 1, glm::vec3(1));
+        // }
+
         image.toPPM("Test.ppm");
         for(int i=0; i<objects.size(); i++) {
             delete objects[i];
