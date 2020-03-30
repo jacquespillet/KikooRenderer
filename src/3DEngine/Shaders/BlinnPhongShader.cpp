@@ -209,10 +209,10 @@ void BlinnPhongParams::SetUniforms() {
     ogl->glUniform1i(reflectSkyboxLocation, reflectSkyboxInt);
     if (reflectSkybox) {
     	MaterialComponent* skyboxMaterial = scene->skyboxCube->GetComponent<MaterialComponent>();
+    	ogl->glActiveTexture(GL_TEXTURE6);
         skyboxMaterial->cubemap.Use();
-    	ogl->glActiveTexture(GL_TEXTURE3);
     	int cubemapLocation = ogl->glGetUniformLocation(this->shader->programShaderObject, "cubemapTexture");
-    	ogl->glUniform1i(cubemapLocation, 3);
+    	ogl->glUniform1i(cubemapLocation, 6);
     }
 
     /*

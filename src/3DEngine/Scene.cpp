@@ -100,6 +100,8 @@ namespace CoreEngine {
         }        
         transformWidget->Update();
         elapsedTime += deltaTime;
+        
+        triggerRefresh=true; 
     }
 
 

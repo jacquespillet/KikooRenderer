@@ -328,9 +328,9 @@ namespace OfflineRenderer {
                 KikooRenderer::Geometry::Ray ray =  camera.GetRay(u, v);
                 
                 //Raytracing
-                glm::vec3 sampleCol = GetColor(ray, 0, brdfSamples, j);
-                
+                // glm::vec3 sampleCol = GetColor(ray, 0, brdfSamples, j);
 
+                glm::vec3 sampleCol = ray.direction;
                 color += sampleCol * numSamplesInv;
             }
             // if(y > 300)  std::cout << x << "  " << y <<  std::endl;

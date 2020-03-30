@@ -282,11 +282,11 @@ void MeshFilterComponent::InitBuffers() {
     ogl->glEnableVertexAttribArray(9);
     ogl->glEnableVertexAttribArray(10);
 
-    ogl->glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(InstanceAttribute), (void*)0);
-    ogl->glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(InstanceAttribute), (void*)(vec4Size));
-    ogl->glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(InstanceAttribute), (void*)(2 * vec4Size));
-    ogl->glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, sizeof(InstanceAttribute), (void*)(3 * vec4Size));
-    ogl->glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, sizeof(InstanceAttribute), (void*)(4 * vec4Size));
+    ogl->glVertexAttribPointer(5,  4, GL_FLOAT, GL_FALSE, sizeof(InstanceAttribute), (void*)(0 * vec4Size));
+    ogl->glVertexAttribPointer(6,  4, GL_FLOAT, GL_FALSE, sizeof(InstanceAttribute), (void*)(1 * vec4Size));
+    ogl->glVertexAttribPointer(7,  4, GL_FLOAT, GL_FALSE, sizeof(InstanceAttribute), (void*)(2 * vec4Size));
+    ogl->glVertexAttribPointer(8,  4, GL_FLOAT, GL_FALSE, sizeof(InstanceAttribute), (void*)(3 * vec4Size));
+    ogl->glVertexAttribPointer(9,  4, GL_FLOAT, GL_FALSE, sizeof(InstanceAttribute), (void*)(4 * vec4Size));
     ogl->glVertexAttribPointer(10, 4, GL_FLOAT, GL_FALSE, sizeof(InstanceAttribute), (void*)(5 * vec4Size));
 
     ogl->glVertexAttribDivisor(5, 1);

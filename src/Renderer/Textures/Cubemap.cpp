@@ -58,16 +58,21 @@ glm::vec4 Cubemap::Sample(glm::vec3 stp) {
         v = 0.5 + t / (2 * p); 
     }
 
-    int texCoordsX = (int)(u * (float)width);
-    int texCoordsY = (int)(v * (float)height);
+    int texCoordsX = std::max(0, std::min(width-1, (int)(u * (float)width)));
+    int texCoordsY = std::max(0, std::min(height-1, (int)(v * (float)height)));
+    
     int inx = texCoordsY * width * nrChannels + texCoordsX * nrChannels;
     
     float r, g, b, a;
+    
+    std::cout <<"0 " <<  inx << std::endl;
 
     r =  (float)(texturesData[faceToSample][inx]) / 255.0f;
     if(nrChannels >1)  g =  (float)(texturesData[faceToSample][inx + 1]) / 255.0f;
     if(nrChannels > 2) b =  (float)(texturesData[faceToSample][inx + 2]) / 255.0f;
     if(nrChannels > 3) a =  (float)(texturesData[faceToSample][inx + 3]) / 255.0f;
+    
+    std::cout <<"1 " <<  inx << std::endl;
 
     return glm::vec4(r, g, b, a);
 }
