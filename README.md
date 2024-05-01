@@ -22,7 +22,7 @@ Here are some of the features illustrated with screen grabs.
 
 ## Overall Interface
 
-<img src="Images/Kikoo/Interface.PNG" width="720" />
+<img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Kikoo/Interface.PNG?raw=true" width="720" />
 
 Shot of the interface of the software. The structure of the software is very much influenced by Unity's. 
 
@@ -37,41 +37,42 @@ Bottom panel is a debugging console
 
 ## Bloom post process
 
-<img src="Images/Kikoo/Bloom.png" width="720" />
+
+<img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Kikoo/Bloom.png?raw=true" width="720" />
 
 Quite a simple implementation, lots of room for improvement.
 
 ## Depth of field post process
 
-<img src="Images/Kikoo/Dof3.png" width="720" />
+<img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Kikoo/Dof3.png?raw=true" width="720" />
 
 Example of a depth of field with a rather large focus distance.
 
 ## Fast approximate Anti aliasing Post process
 
 <p float="left">
-  <img src="Images/Kikoo/NoFxaa.png" />
-  <img src="Images/Kikoo/Fxaa.png" /> 
+  <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Kikoo/NoFxaa.png?raw=true" />
+  <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Kikoo/Fxaa.png?raw=true" /> 
 </p>
 
 [Clever algorithm](https://en.wikipedia.org/wiki/Fast_approximate_anti-aliasing) that applies some image processing techniques to reduce jaggered edges due to aliasing.
 
 ## Cubemap reflections
 
-<img src="Images/Kikoo/Cubemap.png" width="720" />
+<img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Kikoo/Cubemap.png?raw=true" width="720" />
 
 ## Directional Flow
 
-<img src="Images/Gifs/Waterflow.gif" width="720" />
-<img src="Images/Kikoo/DirFlow_0.png" width="720" />
+<img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Gifs/Waterflow.gif" width="720" />
+<img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Kikoo/DirFlow_0.png?raw=true" width="720" />
 
 Implementation of the great tutorial by [Catlike Coding](https://catlikecoding.com/unity/tutorials/flow/directional-flow/).
 
 ## Water Plane
 
 <p float="left">
-  <img src="Images/Kikoo/DUDV_0.png" width="500" />
-  <img src="Images/Kikoo/DUDV.png" width="500" /> 
+  <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Kikoo/DUDV_0.png?raw=true" width="500" />
+  <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Kikoo/DUDV.png?raw=true" width="500" /> 
 </p>
 
 The normals and texture coordinates of a plane are displaced using a "dudv" map.
@@ -87,11 +88,11 @@ The 3 most common types of light are supported :
     * Point
     * Spot
     
-<img src="Images/Kikoo/LowResShadowmap.PNG" width="512" />
+<img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Kikoo/LowResShadowmap.PNG?raw=true" width="512" />
 
 *Example of a low resolution shadow map*
 
-<img src="Images/Kikoo/Shadows.PNG" width="512" />
+<img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Kikoo/Shadows.PNG?raw=true" width="512" />
 
 *Higher resolution shadow map*
 
@@ -111,7 +112,7 @@ Several type of materials are built in :
 Lots of room for improvement in that area.
 
 
-<img src="Images/Kikoo/Materials.PNG" width="720" />
+<img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Kikoo/Materials.PNG?raw=true" width="720" />
 
 *A few different material parameters*
 
@@ -119,7 +120,7 @@ Lots of room for improvement in that area.
 
 Basic implementation of normal mapping
 
-<img src="Images/Kikoo/NormalMapping.png" width="720" />
+<img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Kikoo/NormalMapping.png?raw=true" width="720" />
 
 *Simple plane with displaced normals*
 
@@ -128,8 +129,8 @@ Basic implementation of normal mapping
 Basic implementation of bump mapping
 
 <p float="left">
-  <img src="Images/Kikoo/WithHeightMap.png" />
-  <img src="Images/Kikoo/WithoutHeightMap.png" /> 
+  <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Kikoo/WithHeightMap.png?raw=true" />
+  <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Kikoo/WithoutHeightMap.png?raw=true" /> 
 </p>
 
 *First image is with bump mapping, second is without bump mapping*
@@ -140,9 +141,9 @@ Simple particle system that uses texture atlases and billboards.
 
 
 <p float="left">
-  <img src="Images/Gifs/ParticleSystem.gif" width="512" />
-  <img src="Images/Kikoo/Particles.png" width="512" />
-  <img src="Images/Kikoo/Particles_1.png" width="512" /> 
+  <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Gifs/ParticleSystem.gif" width="512" />
+  <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Kikoo/Particles.png?raw=true" width="512" />
+  <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Kikoo/Particles_1.png?raw=true" width="512" /> 
 </p>
 
 *Same Particle system with two differents particle sizes*
@@ -155,20 +156,20 @@ Not 100% satisfied with the result.
 
 It uses a 3d perlin worley noise.
 
-<img src="Images/Gifs/Clouds.gif"/>
+<img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Gifs/Clouds.gif"/>
 
 <p float="left">
-  <img src="Images/Clouds/1.png" width="400" />
-  <img src="Images/Clouds/2.png" width="400" /> 
-  <img src="Images/Clouds/3.png" width="400" />
+  <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Clouds/1.png?raw=true" width="400" />
+  <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Clouds/2.png?raw=true" width="400" /> 
+  <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Clouds/3.png?raw=true" width="400" />
 </p>
 <p float="left">
-  <img src="Images/Clouds/4.png" width="400" />
-  <img src="Images/Clouds/5.png" width="400" /> 
-  <img src="Images/Clouds/6.png" width="400" />
+  <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Clouds/4.png?raw=true" width="400" />
+  <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Clouds/5.png?raw=true" width="400" /> 
+  <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Clouds/6.png?raw=true" width="400" />
 </p>
 <p float="left">
-  <img src="Images/Clouds/7.png" width="400" />
-  <img src="Images/Clouds/8.png" width="400" /> 
-  <img src="Images/Clouds/9.png" width="400" />
+  <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Clouds/7.png?raw=true" width="400" />
+  <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Clouds/8.png?raw=true" width="400" /> 
+  <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Clouds/9.png?raw=true" width="400" />
 </p>
