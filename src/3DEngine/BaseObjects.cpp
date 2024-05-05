@@ -767,17 +767,17 @@ Object3D* GetHermiteCurve(Scene* scene, std::string name,glm::vec3 _position, gl
 
 
     int inx =0;
-    for(double t=0; t<1; t+=0.01) {
+    for(float t=0; t<1; t+=0.01) {
         inx++;
         if(inx < 1 / 0.01) {
             triangles.push_back(inx-1);
             triangles.push_back(inx);
         }
 
-        glm::vec3 first  = (1 - 3 * t * t + 2 * t * t * t) * point1;
-        glm::vec3 second = (t*t) * (3 - 2*t) * point2;
-        glm::vec3 third  = t * ((t-1) * (t-1)) * tan1;
-        glm::vec3 fourth = (t * t) * (t-1) * tan2;
+        glm::vec3 first  = (1.0f - 3.0f * t * t + 2.0f * t * t * t) * point1;
+        glm::vec3 second = (t*t) * (3.0f - 2.0f*t) * point2;
+        glm::vec3 third  = t * ((t-1.0f) * (t-1.0f)) * tan1;
+        glm::vec3 fourth = (t * t) * (t-1.0f) * tan2;
         glm::vec3 H = first + second + third + fourth;
         
         vertex.push_back(H); 
@@ -817,15 +817,15 @@ Object3D* GetBezierCurve(Scene* scene, std::string name,glm::vec3 _position, glm
 
 
     int inx =0;
-    for(double t=0; t<1; t+=0.01) {
+    for(float t=0; t<1; t+=0.01) {
         inx++;
         if(inx < 1 / 0.01) {
             triangles.push_back(inx-1);
             triangles.push_back(inx);
         }
 
-        glm::vec3 tan1 =  3.0 * (point1 - point0);
-        glm::vec3 tan2 = -3.0 * (point2 - point3);
+        glm::vec3 tan1 =  3.0f * (point1 - point0);
+        glm::vec3 tan2 = -3.0f * (point2 - point3);
 
         glm::vec3 first  = (1 - 3 * t * t + 2 * t * t * t) * point0;
         glm::vec3 second = (t*t) * (3 - 2*t) * point3;

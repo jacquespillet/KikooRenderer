@@ -3,6 +3,7 @@
 #include "../BaseObjects.hpp"
 #include "3DEngine/Scene.hpp"
 
+
 namespace KikooRenderer {
 namespace SpatialPartition {
 
@@ -37,7 +38,7 @@ void Octree::Build(CoreEngine::Scene* scene, std::vector<CoreEngine::Object3D*> 
 	glm::vec3 min = glm::vec3(minX, minY, minZ);
 	glm::vec3 max = glm::vec3(maxX, maxY, maxZ);
 	glm::vec3 size = max - min;
-	glm::vec3 center = min + size * 0.5;
+	glm::vec3 center = min + size * 0.5f;
 
 	root.level = 0;
 	root.position = center;
@@ -48,13 +49,13 @@ void Octree::Build(CoreEngine::Scene* scene, std::vector<CoreEngine::Object3D*> 
 
 void Octree::Subdivide(Node parentNode) {
 	if (parentNode.level < this->maxLevel) {
-		glm::vec3 childSize = parentNode.size * 0.5;
+		glm::vec3 childSize = parentNode.size * 0.5f;
 		
 		for (int x = -1; x <= 1; x+=2) {
 			for (int y = -1; y <= 1; y += 2) {
 				for (int z = -1; z <= 1; z += 2) {
 					Node childNode;
-					childNode.position = parentNode.position + glm::vec3(x, y, z) * childSize * 0.5;
+					childNode.position = parentNode.position + glm::vec3(x, y, z) * childSize * 0.5f;
 					childNode.size = childSize;
 					childNode.parent = &parentNode;
 					childNode.level = parentNode.level + 1;
@@ -91,8 +92,8 @@ bool Octree:: isInside(Node node, CoreEngine::Object3D* object) {
 		glm::vec3 objectMax;
 		bb->GetWorldBounds(&objectMin, &objectMax);
 
-		glm::vec3 nodeMin = node.position - node.size * 0.5;
-		glm::vec3 nodeMax = node.position + node.size * 0.5;
+		glm::vec3 nodeMin = node.position - node.size * 0.5f;
+		glm::vec3 nodeMax = node.position + node.size * 0.5f;
 
 		bool isInside = false;
 		if (nodeMin.x <= objectMin.x && nodeMin.y <= objectMin.y && nodeMin.z <= objectMin.z && nodeMax.x >= objectMax.x && nodeMax.y >= objectMax.y && nodeMax.z >= objectMax.z) isInside = true;

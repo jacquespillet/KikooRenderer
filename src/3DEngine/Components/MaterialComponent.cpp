@@ -51,7 +51,7 @@ MaterialInspector::MaterialInspector(MaterialComponent* materialComponent) : Com
 	ColorPicker* albedoPicker = new ColorPicker("Albedo", 210, 15, 60, 255);
 	mainLayout->addWidget(albedoPicker);
 	connect(albedoPicker, &ColorPicker::ColorPicked, this, [this, materialComponent](QColor color) {
-		glm::vec4 albedoVec = glm::vec4(color.red(), color.green(), color.blue(), color.alpha()) * 0.00392156;
+		glm::vec4 albedoVec = glm::vec4(color.red(), color.green(), color.blue(), color.alpha()) * 0.00392156f;
 		materialComponent->albedo = albedoVec;
 		
 

@@ -41,7 +41,7 @@ LightInspector::LightInspector(LightComponent* lightComponent) : ComponentInspec
 	ColorPicker* lightColorPicker = new ColorPicker("LightColor", 255, 255, 255, 255);
 	mainLayout->addWidget(lightColorPicker);
 	connect(lightColorPicker, &ColorPicker::ColorPicked, this, [this, lightComponent](QColor color) {
-        lightComponent->color = glm::vec4(color.red(), color.green(), color.blue(), color.alpha()) * 0.00392156;
+        lightComponent->color = glm::vec4(color.red(), color.green(), color.blue(), color.alpha()) * 0.00392156f;
         lightComponent->hasChanged = true;
 		scene->triggerRefresh = true;
 	});
@@ -336,7 +336,7 @@ void LightComponent::RenderDepthMap() {
             ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
 
             glm::mat4 model = object3D->transform->GetWorldRotationMatrix();
-            glm::vec3 lightPos = -20.0 * glm::vec4(glm::column(model, 2));
+            glm::vec3 lightPos = -20.0f * glm::vec4(glm::column(model, 2));
             model = glm::translate(model, lightPos);
             // model = object3D->transform->GetWorldModelMatrix();
             viewMat = glm::inverse(model);

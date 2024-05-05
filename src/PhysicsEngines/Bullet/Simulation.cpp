@@ -14,24 +14,24 @@ Simulation::Simulation() {
 
 
 void Simulation::SetScene(CoreEngine::Scene* _scene) {
-    this->scene = _scene;
+    // this->scene = _scene;
 }
 
 void Simulation::SetWorld(WORLD_TYPE _worldType) {
-	Destroy(false);
-	worldType = _worldType;
-	Init();
-	for(int i=0; i<scene->objects3D.size(); i++) {
-		CoreEngine::BulletPhysicsObjectComponent* physicsComponent = scene->objects3D[i]->GetComponent<CoreEngine::BulletPhysicsObjectComponent>();
-		// physicsComponent->Init(); // ?????????????????
-		if(physicsComponent != nullptr) {
-			if(worldType == WORLD_TYPE::RIGID && (physicsComponent->bodyType == CoreEngine::BODY_TYPE::SOFT || physicsComponent->bodyType == CoreEngine::BODY_TYPE::DEFORMABLE)) {
-				//DONT ADD IT IF NOT COMPATIBLE WITH CURRENT WORLD
-			} else {
-				AddObject(scene->objects3D[i]);
-			}
-		}
-	}
+	// Destroy(false);
+	// worldType = _worldType;
+	// Init();
+	// for(int i=0; i<scene->objects3D.size(); i++) {
+	// 	CoreEngine::BulletPhysicsObjectComponent* physicsComponent = scene->objects3D[i]->GetComponent<CoreEngine::BulletPhysicsObjectComponent>();
+	// 	// physicsComponent->Init(); // ?????????????????
+	// 	if(physicsComponent != nullptr) {
+	// 		if(worldType == WORLD_TYPE::RIGID && (physicsComponent->bodyType == CoreEngine::BODY_TYPE::SOFT || physicsComponent->bodyType == CoreEngine::BODY_TYPE::DEFORMABLE)) {
+	// 			//DONT ADD IT IF NOT COMPATIBLE WITH CURRENT WORLD
+	// 		} else {
+	// 			AddObject(scene->objects3D[i]);
+	// 		}
+	// 	}
+	// }
 }
 
 void Simulation::Init() {
@@ -115,170 +115,170 @@ void Simulation::Init() {
 }
 
 void Simulation::AddObject(CoreEngine::Object3D* object3D) {
-	if(worldType == WORLD_TYPE::RIGID) {
-		CoreEngine::BulletPhysicsObjectComponent* physicsObjectComponent = object3D->GetComponent<CoreEngine::BulletPhysicsObjectComponent>();
-		if(physicsObjectComponent != nullptr) {
-			collisionShapes.push_back(physicsObjectComponent->colShape);
-			dynamicsWorld->addRigidBody(physicsObjectComponent->rigidBody);
-			objects.push_back(object3D);
-		}
-	}else if(worldType == WORLD_TYPE::SOFT) {
-		CoreEngine::BulletPhysicsObjectComponent* physicsObjectComponent = object3D->GetComponent<CoreEngine::BulletPhysicsObjectComponent>();
-		if(physicsObjectComponent != nullptr) {
-			collisionShapes.push_back(physicsObjectComponent->colShape);
-			btSoftRigidDynamicsWorld* world = (btSoftRigidDynamicsWorld*) dynamicsWorld; 
-			if(physicsObjectComponent->bodyType == CoreEngine::BODY_TYPE::RIGID) {
-				world->addRigidBody(physicsObjectComponent->rigidBody);
-			} else {
-				world->addSoftBody(physicsObjectComponent->softBody);
-				softBodies.push_back(object3D);
-			}
-			objects.push_back(object3D);
-		}
-	}else if(worldType == WORLD_TYPE::DEFORMABLE) {
-		CoreEngine::BulletPhysicsObjectComponent* physicsObjectComponent = object3D->GetComponent<CoreEngine::BulletPhysicsObjectComponent>();
-		if(physicsObjectComponent != nullptr) {
-			collisionShapes.push_back(physicsObjectComponent->colShape);
-			btDeformableMultiBodyDynamicsWorld* world = (btDeformableMultiBodyDynamicsWorld*) dynamicsWorld; 
-			if(physicsObjectComponent->bodyType == CoreEngine::BODY_TYPE::RIGID) {
-				world->addRigidBody(physicsObjectComponent->rigidBody);
-			} else {
-				world->addSoftBody(physicsObjectComponent->softBody);
-				softBodies.push_back(object3D);
-			}
-			objects.push_back(object3D);
-		}
-	}
+	// if(worldType == WORLD_TYPE::RIGID) {
+	// 	CoreEngine::BulletPhysicsObjectComponent* physicsObjectComponent = object3D->GetComponent<CoreEngine::BulletPhysicsObjectComponent>();
+	// 	if(physicsObjectComponent != nullptr) {
+	// 		collisionShapes.push_back(physicsObjectComponent->colShape);
+	// 		dynamicsWorld->addRigidBody(physicsObjectComponent->rigidBody);
+	// 		objects.push_back(object3D);
+	// 	}
+	// }else if(worldType == WORLD_TYPE::SOFT) {
+	// 	CoreEngine::BulletPhysicsObjectComponent* physicsObjectComponent = object3D->GetComponent<CoreEngine::BulletPhysicsObjectComponent>();
+	// 	if(physicsObjectComponent != nullptr) {
+	// 		collisionShapes.push_back(physicsObjectComponent->colShape);
+	// 		btSoftRigidDynamicsWorld* world = (btSoftRigidDynamicsWorld*) dynamicsWorld; 
+	// 		if(physicsObjectComponent->bodyType == CoreEngine::BODY_TYPE::RIGID) {
+	// 			world->addRigidBody(physicsObjectComponent->rigidBody);
+	// 		} else {
+	// 			world->addSoftBody(physicsObjectComponent->softBody);
+	// 			softBodies.push_back(object3D);
+	// 		}
+	// 		objects.push_back(object3D);
+	// 	}
+	// }else if(worldType == WORLD_TYPE::DEFORMABLE) {
+	// 	CoreEngine::BulletPhysicsObjectComponent* physicsObjectComponent = object3D->GetComponent<CoreEngine::BulletPhysicsObjectComponent>();
+	// 	if(physicsObjectComponent != nullptr) {
+	// 		collisionShapes.push_back(physicsObjectComponent->colShape);
+	// 		btDeformableMultiBodyDynamicsWorld* world = (btDeformableMultiBodyDynamicsWorld*) dynamicsWorld; 
+	// 		if(physicsObjectComponent->bodyType == CoreEngine::BODY_TYPE::RIGID) {
+	// 			world->addRigidBody(physicsObjectComponent->rigidBody);
+	// 		} else {
+	// 			world->addSoftBody(physicsObjectComponent->softBody);
+	// 			softBodies.push_back(object3D);
+	// 		}
+	// 		objects.push_back(object3D);
+	// 	}
+	// }
 
-	for(int i=0; i<objects.size(); i++) {
-		Transform t;
-		t.position = objects[i]->transform->position;
-		t.rotation = objects[i]->transform->rotation;
-		initialTransforms[objects[i]] = t;
-	}	
+	// for(int i=0; i<objects.size(); i++) {
+	// 	Transform t;
+	// 	t.position = objects[i]->transform->position;
+	// 	t.rotation = objects[i]->transform->rotation;
+	// 	initialTransforms[objects[i]] = t;
+	// }	
 }
 
 void Simulation::RemoveObject(CoreEngine::Object3D* object3D) {
-	CoreEngine::BulletPhysicsObjectComponent* physicsObjectComponent = object3D->GetComponent<CoreEngine::BulletPhysicsObjectComponent>();
-	if(physicsObjectComponent != nullptr) {
-		dynamicsWorld->removeRigidBody(physicsObjectComponent->rigidBody);
+	// CoreEngine::BulletPhysicsObjectComponent* physicsObjectComponent = object3D->GetComponent<CoreEngine::BulletPhysicsObjectComponent>();
+	// if(physicsObjectComponent != nullptr) {
+	// 	dynamicsWorld->removeRigidBody(physicsObjectComponent->rigidBody);
 
-		for(int i=0; i<objects.size(); i++) {
-			if(objects[i] == object3D) {
-				objects.erase(objects.begin() + i);
-				break;
-			}
-		}
+	// 	for(int i=0; i<objects.size(); i++) {
+	// 		if(objects[i] == object3D) {
+	// 			objects.erase(objects.begin() + i);
+	// 			break;
+	// 		}
+	// 	}
 
-		for(int i=0; i<softBodies.size(); i++) {
-			if(softBodies[i] == object3D) {
-				softBodies.erase(softBodies.begin() + i);
-				break;
-			}
-		}
+	// 	for(int i=0; i<softBodies.size(); i++) {
+	// 		if(softBodies[i] == object3D) {
+	// 			softBodies.erase(softBodies.begin() + i);
+	// 			break;
+	// 		}
+	// 	}
 
-		initialTransforms.erase(object3D);
+	// 	initialTransforms.erase(object3D);
 
-		collisionShapes.remove (physicsObjectComponent->colShape);
-	}
+	// 	collisionShapes.remove (physicsObjectComponent->colShape);
+	// }
 }
 
 void Simulation::GetSceneData() {
 }
 
 void Simulation::Simulate() {
-    dynamicsWorld->stepSimulation(1.f / 60.f, 10);
+    // dynamicsWorld->stepSimulation(1.f / 60.f, 10);
 
-    //print positions of all objects
-    for (int j = dynamicsWorld->getNumCollisionObjects() - 1; j >= 0; j--)
-    {
-        btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[j];
-        btRigidBody* body = btRigidBody::upcast(obj);
-		if(body) {
-			btTransform trans;
-			if (body && body->getMotionState())
-			{
-				body->getMotionState()->getWorldTransform(trans);
-			}
-			else
-			{
-				trans = obj->getWorldTransform();
-			}
+    // //print positions of all objects
+    // for (int j = dynamicsWorld->getNumCollisionObjects() - 1; j >= 0; j--)
+    // {
+    //     btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[j];
+    //     btRigidBody* body = btRigidBody::upcast(obj);
+	// 	if(body) {
+	// 		btTransform trans;
+	// 		if (body && body->getMotionState())
+	// 		{
+	// 			body->getMotionState()->getWorldTransform(trans);
+	// 		}
+	// 		else
+	// 		{
+	// 			trans = obj->getWorldTransform();
+	// 		}
 
-			objects[j]->transform->position.x = trans.getOrigin().getX();
-			objects[j]->transform->position.y = trans.getOrigin().getY();
-			objects[j]->transform->position.z = trans.getOrigin().getZ();
+	// 		objects[j]->transform->position.x = trans.getOrigin().getX();
+	// 		objects[j]->transform->position.y = trans.getOrigin().getY();
+	// 		objects[j]->transform->position.z = trans.getOrigin().getZ();
 
 
-			btQuaternion rotation = trans.getRotation();
-			btScalar rotX, rotY, rotZ;
-			rotation.getEulerZYX (rotZ, rotY, rotX);
-			objects[j]->transform->rotation.z = rotZ * RADTODEG;
-			objects[j]->transform->rotation.y = rotY* RADTODEG;
-			objects[j]->transform->rotation.x = rotX* RADTODEG;
-		}
-    }
+	// 		btQuaternion rotation = trans.getRotation();
+	// 		btScalar rotX, rotY, rotZ;
+	// 		rotation.getEulerZYX (rotZ, rotY, rotX);
+	// 		objects[j]->transform->rotation.z = rotZ * RADTODEG;
+	// 		objects[j]->transform->rotation.y = rotY* RADTODEG;
+	// 		objects[j]->transform->rotation.x = rotX* RADTODEG;
+	// 	}
+    // }
 
-	if(worldType == WORLD_TYPE::SOFT) {
-		btSoftRigidDynamicsWorld* world = (btSoftRigidDynamicsWorld*) dynamicsWorld;
-		for(int i=0; i<world->getSoftBodyArray().size(); i++) {
-			btSoftBody* body = world->getSoftBodyArray()[i];
-			CoreEngine::Object3D* object = softBodies[i];
-			CoreEngine::MeshFilterComponent* mesh = object->GetComponent<CoreEngine::MeshFilterComponent>();
-			for(int j=0; j<mesh->vertices.size(); j++) {
-				btSoftBody::Node n = body->m_nodes[j];
+	// if(worldType == WORLD_TYPE::SOFT) {
+	// 	btSoftRigidDynamicsWorld* world = (btSoftRigidDynamicsWorld*) dynamicsWorld;
+	// 	for(int i=0; i<world->getSoftBodyArray().size(); i++) {
+	// 		btSoftBody* body = world->getSoftBodyArray()[i];
+	// 		CoreEngine::Object3D* object = softBodies[i];
+	// 		CoreEngine::MeshFilterComponent* mesh = object->GetComponent<CoreEngine::MeshFilterComponent>();
+	// 		for(int j=0; j<mesh->vertices.size(); j++) {
+	// 			btSoftBody::Node n = body->m_nodes[j];
 				
-				mesh->vertices[j].position.x = n.m_x.getX();
-				mesh->vertices[j].position.y = n.m_x.getY();
-				mesh->vertices[j].position.z = n.m_x.getZ();
+	// 			mesh->vertices[j].position.x = n.m_x.getX();
+	// 			mesh->vertices[j].position.y = n.m_x.getY();
+	// 			mesh->vertices[j].position.z = n.m_x.getZ();
 
-				mesh->vertices[j].normal.x = n.m_n.getX();
-				mesh->vertices[j].normal.z = n.m_n.getY();
-				mesh->vertices[j].normal.y = n.m_n.getZ();
-			}
-			mesh->RebuildBuffers();
-		}
-	}
+	// 			mesh->vertices[j].normal.x = n.m_n.getX();
+	// 			mesh->vertices[j].normal.z = n.m_n.getY();
+	// 			mesh->vertices[j].normal.y = n.m_n.getZ();
+	// 		}
+	// 		mesh->RebuildBuffers();
+	// 	}
+	// }
 
-	if(worldType == WORLD_TYPE::DEFORMABLE) {
-		btDeformableMultiBodyDynamicsWorld* world = (btDeformableMultiBodyDynamicsWorld*) dynamicsWorld; 
-		for(int i=0; i<world->getSoftBodyArray().size(); i++) {
-			btSoftBody* body = world->getSoftBodyArray()[i];
-			CoreEngine::Object3D* object = softBodies[i];
-			CoreEngine::MeshFilterComponent* mesh = object->GetComponent<CoreEngine::MeshFilterComponent>();
+	// if(worldType == WORLD_TYPE::DEFORMABLE) {
+	// 	btDeformableMultiBodyDynamicsWorld* world = (btDeformableMultiBodyDynamicsWorld*) dynamicsWorld; 
+	// 	for(int i=0; i<world->getSoftBodyArray().size(); i++) {
+	// 		btSoftBody* body = world->getSoftBodyArray()[i];
+	// 		CoreEngine::Object3D* object = softBodies[i];
+	// 		CoreEngine::MeshFilterComponent* mesh = object->GetComponent<CoreEngine::MeshFilterComponent>();
 			
-			for(int j=0; j<mesh->vertices.size(); j++) {
-				btSoftBody::Node n = body->m_nodes[j];
+	// 		for(int j=0; j<mesh->vertices.size(); j++) {
+	// 			btSoftBody::Node n = body->m_nodes[j];
 				
-				mesh->vertices[j].position.x = n.m_x.getX();
-				mesh->vertices[j].position.y = n.m_x.getY();
-				mesh->vertices[j].position.z = n.m_x.getZ();
+	// 			mesh->vertices[j].position.x = n.m_x.getX();
+	// 			mesh->vertices[j].position.y = n.m_x.getY();
+	// 			mesh->vertices[j].position.z = n.m_x.getZ();
 
-				mesh->vertices[j].normal.x = n.m_n.getX();
-				mesh->vertices[j].normal.z = n.m_n.getY();
-				mesh->vertices[j].normal.y = n.m_n.getZ();
-			}
+	// 			mesh->vertices[j].normal.x = n.m_n.getX();
+	// 			mesh->vertices[j].normal.z = n.m_n.getY();
+	// 			mesh->vertices[j].normal.y = n.m_n.getZ();
+	// 		}
 		
 			
-			mesh->RebuildBuffers();
-		}
-	}
+	// 		mesh->RebuildBuffers();
+	// 	}
+	// }
 
 
-	scene->triggerRefresh = true;
+	// scene->triggerRefresh = true;
 }
 
 void Simulation::SetSceneData() {
 }
 
 void Simulation::Stop() {
-	for(int i=0; i<objects.size(); i++) {
-		Transform t = initialTransforms[objects[i]];
-		objects[i]->transform->position = t.position;
-		objects[i]->transform->rotation = t.rotation;
-		objects[i]->transform->hasChanged = true;
-	}
-	scene->triggerRefresh = true;
+	// for(int i=0; i<objects.size(); i++) {
+	// 	Transform t = initialTransforms[objects[i]];
+	// 	objects[i]->transform->position = t.position;
+	// 	objects[i]->transform->rotation = t.rotation;
+	// 	objects[i]->transform->hasChanged = true;
+	// }
+	// scene->triggerRefresh = true;
 }
 
 void Simulation::Destroy(bool destroyObjects) {

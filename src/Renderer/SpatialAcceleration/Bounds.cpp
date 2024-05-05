@@ -43,7 +43,7 @@ Bounds::Bounds(Bounds b0, Bounds b1) {
 
 
 glm::vec3 Bounds::GetCenter() {
-    return (min + max) * 0.5;
+    return (min + max) * 0.5f;
 }
 
 glm::vec3 Bounds::GetSize() {

@@ -142,11 +142,7 @@ Basic implementation of bump mapping
 Simple particle system that uses texture atlases and billboards.
 
 
-<p float="left">
-  <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Gifs/ParticleSystem.gif" width="512" />
-  <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Kikoo/Particles.png?raw=true" width="512" />
-  <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Kikoo/Particles_1.png?raw=true" width="512" /> 
-</p>
+<img src="https://github.com/jacquespillet/KikooRenderer/blob/master/resources/Gallery/particles.gif?raw=true" width="512" />
 
 *Same Particle system with two differents particle sizes*
 
@@ -185,4 +181,3 @@ I integrated bullet physics in the software, here are a few videos :
 <img src="https://github.com/jacquespillet/KikooRenderer/blob/master/resources/Gallery/Physics_3.gif?raw=true" width="512" />
 <img src="https://github.com/jacquespillet/KikooRenderer/blob/master/resources/Gallery/Physics_4.gif?raw=true" width="512" />
 <img src="https://github.com/jacquespillet/KikooRenderer/blob/master/resources/Gallery/Physics_5.gif?raw=true" width="512" />
-<img src="https://github.com/jacquespillet/KikooRenderer/blob/master/resources/Gallery/particles.gif?raw=true" width="512" />

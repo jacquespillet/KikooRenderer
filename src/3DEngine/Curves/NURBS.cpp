@@ -160,7 +160,7 @@ void NURBS::ComputePositions() {
         for(double u=0; u<1; u+=offset, globalU+=offset) {
             glm::vec3 H = glm::vec3(0);
             for(int k=0; k<=3; k++) {
-                double N = CoxDeBoor((double)i+k-1, 3.0, globalU, knotVector);
+                float N = CoxDeBoor((double)i+k-1, 3.0, globalU, knotVector);
                 H +=  N * points[i+k-1];
             }
 

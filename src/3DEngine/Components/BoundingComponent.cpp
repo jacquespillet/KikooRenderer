@@ -66,7 +66,7 @@ void BoundingBoxComponent::OnEnable() {
 
     
     
-    glm::vec3 position = (max + min) * 0.5;
+    glm::vec3 position = (max + min) * 0.5f;
     glm::vec3 size = max - min;
     inited = true;
 }
@@ -100,7 +100,7 @@ void BoundingBoxComponent::Refresh() {
 
     
     
-    glm::vec3 position = (max + min) * 0.5;
+    glm::vec3 position = (max + min) * 0.5f;
     glm::vec3 size = (max - min);
 }
 

@@ -103,7 +103,7 @@ namespace CoreEngine {
 			zCircle->depthTest = false;
 			rotateObject->AddObject(zCircle);
 		}
-		this->transform->scale = 6 * glm::vec3(scene->camera->GetScreenScale(this->transform->position));
+		this->transform->scale = 6.0f * glm::vec3(scene->camera->GetScreenScale(this->transform->position));
 		this->visible = false;
 	}
 
@@ -146,7 +146,7 @@ namespace CoreEngine {
 	
 	void TransformWidget::Update() {
 		if(currentObjects.size() > 0) {
-			this->transform->scale = 6 * glm::vec3(scene->camera->GetScreenScale(this->transform->position));
+			this->transform->scale = 6.0f * glm::vec3(scene->camera->GetScreenScale(this->transform->position));
 		}
 	}	
 
@@ -189,7 +189,7 @@ namespace CoreEngine {
 			double zsign = transform->position.z > 0 ? -1 : 1;
 
 			glm::vec4 plane = (dotY > dotZ) ? glm::vec4(0, ysign * 1, 0, std::abs(transform->position.y)) : glm::vec4(0, 0, zsign * 1, std::abs(transform->position.z));
-			double t = -glm::dot(plane, glm::vec4(ray.origin, 1.0)) / glm::dot(plane, glm::vec4(ray.direction, 0.0));
+			float t = -glm::dot(plane, glm::vec4(ray.origin, 1.0)) / glm::dot(plane, glm::vec4(ray.direction, 0.0));
 
 			//Get position of ray on the plane
 			glm::vec3 position = ray.origin + t * ray.direction;
@@ -216,7 +216,7 @@ namespace CoreEngine {
 
 			glm::vec4 plane = (dotX > dotZ) ? glm::vec4(xsign * 1, 0, 0, std::abs(transform->position.x)) : glm::vec4(0, 0, zsign * 1, std::abs(transform->position.z));
 
-			double t = -glm::dot(plane, glm::vec4(ray.origin, 1.0)) / glm::dot(plane, glm::vec4(ray.direction, 0.0));
+			float t = -glm::dot(plane, glm::vec4(ray.origin, 1.0)) / glm::dot(plane, glm::vec4(ray.direction, 0.0));
 			glm::vec3 position = ray.origin + t * ray.direction;
 
 			if (isFirstFrame) {
@@ -240,7 +240,7 @@ namespace CoreEngine {
 			double ysign = transform->position.y > 0 ? -1 : 1;
 			glm::vec4 plane = (dotX > dotY) ? glm::vec4(xsign * 1, 0, 0, std::abs(transform->position.x)) : glm::vec4(0, ysign * 1, 0, std::abs(transform->position.y));
 
-			double t = -glm::dot(plane, glm::vec4(ray.origin, 1.0)) / glm::dot(plane, glm::vec4(ray.direction, 0.0));
+			float t = -glm::dot(plane, glm::vec4(ray.origin, 1.0)) / glm::dot(plane, glm::vec4(ray.direction, 0.0));
 			glm::vec3 position = ray.origin + t * ray.direction;
 
 			if (isFirstFrame) {
@@ -349,7 +349,7 @@ namespace CoreEngine {
 			double zsign = transform->position.z > 0 ? -1 : 1;
 
 			glm::vec4 plane = (dotY > dotZ) ? glm::vec4(0, ysign * 1, 0, std::abs(transform->position.y)) : glm::vec4(0, 0, zsign * 1, std::abs(transform->position.z));
-			double t = -glm::dot(plane, glm::vec4(ray.origin, 1.0)) / glm::dot(plane, glm::vec4(ray.direction, 0.0));
+			float t = -glm::dot(plane, glm::vec4(ray.origin, 1.0)) / glm::dot(plane, glm::vec4(ray.direction, 0.0));
 
 			glm::vec3 position = ray.origin + t * ray.direction;
 			if (isFirstFrame) { //First frame of transformation, get offset btw click and origin of transform widget
@@ -372,7 +372,7 @@ namespace CoreEngine {
 
 			glm::vec4 plane = (dotX > dotZ) ? glm::vec4(xsign * 1, 0, 0, std::abs(transform->position.x)) : glm::vec4(0, 0, zsign * 1, std::abs(transform->position.z));
 
-			double t = -glm::dot(plane, glm::vec4(ray.origin, 1.0)) / glm::dot(plane, glm::vec4(ray.direction, 0.0));
+			float t = -glm::dot(plane, glm::vec4(ray.origin, 1.0)) / glm::dot(plane, glm::vec4(ray.direction, 0.0));
 			glm::vec3 position = ray.origin + t * ray.direction;
 
 			if (isFirstFrame) {
@@ -393,7 +393,7 @@ namespace CoreEngine {
 			double ysign = transform->position.y > 0 ? -1 : 1;
 			glm::vec4 plane = (dotX > dotY) ? glm::vec4(xsign * 1, 0, 0, std::abs(transform->position.x)) : glm::vec4(0, ysign * 1, 0, std::abs(transform->position.y));
 
-			double t = -glm::dot(plane, glm::vec4(ray.origin, 1.0)) / glm::dot(plane, glm::vec4(ray.direction, 0.0));
+			float t = -glm::dot(plane, glm::vec4(ray.origin, 1.0)) / glm::dot(plane, glm::vec4(ray.direction, 0.0));
 			glm::vec3 position = ray.origin + t * ray.direction;
 
 			if (isFirstFrame) {

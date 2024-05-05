@@ -23,8 +23,8 @@ class Object3D {
 
 
         bool visible = true;
-        bool enabled;
-        bool started;
+        bool enabled=false;
+        bool started=false;
         bool depthTest = true;
 		bool isStatic = true;
 

@@ -16,7 +16,7 @@ namespace Geometry {
             double randomX = ((double) rand()) / (double) (RAND_MAX+1);
             double randomY = ((double) rand()) / (double) (RAND_MAX+1);
             double randomZ = ((double) rand()) / (double) (RAND_MAX+1);
-            result = 2.0 * glm::vec3(randomX, randomY, randomZ) - glm::vec3(1, 1, 1);
+            result = 2.0f * glm::vec3(randomX, randomY, randomZ) - glm::vec3(1, 1, 1);
         } while(glm::dot(result, result) > 1);
 
         return result;
@@ -28,7 +28,7 @@ namespace Geometry {
             double randomX = ((double) rand()) / (double) (RAND_MAX+1);
             double randomY = ((double) rand()) / (double) (RAND_MAX+1);
             double randomZ = ((double) rand()) / (double) (RAND_MAX+1);
-            result = 2.0 * glm::vec3(randomX, randomY, randomZ) - glm::vec3(1, 1, 1);
+            result = 2.0f * glm::vec3(randomX, randomY, randomZ) - glm::vec3(1, 1, 1);
         } while(glm::dot(result, result) > 1);
 
         return glm::normalize(result);
@@ -57,7 +57,7 @@ namespace Geometry {
         do {
             double randomX = ((double) rand()) / (double) (RAND_MAX+1);
             double randomY = ((double) rand()) / (double) RAND_MAX;
-            p = 2.0 * glm::vec3(randomX, randomY, 0) - glm::vec3(1, 1, 0);
+            p = 2.0f * glm::vec3(randomX, randomY, 0) - glm::vec3(1, 1, 0);
         } while(glm::dot(p, p) >= 1.0);
         return p;
     }
@@ -72,10 +72,9 @@ namespace Geometry {
     bool Refract(glm::vec3 v, glm::vec3 n, double niOverNt, glm::vec3& refracted) {
         glm::vec3 uv = glm::normalize(v);
 
-        double dt = glm::dot(uv, n);
-        double delta = 1.0 - niOverNt * niOverNt * (1.0 - dt*dt);
-        if(delta > 0) {
-            refracted = niOverNt * (uv - n * dt) - n * std::sqrt(delta);
+        float dt = glm::dot(uv, n);
+        float delta = 1.0 - niOverNt * niOverNt * (1.0 - dt*dt);
+        if(delta > 0) {            refracted = (float) niOverNt * (uv - n * dt) - n * std::sqrt(delta);
             return true;
         } else {
             return false;

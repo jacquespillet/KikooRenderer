@@ -35,7 +35,7 @@ namespace Util {
 		glm::vec4 plane = glm::vec4(normal.x, normal.y, normal.z, circleDistance);
 
 		distance = -glm::dot(plane, glm::vec4(rayOrig, 1)) / glm::dot(plane, glm::vec4(rayDir, 0));
-		glm::vec3 intersectPos = rayOrig + distance * rayDir;
+		glm::vec3 intersectPos = rayOrig + (float)distance * rayDir;
 
 
 		double intersectionDistance = glm::distance(intersectPos, circlePosition);

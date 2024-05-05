@@ -535,7 +535,7 @@ float Noise(glm::vec3 p, float scale )
 //----------------------------------------------------------------------------------------
 float fBm(glm::vec3 p)
 {
-    p += glm::vec3(sin(0.7), cos(0.45), sin(0.21))*(.1);
+    p += glm::vec3(sin(0.7), cos(0.45), sin(0.21))*(.1f);
 	float f = 0.0;
 	// Change starting scale to any integer value...
 	float scale = 1;

@@ -121,7 +121,7 @@ glm::vec3 BRDF::OrenNayar(const glm::vec3 &wo, glm::vec3& wi) {
         tanBeta = sinThetaO / AbsCosTheta(wo);
     }
 
-    return R * (1.0 / PI) * (A + B * maxCos * sinAlpha * tanBeta);
+    return R * glm::vec3(1.0f / PI) * (A + B * maxCos * sinAlpha * tanBeta);
 
 }
 

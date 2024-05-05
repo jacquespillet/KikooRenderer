@@ -11,7 +11,7 @@ namespace Geometry {
 
 
     glm::vec3 Ray::pointAtPosition(double t) {
-        return origin + t * direction;
+        return origin + (float)t * direction;
     }
 
 }

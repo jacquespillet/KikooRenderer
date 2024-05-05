@@ -32,34 +32,34 @@ void CameraController::OnUpdate() {
     glm::vec3 forwardVec = glm::column(this->camera->transform->GetModelMatrix(), 2);
     glm::vec3 rightVec = glm::column(this->camera->transform->GetModelMatrix(), 0);
     if(forwardPressed) {
-        this->camera->transform->position += elapsedTimeMoving * forwardVec * speedFactor * this->camera->scene->deltaTime;
+        this->camera->transform->position += elapsedTimeMoving * forwardVec * speedFactor * (float)this->camera->scene->deltaTime;
         camera->scene->triggerRefresh = true;
-        elapsedTimeMoving = (std::min)((float)(elapsedTimeMoving + this->camera->scene->deltaTime), 4.0f);
+        elapsedTimeMoving = (std::min)((float)(elapsedTimeMoving + (float)this->camera->scene->deltaTime), 4.0f);
         
         this->camera->transform->hasChanged = true;
     }
 
     if(backwardPressed) {
-        this->camera->transform->position -= elapsedTimeMoving * forwardVec * speedFactor * this->camera->scene->deltaTime;
+        this->camera->transform->position -= elapsedTimeMoving * forwardVec * speedFactor * (float)this->camera->scene->deltaTime;
         camera->scene->triggerRefresh = true;
-        elapsedTimeMoving = (std::min)((float)(elapsedTimeMoving + this->camera->scene->deltaTime), 4.0f);
+        elapsedTimeMoving = (std::min)((float)(elapsedTimeMoving + (float)this->camera->scene->deltaTime), 4.0f);
         
         this->camera->transform->hasChanged = true;
     }
 
     if(rightPressed) {
-        this->camera->transform->position += elapsedTimeMoving * rightVec * speedFactor * this->camera->scene->deltaTime;
+        this->camera->transform->position += elapsedTimeMoving * rightVec * speedFactor * (float)this->camera->scene->deltaTime;
         camera->scene->triggerRefresh = true;
-        elapsedTimeMoving = (std::min)((float)(elapsedTimeMoving + this->camera->scene->deltaTime), 4.0f);
+        elapsedTimeMoving = (std::min)((float)(elapsedTimeMoving + (float)this->camera->scene->deltaTime), 4.0f);
         
         this->camera->transform->hasChanged = true;
     }
 
     
     if(leftPressed) {
-        this->camera->transform->position -= elapsedTimeMoving * rightVec * speedFactor * this->camera->scene->deltaTime;
+        this->camera->transform->position -= elapsedTimeMoving * rightVec * speedFactor * (float)this->camera->scene->deltaTime;
         camera->scene->triggerRefresh = true;
-        elapsedTimeMoving = (std::min)((float)(elapsedTimeMoving + this->camera->scene->deltaTime), 4.0f);
+        elapsedTimeMoving = (std::min)((float)(elapsedTimeMoving + (float)this->camera->scene->deltaTime), 4.0f);
         
         this->camera->transform->hasChanged = true;
     }
