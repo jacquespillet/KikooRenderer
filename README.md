@@ -1,26 +1,28 @@
-### KikooRenderer
+# KikooRenderer
 
 In order to gain some expertise on real time rendering techniques and algorithms, as a hobby project I developped this thing. Not sure how to call it as it's has no true purpose.
 
 I guess playground is the word.
 
-The interface is built with Qt, and the rendering part is done with openGL.
+The interface is built with Qt, and the rendering is done with openGL.
 
 I stopped the development in 2018 because of time constraints.
 
 ## Build
 
-# Requirements
-  Qt5 installed on the system
-  MSVC Compiler
-  CMake
+### Requirements
+  * Qt5 installed on the system
+  * MSVC Compiler
+  * CMake
   
-# Commands
+### Commands
 
 
 Here are some of the features illustrated with screen grabs.
 
-## Overall Interface
+## Features
+
+### Overall Interface
 
 <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Kikoo/Interface.PNG?raw=true" width="720" />
 
@@ -35,20 +37,20 @@ Right panel shows the selected object parameters and components.
 
 Bottom panel is a debugging console
 
-## Bloom post process
+### Bloom post process
 
 
 <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Kikoo/Bloom.png?raw=true" width="720" />
 
 Quite a simple implementation, lots of room for improvement.
 
-## Depth of field post process
+### Depth of field post process
 
 <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Kikoo/Dof3.png?raw=true" width="720" />
 
 Example of a depth of field with a rather large focus distance.
 
-## Fast approximate Anti aliasing Post process
+### Fast approximate Anti aliasing Post process
 
 <p float="left">
   <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Kikoo/NoFxaa.png?raw=true" />
@@ -57,18 +59,18 @@ Example of a depth of field with a rather large focus distance.
 
 [Clever algorithm](https://en.wikipedia.org/wiki/Fast_approximate_anti-aliasing) that applies some image processing techniques to reduce jaggered edges due to aliasing.
 
-## Cubemap reflections
+### Cubemap reflections
 
 <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Kikoo/Cubemap.png?raw=true" width="720" />
 
-## Directional Flow
+### Directional Flow
 
 <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Gifs/Waterflow.gif" width="720" />
 <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Kikoo/DirFlow_0.png?raw=true" width="720" />
 
 Implementation of the great tutorial by [Catlike Coding](https://catlikecoding.com/unity/tutorials/flow/directional-flow/).
 
-## Water Plane
+### Water Plane
 
 <p float="left">
   <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Kikoo/DUDV_0.png?raw=true" width="500" />
@@ -81,7 +83,7 @@ The objects of the scene are reflected onto that plane using the displaced norma
 
 It also uses the fresnel equations to make the water more reflective based on the camera direction.
 
-## Shadow mapping
+### Shadow mapping
 
 The 3 most common types of light are supported :
     * Directional
@@ -99,7 +101,7 @@ The 3 most common types of light are supported :
 Soft shadows are achieved using either percentage close filtering or poisson disk sampling.
 
 
-## Materials
+### Materials
 
 Several type of materials are built in :
 
@@ -116,7 +118,7 @@ Lots of room for improvement in that area.
 
 *A few different material parameters*
 
-## Normal maps
+### Normal maps
 
 Basic implementation of normal mapping
 
@@ -124,7 +126,7 @@ Basic implementation of normal mapping
 
 *Simple plane with displaced normals*
 
-## Bump mapping
+### Bump mapping
 
 Basic implementation of bump mapping
 
@@ -135,7 +137,7 @@ Basic implementation of bump mapping
 
 *First image is with bump mapping, second is without bump mapping*
 
-## Particle system
+### Particle system
 
 Simple particle system that uses texture atlases and billboards.
 
@@ -148,7 +150,7 @@ Simple particle system that uses texture atlases and billboards.
 
 *Same Particle system with two differents particle sizes*
 
-## Volumetric ray marching
+### Volumetric ray marching
 
 Tried to implement some ray marching for volumetric to render clouds.
 
@@ -173,3 +175,14 @@ It uses a 3d perlin worley noise.
   <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Clouds/8.png?raw=true" width="400" /> 
   <img src="https://github.com/jacquespillet/jacquespillet.github.io/blob/main/Images/Clouds/9.png?raw=true" width="400" />
 </p>
+
+### Integration of Bullet Physics
+
+I integrated bullet physics in the software, here are a few videos :
+
+<img src="https://github.com/jacquespillet/KikooRenderer/blob/master/resources/Gallery/Physics_1.gif?raw=true" width="512" />
+<img src="https://github.com/jacquespillet/KikooRenderer/blob/master/resources/Gallery/Physics_2.gif?raw=true" width="512" />
+<img src="https://github.com/jacquespillet/KikooRenderer/blob/master/resources/Gallery/Physics_3.gif?raw=true" width="512" />
+<img src="https://github.com/jacquespillet/KikooRenderer/blob/master/resources/Gallery/Physics_4.gif?raw=true" width="512" />
+<img src="https://github.com/jacquespillet/KikooRenderer/blob/master/resources/Gallery/Physics_5.gif?raw=true" width="512" />
+<img src="https://github.com/jacquespillet/KikooRenderer/blob/master/resources/Gallery/particles.gif?raw=true" width="512" />
