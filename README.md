@@ -17,10 +17,25 @@ I stopped the development in 2018 because of time constraints.
   
 ### Commands
 
+```
+### Clone the repo and checkout to the latest branch
+git clone --recursive https://github.com/jacquespillet/vulkan.git
+cd vulkan
 
-Here are some of the features illustrated with screen grabs.
+### Generate the solution
+mkdir build
+cd build
+cmake ../
+
+### Build
+cd ..
+Build.bat
+```
+First build may take a while because it's going to build all the dependencies with the project.
+
 
 ## Features
+Here are some of the features illustrated with screen grabs.
 
 ### Overall Interface
 
